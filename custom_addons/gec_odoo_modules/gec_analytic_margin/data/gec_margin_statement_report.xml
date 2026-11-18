@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="gec_margin_statement_report" model="account.report">
+        <field name="name">Analytic Margin Statement</field>
+        <field name="filter_date_range" eval="True"/>
+        <field name="default_opening_date_filter">this_year</field>
+        <field name="filter_period_comparison" eval="True"/>
+        <field name="filter_unfold_all" eval="True"/>
+        <field name="filter_multi_company">selector</field>
+        <field name="load_more_limit" eval="80"/>
+        <field name="search_bar" eval="True"/>
+        <!-- Off: journals, draft entries and the analytic filter speak account.move.line, not analytic items. -->
+        <field name="filter_journals" eval="False"/>
+        <field name="filter_show_draft" eval="False"/>
+        <field name="custom_handler_model_id" ref="model_gec_margin_statement_report_handler"/>
+        <field name="column_ids">
+            <record id="gec_margin_statement_column_revenue" model="account.report.column">
+                <field name="name">Revenue</field>
+                <field name="sequence">10</field>
+                <field name="expression_label">revenue</field>
+                <field name="figure_type">monetary</field>
+                <field name="blank_if_zero" eval="True"/>
+            </record>
+            <record id="gec_margin_statement_column_expense" model="account.report.column">
+                <field name="name">Expense</field>
+                <field name="sequence">20</field>
+                <field name="expression_label">expense</field>
+                <field name="figure_type">monetary</field>
+                <field name="blank_if_zero" eval="True"/>
+            </record>
+            <record id="gec_margin_statement_column_actual" model="account.report.column">
+                <field name="name">Net</field>
+                <field name="sequence">30</field>
+                <field name="expression_label">actual</field>
+                <field name="figure_type">monetary</field>
+            </record>
+            <record id="gec_margin_statement_column_margin_pct" model="account.report.column">
+                <field name="name">Margin %</field>
+                <field name="sequence">35</field>
+                <field name="expression_label">margin_pct</field>
+                <field name="figure_type">percentage</field>
+                <field name="blank_if_zero" eval="True"/>
+            </record>
+            <record id="gec_margin_statement_column_budget" model="account.report.column">
+                <field name="name">Budget</field>
+                <field name="sequence">40</field>
+                <field name="expression_label">budget</field>
+                <field name="figure_type">monetary</field>
+                <field name="blank_if_zero" eval="True"/>
+            </record>
+            <record id="gec_margin_statement_column_variance" model="account.report.column">
+                <field name="name">Variance</field>
+                <field name="sequence">50</field>
+                <field name="expression_label">variance</field>
+                <field name="figure_type">monetary</field>
+                <field name="blank_if_zero" eval="True"/>
+            </record>
+            <!-- No quantity column: unit_amount is a quantity on a document, hours on a timesheet; summing mixes them.
+                 A driver unit is homogeneous only on an activity line, where it is printed in the label. -->
+        </field>
+    </record>
+
+    <record id="action_gec_margin_statement_report" model="ir.actions.client">
+        <field name="name">Analytic Margin Statement</field>
+        <field name="tag">account_report</field>
+        <field name="context" eval="{'report_id': ref('gec_margin_statement_report')}"/>
+    </record>
+
+    <menuitem id="menu_gec_margin_statement_report"
+              name="Margin Statement"
+              parent="gec_analytic_margin.menu_gec_abc_reports"
+              action="action_gec_margin_statement_report"
+              sequence="10"/>
+
+</odoo>

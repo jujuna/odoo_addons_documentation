@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_gec_vat_declaration_list" model="ir.ui.view">
+        <field name="name">gec.vat.declaration.list</field>
+        <field name="model">gec.vat.declaration</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="date_from"/>
+                <field name="decl_type"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="vat_payable"/>
+                <field name="vat_refund"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'filed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_gec_vat_declaration_form" model="ir.ui.view">
+        <field name="name">gec.vat.declaration.form</field>
+        <field name="model">gec.vat.declaration</field>
+        <field name="arch" type="xml">
+            <form class="o_gec_vat_declaration_form">
+                <header>
+                    <button name="action_generate" type="object" string="Generate" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_mark_filed" type="object" string="Mark as Filed" invisible="state != 'draft'"
+                        confirm="Marking as filed locks the tax month for the company and all its branches; Reset to Draft does not unlock it. Continue?"/>
+                    <button name="action_draft" type="object" string="Reset to Draft" invisible="state != 'filed'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-warning" role="alert" invisible="not generation_warnings">
+                        <field name="generation_warnings" nolabel="1"/>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group name="period">
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft' or id"/>
+                            <field name="date_from" readonly="state != 'draft'"/>
+                            <field name="decl_type" readonly="state != 'draft'"/>
+                            <field name="portal_number"/>
+                        </group>
+                        <group name="result">
+                            <field name="vat_payable"/>
+                            <field name="vat_refund"/>
+                            <field name="odoo_net_vat"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="tab1" string="1 · A-I Taxable">
+                            <field name="tab1_line_ids" widget="gec_vat_grid" options="{'tab': '1'}"
+                                   readonly="state != 'draft'">
+                                <list editable="bottom" create="0" delete="0" limit="200">
+                                    <field name="name" column_invisible="1"/>
+                                    <field name="note" column_invisible="1"/>
+                                    <field name="formula" column_invisible="1"/>
+                                    <field name="auditable" column_invisible="1"/>
+                                    <field name="line" column_invisible="1"/>
+                                    <field name="line_label" column_invisible="1"/>
+                                    <field name="slot" column_invisible="1"/>
+                                    <field name="value" readonly="locked"/>
+                                    <field name="odoo_value" column_invisible="1"/>
+                                    <field name="proposed_value" column_invisible="1"/>
+                                    <field name="locked" column_invisible="1"/>
+                                    <field name="proposed" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="tab2" string="2 · A-II Reverse charge">
+                            <field name="tab2_line_ids" widget="gec_vat_grid" options="{'tab': '2'}"
+                                   readonly="state != 'draft'">
+                                <list editable="bottom" create="0" delete="0" limit="200">
+                                    <field name="name" column_invisible="1"/>
+                                    <field name="note" column_invisible="1"/>
+                                    <field name="formula" column_invisible="1"/>
+                                    <field name="auditable" column_invisible="1"/>
+                                    <field name="line" column_invisible="1"/>
+                                    <field name="line_label" column_invisible="1"/>
+                                    <field name="slot" column_invisible="1"/>
+                                    <field name="value" readonly="locked"/>
+                                    <field name="odoo_value" column_invisible="1"/>
+                                    <field name="proposed_value" column_invisible="1"/>
+                                    <field name="locked" column_invisible="1"/>
+                                    <field name="proposed" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="tab3" string="3 · A-III Creditable">
+                            <field name="tab3_line_ids" widget="gec_vat_grid" options="{'tab': '3'}"
+                                   readonly="state != 'draft'">
+                                <list editable="bottom" create="0" delete="0" limit="200">
+                                    <field name="name" column_invisible="1"/>
+                                    <field name="note" column_invisible="1"/>
+                                    <field name="formula" column_invisible="1"/>
+                                    <field name="auditable" column_invisible="1"/>
+                                    <field name="line" column_invisible="1"/>
+                                    <field name="line_label" column_invisible="1"/>
+                                    <field name="slot" column_invisible="1"/>
+                                    <field name="value" readonly="locked"/>
+                                    <field name="odoo_value" column_invisible="1"/>
+                                    <field name="proposed_value" column_invisible="1"/>
+                                    <field name="locked" column_invisible="1"/>
+                                    <field name="proposed" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="tab4" string="4 · B-I Issued Invoices">
+                            <field name="b1_amount" invisible="1"/>
+                            <field name="b1_reduce_amount" invisible="1"/>
+                            <field name="b1_advance_amount" invisible="1"/>
+                            <field name="invoice_line_ids" nolabel="1" widget="gec_vat_rows" options="{'grid': 'b1'}"
+                                   context="{'default_part': 'sale'}" readonly="state != 'draft'">
+                                <list editable="bottom" limit="500">
+                                    <field name="part" column_invisible="1"/>
+                                    <field name="move_id"/>
+                                    <field name="series" readonly="move_id"/>
+                                    <field name="number" readonly="move_id"/>
+                                    <field name="operation_month" options="{'min_precision': 'months'}" readonly="move_id"/>
+                                    <field name="partner_tin" readonly="move_id"/>
+                                    <field name="amount" readonly="move_id"/>
+                                    <field name="reduce_amount" readonly="move_id"/>
+                                    <field name="korect_series" readonly="move_id"/>
+                                    <field name="korect_number" readonly="move_id"/>
+                                </list>
+                            </field>
+                            <field name="advance_line_ids" nolabel="1" widget="gec_vat_rows" options="{'grid': 'b1_advance'}"
+                                   context="{'default_part': 'sale'}" readonly="state != 'draft'">
+                                <list editable="bottom" limit="500">
+                                    <field name="part" column_invisible="1"/>
+                                    <field name="settlement_id"/>
+                                    <field name="delivery_series" readonly="settlement_id"/>
+                                    <field name="delivery_number" readonly="settlement_id"/>
+                                    <field name="advance_series" readonly="settlement_id"/>
+                                    <field name="advance_number" readonly="settlement_id"/>
+                                    <field name="amount" readonly="settlement_id"/>
+                                </list>
+                            </field>
+                            <p class="text-muted small mt-2">
+                                Generate builds the rows from the customer invoices rs.ge accepted; a correction appears
+                                in the month the buyer accepted it, with the change against the invoice it corrects.
+                                Rows linked to an Odoo invoice are rebuilt on every Generate; add a row for a paper invoice.
+                            </p>
+                        </page>
+                        <page name="tab5" string="5 · B-II Received Invoices">
+                            <field name="b2_amount" invisible="1"/>
+                            <field name="b2_reduce_amount" invisible="1"/>
+                            <field name="b2_advance_amount" invisible="1"/>
+                            <field name="purchase_line_ids" nolabel="1" widget="gec_vat_rows" options="{'grid': 'b2'}"
+                                   context="{'default_part': 'purchase'}" readonly="state != 'draft'">
+                                <list editable="bottom" limit="500">
+                                    <field name="part" column_invisible="1"/>
+                                    <field name="move_id"/>
+                                    <field name="series" readonly="move_id"/>
+                                    <field name="number" readonly="move_id"/>
+                                    <field name="operation_month" options="{'min_precision': 'months'}" readonly="move_id"/>
+                                    <field name="partner_tin" readonly="move_id"/>
+                                    <field name="amount" readonly="move_id"/>
+                                    <field name="reduce_amount" readonly="move_id"/>
+                                    <field name="korect_series" readonly="move_id"/>
+                                    <field name="korect_number" readonly="move_id"/>
+                                </list>
+                            </field>
+                            <field name="purchase_advance_line_ids" nolabel="1" widget="gec_vat_rows" options="{'grid': 'b2_advance'}"
+                                   context="{'default_part': 'purchase'}" readonly="state != 'draft'">
+                                <list editable="bottom" limit="500">
+                                    <field name="part" column_invisible="1"/>
+                                    <field name="settlement_id"/>
+                                    <field name="delivery_series" readonly="settlement_id"/>
+                                    <field name="delivery_number" readonly="settlement_id"/>
+                                    <field name="advance_series" readonly="settlement_id"/>
+                                    <field name="advance_number" readonly="settlement_id"/>
+                                    <field name="amount" readonly="settlement_id"/>
+                                </list>
+                            </field>
+                            <p class="text-muted small mt-2">
+                                Generate builds the rows from the vendor bills linked to rs.ge invoices that are accepted,
+                                in the month of their accounting date, where Odoo credits the VAT; a correction shows the
+                                change against the bill it corrects. Add a row for a paper invoice or an advance offset.
+                            </p>
+                        </page>
+                        <page name="tab6" string="6 · B-III Customs Declarations">
+                            <field name="b3_amount" invisible="1"/>
+                            <field name="customs_line_ids" nolabel="1" widget="gec_vat_rows" options="{'grid': 'b3'}"
+                                   readonly="state != 'draft'">
+                                <list editable="bottom" limit="500">
+                                    <field name="assessment_number"/>
+                                    <field name="customs_code"/>
+                                    <field name="assessment_date"/>
+                                    <field name="amount"/>
+                                    <field name="pdf_type"/>
+                                    <field name="attachment_id"/>
+                                </list>
+                            </field>
+                            <p class="text-muted small mt-2">
+                                Upload the customs declaration or Form 4 PDFs, one row per PDF. The type, the number,
+                                the customs code, the date and the VAT are read from the PDF and can be corrected; the
+                                VAT is the "გადახდილია სულ" total of a customs declaration and the "დღგ" payment line of
+                                a Form 4. Deleting a row keeps its PDF. Deleting the declaration deletes the PDFs
+                                uploaded here (with the Documents app, a copy stays in its trash for a while); PDFs
+                                taken from the Documents folders stay there, and such a PDF comes back at the next
+                                Generate until it is moved out of its folder.
+                            </p>
+                        </page>
+                        <page name="tab7" string="7 · B-IV Auction Purchases">
+                            <field name="b4_amount" invisible="1"/>
+                            <field name="b4_line_ids" nolabel="1" widget="gec_vat_rows" options="{'grid': 'b4'}"
+                                   context="{'default_grid': 'b4'}" readonly="state != 'draft'">
+                                <list editable="bottom" limit="500">
+                                    <field name="grid" column_invisible="1"/>
+                                    <field name="ref_number"/>
+                                    <field name="partner_tin"/>
+                                    <field name="partner_name"/>
+                                    <field name="owner_tin"/>
+                                    <field name="owner_name"/>
+                                    <field name="ref_date"/>
+                                    <field name="amount"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="tab8" string="8 · B-V Barter">
+                            <field name="b5_amount" invisible="1"/>
+                            <field name="b5_line_ids" nolabel="1" widget="gec_vat_rows" options="{'grid': 'b5'}"
+                                   context="{'default_grid': 'b5'}" readonly="state != 'draft'">
+                                <list editable="bottom" limit="500">
+                                    <field name="grid" column_invisible="1"/>
+                                    <field name="ref_number"/>
+                                    <field name="partner_tin"/>
+                                    <field name="partner_name"/>
+                                    <field name="period" options="{'min_precision': 'months'}"/>
+                                    <field name="amount"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="tab10" string="10 · B-VIII Turnover Corrections">
+                            <field name="b8_amount" invisible="1"/>
+                            <field name="b8_line_ids" nolabel="1" widget="gec_vat_rows" options="{'grid': 'b8'}"
+                                   context="{'default_grid': 'b8'}" readonly="state != 'draft'">
+                                <list editable="bottom" limit="500">
+                                    <field name="grid" column_invisible="1"/>
+                                    <field name="ref_number"/>
+                                    <field name="period" options="{'min_precision': 'months'}"/>
+                                    <field name="amount"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="tab11" string="11 · B-IX Reverse-charge Corrections">
+                            <field name="b9_amount" invisible="1"/>
+                            <field name="b9_line_ids" nolabel="1" widget="gec_vat_rows" options="{'grid': 'b9'}"
+                                   context="{'default_grid': 'b9'}" readonly="state != 'draft'">
+                                <list editable="bottom" limit="500">
+                                    <field name="grid" column_invisible="1"/>
+                                    <field name="ref_number"/>
+                                    <field name="period" options="{'min_precision': 'months'}"/>
+                                    <field name="amount"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="tab13" string="13 · Issued Petroleum Invoices">
+                            <field name="b13_amount" invisible="1"/>
+                            <field name="b13_reduce_amount" invisible="1"/>
+                            <field name="b13_advance_amount" invisible="1"/>
+                            <field name="spec_line_ids" nolabel="1" widget="gec_vat_rows" options="{'grid': 'spec13'}"
+                                   context="{'default_part': 'spec_sale'}" readonly="state != 'draft'">
+                                <list editable="bottom" limit="500">
+                                    <field name="part" column_invisible="1"/>
+                                    <field name="move_id"/>
+                                    <field name="series" readonly="move_id"/>
+                                    <field name="number" readonly="move_id"/>
+                                    <field name="operation_date" readonly="move_id"/>
+                                    <field name="korect_series" readonly="move_id"/>
+                                    <field name="korect_number" readonly="move_id"/>
+                                    <field name="korect_date" readonly="move_id"/>
+                                    <field name="station_from" readonly="move_id"/>
+                                    <field name="station_to" readonly="move_id"/>
+                                    <field name="partner_tin" readonly="move_id"/>
+                                    <field name="product_code" readonly="move_id"/>
+                                    <field name="quantity_l" readonly="move_id"/>
+                                    <field name="quantity_kg" readonly="move_id"/>
+                                    <field name="amount" readonly="move_id"/>
+                                    <field name="reduce_amount" readonly="move_id"/>
+                                </list>
+                            </field>
+                            <field name="spec_advance_line_ids" nolabel="1" widget="gec_vat_rows" options="{'grid': 'spec13_advance'}"
+                                   context="{'default_part': 'spec_sale'}" readonly="state != 'draft'">
+                                <list editable="bottom" limit="500">
+                                    <field name="part" column_invisible="1"/>
+                                    <field name="settlement_id"/>
+                                    <field name="delivery_series" readonly="settlement_id"/>
+                                    <field name="delivery_number" readonly="settlement_id"/>
+                                    <field name="advance_series" readonly="settlement_id"/>
+                                    <field name="advance_number" readonly="settlement_id"/>
+                                    <field name="amount" readonly="settlement_id"/>
+                                </list>
+                            </field>
+                            <p class="text-muted small mt-2">
+                                Generate builds the rows from the petroleum invoices (ნსაფ) rs.ge accepted; a correction
+                                appears in the month the buyer accepted it, with the change against the invoice it corrects.
+                                Rows linked to an Odoo invoice are rebuilt on every Generate; add a row for a paper invoice.
+                            </p>
+                        </page>
+                        <page name="tab14" string="14 · Received Petroleum Invoices">
+                            <field name="b14_amount" invisible="1"/>
+                            <field name="b14_reduce_amount" invisible="1"/>
+                            <field name="b14_advance_amount" invisible="1"/>
+                            <field name="spec_purchase_line_ids" nolabel="1" widget="gec_vat_rows" options="{'grid': 'spec14'}"
+                                   context="{'default_part': 'spec_purchase'}" readonly="state != 'draft'">
+                                <list editable="bottom" limit="500">
+                                    <field name="part" column_invisible="1"/>
+                                    <field name="move_id"/>
+                                    <field name="series" readonly="move_id"/>
+                                    <field name="number" readonly="move_id"/>
+                                    <field name="operation_date" readonly="move_id"/>
+                                    <field name="korect_series" readonly="move_id"/>
+                                    <field name="korect_number" readonly="move_id"/>
+                                    <field name="korect_date" readonly="move_id"/>
+                                    <field name="station_from" readonly="move_id"/>
+                                    <field name="station_to" readonly="move_id"/>
+                                    <field name="partner_tin" readonly="move_id"/>
+                                    <field name="product_code" readonly="move_id"/>
+                                    <field name="quantity_l" readonly="move_id"/>
+                                    <field name="quantity_kg" readonly="move_id"/>
+                                    <field name="amount" readonly="move_id"/>
+                                    <field name="reduce_amount" readonly="move_id"/>
+                                </list>
+                            </field>
+                            <field name="spec_purchase_advance_line_ids" nolabel="1" widget="gec_vat_rows" options="{'grid': 'spec14_advance'}"
+                                   context="{'default_part': 'spec_purchase'}" readonly="state != 'draft'">
+                                <list editable="bottom" limit="500">
+                                    <field name="part" column_invisible="1"/>
+                                    <field name="settlement_id"/>
+                                    <field name="delivery_series" readonly="settlement_id"/>
+                                    <field name="delivery_number" readonly="settlement_id"/>
+                                    <field name="advance_series" readonly="settlement_id"/>
+                                    <field name="advance_number" readonly="settlement_id"/>
+                                    <field name="amount" readonly="settlement_id"/>
+                                </list>
+                            </field>
+                            <p class="text-muted small mt-2">
+                                Generate builds the rows from the vendor bills imported as petroleum invoices (ნსაფ) that
+                                are accepted on rs.ge, in the month of their accounting date; a correction shows the change
+                                against the bill it corrects. Add a row for a paper invoice or an advance offset.
+                            </p>
+                        </page>
+                        <page name="tab15" string="15 · Petroleum Stock Balances">
+                            <field name="stock_line_ids" nolabel="1" widget="gec_vat_rows" options="{'grid': 'stock15'}" readonly="state != 'draft'">
+                                <list editable="bottom" limit="500">
+                                    <field name="product_ids" widget="many2many_tags"/>
+                                    <field name="product_code" readonly="product_ids"/>
+                                    <field name="opening_kg" readonly="product_ids"/>
+                                    <field name="opening_l" readonly="product_ids"/>
+                                    <field name="received_kg" readonly="product_ids"/>
+                                    <field name="received_l" readonly="product_ids"/>
+                                    <field name="spec_sold_kg" readonly="product_ids"/>
+                                    <field name="spec_sold_l" readonly="product_ids"/>
+                                    <field name="sold_kg" readonly="product_ids"/>
+                                    <field name="sold_l" readonly="product_ids"/>
+                                    <field name="sold_amount_kg" readonly="product_ids"/>
+                                    <field name="sold_amount_l" readonly="product_ids"/>
+                                    <field name="discount_sold_kg" readonly="product_ids"/>
+                                    <field name="discount_sold_l" readonly="product_ids"/>
+                                    <field name="discount_amount_kg" readonly="product_ids"/>
+                                    <field name="discount_amount_l" readonly="product_ids"/>
+                                    <field name="own_use_kg" readonly="product_ids"/>
+                                    <field name="own_use_l" readonly="product_ids"/>
+                                    <field name="processed_kg" readonly="product_ids"/>
+                                    <field name="processed_l" readonly="product_ids"/>
+                                    <field name="closing_kg" readonly="1"/>
+                                    <field name="closing_l" readonly="1"/>
+                                </list>
+                            </field>
+                            <p class="text-muted small mt-2">
+                                Generate builds one row per petroleum product code: the stock at the start of the month, the vendor
+                                receipts of the month, the quantities sold with ნსაფ (tab 13) and the invoiced sales without
+                                ნსაფ, with and without a line discount (amounts with VAT). Own use, processed and the closing
+                                balance are left empty; type them on the portal. Add a row for a product Odoo does not hold.
+                            </p>
+                        </page>
+                        <page name="tab16" string="16 · III Calculation">
+                            <field name="tab16_line_ids" widget="gec_vat_grid" options="{'tab': '16'}"
+                                   readonly="state != 'draft'">
+                                <list editable="bottom" create="0" delete="0" limit="200">
+                                    <field name="name" column_invisible="1"/>
+                                    <field name="note" column_invisible="1"/>
+                                    <field name="formula" column_invisible="1"/>
+                                    <field name="auditable" column_invisible="1"/>
+                                    <field name="line" column_invisible="1"/>
+                                    <field name="line_label" column_invisible="1"/>
+                                    <field name="slot" column_invisible="1"/>
+                                    <field name="value" readonly="locked"/>
+                                    <field name="odoo_value" column_invisible="1"/>
+                                    <field name="proposed_value" column_invisible="1"/>
+                                    <field name="locked" column_invisible="1"/>
+                                    <field name="proposed" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="tab17" string="17 · III-19⁶ Margin">
+                            <field name="tab17_line_ids" widget="gec_vat_grid" options="{'tab': '17'}"
+                                   readonly="state != 'draft'">
+                                <list editable="bottom" create="0" delete="0" limit="200">
+                                    <field name="name" column_invisible="1"/>
+                                    <field name="note" column_invisible="1"/>
+                                    <field name="formula" column_invisible="1"/>
+                                    <field name="auditable" column_invisible="1"/>
+                                    <field name="line" column_invisible="1"/>
+                                    <field name="line_label" column_invisible="1"/>
+                                    <field name="slot" column_invisible="1"/>
+                                    <field name="value" readonly="locked"/>
+                                    <field name="odoo_value" column_invisible="1"/>
+                                    <field name="proposed_value" column_invisible="1"/>
+                                    <field name="locked" column_invisible="1"/>
+                                    <field name="proposed" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_gec_vat_declaration_search" model="ir.ui.view">
+        <field name="name">gec.vat.declaration.search</field>
+        <field name="model">gec.vat.declaration</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="filed" string="Filed" domain="[('state', '=', 'filed')]"/>
+                <group name="group_by">
+                    <filter name="group_company" string="Company" context="{'group_by': 'company_id'}"/>
+                    <filter name="group_month" string="Month" context="{'group_by': 'date_from:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_gec_vat_declaration" model="ir.actions.act_window">
+        <field name="name">VAT Declaration (rs.ge)</field>
+        <field name="res_model">gec.vat.declaration</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create the VAT declaration of a month</p>
+            <p>Generate proposes the cells from the Georgian VAT report. Adjust the editable cells, then type the result into the rs.ge portal.</p>
+        </field>
+    </record>
+</odoo>

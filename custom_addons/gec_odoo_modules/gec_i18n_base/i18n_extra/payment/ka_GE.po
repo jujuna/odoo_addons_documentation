@@ -1,0 +1,3597 @@
+# Georgian translation of the Odoo addon payment, kept in gec_i18n_base.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-18 17:39+0000\n"
+"PO-Revision-Date: 2026-09-30 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian (ka_GE)\n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#. module: payment
+#: model_terms:ir.actions.act_window,help:payment.action_payment_method
+msgid "<i class=\"oi me-1\" data-icon=\"east\"></i> Configure a payment provider"
+msgstr "<i class=\"oi me-1\" data-icon=\"east\"></i> გადახდის მიმწოდებლის კონფიგურაცია"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_capture_wizard_view_form
+msgid "<i class=\"oi oe_inline\" data-icon=\"info\" invisible=\"support_partial_capture != 'full_only'\" title=\"Some of the transactions you intend to capture can only be captured in full. Handle the transactions individually to capture a partial amount.\"/>"
+msgstr "<i class=\"oi oe_inline\" data-icon=\"info\" invisible=\"support_partial_capture != 'full_only'\" title=\"ზოგიერთი ტრანზაქცია, რომლის დაკავებასაც აპირებთ, მხოლოდ სრულად შეიძლება დაიკავოს. ნაწილობრივი თანხის დასაკავებლად ტრანზაქციები ინდივიდუალურად დაამუშავეთ.\"/>"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.token_form
+msgid "<i class=\"oi oi-filled\" data-icon=\"delete\" title=\"Delete payment method\" data-bs-toggle=\"tooltip\" data-bs-placement=\"top\" data-bs-delay=\"0\"/>"
+msgstr "<i class=\"oi oi-filled\" data-icon=\"delete\" title=\"გადახდის მეთოდის წაშლა\" data-bs-toggle=\"tooltip\" data-bs-placement=\"top\" data-bs-delay=\"0\"/>"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.portal_breadcrumb
+msgid "<i class=\"oi\" data-icon=\"home\" role=\"img\" title=\"Home\" aria-label=\"Home\"/>"
+msgstr "<i class=\"oi\" data-icon=\"home\" role=\"img\" title=\"მთავარი\" aria-label=\"მთავარი\"/>"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_method_form
+msgid ""
+"<i class=\"oi\" data-icon=\"warning\"/> These properties are set to\n"
+"                                match the behavior of providers and that of their integration with\n"
+"                                Odoo regarding this payment method. Any change may result in errors\n"
+"                                and should be tested on a test database first."
+msgstr ""
+"<i class=\"oi\" data-icon=\"warning\"/> ეს თვისებები დაყენებულია ისე, რომ\n"
+"                                შეესაბამებოდეს მიმწოდებლების ქცევასა და Odoo-სთან მათ ინტეგრაციას\n"
+"                                ამ გადახდის მეთოდთან დაკავშირებით. ნებისმიერმა ცვლილებამ შეიძლება შეცდომები გამოიწვიოს\n"
+"                                და ჯერ სატესტო ბაზაზე უნდა შემოწმდეს."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.method_form
+msgid "<small class=\"text-600\">Save my payment details</small>"
+msgstr "<small class=\"text-600\">გადახდის დეტალების შენახვა</small>"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.amount_input
+msgid "<small>Amount</small>"
+msgstr "<small>თანხა</small>"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid "<span class=\"o_stat_text text-danger\">Unpublished</span>"
+msgstr "<span class=\"o_stat_text text-danger\">გამოუქვეყნებელი</span>"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid "<span class=\"o_stat_text text-success\">Published</span>"
+msgstr "<span class=\"o_stat_text text-success\">გამოქვეყნებული</span>"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.view_partners_form_payment_defaultcreditcard
+msgid "<span class=\"o_stat_text\">Saved Payment Methods</span>"
+msgstr "<span class=\"o_stat_text\">შენახული გადახდის მეთოდები</span>"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_method_form
+msgid ""
+"<span class=\"oe_inline text-muted\" invisible=\"supported_country_ids\">\n"
+"                                All countries are supported.\n"
+"                            </span>"
+msgstr ""
+"<span class=\"oe_inline text-muted\" invisible=\"supported_country_ids\">\n"
+"                                ყველა ქვეყანა მხარდაჭერილია.\n"
+"                            </span>"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_method_form
+msgid ""
+"<span class=\"oe_inline text-muted\" invisible=\"supported_currency_ids\">\n"
+"                                All currencies are supported.\n"
+"                            </span>"
+msgstr ""
+"<span class=\"oe_inline text-muted\" invisible=\"supported_currency_ids\">\n"
+"                                ყველა ვალუტა მხარდაჭერილია.\n"
+"                            </span>"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_transaction_form
+msgid ""
+"<span invisible=\"is_live\" class=\"badge rounded-pill text-bg-warning fs-6\">\n"
+"                            Test Mode\n"
+"                        </span>"
+msgstr ""
+"<span invisible=\"is_live\" class=\"badge rounded-pill text-bg-warning fs-6\">\n"
+"                            სატესტო რეჟიმი\n"
+"                        </span>"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.method_form model_terms:ir.ui.view,arch_db:payment.token_form
+msgid "<span><i class=\"oi\" data-icon=\"lock\"/> Secured by</span>"
+msgstr "<span><i class=\"oi\" data-icon=\"lock\"/> დაცულია</span>"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.no_pms_available_warning
+msgid "<strong><i class=\"oi oi-filled\" data-icon=\"article\"/> Show availability report</strong>"
+msgstr "<strong><i class=\"oi oi-filled\" data-icon=\"article\"/> ხელმისაწვდომობის ანგარიშის ჩვენება</strong>"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.no_pms_available_warning
+msgid "<strong>No payment methods are available</strong>"
+msgstr "<strong>გადახდის მეთოდები ხელმისაწვდომი არ არის</strong>"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.no_pms_available_warning
+msgid "<strong>No payment providers are configured</strong>"
+msgstr "<strong>გადახდის მიმწოდებლები დაკონფიგურირებული არ არის</strong>"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_capture_wizard_view_form
+msgid ""
+"<strong>Warning!</strong> There is a partial capture pending. Please wait a\n"
+"                    moment for it to be processed. Check your payment provider configuration if\n"
+"                    the capture is still pending after a few minutes."
+msgstr ""
+"<strong>გაფრთხილება!</strong> ნაწილობრივი დაკავება მოლოდინშია. გთხოვთ, დაელოდოთ\n"
+"                    მის დამუშავებას. თუ დაკავება რამდენიმე წუთის შემდეგაც მოლოდინშია,\n"
+"                    შეამოწმეთ გადახდის მიმწოდებლის კონფიგურაცია."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_capture_wizard_view_form
+msgid ""
+"<strong>Warning!</strong> You can not capture a negative amount nor more\n"
+"                    than"
+msgstr ""
+"<strong>გაფრთხილება!</strong> ვერ დაიკავებთ უარყოფით თანხას და ვერც მეტს,\n"
+"                    ვიდრე"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid ""
+"<strong>Warning:</strong> Creating a payment provider from scratch is not\n"
+"                        supported; please use the <em>Duplicate</em> action instead."
+msgstr ""
+"<strong>გაფრთხილება:</strong> გადახდის მიმწოდებლის ნულიდან შექმნა\n"
+"                        მხარდაჭერილი არ არის; გთხოვთ, სანაცვლოდ გამოიყენოთ მოქმედება <em>დუბლირება</em>."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.pay
+msgid ""
+"<strong>Warning</strong> Make sure you are logged in as the\n"
+"                                    correct partner before making this payment."
+msgstr ""
+"<strong>გაფრთხილება</strong> ამ გადახდის განხორციელებამდე დარწმუნდით, რომ\n"
+"                                    სწორი პარტნიორის სახელით ხართ შესული."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.pay
+msgid "<strong>Warning</strong> The currency is missing or incorrect."
+msgstr "<strong>გაფრთხილება</strong> ვალუტა აკლია ან არასწორია."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.pay
+msgid "<strong>Warning</strong> You must be logged in to pay."
+msgstr "<strong>გაფრთხილება</strong> გადასახდელად უნდა იყოთ შესული."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.no_pms_available_warning
+msgid "Account"
+msgstr "ანგარიში"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_method__active model:ir.model.fields,field_description:payment.field_payment_provider__active model:ir.model.fields,field_description:payment.field_payment_token__active
+msgid "Active"
+msgstr "აქტიური"
+
+#. module: payment
+#: model:ir.actions.server,name:payment.action_add_payment_method
+msgid "Add a Payment Method"
+msgstr "გადახდის მეთოდის დამატება"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_transaction__partner_address
+msgid "Address"
+msgstr "მისამართი"
+
+#. module: payment
+#: model:payment.provider,name:payment.payment_provider_adyen
+msgid "Adyen"
+msgstr "Adyen"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid "All Countries"
+msgstr "ყველა ქვეყანა"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid "All Currencies"
+msgstr "ყველა ვალუტა"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__allow_express_checkout
+msgid "Allow Express Checkout"
+msgstr "სწრაფი გადახდის დაშვება"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__allow_tokenization
+msgid "Allow Saving Payment Methods"
+msgstr "გადახდის მეთოდების შენახვის დაშვება"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_method__allow_amount_selection
+msgid "Allow splitting payments across several payment methods."
+msgstr "გადახდების რამდენიმე გადახდის მეთოდზე გაყოფის დაშვება."
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_capture_wizard__captured_amount
+msgid "Already Captured"
+msgstr "უკვე დაკავებულია"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_capture_wizard__voided_amount
+msgid "Already Voided"
+msgstr "უკვე გაუქმებულია"
+
+#. module: payment
+#: model:payment.provider,name:payment.payment_provider_aps
+msgid "Amazon Payment Services"
+msgstr "Amazon Payment Services"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_link_wizard__amount model:ir.model.fields,field_description:payment.field_payment_transaction__amount model_terms:ir.ui.view,arch_db:payment.confirm model_terms:ir.ui.view,arch_db:payment.pay model_terms:ir.ui.view,arch_db:payment.payment_status
+msgid "Amount"
+msgstr "თანხა"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_method__allow_amount_selection
+msgid "Amount Selection"
+msgstr "თანხის არჩევა"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_capture_wizard__amount_to_capture
+msgid "Amount To Capture"
+msgstr "დასაკავებელი თანხა"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "An error occurred during the processing of your payment."
+msgstr "თქვენი გადახდის დამუშავებისას მოხდა შეცდომა."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "An error occurred while saving your payment method."
+msgstr "თქვენი გადახდის მეთოდის შენახვისას მოხდა შეცდომა."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form model_terms:ir.ui.view,arch_db:payment.payment_provider_search model_terms:ir.ui.view,arch_db:payment.payment_token_form model_terms:ir.ui.view,arch_db:payment.payment_token_search
+msgid "Archived"
+msgstr "დაარქივებული"
+
+#. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/xml/payment_form_templates.xml:0
+msgid "Are you sure you want to delete this payment method?"
+msgstr "დარწმუნებული ხართ, რომ გსურთ ამ გადახდის მეთოდის წაშლა?"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_transaction_form
+msgid "Are you sure you want to void the authorized transaction? This                                  action can't be undone."
+msgstr "დარწმუნებული ხართ, რომ გსურთ ავტორიზებული ტრანზაქციის გაუქმება? ამ მოქმედების გაუქმება შეუძლებელია."
+
+#. module: payment
+#: model:payment.provider,name:payment.payment_provider_asiapay
+msgid "Asiapay"
+msgstr "Asiapay"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__auth_msg
+msgid "Authorize Message"
+msgstr "ავტორიზაციის შეტყობინება"
+
+#. module: payment
+#: model:payment.provider,name:payment.payment_provider_authorize
+msgid "Authorize.net"
+msgstr "Authorize.net"
+
+#. module: payment
+#: model:ir.model.fields.selection,name:payment.selection__payment_transaction__state__authorized
+msgid "Authorized"
+msgstr "ავტორიზებული"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_capture_wizard__authorized_amount
+msgid "Authorized Amount"
+msgstr "ავტორიზებული თანხა"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.availability_report
+msgid "Availability report"
+msgstr "ხელმისაწვდომობის ანგარიში"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_method_search
+msgid "Available methods"
+msgstr "ხელმისაწვდომი მეთოდები"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_method__brand_ids model_terms:ir.ui.view,arch_db:payment.payment_method_form
+msgid "Brands"
+msgstr "ბრენდები"
+
+#. module: payment
+#: model:payment.provider,name:payment.payment_provider_buckaroo
+msgid "Buckaroo"
+msgstr "Buckaroo"
+
+#. module: payment
+#: model:ir.model.fields.selection,name:payment.selection__payment_transaction__state__cancel
+msgid "Canceled"
+msgstr "გაუქმებული"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__cancel_msg
+msgid "Cancelled Message"
+msgstr "გაუქმების შეტყობინება"
+
+#. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/interactions/payment_form.js:0
+msgid "Cannot delete payment method"
+msgstr "გადახდის მეთოდის წაშლა შეუძლებელია"
+
+#. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/interactions/payment_form.js:0
+msgid "Cannot save payment method"
+msgstr "გადახდის მეთოდის შენახვა შეუძლებელია"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0 model_terms:ir.ui.view,arch_db:payment.payment_capture_wizard_view_form
+msgid "Capture"
+msgstr "დაკავება"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__capture_manually model:ir.model.fields,field_description:payment.field_payment_transaction__capture_manually
+msgid "Capture Amount Manually"
+msgstr "თანხის ხელით დაკავება"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_transaction_form
+msgid "Capture Transaction"
+msgstr "ტრანზაქციის დაფიქსირება"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_transaction__capture_manually
+msgid "Capture the amount from Odoo, when the delivery is completed. Use this if you want to charge your customers cards only when you are sure you can ship the goods to them."
+msgstr "ჩამოჭერით თანხა Odoo-დან მიწოდების დასრულებისას. გამოიყენეთ ეს, თუ გსურთ კლიენტების ბარათებიდან თანხის ჩამოჭრა მხოლოდ მაშინ, როცა დარწმუნებული ხართ, რომ საქონლის გაგზავნას შეძლებთ."
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_transaction__child_transaction_count
+msgid "Child Transaction Count"
+msgstr "შვილობილი ტრანზაქციების რაოდენობა"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_transaction__child_transaction_ids
+msgid "Child Transactions"
+msgstr "შვილობილი ტრანზაქციები"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.form
+msgid "Choose another method <i class=\"oi\" data-icon=\"south\"/>"
+msgstr "აირჩიეთ სხვა მეთოდი <i class=\"oi\" data-icon=\"south\"/>"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_transaction__partner_city
+msgid "City"
+msgstr "ქალაქი"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_capture_wizard_view_form model_terms:ir.ui.view,arch_db:payment.payment_link_wizard_view_form
+msgid "Close"
+msgstr "დახურვა"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_method__code model:ir.model.fields,field_description:payment.field_payment_provider__code
+msgid "Code"
+msgstr "კოდი"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_link_wizard__company_id model:ir.model.fields,field_description:payment.field_payment_provider__company_id model:ir.model.fields,field_description:payment.field_payment_token__company_id model:ir.model.fields,field_description:payment.field_payment_transaction__company_id model_terms:ir.ui.view,arch_db:payment.payment_provider_search model_terms:ir.ui.view,arch_db:payment.payment_token_search model_terms:ir.ui.view,arch_db:payment.payment_transaction_search
+msgid "Company"
+msgstr "კომპანია"
+
+#. module: payment
+#: model:ir.model,name:payment.model_res_config_settings
+msgid "Config Settings"
+msgstr "კონფიგურაციის პარამეტრები"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_method_form model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid "Configuration"
+msgstr "კონფიგურაცია"
+
+#. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/interactions/payment_form.js:0
+msgid "Confirm Deletion"
+msgstr "წაშლის დადასტურება"
+
+#. module: payment
+#: model:ir.model.fields.selection,name:payment.selection__payment_transaction__state__done model_terms:ir.ui.view,arch_db:payment.payment_transaction_search
+msgid "Confirmed"
+msgstr "დადასტურებული"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.no_pms_available_warning
+msgid "Connect"
+msgstr "დაკავშირება"
+
+#. module: payment
+#: model:ir.model,name:payment.model_res_partner model_terms:ir.ui.view,arch_db:payment.no_pms_available_warning
+msgid "Contact"
+msgstr "კონტაქტი"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__module_id
+msgid "Corresponding Module"
+msgstr "შესაბამისი მოდული"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_provider.py:0
+msgid "Could not establish the connection to the payment provider."
+msgstr "გადახდის მიმწოდებელთან კავშირის დამყარება ვერ მოხერხდა."
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_method__supported_country_ids model:ir.model.fields,field_description:payment.field_payment_provider__available_country_ids
+msgid "Countries"
+msgstr "ქვეყნები"
+
+#. module: payment
+#: model:ir.model,name:payment.model_res_country model:ir.model.fields,field_description:payment.field_payment_transaction__partner_country_id
+msgid "Country"
+msgstr "ქვეყანა"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.no_pms_available_warning
+msgid "Create"
+msgstr "შექმნა"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_transaction__tokenize
+msgid "Create Token"
+msgstr "ტოკენის შექმნა"
+
+#. module: payment
+#: model:ir.model,website_form_label:payment.model_res_partner
+msgid "Create a Customer"
+msgstr "მომხმარებლის შექმნა"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_data_form model_terms:ir.ui.view,arch_db:payment.payment_data_list
+msgid "Created On"
+msgstr "შექმნის თარიღი"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_capture_wizard__create_uid model:ir.model.fields,field_description:payment.field_payment_data__create_uid model:ir.model.fields,field_description:payment.field_payment_link_wizard__create_uid model:ir.model.fields,field_description:payment.field_payment_method__create_uid model:ir.model.fields,field_description:payment.field_payment_provider__create_uid model:ir.model.fields,field_description:payment.field_payment_token__create_uid model:ir.model.fields,field_description:payment.field_payment_transaction__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_capture_wizard__create_date model:ir.model.fields,field_description:payment.field_payment_data__create_date model:ir.model.fields,field_description:payment.field_payment_link_wizard__create_date model:ir.model.fields,field_description:payment.field_payment_method__create_date model:ir.model.fields,field_description:payment.field_payment_provider__create_date model:ir.model.fields,field_description:payment.field_payment_token__create_date model:ir.model.fields,field_description:payment.field_payment_transaction__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "Creating a transaction from an archived token is forbidden."
+msgstr "დაარქივებული ტოკენიდან ტრანზაქციის შექმნა აკრძალულია."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid "Credentials"
+msgstr "ავტორიზაციის მონაცემები"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_method__supported_currency_ids model:ir.model.fields,field_description:payment.field_payment_provider__available_currency_ids
+msgid "Currencies"
+msgstr "ვალუტები"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_capture_wizard__currency_id model:ir.model.fields,field_description:payment.field_payment_link_wizard__currency_id model:ir.model.fields,field_description:payment.field_payment_provider__main_currency_id model:ir.model.fields,field_description:payment.field_payment_transaction__currency_id
+msgid "Currency"
+msgstr "ვალუტა"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_transaction__partner_id model_terms:ir.ui.view,arch_db:payment.payment_token_form model_terms:ir.ui.view,arch_db:payment.payment_token_list
+msgid "Customer"
+msgstr "კლიენტი"
+
+#. module: payment
+#: model:payment.provider,name:payment.payment_provider_dpo
+msgid "DPO Pay"
+msgstr "DPO Pay"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_provider__sequence
+msgid "Define the display order"
+msgstr "განსაზღვრავს ჩვენების თანმიმდევრობას"
+
+#. module: payment
+#: model:payment.provider,name:payment.payment_provider_demo
+msgid "Demo"
+msgstr "დემო"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_ir_http__display_name model:ir.model.fields,field_description:payment.field_ir_websocket__display_name model:ir.model.fields,field_description:payment.field_payment_capture_wizard__display_name model:ir.model.fields,field_description:payment.field_payment_data__display_name model:ir.model.fields,field_description:payment.field_payment_link_wizard__display_name model:ir.model.fields,field_description:payment.field_payment_method__display_name model:ir.model.fields,field_description:payment.field_payment_provider__display_name model:ir.model.fields,field_description:payment.field_payment_token__display_name model:ir.model.fields,field_description:payment.field_payment_transaction__display_name model:ir.model.fields,field_description:payment.field_portal_entry__display_name model:ir.model.fields,field_description:payment.field_res_company__display_name model:ir.model.fields,field_description:payment.field_res_config_settings__display_name model:ir.model.fields,field_description:payment.field_res_country__display_name model:ir.model.fields,field_description:payment.field_res_partner__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_status
+msgid "Don't hesitate to contact us if you don't receive it."
+msgstr "თუ არ მიიღებთ, უყოყმანოდ დაგვიკავშირდით."
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__done_msg
+msgid "Done Message"
+msgstr "დასრულების შეტყობინება"
+
+#. module: payment
+#: model:ir.model.fields.selection,name:payment.selection__payment_transaction__state__draft
+msgid "Draft"
+msgstr "მონახაზი"
+
+#. module: payment
+#: model:payment.provider,name:payment.payment_provider_ecpay
+msgid "ECPay"
+msgstr "ECPay"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_link_wizard__partner_email model:ir.model.fields,field_description:payment.field_payment_transaction__partner_email
+msgid "Email"
+msgstr "ელ-ფოსტა"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_kanban
+msgid "Enterprise"
+msgstr "Enterprise"
+
+#. module: payment
+#: model:ir.model.fields.selection,name:payment.selection__payment_transaction__state__error
+msgid "Error"
+msgstr "შეცდომა"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_data__error_traceback
+msgid "Error Traceback"
+msgstr "შეცდომის Traceback"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_method__support_express_checkout model:ir.model.fields,field_description:payment.field_payment_provider__support_express_checkout
+msgid "Express Checkout"
+msgstr "სწრაფი გადახდა"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__express_checkout_form_view_id
+msgid "Express Checkout Form Template"
+msgstr "სწრაფი გადახდის ფორმის შაბლონი"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_method__support_express_checkout
+msgid "Express checkout allows customers to pay faster by using a payment method that provides all required billing and shipping information, thus allowing to skip the checkout process."
+msgstr "სწრაფი გადახდა კლიენტებს საშუალებას აძლევს უფრო ჩქარა გადაიხადონ ისეთი გადახდის მეთოდით, რომელიც ყველა საჭირო ბილინგისა და მიწოდების ინფორმაციას აწვდის, რაც გადახდის პროცესის გამოტოვების საშუალებას იძლევა."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/const.py:0
+msgid "Express checkout not supported"
+msgstr "სწრაფი გადახდა მხარდაუჭერელია"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_data__errored
+msgid "Failed"
+msgstr "ვერ შესრულდა"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.no_pms_available_warning
+msgid "Find a Payment Provider"
+msgstr "გადახდის პროვაიდერის მოძებნა"
+
+#. module: payment
+#: model:payment.provider,name:payment.payment_provider_flutterwave
+msgid "Flutterwave"
+msgstr "Flutterwave"
+
+#. module: payment
+#: model:ir.model.fields.selection,name:payment.selection__payment_method__support_manual_capture__partial model:ir.model.fields.selection,name:payment.selection__payment_method__support_refund__partial model:ir.model.fields.selection,name:payment.selection__payment_provider__support_refund__partial
+msgid "Full & Partial"
+msgstr "სრული და ნაწილობრივი"
+
+#. module: payment
+#: model:ir.model.fields.selection,name:payment.selection__payment_method__support_manual_capture__full_only model:ir.model.fields.selection,name:payment.selection__payment_method__support_refund__full_only model:ir.model.fields.selection,name:payment.selection__payment_provider__support_manual_capture__full_only model:ir.model.fields.selection,name:payment.selection__payment_provider__support_refund__full_only
+msgid "Full Only"
+msgstr "მხოლოდ სრული"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_link_wizard_view_form
+msgid "Generate Payment Link"
+msgstr "გადახდის ბმულის გენერირება"
+
+#. module: payment
+#: model:ir.model,name:payment.model_payment_link_wizard
+msgid "Generate Sales Payment Link"
+msgstr "გაყიდვის გადახდის ბმულის გენერირება"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_link_wizard_view_form
+msgid "Generate and Copy Payment Link"
+msgstr "გადახდის ბმულის გენერირება და კოპირება"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.confirm
+msgid "Go to my Account <i class=\"oi ms-2\" data-icon=\"east\"/>"
+msgstr "ჩემს ანგარიშზე გადასვლა <i class=\"oi ms-2\" data-icon=\"east\"/>"
+
+#. module: payment
+#: model:ir.model,name:payment.model_ir_http
+msgid "HTTP Routing"
+msgstr "HTTP მარშრუტიზაცია"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_capture_wizard__has_draft_children
+msgid "Has Draft Children"
+msgstr "აქვს მონახაზი შვილობილები"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_capture_wizard__has_remaining_amount
+msgid "Has Remaining Amount"
+msgstr "აქვს დარჩენილი თანხა"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_transaction__is_post_processed
+msgid "Has the payment been post-processed"
+msgstr "დამუშავდა თუ არა გადახდა შემდგომ ეტაპზე"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__pre_msg
+msgid "Help Message"
+msgstr "დახმარების შეტყობინება"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_ir_http__id model:ir.model.fields,field_description:payment.field_ir_websocket__id model:ir.model.fields,field_description:payment.field_payment_capture_wizard__id model:ir.model.fields,field_description:payment.field_payment_data__id model:ir.model.fields,field_description:payment.field_payment_link_wizard__id model:ir.model.fields,field_description:payment.field_payment_method__id model:ir.model.fields,field_description:payment.field_payment_provider__id model:ir.model.fields,field_description:payment.field_payment_token__id model:ir.model.fields,field_description:payment.field_payment_transaction__id model:ir.model.fields,field_description:payment.field_portal_entry__id model:ir.model.fields,field_description:payment.field_res_company__id model:ir.model.fields,field_description:payment.field_res_config_settings__id model:ir.model.fields,field_description:payment.field_res_country__id model:ir.model.fields,field_description:payment.field_res_partner__id
+msgid "ID"
+msgstr "ID"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_provider__is_live
+msgid "If live mode is disabled, a fake payment is processed through a test payment interface. This mode is advised when setting up the provider."
+msgstr "თუ ცოცხალი რეჟიმი გათიშულია, გადახდა სიმულირდება სატესტო გადახდის ინტერფეისის მეშვეობით. ეს რეჟიმი რეკომენდებულია მიმწოდებლის დაყენებისას."
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_method__image
+msgid "Image"
+msgstr "სურათი"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/const.py:0
+msgid "Incompatible country"
+msgstr "შეუთავსებელი ქვეყანა"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/const.py:0
+msgid "Incompatible currency"
+msgstr "შეუთავსებელი ვალუტა"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/const.py:0
+msgid "Incompatible website"
+msgstr "შეუთავსებელი ვებსაიტი"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__inline_form_view_id
+msgid "Inline Form Template"
+msgstr "ჩაშენებული ფორმის შაბლონი"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form model_terms:ir.ui.view,arch_db:payment.payment_provider_kanban
+msgid "Install"
+msgstr "დაყენება"
+
+#. module: payment
+#: model_terms:ir.actions.act_window,help:payment.action_payment_provider
+msgid "Install the provider you want to add."
+msgstr "დააინსტალირეთ მიმწოდებელი, რომლის დამატებაც გსურთ."
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__module_state
+msgid "Installation State"
+msgstr "ინსტალაციის მდგომარეობა"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_search
+msgid "Installed"
+msgstr "დაინსტალირებული"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_res_config_settings__installed_provider_id
+msgid "Installed Provider"
+msgstr "დაინსტალირებული მიმწოდებელი"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_capture_wizard__is_amount_to_capture_valid
+msgid "Is Amount To Capture Valid"
+msgstr "დასაკავებელი თანხა სწორია"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_res_country__is_mercado_pago_supported_country
+msgid "Is Mercado Pago Supported Country"
+msgstr "არის Mercado Pago-ს მხარდაჭერილი ქვეყანა"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_transaction__is_post_processed
+msgid "Is Post-processed"
+msgstr "შემდგომ დამუშავებულია"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_method__is_primary
+msgid "Is Primary Payment Method"
+msgstr "არის ძირითადი გადახდის მეთოდი"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_res_country__is_stripe_supported_country
+msgid "Is Stripe Supported Country"
+msgstr "არის Stripe-ის მხარდაჭერილი ქვეყანა"
+
+#. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/xml/payment_form_templates.xml:0
+msgid "It is currently linked to the following documents:"
+msgstr "ის ამჟამად შემდეგ დოკუმენტებს უკავშირდება:"
+
+#. module: payment
+#: model:payment.provider,name:payment.payment_provider_iyzico
+msgid "Iyzico"
+msgstr "Iyzico"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_transaction__landing_route
+msgid "Landing Route"
+msgstr "დაბრუნების მარშრუტი"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_transaction__partner_lang
+msgid "Language"
+msgstr "ენა"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_transaction__last_state_change
+msgid "Last State Change Date"
+msgstr "მდგომარეობის ბოლო ცვლილების თარიღი"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_capture_wizard__write_uid model:ir.model.fields,field_description:payment.field_payment_data__write_uid model:ir.model.fields,field_description:payment.field_payment_link_wizard__write_uid model:ir.model.fields,field_description:payment.field_payment_method__write_uid model:ir.model.fields,field_description:payment.field_payment_provider__write_uid model:ir.model.fields,field_description:payment.field_payment_token__write_uid model:ir.model.fields,field_description:payment.field_payment_transaction__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_capture_wizard__write_date model:ir.model.fields,field_description:payment.field_payment_data__write_date model:ir.model.fields,field_description:payment.field_payment_link_wizard__write_date model:ir.model.fields,field_description:payment.field_payment_method__write_date model:ir.model.fields,field_description:payment.field_payment_provider__write_date model:ir.model.fields,field_description:payment.field_payment_token__write_date model:ir.model.fields,field_description:payment.field_payment_transaction__write_date
+msgid "Last Updated on"
+msgstr "ბოლოს განახლდა"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__is_live model_terms:ir.ui.view,arch_db:payment.payment_provider_kanban
+msgid "Live"
+msgstr "ცოცხალი"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__image_128
+msgid "Logo"
+msgstr "ლოგო"
+
+#. module: payment
+#: model:portal.entry,description:payment.payment_methods_portal_entry
+msgid "Manage your payment methods"
+msgstr "მართეთ თქვენი გადახდის მეთოდები"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_method__support_manual_capture
+msgid "Manual Capture"
+msgstr "ხელით დაკავება"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__support_manual_capture
+msgid "Manual Capture Supported"
+msgstr "ხელით დაკავება მხარდაჭერილია"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/const.py:0
+msgid "Manual capture not supported"
+msgstr "ხელით დაკავება მხარდაუჭერელია"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "Manually confirmed by the user."
+msgstr "მომხმარებელმა ხელით დაადასტურა."
+
+#. module: payment
+#: model:ir.actions.server,name:payment.action_confirm_payment_transaction
+msgid "Mark as Confirmed"
+msgstr "დადასტურებულად მონიშვნა"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__maximum_amount
+msgid "Maximum Amount"
+msgstr "მაქსიმალური თანხა"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_capture_wizard__available_amount
+msgid "Maximum Capture Allowed"
+msgstr "დაშვებული მაქსიმალური დაკავება"
+
+#. module: payment
+#: model:ir.model.fields.selection,name:payment.selection__res_company__onboarding_payment_module__mercado_pago model:payment.provider,name:payment.payment_provider_mercado_pago
+msgid "Mercado Pago"
+msgstr "Mercado Pago"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_transaction__state_message model_terms:ir.ui.view,arch_db:payment.payment_transaction_form
+msgid "Message"
+msgstr "შეტყობინება"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid "Messages"
+msgstr "შეტყობინებები"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_token_form model_terms:ir.ui.view,arch_db:payment.payment_token_list model_terms:ir.ui.view,arch_db:payment.payment_transaction_list
+msgid "Method"
+msgstr "მეთოდი"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__minimum_amount
+msgid "Minimum Amount"
+msgstr "მინიმალური თანხა"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/const.py:0
+msgid "Minimum or maximum amount exceeded"
+msgstr "მინიმალურ ან მაქსიმალურ თანხას გადააჭარბა"
+
+#. module: payment
+#: model:payment.provider,name:payment.payment_provider_mollie
+msgid "Mollie"
+msgstr "Mollie"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_method__name model:ir.model.fields,field_description:payment.field_payment_provider__name model_terms:ir.ui.view,arch_db:payment.payment_method_form model_terms:ir.ui.view,arch_db:payment.payment_method_search model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid "Name"
+msgstr "სახელი"
+
+#. module: payment
+#: model:ir.model.fields.selection,name:payment.selection__payment_provider__code__none
+msgid "No Provider Set"
+msgstr "მიმწოდებელი მითითებული არ არის"
+
+#. module: payment
+#: model_terms:ir.actions.act_window,help:payment.action_payment_method
+msgid "No payment methods found for your payment providers."
+msgstr "თქვენი გადახდის მიმწოდებლებისთვის გადახდის მეთოდები ვერ მოიძებნა."
+
+#. module: payment
+#: model_terms:ir.actions.act_window,help:payment.action_payment_provider
+msgid "No providers available"
+msgstr "ხელმისაწვდომი მიმწოდებლები არ არის"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_token.py:0
+msgid "No token can be assigned to the public partner."
+msgstr "საჯარო პარტნიორს ტოკენი ვერ მიენიჭება."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.no_pms_available_warning
+msgid "None is configured for:"
+msgstr "არაფერია დაკონფიგურირებული:"
+
+#. module: payment
+#: model:payment.provider,name:payment.payment_provider_nuvei
+msgid "Nuvei"
+msgstr "Nuvei"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__module_to_buy
+msgid "Odoo Enterprise Module"
+msgstr "Odoo Enterprise-ის მოდული"
+
+#. module: payment
+#: model:ir.model.fields.selection,name:payment.selection__payment_transaction__operation__offline
+msgid "Offline payment by token"
+msgstr "ოფლაინ გადახდა ტოკენით"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_res_company__onboarding_payment_module model:ir.model.fields,field_description:payment.field_res_config_settings__onboarding_payment_module
+msgid "Onboarding Payment Module"
+msgstr "დანერგვის გადახდის მოდული"
+
+#. module: payment
+#: model:ir.model.fields.selection,name:payment.selection__payment_transaction__operation__online_direct
+msgid "Online direct payment"
+msgstr "ონლაინ პირდაპირი გადახდა"
+
+#. module: payment
+#: model:ir.model.fields.selection,name:payment.selection__payment_transaction__operation__online_token
+msgid "Online payment by token"
+msgstr "ონლაინ გადახდა ტოკენით"
+
+#. module: payment
+#: model:ir.model.fields.selection,name:payment.selection__payment_transaction__operation__online_redirect
+msgid "Online payment with redirection"
+msgstr "ონლაინ გადახდა გადამისამართებით"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "Only authorized transactions can be voided."
+msgstr "გაუქმება მხოლოდ ავტორიზებული ტრანზაქციებისა შეიძლება."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "Only confirmed transactions can be refunded."
+msgstr "დაბრუნება მხოლოდ დადასტურებული ტრანზაქციებისა შეიძლება."
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_transaction__operation
+msgid "Operation"
+msgstr "ოპერაცია"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0 model_terms:ir.ui.view,arch_db:payment.payment_transaction_form
+msgid "Operations"
+msgstr "ოპერაციები"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid "Options"
+msgstr "პარამეტრები"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.form
+msgid "Other payment methods"
+msgstr "სხვა გადახდის მეთოდები"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid "Others"
+msgstr "სხვები"
+
+#. module: payment
+#: model:ir.model.fields.selection,name:payment.selection__payment_provider__support_manual_capture__partial
+msgid "Partial"
+msgstr "ნაწილობრივი"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_link_wizard__partner_id model:ir.model.fields,field_description:payment.field_payment_token__partner_id model_terms:ir.ui.view,arch_db:payment.payment_token_search model_terms:ir.ui.view,arch_db:payment.payment_transaction_search
+msgid "Partner"
+msgstr "პარტნიორი"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_transaction__partner_name
+msgid "Partner Name"
+msgstr "პარტნიორის სახელი"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.form
+msgid "Pay"
+msgstr "გადახდა"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_res_company__pay_later_label
+msgid "Pay Later Label"
+msgstr "მოგვიანებით გადახდის წარწერა"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_res_company__pay_now_label
+msgid "Pay Now Label"
+msgstr "ახლა გადახდის წარწერა"
+
+#. module: payment
+#: model:payment.provider,name:payment.payment_provider_pay_on_invoice
+msgid "Pay on Invoice"
+msgstr "ინვოისით გადახდა"
+
+#. module: payment
+#: model:payment.provider,name:payment.payment_provider_paypal
+msgid "PayPal"
+msgstr "PayPal"
+
+#. module: payment
+#: model:payment.provider,name:payment.payment_provider_payu
+msgid "PayU"
+msgstr "PayU"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_data__payload
+msgid "Payload"
+msgstr "დატვირთვა"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.pay model_terms:ir.ui.view,arch_db:payment.payment_transaction_form
+msgid "Payment"
+msgstr "გადახდა"
+
+#. module: payment
+#: model:ir.model,name:payment.model_payment_capture_wizard
+msgid "Payment Capture Wizard"
+msgstr "გადახდის დაკავების ვიზარდი"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.confirm
+msgid "Payment Confirmation"
+msgstr "გადახდის დადასტურება"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_transaction__payment_data_count
+msgid "Payment Data Count"
+msgstr "გადახდის მონაცემების რაოდენობა"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_token__payment_details
+msgid "Payment Details"
+msgstr "გადახდის დეტალები"
+
+#. module: payment
+#: model:ir.module.module,shortdesc:base.module_payment
+msgid "Payment Engine"
+msgstr "გადახდის ძრავა"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_provider.py:0
+msgid "Payment History"
+msgstr "გადახდების ისტორია"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_link_wizard__link
+msgid "Payment Link"
+msgstr "გადახდის ბმული"
+
+#. module: payment
+#: model:ir.model,name:payment.model_payment_method model:ir.model.fields,field_description:payment.field_payment_token__payment_method_id model:ir.model.fields,field_description:payment.field_payment_transaction__payment_method_id model_terms:ir.ui.view,arch_db:payment.confirm model_terms:ir.ui.view,arch_db:payment.payment_method_form model_terms:ir.ui.view,arch_db:payment.payment_provider_search
+msgid "Payment Method"
+msgstr "გადახდის მეთოდი"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_token__payment_method_code model:ir.model.fields,field_description:payment.field_payment_transaction__payment_method_code
+msgid "Payment Method Code"
+msgstr "გადახდის მეთოდის კოდი"
+
+#. module: payment
+#: model:ir.actions.act_window,name:payment.action_payment_method model:portal.entry,name:payment.payment_methods_portal_entry model_terms:ir.ui.view,arch_db:payment.no_pms_available_warning model_terms:ir.ui.view,arch_db:payment.payment_methods model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid "Payment Methods"
+msgstr "გადახდის მეთოდები"
+
+#. module: payment
+#: model:ir.model,name:payment.model_payment_provider
+msgid "Payment Provider"
+msgstr "გადახდის პროვაიდერი"
+
+#. module: payment
+#: model:ir.actions.act_window,name:payment.action_payment_provider model_terms:ir.ui.view,arch_db:payment.payment_provider_list
+msgid "Payment Providers"
+msgstr "გადახდის პროვაიდერები"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/controllers/payment_status.py:0 model_terms:ir.ui.view,arch_db:payment.payment_status
+msgid "Payment Status"
+msgstr "გადახდის სტატუსი"
+
+#. module: payment
+#: model:ir.model,name:payment.model_payment_token model:ir.model.fields,field_description:payment.field_payment_transaction__token_id
+msgid "Payment Token"
+msgstr "გადახდის ტოკენი"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_res_partner__payment_token_count model:ir.model.fields,field_description:payment.field_res_users__payment_token_count
+msgid "Payment Token Count"
+msgstr "გადახდის ტოკენების რაოდენობა"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_provider.py:0 model:ir.actions.act_window,name:payment.action_payment_token model:ir.model.fields,field_description:payment.field_payment_provider__payment_token_ids model:ir.model.fields,field_description:payment.field_res_partner__payment_token_ids model:ir.model.fields,field_description:payment.field_res_users__payment_token_ids model_terms:ir.ui.view,arch_db:payment.payment_token_form model_terms:ir.ui.view,arch_db:payment.payment_token_list model_terms:ir.ui.view,arch_db:payment.payment_token_search
+msgid "Payment Tokens"
+msgstr "გადახდის ტოკენები"
+
+#. module: payment
+#: model:ir.model,name:payment.model_payment_transaction
+msgid "Payment Transaction"
+msgstr "გადახდის ტრანზაქცია"
+
+#. module: payment
+#: model:ir.actions.act_window,name:payment.action_payment_transaction model:ir.model.fields,field_description:payment.field_payment_provider__payment_transaction_ids model:ir.model.fields,field_description:payment.field_payment_token__transaction_ids model_terms:ir.ui.view,arch_db:payment.payment_transaction_form model_terms:ir.ui.view,arch_db:payment.payment_transaction_list
+msgid "Payment Transactions"
+msgstr "გადახდის ტრანზაქციები"
+
+#. module: payment
+#: model:ir.actions.act_window,name:payment.action_payment_transaction_linked_to_token
+msgid "Payment Transactions Linked To Token"
+msgstr "ტოკენთან დაკავშირებული გადახდის ტრანზაქციები"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_token.py:0
+msgid "Payment details saved on %(date)s"
+msgstr "გადახდის დეტალები შენახულია %(date)s-ზე"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.form
+msgid "Payment method"
+msgstr "გადახდის მეთოდი"
+
+#. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/interactions/payment_form.js:0
+msgid "Payment method unavailable"
+msgstr "გადახდის მეთოდი მიუწვდომელია"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/const.py:0
+msgid "Payment method with duplicate code"
+msgstr "გადახდის მეთოდი დუბლირებული კოდით"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.availability_report
+msgid "Payment methods"
+msgstr "გადახდის მეთოდები"
+
+#. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/interactions/express_checkout.js:0 code:addons/payment/static/src/interactions/payment_form.js:0
+msgid "Payment processing failed"
+msgstr "გადახდის დამუშავება ვერ მოხერხდა"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid "Payment provider"
+msgstr "გადახდის მიმწოდებელი"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.availability_report
+msgid "Payment providers"
+msgstr "გადახდის მიმწოდებლები"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "Payment transactions should not be updated directly. Either use _record() to queue payment data for processing, or pass payment_safe_write=True to the context after ensuring that the update can tolerate a rollback."
+msgstr "გადახდის ტრანზაქციები პირდაპირ არ უნდა განახლდეს. ან გამოიყენეთ _record() გადახდის მონაცემების დასამუშავებლად რიგში ჩასაყენებლად, ან კონტექსტს გადაეცით payment_safe_write=True მას შემდეგ, რაც დარწმუნდებით, რომ განახლება rollback-ს გაუძლებს."
+
+#. module: payment
+#: model:ir.actions.server,name:payment.post_processing_cron_ir_actions_server
+msgid "Payment: Run Post-processing"
+msgstr "გადახდა: შემდგომი დამუშავების გაშვება"
+
+#. module: payment
+#: model:ir.actions.server,name:payment.processing_cron_ir_actions_server
+msgid "Payment: Run Processing"
+msgstr "გადახდა: დამუშავების გაშვება"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_token_form
+msgid "Payments"
+msgstr "გადახდები"
+
+#. module: payment
+#: model:payment.provider,name:payment.payment_provider_paymob
+msgid "Paymob"
+msgstr "Paymob"
+
+#. module: payment
+#: model:ir.model.fields.selection,name:payment.selection__payment_transaction__state__pending
+msgid "Pending"
+msgstr "მოლოდინში"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__pending_msg
+msgid "Pending Message"
+msgstr "მოლოდინის შეტყობინება"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0 model:ir.model.fields,field_description:payment.field_payment_transaction__payment_data_ids model_terms:ir.ui.view,arch_db:payment.payment_data_form model_terms:ir.ui.view,arch_db:payment.payment_data_list model_terms:ir.ui.view,arch_db:payment.payment_transaction_form
+msgid "Pending Updates"
+msgstr "მოლოდინში მყოფი განახლებები"
+
+#. module: payment
+#: model:ir.model,name:payment.model_payment_data
+msgid "Pending payment data payload to process"
+msgstr "გადახდის მონაცემების დამუშავების მომლოდინე დატვირთვა"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_transaction__partner_phone
+msgid "Phone"
+msgstr "ტელეფონი"
+
+#. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/interactions/payment_form.js:0
+msgid "Please choose another payment method."
+msgstr "გთხოვთ, აირჩიოთ სხვა გადახდის მეთოდი."
+
+#. module: payment
+#: model_terms:payment.provider,pending_msg:payment.payment_provider_transfer
+msgid "Please find the payment details below."
+msgstr "გადახდის დეტალები იხილეთ ქვემოთ."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/wizards/payment_link_wizard.py:0
+msgid "Please set a positive amount."
+msgstr "გთხოვთ, მიუთითოთ დადებითი თანხა."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.company_mismatch_warning
+msgid "Please switch to company"
+msgstr "გთხოვთ, გადაერთოთ კომპანიაზე"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_status
+msgid "Please wait..."
+msgstr "გთხოვთ, დაელოდოთ..."
+
+#. module: payment
+#: model:ir.model,name:payment.model_portal_entry
+msgid "Portal Entry"
+msgstr "პორტალის ჩანაწერი"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_transaction_form
+msgid "Post-process"
+msgstr "შემდგომი დამუშავება"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_transaction_form
+msgid "Post-processed"
+msgstr "შემდგომ დამუშავებული"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_method__primary_payment_method_id model:ir.model.fields,field_description:payment.field_payment_transaction__primary_payment_method_id
+msgid "Primary Payment Method"
+msgstr "ძირითადი გადახდის მეთოდი"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__primary_payment_method_ids
+msgid "Primary Payment Methods"
+msgstr "ძირითადი გადახდის მეთოდები"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__processed_amount
+msgid "Processed Amount"
+msgstr "დამუშავებული თანხა"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.confirm
+msgid "Processed by"
+msgstr "დამუშავებულია"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_transaction__is_live model_terms:ir.ui.view,arch_db:payment.payment_transaction_search
+msgid "Production Environment"
+msgstr "საწარმოო გარემო"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_method__provider_id model:ir.model.fields,field_description:payment.field_payment_token__provider_id model:ir.model.fields,field_description:payment.field_payment_transaction__provider_id model_terms:ir.ui.view,arch_db:payment.payment_provider_search model_terms:ir.ui.view,arch_db:payment.payment_token_search model_terms:ir.ui.view,arch_db:payment.payment_transaction_search
+msgid "Provider"
+msgstr "პროვაიდერი"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_token__provider_code model:ir.model.fields,field_description:payment.field_payment_transaction__provider_code
+msgid "Provider Code"
+msgstr "მიმწოდებლის კოდი"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_token__provider_ref model:ir.model.fields,field_description:payment.field_payment_transaction__provider_reference
+msgid "Provider Reference"
+msgstr "მიმწოდებლის მიმართვის ნომერი"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__is_published model_terms:ir.ui.view,arch_db:payment.payment_provider_kanban
+msgid "Published"
+msgstr "გამოქვეყნებული"
+
+#. module: payment
+#: model:ir.model.fields.selection,name:payment.selection__res_company__onboarding_payment_module__razorpay model:payment.provider,name:payment.payment_provider_razorpay
+msgid "Razorpay"
+msgstr "Razorpay"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__redirect_form_view_id
+msgid "Redirect Form Template"
+msgstr "გადამისამართების ფორმის შაბლონი"
+
+#. module: payment
+#: model:payment.provider,name:payment.payment_provider_redsys
+msgid "Redsys"
+msgstr "Redsys"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_transaction__reference model_terms:ir.ui.view,arch_db:payment.confirm model_terms:ir.ui.view,arch_db:payment.pay model_terms:ir.ui.view,arch_db:payment.payment_status model_terms:ir.ui.view,arch_db:payment.payment_transaction_form
+msgid "Reference"
+msgstr "მითითება"
+
+#. module: payment
+#: model:ir.model.constraint,message:payment.constraint_payment_transaction_reference_uniq
+msgid "Reference must be unique!"
+msgstr "მიმართვის ნომერი უნიკალური უნდა იყოს!"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0 model:ir.model.fields,field_description:payment.field_payment_method__support_refund model:ir.model.fields,field_description:payment.field_payment_provider__support_refund model:ir.model.fields.selection,name:payment.selection__payment_transaction__operation__refund
+msgid "Refund"
+msgstr "დაბრუნება"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_method__support_refund model:ir.model.fields,help:payment.field_payment_provider__support_refund
+msgid "Refund is a feature allowing to refund customers directly from the payment in Odoo."
+msgstr "დაბრუნება ფუნქციაა, რომელიც საშუალებას იძლევა კლიენტებს თანხა პირდაპირ Odoo-ს გადახდიდან დაუბრუნოთ."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_transaction_form
+msgid "Refunds"
+msgstr "დაბრუნებები"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_transaction__refunds_count
+msgid "Refunds Count"
+msgstr "დაბრუნებების რაოდენობა"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_link_wizard__res_id
+msgid "Related Document ID"
+msgstr "დაკავშირებული დოკუმენტის ID"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_link_wizard__res_model
+msgid "Related Document Model"
+msgstr "დაკავშირებული დოკუმენტის მოდელი"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid "Restrictions"
+msgstr "შეზღუდვები"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_transaction_form
+msgid "Run the post-processing step for this transaction."
+msgstr "გაუშვით ამ ტრანზაქციის შემდგომი დამუშავების ეტაპი."
+
+#. module: payment
+#: model:payment.provider,name:payment.payment_provider_sepa_direct_debit
+msgid "SEPA Direct Debit"
+msgstr "SEPA პირდაპირი დებეტი"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.form
+msgid "Save"
+msgstr "შენახვა"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "Saving your payment method."
+msgstr "მიმდინარეობს თქვენი გადახდის მეთოდის შენახვა."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_method_form
+msgid "Select countries. Leave empty to allow any."
+msgstr "აირჩიეთ ქვეყნები. ნებისმიერის დასაშვებად დატოვეთ ცარიელი."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_method_form
+msgid "Select currencies. Leave empty to allow any."
+msgstr "აირჩიეთ ვალუტები. ნებისმიერის დასაშვებად დატოვეთ ცარიელი."
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_method__sequence model:ir.model.fields,field_description:payment.field_payment_provider__sequence
+msgid "Sequence"
+msgstr "მიმდევრობა"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/wizards/payment_capture_wizard.py:0
+msgid "Some of the transactions you intend to capture can only be captured in full. Handle the transactions individually to capture a partial amount."
+msgstr "ზოგიერთი ტრანზაქცია, რომლის დაკავებასაც აპირებთ, მხოლოდ სრულად შეიძლება დაიკავოს. ნაწილობრივი თანხის დასაკავებლად ტრანზაქციები ინდივიდუალურად დაამუშავეთ."
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_transaction__source_transaction_id
+msgid "Source Transaction"
+msgstr "საწყისი ტრანზაქცია"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_transaction__partner_state_id
+msgid "State"
+msgstr "მდგომარეობა"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_transaction__state model_terms:ir.ui.view,arch_db:payment.payment_transaction_search
+msgid "Status"
+msgstr "სტატუსი"
+
+#. module: payment
+#: model:ir.model.fields.selection,name:payment.selection__res_company__onboarding_payment_module__stripe model:payment.provider,name:payment.payment_provider_stripe
+msgid "Stripe"
+msgstr "Stripe"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_capture_wizard__support_partial_capture
+msgid "Support Partial Capture"
+msgstr "ნაწილობრივი დაკავების მხარდაჭერა"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__payment_method_ids
+msgid "Supported Payment Methods"
+msgstr "მხარდაჭერილი გადახდის მეთოდები"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_method_form
+msgid "Supported by"
+msgstr "მხარდაჭერილია"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_kanban
+msgid "Test"
+msgstr "ტესტი"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid "Test Mode"
+msgstr "სატესტო რეჟიმი"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.method_form model_terms:ir.ui.view,arch_db:payment.token_form
+msgid "Test mode"
+msgstr "სატესტო რეჟიმი"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "The %(tx_label)s %(ref)s of %(formatted_amount)s encountered an error."
+msgstr "%(tx_label)s %(ref)s (%(formatted_amount)s) შეცდომას წააწყდა."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "The %(tx_label)s %(ref)s of %(formatted_amount)s has been authorized."
+msgstr "%(tx_label)s %(ref)s (%(formatted_amount)s) ავტორიზებულია."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "The %(tx_label)s %(ref)s of %(formatted_amount)s has been canceled."
+msgstr "%(tx_label)s %(ref)s (%(formatted_amount)s) გაუქმებულია."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "The %(tx_label)s %(ref)s of %(formatted_amount)s has been confirmed."
+msgstr "%(tx_label)s %(ref)s (%(formatted_amount)s) დადასტურებულია."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "The %(tx_label)s %(ref)s of %(formatted_amount)s is pending."
+msgstr "%(tx_label)s %(ref)s (%(formatted_amount)s) მოლოდინშია."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "The amount from the payment data doesn't match the one from the transaction."
+msgstr "გადახდის მონაცემების თანხა ტრანზაქციის თანხას არ ემთხვევა."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "The amount or currency is missing from the payment data."
+msgstr "გადახდის მონაცემებში თანხა ან ვალუტა აკლია."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/wizards/payment_capture_wizard.py:0
+msgid "The amount to capture must be positive and cannot be superior to %s."
+msgstr "დასაკავებელი თანხა დადებითი უნდა იყოს და %s-ს ვერ აღემატება."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_method__image model:ir.model.fields,help:payment.field_payment_method__image_payment_form
+msgid "The base image used for this payment method; in a 64x64 px format."
+msgstr "ამ გადახდის მეთოდისთვის გამოყენებული საბაზისო სურათი; 64x64 პქ ფორმატში."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_method__brand_ids
+msgid "The brands of the payment methods that will be displayed on the payment form."
+msgstr "გადახდის მეთოდების ბრენდები, რომლებიც გადახდის ფორმაზე გამოჩნდება."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_transaction__child_transaction_ids
+msgid "The child transactions of the transaction."
+msgstr "ტრანზაქციის შვილობილი ტრანზაქციები."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_token__payment_details
+msgid "The clear part of the payment method's payment details."
+msgstr "გადახდის მეთოდის გადახდის დეტალების ღია ნაწილი."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_transaction__state_message
+msgid "The complementary information message about the state"
+msgstr "დამატებითი საინფორმაციო შეტყობინება მდგომარეობის შესახებ"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_provider__available_country_ids
+msgid "The countries in which this payment provider is available. Leave blank to make it available in all countries."
+msgstr "ქვეყნები, სადაც ეს გადახდის მიმწოდებელი ხელმისაწვდომია. ყველა ქვეყანაში ხელმისაწვდომობისთვის დატოვეთ ცარიელი."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_provider__available_currency_ids
+msgid "The currencies available with this payment provider. Leave empty not to restrict any."
+msgstr "ამ გადახდის მიმწოდებელთან ხელმისაწვდომი ვალუტები. შეზღუდვის გარეშე დასატოვებლად დატოვეთ ცარიელი."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "The currency from the payment data doesn't match the one from the transaction."
+msgstr "გადახდის მონაცემების ვალუტა ტრანზაქციის ვალუტას არ ემთხვევა."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_provider.py:0
+msgid "The following fields must be filled: %s"
+msgstr "შემდეგი ველები უნდა შეივსოს: %s"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/controllers/portal.py:0
+msgid "The following kwargs are not whitelisted: %s"
+msgstr "შემდეგი kwargs თეთრ სიაში არ არის: %s"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_method.py:0
+msgid "The following payment methods cannot be enabled because their payment provider has manual capture activated: %s"
+msgstr "შემდეგი გადახდის მეთოდები ვერ ჩაირთვება, რადგან მათ გადახდის მიმწოდებელს ხელით დაკავება აქვს გააქტიურებული: %s"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_provider.py:0
+msgid "The following payment methods must be disabled in order to enable manual capture: %s"
+msgstr "ხელით დაკავების ჩასართავად შემდეგი გადახდის მეთოდები უნდა გამოირთოს: %s"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_transaction__reference
+msgid "The internal reference of the transaction"
+msgstr "ტრანზაქციის შიდა მიმართვის ნომერი"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_res_company__pay_later_label
+msgid "The label to be displayed on the payment buttons for 'Pay Later' payment methods."
+msgstr "წარწერა, რომელიც გამოჩნდება გადახდის ღილაკებზე 'მოგვიანებით გადახდა' ტიპის გადახდის მეთოდებისთვის."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_res_company__pay_now_label
+msgid "The label to be displayed on the payment buttons for 'Pay Now' payment methods."
+msgstr "წარწერა, რომელიც გამოჩნდება გადახდის ღილაკებზე 'ახლა გადახდა' ტიპის გადახდის მეთოდებისთვის."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_method__supported_country_ids
+msgid "The list of countries in which this payment method can be used (if the provider allows it). In other countries, this payment method is not available to customers."
+msgstr "ქვეყნების სია, სადაც ამ გადახდის მეთოდის გამოყენება შესაძლებელია (თუ მიმწოდებელი უშვებს). სხვა ქვეყნებში ეს გადახდის მეთოდი კლიენტებისთვის ხელმისაწვდომი არ არის."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_method__supported_currency_ids
+msgid "The list of currencies for that are supported by this payment method (if the provider allows it). When paying with another currency, this payment method is not available to customers."
+msgstr "ვალუტების სია, რომლებიც ამ გადახდის მეთოდის მიერ მხარდაჭერილია (თუ მიმწოდებელი უშვებს). სხვა ვალუტით გადახდისას ეს მეთოდი კლიენტებისთვის ხელმისაწვდომი არ არის."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_provider__main_currency_id
+msgid "The main currency of the company, used to display monetary fields."
+msgstr "კომპანიის ძირითადი ვალუტა, გამოიყენება ფულადი ველების საჩვენებლად."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_provider__maximum_amount
+msgid "The maximum payment amount that this payment provider is available for. Leave blank to make it available for any payment amount."
+msgstr "მაქსიმალური გადახდის თანხა, რომლისთვისაც ეს გადახდის მიმწოდებელი ხელმისაწვდომია. ნებისმიერი თანხისთვის ხელმისაწვდომობისთვის დატოვეთ ცარიელი."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_provider__auth_msg
+msgid "The message displayed if payment is authorized"
+msgstr "შეტყობინება, რომელიც ჩანს გადახდის ავტორიზაციისას"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_provider__cancel_msg
+msgid "The message displayed if the order is cancelled during the payment process"
+msgstr "შეტყობინება, რომელიც ჩანს, თუ შეკვეთა გადახდის პროცესში გაუქმდა"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_provider__done_msg
+msgid "The message displayed if the order is successfully done after the payment process"
+msgstr "შეტყობინება, რომელიც ჩანს, თუ შეკვეთა გადახდის პროცესის შემდეგ წარმატებით დასრულდა"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_provider__pending_msg
+msgid "The message displayed if the order pending after the payment process"
+msgstr "შეტყობინება, რომელიც ჩანს, თუ შეკვეთა გადახდის პროცესის შემდეგ მოლოდინშია"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_provider__pre_msg
+msgid "The message displayed to explain and help the payment process"
+msgstr "შეტყობინება, რომელიც ჩანს გადახდის პროცესის ასახსნელად და დასახმარებლად"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_provider__minimum_amount
+msgid "The minimum payment amount that this payment provider is available for. Leave blank to make it available for any payment amount."
+msgstr "გადახდის მინიმალური თანხა, რომლისთვისაც ეს გადახდის მიმწოდებელი ხელმისაწვდომია. დატოვეთ ცარიელი, რომ ის გადახდის ნებისმიერი თანხისთვის იყოს ხელმისაწვდომი."
+
+#. module: payment
+#: model:ir.module.module,summary:base.module_payment
+msgid "The payment engine used by payment provider modules."
+msgstr "გადახდის ძრავა, რომელსაც გადახდის მიმწოდებლის მოდულები იყენებენ."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_method__support_manual_capture
+msgid "The payment is authorized and captured in two steps instead of one."
+msgstr "გადახდა ავტორიზდება და იკავებს ორ ეტაპად და არა ერთად."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_provider.py:0
+msgid ""
+"The payment provider rejected the request.\n"
+"%s"
+msgstr ""
+"გადახდის მიმწოდებელმა მოთხოვნა უარყო.\n"
+"%s"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_method__primary_payment_method_id
+msgid ""
+"The primary payment method of the current payment method, if the latter is a brand.\n"
+"For example, \"Card\" is the primary payment method of the card brand \"VISA\"."
+msgstr ""
+"მიმდინარე გადახდის მეთოდის ძირითადი გადახდის მეთოდი, თუ ეს უკანასკნელი ბრენდია.\n"
+"მაგალითად, „ბარათი“ არის ბარათის ბრენდის „VISA“ ძირითადი გადახდის მეთოდი."
+
+#. module: payment
+#: model:ir.model.constraint,message:payment.constraint_payment_method_provider_id_code_uniq
+msgid "The provider already has a payment method with this code."
+msgstr "მიმწოდებელს უკვე აქვს გადახდის მეთოდი ამ კოდით."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "The provider must not be archived to make a request."
+msgstr "მოთხოვნის გასაგზავნად მიმწოდებელი დაარქივებული არ უნდა იყოს."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_token__provider_ref
+msgid "The provider reference of the token of the transaction."
+msgstr "ტრანზაქციის ტოკენის მიმწოდებლის მიმართვის ნომერი."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_transaction__provider_reference
+msgid "The provider reference of the transaction"
+msgstr "ტრანზაქციის მიმწოდებლის მიმართვის ნომერი"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_method__provider_id
+msgid "The provider supporting this payment method."
+msgstr "ამ გადახდის მეთოდის მხარდამჭერი მიმწოდებელი."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "The refund %(ref)s of %(formatted_amount)s has been initiated."
+msgstr "დაბრუნება %(ref)s (%(formatted_amount)s) ინიცირებულია."
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_method__image_payment_form
+msgid "The resized image displayed on the payment form."
+msgstr "გადახდის ფორმაზე ნაჩვენები ზომაშეცვლილი სურათი."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_transaction__landing_route
+msgid "The route the user is redirected to after the transaction"
+msgstr "მარშრუტი, სადაც მომხმარებელი ტრანზაქციის შემდეგ გადამისამართდება"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "The saving of your payment method has been canceled."
+msgstr "თქვენი გადახდის მეთოდის შენახვა გაუქმდა."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_transaction__source_transaction_id
+msgid "The source transaction of the related child transactions"
+msgstr "დაკავშირებული შვილობილი ტრანზაქციების საწყისი ტრანზაქცია"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_method__code model:ir.model.fields,help:payment.field_payment_token__payment_method_code model:ir.model.fields,help:payment.field_payment_transaction__payment_method_code
+msgid "The technical code of this payment method."
+msgstr "ამ გადახდის მეთოდის ტექნიკური კოდი."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_provider__code model:ir.model.fields,help:payment.field_payment_token__provider_code model:ir.model.fields,help:payment.field_payment_transaction__provider_code
+msgid "The technical code of this payment provider."
+msgstr "ამ გადახდის მიმწოდებლის ტექნიკური კოდი."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_provider__redirect_form_view_id
+msgid "The template rendering a form submitted to redirect the user when making a payment"
+msgstr "შაბლონი, რომელიც აგებს ფორმას, რომელიც იგზავნება მომხმარებლის გადამისამართებისთვის გადახდისას"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_provider__express_checkout_form_view_id
+msgid "The template rendering the express payment methods' form."
+msgstr "შაბლონი, რომელიც აგებს სწრაფი გადახდის მეთოდების ფორმას."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_provider__inline_form_view_id
+msgid "The template rendering the inline payment form when making a direct payment"
+msgstr "შაბლონი, რომელიც აგებს ჩაშენებულ გადახდის ფორმას პირდაპირი გადახდისას"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_provider__token_inline_form_view_id
+msgid "The template rendering the inline payment form when making a payment by token."
+msgstr "შაბლონი, რომელიც აგებს ჩაშენებულ გადახდის ფორმას ტოკენით გადახდისას."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "The transaction %(ref)s of %(formatted_amount)s has been initiated."
+msgstr "ტრანზაქცია %(ref)s (%(formatted_amount)s) ინიცირებულია."
+
+#. module: payment
+#: model_terms:ir.actions.act_window,help:payment.action_payment_transaction
+msgid "There are no transactions to show"
+msgstr "საჩვენებელი ტრანზაქციები არ არის"
+
+#. module: payment
+#: model_terms:ir.actions.act_window,help:payment.action_payment_token
+msgid "There is no token created yet."
+msgstr "ჯერ ტოკენი შექმნილი არ არის."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.pay
+msgid "There is nothing to pay."
+msgstr "გადასახდელი არაფერია."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_method.py:0
+msgid "This action will also archive %s tokens that are registered with this payment method."
+msgstr "ეს მოქმედება ასევე დაარქივებს %s ტოკენს, რომლებიც ამ გადახდის მეთოდზეა რეგისტრირებული."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_provider.py:0
+msgid "This action will also archive %s tokens that are registered with this provider."
+msgstr "ეს მოქმედება ასევე დაარქივებს %s ტოკენს, რომლებიც ამ მიმწოდებელზეა რეგისტრირებული."
+
+#. module: payment
+msgid "This controls whether customers can save their payment methods as payment tokens. A payment token is an anonymous link to the payment method details saved in the provider's database, allowing the customer to reuse it for a next purchase."
+msgstr "ეს განსაზღვრავს, შეუძლიათ თუ არა კლიენტებს გადახდის მეთოდების გადახდის ტოკენებად შენახვა. გადახდის ტოკენი არის ანონიმური ბმული მიმწოდებლის ბაზაში შენახულ გადახდის მეთოდის დეტალებზე, რაც კლიენტს საშუალებას აძლევს მომდევნო შესყიდვისთვის ხელახლა გამოიყენოს."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_provider__allow_express_checkout
+msgid "This controls whether customers can use express payment methods. Express checkout enables customers to pay with Google Pay and Apple Pay from which address information is collected at payment."
+msgstr "ეს განსაზღვრავს, შეუძლიათ თუ არა კლიენტებს სწრაფი გადახდის მეთოდების გამოყენება. სწრაფი გადახდა კლიენტებს Google Pay-ითა და Apple Pay-ით გადახდის საშუალებას აძლევს, საიდანაც მისამართის ინფორმაცია გადახდისას გროვდება."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_link_wizard_view_form
+msgid ""
+"This partner has no email, which may cause issues with some payment providers.\n"
+"                     Setting an email for this partner is advised."
+msgstr ""
+"ამ პარტნიორს ელფოსტა არ აქვს, რაც ზოგიერთ გადახდის მიმწოდებელთან პრობლემას გამოიწვევს.\n"
+"                     რეკომენდებულია ამ პარტნიორისთვის ელფოსტის მითითება."
+
+#. module: payment
+#: model_terms:ir.actions.act_window,help:payment.action_payment_provider
+msgid "To add a provider to the current company:"
+msgstr "მიმდინარე კომპანიაში მიმწოდებლის დასამატებლად:"
+
+#. module: payment
+#: model_terms:ir.actions.act_window,help:payment.action_payment_provider
+msgid "Toggle the main company in the company switcher."
+msgstr "გადართეთ ძირითადი კომპანია კომპანიების გადამრთველში."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_token_form model_terms:ir.ui.view,arch_db:payment.payment_token_list
+msgid "Token"
+msgstr "ტოკენი"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__token_count
+msgid "Token Count"
+msgstr "ტოკენების რაოდენობა"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__token_inline_form_view_id
+msgid "Token Inline Form Template"
+msgstr "ტოკენის ჩაშენებული ფორმის შაბლონი"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_method__support_tokenization model:ir.model.fields,field_description:payment.field_payment_provider__support_tokenization
+msgid "Tokenization"
+msgstr "ტოკენიზაცია"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_method__support_tokenization
+msgid "Tokenization is the process of saving the payment details as a token that can later be reused without having to enter the payment details again."
+msgstr "ტოკენიზაცია არის გადახდის დეტალების ტოკენად შენახვის პროცესი, რომელიც მოგვიანებით ხელახლა გამოიყენება გადახდის დეტალების ხელახლა შეყვანის გარეშე."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/const.py:0
+msgid "Tokenization not supported"
+msgstr "ტოკენიზაცია მხარდაუჭერელია"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/const.py:0
+msgid "Tokenization without payment no supported"
+msgstr "ტოკენიზაცია გადახდის გარეშე მხარდაუჭერელია"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid "Tokens"
+msgstr "ტოკენები"
+
+#. module: payment
+#: model:payment.provider,name:payment.payment_provider_toss_payments
+msgid "Toss Payments"
+msgstr "Toss Payments"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_capture_wizard__transaction_ids model:ir.model.fields,field_description:payment.field_payment_data__transaction_id
+msgid "Transaction"
+msgstr "ტრანზაქცია"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__transaction_count
+msgid "Transaction Count"
+msgstr "ტრანზაქციების რაოდენობა"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "Transaction authorization is not supported by the following payment providers: %s"
+msgstr "ტრანზაქციის ავტორიზაცია მხარდაუჭერელია შემდეგი გადახდის მიმწოდებლების მიერ: %s"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid "Transactions"
+msgstr "ტრანზაქციები"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.method_form model_terms:ir.ui.view,arch_db:payment.payment_provider_kanban model_terms:ir.ui.view,arch_db:payment.token_form
+msgid "Unpublished"
+msgstr "გამოუქვეყნებელი"
+
+#. module: payment
+#: model:ir.model.fields.selection,name:payment.selection__payment_method__support_manual_capture__none model:ir.model.fields.selection,name:payment.selection__payment_method__support_refund__none model:ir.model.fields.selection,name:payment.selection__payment_provider__support_refund__none
+msgid "Unsupported"
+msgstr "მხარდაუჭერელი"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form model_terms:ir.ui.view,arch_db:payment.payment_provider_kanban
+msgid "Upgrade"
+msgstr "განახლება"
+
+#. module: payment
+#: model:ir.model.fields.selection,name:payment.selection__payment_transaction__operation__validation
+msgid "Validation of the payment method"
+msgstr "გადახდის მეთოდის დამოწმება"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_capture_wizard__void_remaining_amount
+msgid "Void Remaining Amount"
+msgstr "დარჩენილი თანხის გაუქმება"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_transaction_form
+msgid "Void Transaction"
+msgstr "ტრანზაქციის გაუქმება"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_method.py:0 code:addons/payment/models/payment_provider.py:0
+msgid "Warning"
+msgstr "გაფრთხილება"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_link_wizard__warning_message
+msgid "Warning Message"
+msgstr "გაფრთხილების შეტყობინება"
+
+#. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/interactions/payment_form.js:0
+msgid "Warning!"
+msgstr "გაფრთხილება!"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_transaction__tokenize
+msgid "Whether a payment token should be created when post-processing the transaction"
+msgstr "უნდა შეიქმნას თუ არა გადახდის ტოკენი ტრანზაქციის შემდგომი დამუშავებისას"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_capture_wizard__support_partial_capture
+msgid "Whether each of the transactions' provider supports the partial capture."
+msgstr "უჭერს თუ არა მხარს თითოეული ტრანზაქციის მიმწოდებელი ნაწილობრივ დაკავებას."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_provider__is_published
+msgid "Whether the provider is visible on the website or not. Tokens remain functional but are only visible on manage forms."
+msgstr "ჩანს თუ არა მიმწოდებელი ვებსაიტზე. ტოკენები ფუნქციური რჩება, მაგრამ მხოლოდ მართვის ფორმებზე ჩანს."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_transaction__is_live
+msgid "Whether the transaction happened in a production environment. False for transactions created before this tracking was implemented."
+msgstr "მოხდა თუ არა ტრანზაქცია საწარმოო გარემოში. მცდარია იმ ტრანზაქციებისთვის, რომლებიც ამ აღრიცხვის დანერგვამდე შეიქმნა."
+
+#. module: payment
+#: model:payment.provider,name:payment.payment_provider_transfer
+msgid "Wire Transfer"
+msgstr "საბანკო გადარიცხვა"
+
+#. module: payment
+#: model:payment.provider,name:payment.payment_provider_worldline
+msgid "Worldline"
+msgstr "Worldline"
+
+#. module: payment
+#: model:payment.provider,name:payment.payment_provider_xendit
+msgid "Xendit"
+msgstr "Xendit"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_token.py:0
+msgid "You can't unarchive tokens linked to inactive payment methods or archived providers."
+msgstr "ვერ ამოიღებთ არქივიდან ტოკენებს, რომლებიც არააქტიურ გადახდის მეთოდებს ან დაარქივებულ მიმწოდებლებს უკავშირდება."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_provider.py:0
+msgid "You cannot change the company of a payment provider with existing transactions."
+msgstr "არსებული ტრანზაქციების მქონე გადახდის მიმწოდებლის კომპანიას ვერ შეცვლით."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_method.py:0
+msgid "You cannot delete the default payment method."
+msgstr "ნაგულისხმევი გადახდის მეთოდის წაშლა შეუძლებელია."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_provider.py:0
+msgid "You cannot delete the payment provider %s; archive or uninstall it instead."
+msgstr "გადახდის მიმწოდებელს %s ვერ წაშლით — სანაცვლოდ დაარქივეთ ან წაშალეთ ინსტალაცია."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/controllers/portal.py:0
+msgid "You do not have access to this payment token."
+msgstr "ამ გადახდის ტოკენზე წვდომა არ გაქვთ."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_status
+msgid ""
+"You should receive an email confirming your payment within a few\n"
+"                                    minutes."
+msgstr "რამდენიმე წუთში უნდა მიიღოთ წერილი თქვენი გადახდის დადასტურებით."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_status
+msgid "Your order is being processed."
+msgstr "თქვენი შეკვეთა მუშავდება."
+
+#. module: payment
+#: model_terms:payment.provider,done_msg:payment.payment_provider_pay_on_invoice
+msgid "Your order is confirmed, you will receive your invoice shortly."
+msgstr "თქვენი შეკვეთა დადასტურებულია, ინვოისს მალე მიიღებთ."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_provider.py:0 model_terms:payment.provider,auth_msg:payment.payment_provider_adyen model_terms:payment.provider,auth_msg:payment.payment_provider_aps model_terms:payment.provider,auth_msg:payment.payment_provider_asiapay model_terms:payment.provider,auth_msg:payment.payment_provider_authorize model_terms:payment.provider,auth_msg:payment.payment_provider_buckaroo model_terms:payment.provider,auth_msg:payment.payment_provider_demo model_terms:payment.provider,auth_msg:payment.payment_provider_dpo model_terms:payment.provider,auth_msg:payment.payment_provider_ecpay model_terms:payment.provider,auth_msg:payment.payment_provider_flutterwave model_terms:payment.provider,auth_msg:payment.payment_provider_iyzico model_terms:payment.provider,auth_msg:payment.payment_provider_mercado_pago model_terms:payment.provider,auth_msg:payment.payment_provider_mollie model_terms:payment.provider,auth_msg:payment.payment_provider_nuvei model_terms:payment.provider,auth_msg:payment.payment_provider_pay_on_invoice model_terms:payment.provider,auth_msg:payment.payment_provider_paymob model_terms:payment.provider,auth_msg:payment.payment_provider_paypal model_terms:payment.provider,auth_msg:payment.payment_provider_payu model_terms:payment.provider,auth_msg:payment.payment_provider_razorpay model_terms:payment.provider,auth_msg:payment.payment_provider_redsys model_terms:payment.provider,auth_msg:payment.payment_provider_sepa_direct_debit model_terms:payment.provider,auth_msg:payment.payment_provider_stripe model_terms:payment.provider,auth_msg:payment.payment_provider_toss_payments model_terms:payment.provider,auth_msg:payment.payment_provider_transfer model_terms:payment.provider,auth_msg:payment.payment_provider_worldline model_terms:payment.provider,auth_msg:payment.payment_provider_xendit
+msgid "Your payment has been authorized."
+msgstr "თქვენი გადახდა ავტორიზებულია."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_provider.py:0 model_terms:payment.provider,cancel_msg:payment.payment_provider_adyen model_terms:payment.provider,cancel_msg:payment.payment_provider_aps model_terms:payment.provider,cancel_msg:payment.payment_provider_asiapay model_terms:payment.provider,cancel_msg:payment.payment_provider_authorize model_terms:payment.provider,cancel_msg:payment.payment_provider_buckaroo model_terms:payment.provider,cancel_msg:payment.payment_provider_demo model_terms:payment.provider,cancel_msg:payment.payment_provider_dpo model_terms:payment.provider,cancel_msg:payment.payment_provider_ecpay model_terms:payment.provider,cancel_msg:payment.payment_provider_flutterwave model_terms:payment.provider,cancel_msg:payment.payment_provider_iyzico model_terms:payment.provider,cancel_msg:payment.payment_provider_mercado_pago model_terms:payment.provider,cancel_msg:payment.payment_provider_mollie model_terms:payment.provider,cancel_msg:payment.payment_provider_nuvei model_terms:payment.provider,cancel_msg:payment.payment_provider_pay_on_invoice model_terms:payment.provider,cancel_msg:payment.payment_provider_paymob model_terms:payment.provider,cancel_msg:payment.payment_provider_paypal model_terms:payment.provider,cancel_msg:payment.payment_provider_payu model_terms:payment.provider,cancel_msg:payment.payment_provider_razorpay model_terms:payment.provider,cancel_msg:payment.payment_provider_redsys model_terms:payment.provider,cancel_msg:payment.payment_provider_sepa_direct_debit model_terms:payment.provider,cancel_msg:payment.payment_provider_stripe model_terms:payment.provider,cancel_msg:payment.payment_provider_toss_payments model_terms:payment.provider,cancel_msg:payment.payment_provider_transfer model_terms:payment.provider,cancel_msg:payment.payment_provider_worldline model_terms:payment.provider,cancel_msg:payment.payment_provider_xendit
+msgid "Your payment has been cancelled."
+msgstr "თქვენი გადახდა გაუქმდა."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_provider.py:0 model_terms:payment.provider,pending_msg:payment.payment_provider_adyen model_terms:payment.provider,pending_msg:payment.payment_provider_aps model_terms:payment.provider,pending_msg:payment.payment_provider_asiapay model_terms:payment.provider,pending_msg:payment.payment_provider_authorize model_terms:payment.provider,pending_msg:payment.payment_provider_buckaroo model_terms:payment.provider,pending_msg:payment.payment_provider_demo model_terms:payment.provider,pending_msg:payment.payment_provider_dpo model_terms:payment.provider,pending_msg:payment.payment_provider_ecpay model_terms:payment.provider,pending_msg:payment.payment_provider_flutterwave model_terms:payment.provider,pending_msg:payment.payment_provider_iyzico model_terms:payment.provider,pending_msg:payment.payment_provider_mercado_pago model_terms:payment.provider,pending_msg:payment.payment_provider_mollie model_terms:payment.provider,pending_msg:payment.payment_provider_nuvei model_terms:payment.provider,pending_msg:payment.payment_provider_pay_on_invoice model_terms:payment.provider,pending_msg:payment.payment_provider_paymob model_terms:payment.provider,pending_msg:payment.payment_provider_paypal model_terms:payment.provider,pending_msg:payment.payment_provider_payu model_terms:payment.provider,pending_msg:payment.payment_provider_razorpay model_terms:payment.provider,pending_msg:payment.payment_provider_redsys model_terms:payment.provider,pending_msg:payment.payment_provider_sepa_direct_debit model_terms:payment.provider,pending_msg:payment.payment_provider_stripe model_terms:payment.provider,pending_msg:payment.payment_provider_toss_payments model_terms:payment.provider,pending_msg:payment.payment_provider_worldline model_terms:payment.provider,pending_msg:payment.payment_provider_xendit
+msgid "Your payment has been processed but is waiting for approval."
+msgstr "თქვენი გადახდა დამუშავებულია, მაგრამ დამტკიცების მოლოდინშია."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_provider.py:0 model_terms:payment.provider,done_msg:payment.payment_provider_adyen model_terms:payment.provider,done_msg:payment.payment_provider_aps model_terms:payment.provider,done_msg:payment.payment_provider_asiapay model_terms:payment.provider,done_msg:payment.payment_provider_authorize model_terms:payment.provider,done_msg:payment.payment_provider_buckaroo model_terms:payment.provider,done_msg:payment.payment_provider_demo model_terms:payment.provider,done_msg:payment.payment_provider_dpo model_terms:payment.provider,done_msg:payment.payment_provider_ecpay model_terms:payment.provider,done_msg:payment.payment_provider_flutterwave model_terms:payment.provider,done_msg:payment.payment_provider_iyzico model_terms:payment.provider,done_msg:payment.payment_provider_mercado_pago model_terms:payment.provider,done_msg:payment.payment_provider_mollie model_terms:payment.provider,done_msg:payment.payment_provider_nuvei model_terms:payment.provider,done_msg:payment.payment_provider_paymob model_terms:payment.provider,done_msg:payment.payment_provider_paypal model_terms:payment.provider,done_msg:payment.payment_provider_payu model_terms:payment.provider,done_msg:payment.payment_provider_razorpay model_terms:payment.provider,done_msg:payment.payment_provider_redsys model_terms:payment.provider,done_msg:payment.payment_provider_sepa_direct_debit model_terms:payment.provider,done_msg:payment.payment_provider_stripe model_terms:payment.provider,done_msg:payment.payment_provider_toss_payments model_terms:payment.provider,done_msg:payment.payment_provider_transfer model_terms:payment.provider,done_msg:payment.payment_provider_worldline model_terms:payment.provider,done_msg:payment.payment_provider_xendit
+msgid "Your payment has been processed."
+msgstr "თქვენი გადახდა დამუშავებულია."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "Your payment has not been processed yet."
+msgstr "თქვენი გადახდა ჯერ არ დამუშავებულა."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_status
+msgid "Your payment is being processed."
+msgstr "თქვენი გადახდა მუშავდება."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_status
+msgid "Your payment is on its way!"
+msgstr "თქვენი გადახდა გზაშია!"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "Your payment method has been saved."
+msgstr "თქვენი გადახდის მეთოდი შენახულია."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "Your payment method has not been saved yet."
+msgstr "თქვენი გადახდის მეთოდი ჯერ არ არის შენახული."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.form
+msgid "Your payment methods"
+msgstr "თქვენი გადახდის მეთოდები"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "Your payment operation could not be completed for following transactions: %(tx_refs)s"
+msgstr "თქვენი გადახდის ოპერაცია ვერ დასრულდა შემდეგი ტრანზაქციებისთვის: %(tx_refs)s"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "Your payment operation has been successfully submitted."
+msgstr "თქვენი გადახდის ოპერაცია წარმატებით გაიგზავნა."
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_transaction__partner_zip
+msgid "Zip"
+msgstr "საფოსტო ინდექსი"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_provider.py:0
+msgid "id"
+msgstr "id"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_kanban
+msgid "provider"
+msgstr "მიმწოდებელი"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "source_transaction_id"
+msgstr "source_transaction_id"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.no_pms_available_warning
+msgid "the website administrator."
+msgstr "ვებსაიტის ადმინისტრატორს."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.company_mismatch_warning
+msgid ""
+"to make this\n"
+"                    payment."
+msgstr ""
+"ამ გადახდის\n"
+"                    განსახორციელებლად."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "transaction_id"
+msgstr "transaction_id"
+
+#. module: payment
+#: model:ir.model,name:payment.model_ir_websocket
+msgid "websocket message handling"
+msgstr "websocket შეტყობინების დამუშავება"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.availability_report_records
+msgid "(ID:"
+msgstr "(ID:"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_7eleven
+msgid "7Eleven"
+msgstr "7Eleven"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_method_form
+msgid ""
+"<i class=\"fa fa-exclamation-triangle\"/> These properties are set to\n"
+"                                match the behavior of providers and that of their integration with\n"
+"                                Odoo regarding this payment method. Any change may result in errors\n"
+"                                and should be tested on a test database first."
+msgstr ""
+"<i class=\"fa fa-exclamation-triangle\"/> ეს თვისებები დაყენებულია ისე, რომ\n"
+"                                შეესაბამებოდეს მიმწოდებლების ქცევასა და Odoo-სთან მათ ინტეგრაციას\n"
+"                                ამ გადახდის მეთოდთან დაკავშირებით. ნებისმიერმა ცვლილებამ შეიძლება შეცდომები გამოიწვიოს\n"
+"                                და ჯერ სატესტო ბაზაზე უნდა შემოწმდეს."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.portal_breadcrumb
+msgid "<i class=\"fa fa-home\" role=\"img\" title=\"Home\" aria-label=\"Home\"/>"
+msgstr "<i class=\"fa fa-home\" role=\"img\" title=\"მთავარი\" aria-label=\"მთავარი\"/>"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_capture_wizard_view_form
+msgid "<i class=\"fa fa-info-circle oe_inline\" invisible=\"support_partial_capture != 'full_only'\" title=\"Some of the transactions you intend to capture can only be captured in full. Handle the transactions individually to capture a partial amount.\"/>"
+msgstr "<i class=\"fa fa-info-circle oe_inline\" invisible=\"support_partial_capture != 'full_only'\" title=\"ზოგიერთი ტრანზაქცია, რომლის დაკავებასაც აპირებთ, მხოლოდ სრულად შეიძლება დაიკავოს. ნაწილობრივი თანხის დასაკავებლად ტრანზაქციები ინდივიდუალურად დაამუშავეთ.\"/>"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.token_form
+msgid "<i class=\"fa fa-trash\" title=\"Delete payment method\" data-bs-toggle=\"tooltip\" data-bs-placement=\"top\" data-bs-delay=\"0\"/>"
+msgstr "<i class=\"fa fa-trash\" title=\"გადახდის მეთოდის წაშლა\" data-bs-toggle=\"tooltip\" data-bs-placement=\"top\" data-bs-delay=\"0\"/>"
+
+#. module: payment
+#: model_terms:ir.actions.act_window,help:payment.action_payment_method
+msgid "<i class=\"oi oi-arrow-right me-1\"></i> Configure a payment provider"
+msgstr "<i class=\"oi oi-arrow-right me-1\"></i> გადახდის მიმწოდებლის კონფიგურაცია"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid ""
+"<i class=\"oi oi-fw o_button_icon oi-arrow-right\"/>\n"
+"                                            Enable Payment Methods"
+msgstr ""
+"<i class=\"oi oi-fw o_button_icon oi-arrow-right\"/>\n"
+"                                            გადახდის მეთოდების ჩართვა"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.method_form model_terms:ir.ui.view,arch_db:payment.token_form
+msgid "<span><i class=\"fa fa-lock\"/> Secured by</span>"
+msgstr "<span><i class=\"fa fa-lock\"/> დაცულია</span>"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.no_pms_available_warning
+msgid "<strong><i class=\"fa fa-file-text\"/> Show availability report</strong>"
+msgstr "<strong><i class=\"fa fa-file-text\"/> ხელმისაწვდომობის ანგარიშის ჩვენება</strong>"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.no_pms_available_warning
+msgid "<strong><i class=\"oi oi-arrow-right\"/> Payment Methods</strong>"
+msgstr "<strong><i class=\"oi oi-arrow-right\"/> გადახდის მეთოდები</strong>"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.no_pms_available_warning
+msgid "<strong><i class=\"oi oi-arrow-right\"/> Payment Providers</strong>"
+msgstr "<strong><i class=\"oi oi-arrow-right\"/> გადახდის მიმწოდებლები</strong>"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.no_pms_available_warning
+msgid "<strong>No payment method available</strong>"
+msgstr "<strong>ხელმისაწვდომი გადახდის მეთოდი არ არის</strong>"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid ""
+"<strong>Warning</strong> Creating a payment provider from the <em>CREATE</em> button is not supported.\n"
+"                        Please use the <em>Duplicate</em> action instead."
+msgstr ""
+"<strong>გაფრთხილება</strong> გადახდის მიმწოდებლის შექმნა <em>შექმნის</em> ღილაკით მხარდაჭერილი არ არის.\n"
+"                        გთხოვთ, სანაცვლოდ გამოიყენოთ მოქმედება <em>დუბლირება</em>."
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_ach_direct_debit
+msgid "ACH Direct Debit"
+msgstr "ACH Direct Debit"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.no_pms_available_warning
+msgid "ACTIVATE"
+msgstr "გააქტიურება"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_abitab
+msgid "Abitab"
+msgstr "Abitab"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_kanban
+msgid "Activate"
+msgstr "გააქტიურება"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_res_config_settings__active_provider_id
+msgid "Active Provider"
+msgstr "აქტიური მიმწოდებელი"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_affirm
+msgid "Affirm"
+msgstr "Affirm"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_afterpay_riverty
+msgid "AfterPay"
+msgstr "AfterPay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_afterpay
+msgid "Afterpay"
+msgstr "Afterpay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_akulaku
+msgid "Akulaku PayLater"
+msgstr "Akulaku PayLater"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_alipay_hk
+msgid "AliPayHK"
+msgstr "AliPayHK"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_alipay
+msgid "Alipay"
+msgstr "Alipay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_alipay_plus
+msgid "Alipay+"
+msgstr "Alipay+"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_alma
+msgid "Alma"
+msgstr "Alma"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_aman
+msgid "Aman"
+msgstr "Aman"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_amazon_pay
+msgid "Amazon Pay"
+msgstr "Amazon Pay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_amex
+msgid "American Express"
+msgstr "American Express"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_link_wizard__amount_max
+msgid "Amount Max"
+msgstr "მაქს. თანხა"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_appota
+msgid "Appota"
+msgstr "Appota"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_transaction_form
+msgid "Are you sure you want to void the authorized transaction? This action can't be undone."
+msgstr "დარწმუნებული ხართ, რომ გსურთ ავტორიზებული ტრანზაქციის გაუქმება? ამ მოქმედების გაუქმება შეუძლებელია."
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_argencard
+msgid "Argencard"
+msgstr "Argencard"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_astropay
+msgid "Astropay TEF"
+msgstr "Astropay TEF"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_atome
+msgid "Atome"
+msgstr "Atome"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid "Availability"
+msgstr "ხელმისაწვდომობა"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_bacs_direct_debit
+msgid "BACS Direct Debit"
+msgstr "BACS Direct Debit"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_bank_bca
+msgid "BCA"
+msgstr "BCA"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_becs_direct_debit
+msgid "BECS Direct Debit"
+msgstr "BECS Direct Debit"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_blik
+msgid "BLIK"
+msgstr "BLIK"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_bri
+msgid "BRI"
+msgstr "BRI"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_bancnet
+msgid "BancNet"
+msgstr "BancNet"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_banco_guayaquil
+msgid "Banco Guayaquil"
+msgstr "Banco Guayaquil"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_banco_pichincha
+msgid "Banco Pichincha"
+msgstr "Banco Pichincha"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_banco_de_bogota
+msgid "Banco de Bogota"
+msgstr "Banco de Bogota"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_bancolombia
+msgid "Bancolombia"
+msgstr "Bancolombia"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_bancontact
+msgid "Bancontact"
+msgstr "Bancontact"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_bangkok_bank
+msgid "Bangkok Bank"
+msgstr "Bangkok Bank"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_bank_account
+msgid "Bank Account"
+msgstr "საბანკო ანგარიში"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_installments_eg
+msgid "Bank Installments"
+msgstr "საბანკო განვადება"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_bni
+msgid "Bank Negara Indonesia"
+msgstr "Bank Negara Indonesia"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_bank_permata
+msgid "Bank Permata"
+msgstr "Bank Permata"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_bsi
+msgid "Bank Syariah Indonesia"
+msgstr "Bank Syariah Indonesia"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_bank_transfer
+msgid "Bank Transfer"
+msgstr "საბანკო გადარიცხვა"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_bank_of_ayudhya
+msgid "Bank of Ayudhya"
+msgstr "Bank of Ayudhya"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_bank_reference
+msgid "Bank reference"
+msgstr "საბანკო მიმართვის ნომერი"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_belfius
+msgid "Belfius"
+msgstr "Belfius"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_benefit
+msgid "Benefit"
+msgstr "Benefit"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_bharatqr
+msgid "BharatQR"
+msgstr "BharatQR"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_billease
+msgid "BillEase"
+msgstr "BillEase"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_billink
+msgid "Billink"
+msgstr "Billink"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_bizum
+msgid "Bizum"
+msgstr "Bizum"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_boleto
+msgid "Boleto"
+msgstr "Boleto"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_boost
+msgid "Boost"
+msgstr "Boost"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_cimb_niaga
+msgid "CIMB Niaga"
+msgstr "CIMB Niaga"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_cmr
+msgid "CMR"
+msgstr "CMR"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_cabal
+msgid "Cabal"
+msgstr "Cabal"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_caixa
+msgid "Caixa"
+msgstr "Caixa"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_provider__capture_manually
+msgid ""
+"Capture the amount from Odoo, when the delivery is completed.\n"
+"Use this if you want to charge your customers cards only when\n"
+"you are sure you can ship the goods to them."
+msgstr ""
+"დაიკავეთ თანხა Odoo-დან მიწოდების დასრულებისას.\n"
+"გამოიყენეთ ეს, თუ გსურთ კლიენტების ბარათებიდან თანხის ჩამოჭრა მხოლოდ მაშინ,\n"
+"როცა დარწმუნებული ხართ, რომ საქონლის გაგზავნას შეძლებთ."
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_card
+msgid "Card"
+msgstr "ბარათი"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_dpo
+msgid "Card / Mobile"
+msgstr "ბარათი / მობილური"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_carnet
+msgid "Carnet"
+msgstr "Carnet"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_cartes_bancaires
+msgid "Cartes Bancaires"
+msgstr "Cartes Bancaires"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_cash_app_pay
+msgid "Cash App Pay"
+msgstr "Cash App Pay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_cashalo
+msgid "Cashalo"
+msgstr "Cashalo"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_cebuana
+msgid "Cebuana"
+msgstr "Cebuana"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_cencosud
+msgid "Cencosud"
+msgstr "Cencosud"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_transaction_form
+msgid "Child transactions"
+msgstr "შვილობილი ტრანზაქციები"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.form
+msgid "Choose another method <i class=\"oi oi-arrow-down\"/>"
+msgstr "აირჩიეთ სხვა მეთოდი <i class=\"oi oi-arrow-down\"/>"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_cirrus
+msgid "Cirrus"
+msgstr "Cirrus"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_clearpay
+msgid "Clearpay"
+msgstr "Clearpay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_codensa
+msgid "Codensa"
+msgstr "Codensa"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_provider__color
+msgid "Color"
+msgstr "ფერი"
+
+#. module: payment
+msgid "Companies"
+msgstr "კომპანიები"
+
+#. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/interactions/payment_form.js:0
+msgid "Confirm"
+msgstr "დადასტურება"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_cordial
+msgid "Cordial"
+msgstr "Cordial"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_cordobesa
+msgid "Cordobesa"
+msgstr "Cordobesa"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_credit
+msgid "Credit Payment"
+msgstr "საკრედიტო გადახდა"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_dana
+msgid "Dana"
+msgstr "Dana"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_dankort
+msgid "Dankort"
+msgstr "Dankort"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_davivienda
+msgid "Davivienda"
+msgstr "Davivienda"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_diners
+msgid "Diners Club International"
+msgstr "Diners Club International"
+
+#. module: payment
+#: model:ir.model.fields.selection,name:payment.selection__payment_provider__state__disabled model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid "Disabled"
+msgstr "გათიშული"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_discover
+msgid "Discover"
+msgstr "Discover"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_duitnow
+msgid "DuitNow"
+msgstr "DuitNow"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_emi_india
+msgid "EMI"
+msgstr "EMI"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_eps
+msgid "EPS"
+msgstr "EPS"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_easypaisa
+msgid "EasyPaisa"
+msgstr "EasyPaisa"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_elo
+msgid "Elo"
+msgstr "Elo"
+
+#. module: payment
+#: model:ir.model.fields.selection,name:payment.selection__payment_provider__state__enabled
+msgid "Enabled"
+msgstr "ჩართულია"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_fps
+msgid "FPS"
+msgstr "FPS"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_fpx
+msgid "FPX"
+msgstr "FPX"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_facilito
+msgid "Facilito"
+msgstr "Facilito"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_floa_bank
+msgid "Floa Bank"
+msgstr "Floa Bank"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_forsa
+msgid "Forsa"
+msgstr "Forsa"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_gcash
+msgid "GCash"
+msgstr "GCash"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.confirm
+msgid "Go to my Account <i class=\"oi oi-arrow-right ms-2\"/>"
+msgstr "ჩემს ანგარიშზე გადასვლა <i class=\"oi oi-arrow-right ms-2\"/>"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_gopay
+msgid "GoPay"
+msgstr "GoPay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_grabpay
+msgid "GrabPay"
+msgstr "GrabPay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_hd
+msgid "HD Bank"
+msgstr "HD Bank"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_halan
+msgid "Halan"
+msgstr "Halan"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_res_config_settings__has_enabled_provider
+msgid "Has Enabled Provider"
+msgstr "აქვს ჩართული მიმწოდებელი"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_hipercard
+msgid "Hipercard"
+msgstr "Hipercard"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_hoolah
+msgid "Hoolah"
+msgstr "Hoolah"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_humm
+msgid "Humm"
+msgstr "Humm"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.no_pms_available_warning
+msgid "If you believe that it is an error, please contact the website administrator."
+msgstr "თუ ფიქრობთ, რომ ეს შეცდომაა, გთხოვთ, დაუკავშირდეთ ვებსაიტის ადმინისტრატორს."
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_provider__state
+msgid ""
+"In test mode, a fake payment is processed through a test payment interface.\n"
+"This mode is advised when setting up the provider."
+msgstr ""
+"სატესტო რეჟიმში გადახდა სიმულირდება სატესტო გადახდის ინტერფეისის მეშვეობით.\n"
+"ეს რეჟიმი რეკომენდებულია პროვაიდერის დაყენებისას."
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_jcb
+msgid "JCB"
+msgstr "JCB"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_jazzcash
+msgid "JazzCash"
+msgstr "JazzCash"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_jeniuspay
+msgid "JeniusPay"
+msgstr "JeniusPay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_jkopay
+msgid "Jkopay"
+msgstr "Jkopay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_kbc_cbc
+msgid "KBC/CBC"
+msgstr "KBC/CBC"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_knet
+msgid "KNET"
+msgstr "KNET"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_kakaopay
+msgid "KakaoPay"
+msgstr "KakaoPay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_kasikorn_bank
+msgid "Kasikorn Bank"
+msgstr "Kasikorn Bank"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_kiosk
+msgid "Kiosk"
+msgstr "კიოსკი"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_klarna
+msgid "Klarna"
+msgstr "Klarna"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_klarna_paynow
+msgid "Klarna - Pay Now"
+msgstr "Klarna - Pay Now"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_klarna_pay_over_time
+msgid "Klarna - Pay over time"
+msgstr "Klarna - Pay over time"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_kredivo
+msgid "Kredivo"
+msgstr "Kredivo"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_krungthai_bank
+msgid "KrungThai Bank"
+msgstr "KrungThai Bank"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_kfh
+msgid "Kuwait Finance House"
+msgstr "Kuwait Finance House"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_linepay
+msgid "LINE Pay"
+msgstr "LINE Pay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_lider
+msgid "Lider"
+msgstr "Lider"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_linkaja
+msgid "LinkAja"
+msgstr "LinkAja"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_nuvei_local
+msgid "Local Payments"
+msgstr "ადგილობრივი გადახდები"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_mpesa
+msgid "M-Pesa"
+msgstr "M-Pesa"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_mbway
+msgid "MB WAY"
+msgstr "MB WAY"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_mada
+msgid "Mada"
+msgstr "Mada"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_maestro
+msgid "Maestro"
+msgstr "Maestro"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_magna
+msgid "Magna"
+msgstr "Magna"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_transaction.py:0
+msgid "Making a request to the provider is not possible because the provider is disabled."
+msgstr "მიმწოდებელთან მოთხოვნის გაგზავნა შეუძლებელია, რადგან მიმწოდებელი გამორთულია."
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_mandiri
+msgid "Mandiri"
+msgstr "Mandiri"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_mastercard
+msgid "MasterCard"
+msgstr "MasterCard"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_maya
+msgid "Maya"
+msgstr "Maya"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_maybank
+msgid "Maybank"
+msgstr "Maybank"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_meeza
+msgid "Meeza"
+msgstr "Meeza"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_mercado_livre
+msgid "Mercado Livre"
+msgstr "Mercado Livre"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_mercado_pago_wallet
+msgid "Mercado Pago Wallet"
+msgstr "Mercado Pago Wallet"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_momo
+msgid "MoMo"
+msgstr "MoMo"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_mobile_wallet_eg
+msgid "Mobile Wallets Egypt"
+msgstr "Mobile Wallets Egypt"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_mobile_money
+msgid "Mobile money"
+msgstr "მობილური ფული"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_mobile_pay
+msgid "MobilePay"
+msgstr "MobilePay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_multibanco
+msgid "Multibanco"
+msgstr "Multibanco"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_mybank
+msgid "MyBank"
+msgstr "MyBank"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_naps
+msgid "NAPS"
+msgstr "NAPS"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_napas_card
+msgid "Napas Card"
+msgstr "Napas Card"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_naranja
+msgid "Naranja"
+msgstr "Naranja"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_nativa
+msgid "Nativa"
+msgstr "Nativa"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_netbanking
+msgid "Netbanking"
+msgstr "ინტერნეტბანკი"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.no_pms_available_warning
+msgid "No payment providers are configured."
+msgstr "გადახდის მიმწოდებლები დაკონფიგურირებული არ არის."
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_ovo
+msgid "OVO"
+msgstr "OVO"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_oca
+msgid "Oca"
+msgstr "Oca"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_octopus
+msgid "Octopus"
+msgstr "Octopus"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_omannet
+msgid "OmanNet"
+msgstr "OmanNet"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_online_banking_czech_republic
+msgid "Online Banking Czech Republic"
+msgstr "ინტერნეტბანკი — ჩეხეთი"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_online_banking_india
+msgid "Online Banking India"
+msgstr "ინტერნეტბანკი — ინდოეთი"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_online_banking_slovakia
+msgid "Online Banking Slovakia"
+msgstr "ინტერნეტბანკი — სლოვაკეთი"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_online_banking_thailand
+msgid "Online Banking Thailand"
+msgstr "ინტერნეტბანკი — ტაილანდი"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_open_banking
+msgid "Open banking"
+msgstr "ღია ბანკინგი"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_oxxopay
+msgid "Oxxo Pay"
+msgstr "Oxxo Pay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_p24
+msgid "P24"
+msgstr "P24"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_poli
+msgid "POLi"
+msgstr "POLi"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_pps
+msgid "PPS"
+msgstr "PPS"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_pse
+msgid "PSE"
+msgstr "PSE"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_pace
+msgid "Pace."
+msgstr "Pace."
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_paylater_india
+msgid "Pay Later"
+msgstr "მოგვიანებით გადახდა"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_paybright
+msgid "PayBright"
+msgstr "PayBright"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_pay_id
+msgid "PayID"
+msgstr "PayID"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_payme
+msgid "PayMe"
+msgstr "PayMe"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_paynow
+msgid "PayNow"
+msgstr "PayNow"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_paysafecard
+msgid "PaySafeCard"
+msgstr "PaySafeCard"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid "Payment Followup"
+msgstr "გადახდის მიდევნება"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid "Payment Form"
+msgstr "გადახდის ფორმა"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_link_wizard_view_form
+msgid "Payment Info"
+msgstr "გადახდის ინფორმაცია"
+
+#. module: payment
+#: model:ir.actions.server,name:payment.cron_post_process_payment_tx_ir_actions_server
+msgid "Payment: Post-process transactions"
+msgstr "გადახდა: ტრანზაქციების შემდგომი დამუშავება"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_paypal
+msgid "Paypal"
+msgstr "Paypal"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_paytm
+msgid "Paytm"
+msgstr "Paytm"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_paytrail
+msgid "Paytrail"
+msgstr "Paytrail"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_pix
+msgid "Pix"
+msgstr "Pix"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_method.py:0
+msgid "Please make sure that %(payment_method)s is supported by %(provider)s."
+msgstr "გთხოვთ, დარწმუნდეთ, რომ %(payment_method)s მხარდაჭერილია %(provider)s-ის მიერ."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/wizards/payment_link_wizard.py:0
+msgid "Please set an amount lower than %s."
+msgstr "გთხოვთ, მიუთითოთ %s-ზე ნაკლები თანხა."
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_post_finance
+msgid "PostFinance Pay"
+msgstr "PostFinance Pay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_poste_pay
+msgid "PostePay"
+msgstr "PostePay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_premium_card
+msgid "Premium Card"
+msgstr "პრემიუმ ბარათი"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_presto
+msgid "Presto"
+msgstr "Presto"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_promptpay
+msgid "Prompt Pay"
+msgstr "Prompt Pay"
+
+#. module: payment
+#: model:ir.model.fields,field_description:payment.field_payment_method__provider_ids model_terms:ir.ui.view,arch_db:payment.payment_method_form
+msgid "Providers"
+msgstr "მიმწოდებლები"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_qris
+msgid "QRIS"
+msgstr "QRIS"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_rabbit_line_pay
+msgid "Rabbit LINE Pay"
+msgstr "Rabbit LINE Pay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_ratepay
+msgid "Ratepay"
+msgstr "Ratepay"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.availability_report_records
+msgid "Reason:"
+msgstr "მიზეზი:"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_redpagos
+msgid "Redpagos"
+msgstr "Redpagos"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_revolut_pay
+msgid "Revolut Pay"
+msgstr "Revolut Pay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_rupay
+msgid "RuPay"
+msgstr "RuPay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_spei
+msgid "SPEI"
+msgstr "SPEI"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_stcpay
+msgid "STCPay"
+msgstr "STCPay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_samsung_pay
+msgid "Samsung Pay"
+msgstr "Samsung Pay"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid "Select countries. Leave empty to make available everywhere."
+msgstr "აირჩიეთ ქვეყნები. ყველგან ხელმისაწვდომობისთვის დატოვეთ ცარიელი."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
+msgid "Select currencies. Leave empty not to restrict any."
+msgstr "აირჩიეთ ვალუტები. შეზღუდვის გარეშე დასატოვებლად დატოვეთ ცარიელი."
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_shopback
+msgid "ShopBack"
+msgstr "ShopBack"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_shopeepay
+msgid "ShopeePay"
+msgstr "ShopeePay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_shopping
+msgid "Shopping Card"
+msgstr "სავაჭრო ბარათი"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_scb
+msgid "Siam Commerical Bank"
+msgstr "Siam Commerical Bank"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.state_header
+msgid "Skip <i class=\"oi oi-arrow-right ms-1 small\"/>"
+msgstr "გამოტოვება <i class=\"oi oi-arrow-right ms-1 small\"/>"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_sofort
+msgid "Sofort"
+msgstr "Sofort"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_souhoola
+msgid "Souhoola"
+msgstr "Souhoola"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.availability_report_records
+msgid "Supported providers:"
+msgstr "მხარდაჭერილი მიმწოდებლები:"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_swish
+msgid "Swish"
+msgstr "Swish"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_sympl
+msgid "Sympl"
+msgstr "Sympl"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_tenpay
+msgid "TENPAY"
+msgstr "TENPAY"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_ttb
+msgid "TTB"
+msgstr "TTB"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_tabby
+msgid "Tabby"
+msgstr "Tabby"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_tamara
+msgid "Tamara"
+msgstr "Tamara"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_tmb
+msgid "Tamilnad Mercantile Bank Limited"
+msgstr "Tamilnad Mercantile Bank Limited"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_tarjeta_mercadopago
+msgid "Tarjeta MercadoPago"
+msgstr "Tarjeta MercadoPago"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_techcom
+msgid "Techcombank"
+msgstr "Techcombank"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_tendopay
+msgid "TendoPay"
+msgstr "TendoPay"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.state_header
+msgid "Thank you!"
+msgstr "გმადლობთ!"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_provider__color
+msgid "The color of the card in kanban view"
+msgstr "ბარათის ფერი კანბანის ხედში"
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_method__provider_ids
+msgid "The list of providers supporting this payment method."
+msgstr "ამ გადახდის მეთოდის მხარდამჭერი მიმწოდებლების სია."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/wizards/payment_link_wizard.py:0
+msgid "There is nothing to be paid."
+msgstr "გადასახდელი არაფერია."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_provider.py:0
+msgid "This action will also archive %s tokens that are registered with this provider. "
+msgstr "ეს მოქმედება ასევე დაარქივებს %s ტოკენს, რომლებიც ამ მიმწოდებელზეა რეგისტრირებული. "
+
+#. module: payment
+#: model:ir.model.fields,help:payment.field_payment_provider__allow_tokenization
+msgid ""
+"This controls whether customers can save their payment methods as payment tokens.\n"
+"A payment token is an anonymous link to the payment method details saved in the\n"
+"provider's database, allowing the customer to reuse it for a next purchase."
+msgstr ""
+"ეს განსაზღვრავს, შეუძლიათ თუ არა კლიენტებს გადახდის მეთოდების გადახდის ტოკენებად შენახვა.\n"
+"გადახდის ტოკენი არის ანონიმური ბმული მიმწოდებლის ბაზაში შენახულ გადახდის მეთოდის\n"
+"დეტალებზე, რაც კლიენტს საშუალებას აძლევს მომდევნო შესყიდვისთვის ხელახლა გამოიყენოს."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_method.py:0
+msgid "This payment method needs a partner in crime; you should enable a payment provider supporting this method first."
+msgstr "ამ გადახდის მეთოდს თანამგზავრი სჭირდება — ჯერ ჩართეთ ამ მეთოდის მხარდამჭერი გადახდის მიმწოდებელი."
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_tienphong
+msgid "Tienphong"
+msgstr "Tienphong"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_tinka
+msgid "Tinka"
+msgstr "Tinka"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_touch_n_go
+msgid "Touch'n Go"
+msgstr "Touch'n Go"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_troy
+msgid "Troy"
+msgstr "Troy"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_truemoney
+msgid "TrueMoney"
+msgstr "TrueMoney"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_trustly
+msgid "Trustly"
+msgstr "Trustly"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_twint
+msgid "Twint"
+msgstr "Twint"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_upi
+msgid "UPI"
+msgstr "UPI"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_ussd
+msgid "USSD"
+msgstr "USSD"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_unionpay
+msgid "UnionPay"
+msgstr "UnionPay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_uob
+msgid "United Overseas Bank"
+msgstr "United Overseas Bank"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_uatp
+msgid "Universal Air Travel Plan"
+msgstr "Universal Air Travel Plan"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_vpay
+msgid "V PAY"
+msgstr "V PAY"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_visa
+msgid "VISA"
+msgstr "VISA"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_vnptwallet
+msgid "VNPT Money"
+msgstr "VNPT Money"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_vpbank
+msgid "VP Bank"
+msgstr "VP Bank"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_valu
+msgid "ValU"
+msgstr "ValU"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_venmo
+msgid "Venmo"
+msgstr "Venmo"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_vietcapital
+msgid "Viet Capital"
+msgstr "Viet Capital"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_vietcom
+msgid "Vietcombank"
+msgstr "Vietcombank"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_viettelpay
+msgid "Viettel Pay"
+msgstr "Viettel Pay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_vipps
+msgid "Vipps"
+msgstr "Vipps"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_wallets_india
+msgid "Wallets India"
+msgstr "Wallets India"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_walley
+msgid "Walley"
+msgstr "Walley"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_wechat_pay
+msgid "WeChat Pay"
+msgstr "WeChat Pay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_welend
+msgid "WeLend"
+msgstr "WeLend"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_webpay
+msgid "WebPay"
+msgstr "WebPay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_woori
+msgid "Woori Bank"
+msgstr "Woori Bank"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_token.py:0
+msgid "You can't unarchive tokens linked to inactive payment methods or disabled providers."
+msgstr "ვერ ამოიღებთ არქივიდან ტოკენებს, რომლებიც არააქტიურ გადახდის მეთოდებს ან გამორთულ მიმწოდებლებს უკავშირდება."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_provider.py:0
+msgid "You cannot delete the payment provider %s; disable it or uninstall it instead."
+msgstr "გადახდის მიმწოდებელს %s ვერ წაშლით — სანაცვლოდ გამორთეთ ან წაშალეთ ინსტალაცია."
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/models/payment_provider.py:0
+msgid "You cannot publish a disabled provider."
+msgstr "გამორთულ მიმწოდებელს ვერ გამოაქვეყნებთ."
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_transaction_form
+msgid "ZIP"
+msgstr "ZIP"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_zalopay
+msgid "Zalopay"
+msgstr "Zalopay"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_cofidis
+msgid "cofidis"
+msgstr "cofidis"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_enets
+msgid "eNETS"
+msgstr "eNETS"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/const.py:0
+msgid "express checkout not supported"
+msgstr "სწრაფი გადახდა მხარდაუჭერელია"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_ideal
+msgid "iDEAL"
+msgstr "iDEAL"
+
+#. module: payment
+#: model:payment.method,name:payment.payment_method_in3
+msgid "in3"
+msgstr "in3"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/const.py:0
+msgid "incompatible country"
+msgstr "შეუთავსებელი ქვეყანა"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/const.py:0
+msgid "incompatible currency"
+msgstr "შეუთავსებელი ვალუტა"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/const.py:0
+msgid "incompatible website"
+msgstr "შეუთავსებელი ვებსაიტი"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/const.py:0
+msgid "manual capture not supported"
+msgstr "ხელით დაკავება მხარდაუჭერელი"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/const.py:0
+msgid "maximum amount exceeded"
+msgstr "მაქსიმალურ თანხას გადააჭარბა"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/const.py:0
+msgid "no supported provider available"
+msgstr "მხარდაჭერილი მიმწოდებელი არ არის ხელმისაწვდომი"
+
+#. module: payment
+#: model_terms:ir.ui.view,arch_db:payment.payment_provider_search
+msgid "payment method"
+msgstr "გადახდის მეთოდი"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/const.py:0
+msgid "tokenization not supported"
+msgstr "ტოკენიზაცია მხარდაუჭერელია"
+
+#. module: payment
+#. odoo-python
+#: code:addons/payment/const.py:0
+msgid "tokenization without payment no supported"
+msgstr "ტოკენიზაცია გადახდის გარეშე მხარდაუჭერელია"

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_users_form_inherit_rs_base" model="ir.ui.view">
+        <field name="name">res.users.form.inherit.rs.base</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='preferences']" position="after">
+                <page string="Revenue Service" name="rs_credentials">
+                    <group string="Revenue Service (rs.ge)">
+                        <field name="rs_company_id"/>
+                        <field name="rs_username"/>
+                        <field name="rs_password" password="True"/>
+                        <field name="rs_user_id" readonly="1"/>
+                        <field name="rs_un_id" readonly="1"/>
+                        <field name="rs_is_responsible"
+                               help="Tick to make this user the one whose login runs the automated rs.ge operations of the company shown above (cron sync, status refresh, employee registry)."/>
+                        <field name="rs_token_expiry" readonly="1"/>
+                        <field name="rs_device_paired_on" readonly="1"/>
+                    </group>
+                    <div class="d-flex flex-wrap gap-2 mt-3">
+                        <button name="action_rs_test_credentials"
+                                type="object"
+                                string="Test RS Credentials"
+                                class="btn btn-secondary"
+                                icon="power"
+                                help="Tests the login on the rs.ge e-invoice service (revenue.mof.ge) and the waybill service (services.rs.ge). A waybill failure is shown as a warning and does not block the e-invoice result."/>
+                        <button name="action_rs_test_rest_credentials"
+                                type="object"
+                                string="Test REST (eapi.rs.ge)"
+                                class="btn btn-secondary"
+                                icon="key"
+                                help="Authenticates against eapi.rs.ge. If the account has 2FA, an SMS PIN prompt opens so you can pair this device."/>
+                        <button name="action_rs_signout_rest"
+                                type="object"
+                                string="Sign out from REST"
+                                class="btn btn-warning"
+                                icon="logout"
+                                groups="base.group_system"
+                                confirm="This signs out this user from eapi.rs.ge and clears the cached bearer token. Active background jobs using this account will pay one extra re-authentication round-trip on their next call. Continue?"
+                                help="Calls /Users/SignOut and clears the cached REST token. Device pairing (DEVICE_CODE) is preserved so 2FA does not retrigger."/>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_users_form_simple_modif_inherit_rs_base" model="ir.ui.view">
+        <field name="name">res.users.form.simple.inherit.rs.base</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form_simple_modif"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='preferences_page']" position="after">
+                <page string="Revenue Service" name="rs_credentials">
+                    <group string="Revenue Service (rs.ge)">
+                        <field name="rs_company_id"/>
+                        <field name="rs_username"/>
+                        <field name="rs_password" password="True"/>
+                        <field name="rs_user_id" readonly="1"/>
+                    </group>
+                    <div class="d-flex flex-wrap gap-2 mt-3">
+                        <button name="action_rs_test_credentials"
+                                type="object"
+                                string="Test RS Credentials"
+                                class="btn btn-secondary"
+                                icon="power"/>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

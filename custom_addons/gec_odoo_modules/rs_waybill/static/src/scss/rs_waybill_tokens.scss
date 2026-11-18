@@ -1,0 +1,226 @@
+// Dark mode: web.assets_web_dark recompiles all backend SCSS with $o-webclient-color-scheme: dark; tokens hold both.
+
+$rsw-dark: $o-webclient-color-scheme == dark;
+
+@function rsw-pick($light, $dark) {
+    @return if($rsw-dark, $dark, $light);
+}
+
+// Form: .rsw-tab exists only in the waybill form (and its Live RS View / Adjustment popup).
+$rsw-form: '.o_form_view:has(.rsw-tab)';
+$rsw-list: '.o_list_view:is(:has(.o_rs_waybill_main), :has(.o_waybill_state_icon_cell), .o_rs_waybill_template_list)';
+$rsw-dialog: '.modal:is(:has(button[name="action_reduce_order"]), :has(button[name="action_deliver_later"]), :has(button[name="action_confirm"]):has(th[data-name="qty"]):has(button[special="cancel"]):has(.o_field_widget[name="line_ids"] th[data-name="product_id"]))';
+
+$rsw-font-path: '../fonts';
+$rsw-latin-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+$rsw-georgian-range: U+0589, U+10A0-10FF, U+1C90-1CBA, U+1CBD-1CBF, U+205A, U+2D00-2D2F, U+2E31;
+
+@each $weight in (400, 500, 600, 700) {
+    @font-face {
+        font-family: 'RSW Noto Sans';
+        font-style: normal;
+        font-weight: $weight;
+        font-display: swap;
+        src: url('#{$rsw-font-path}/noto-sans-latin-#{$weight}.woff2') format('woff2');
+        unicode-range: $rsw-latin-range;
+    }
+    @font-face {
+        font-family: 'RSW Noto Sans';
+        font-style: normal;
+        font-weight: $weight;
+        font-display: swap;
+        src: url('#{$rsw-font-path}/noto-sans-georgian-#{$weight}.woff2') format('woff2');
+        unicode-range: $rsw-georgian-range;
+    }
+}
+
+$rsw-font: 'RSW Noto Sans', system-ui, sans-serif;
+
+@mixin rsw-tokens {
+    --rsw-paper:        #{rsw-pick(#F2F2EF, #121212)};
+    --rsw-sheet:        #{rsw-pick(#FFFFFF, #1A1A19)};
+    --rsw-head:         #{rsw-pick(#F6F6F3, #212120)};
+    --rsw-ink:          #{rsw-pick(#151515, #ECECE8)};
+    --rsw-ink-2:        #{rsw-pick(#3F3F3C, #C8C8C2)};
+    --rsw-label:        #{rsw-pick(#5C5C58, #9C9C96)};
+    --rsw-rule:         #{rsw-pick(#E0E0DB, #2E2E2C)};
+    --rsw-group:        #{rsw-pick(#CFCFC9, #3D3D3A)};
+    --rsw-line:         #{rsw-pick(#8A8A84, #74746E)};
+    --rsw-accent:       #{rsw-pick(#7A2230, #E29AA6)};
+    --rsw-accent-tint:  #{rsw-pick(#F3E5E7, #3A1F25)};
+    --rsw-on-accent:    #{rsw-pick(#FFFFFF, #2A0D13)};
+    --rsw-done:         #{rsw-pick(#2F6A3E, #7CC48F)};
+    --rsw-on-done:      #{rsw-pick(#FFFFFF, #0E2414)};
+    --rsw-done-tint:    #{rsw-pick(#E4EFE6, #1C2B20)};
+    --rsw-active:       #{rsw-pick(#7F5200, #E2B460)};
+    --rsw-active-tint:  #{rsw-pick(#FBF1DC, #33291A)};
+    --rsw-draft:        #{rsw-pick(#57534C, #B5B5AE)};
+    --rsw-draft-tint:   #{rsw-pick(#EFEEEA, #262624)};
+    --rsw-void-tint:    #{rsw-pick(#E6E6E3, #2A2A28)};
+    --rsw-accent-soft:  #{rsw-pick(#9A4A57, #C98692)};
+    --rsw-sec-party:      #{rsw-pick(#8E2A3A, #E29AA6)};
+    --rsw-sec-move:       #{rsw-pick(#2F5D8A, #7FA8D6)};
+    --rsw-sec-other:      #{rsw-pick(#4A4A46, #A8A8A2)};
+    --rsw-st-draft:       #{rsw-pick(#8A8A84, #9C9C96)};
+    --rsw-st-active:      #{rsw-pick(#E08A00, #F0A93B)};
+    --rsw-on-st-active:   #{rsw-pick(#1A1000, #1A1000)};
+    --rsw-st-active-text: #{rsw-pick(#8A5300, #F0A93B)};
+    --rsw-st-active-tint: #{rsw-pick(#FDEBC8, #3D2C10)};
+    --rsw-st-done:        #{rsw-pick(#1F7A3A, #4CB56E)};
+    --rsw-on-st-done:     #{rsw-pick(#FFFFFF, #06210F)};
+    --rsw-st-done-text:   #{rsw-pick(#1F7A3A, #5CC27E)};
+    --rsw-st-done-tint:   #{rsw-pick(#DDF0E2, #173322)};
+    --rsw-st-void:        #{rsw-pick(#B42318, #E5675A)};
+    --rsw-on-st-void:     #{rsw-pick(#FFFFFF, #2A0705)};
+    --rsw-st-void-text:   #{rsw-pick(#B42318, #F08B7F)};
+    --rsw-st-void-tint:   #{rsw-pick(#FBE1DE, #3D1A17)};
+    --rsw-void:         #{rsw-pick(#2B2B29, #D8D8D2)};
+    --rsw-on-void:      #{rsw-pick(#FFFFFF, #151515)};
+    --rsw-alert:        #{rsw-pick(#B42318, #F28B7D)};
+    --rsw-alert-tint:   #{rsw-pick(#FBE9E7, #3A1D1A)};
+    --rsw-drift-tint:   #{rsw-pick(#FFF1D0, #3A2E14)};
+    // waybill colors for gec_brand_kit's frames (header, list head, status step); unused without that module
+    --gec-app-primary:    var(--rsw-accent);
+    --gec-app-accent:     var(--rsw-accent);
+    --gec-app-action:     var(--rsw-accent);
+    --gec-app-on-primary: var(--rsw-on-accent);
+    --rsw-r: 4px;
+    --rsw-R: 6px;
+
+    font-family: $rsw-font;
+    font-variant-numeric: tabular-nums lining-nums;
+}
+
+#{$rsw-form},
+#{$rsw-list},
+#{$rsw-dialog} {
+    @include rsw-tokens;
+}
+
+@mixin rsw-focus {
+    outline: 0;
+    border-color: var(--rsw-accent) !important;
+    box-shadow: 0 0 0 2px var(--rsw-accent-tint) !important;
+}
+
+@mixin rsw-btn-secondary {
+    --bs-btn-bg: var(--rsw-sheet);
+    --bs-btn-color: var(--rsw-ink);
+    --bs-btn-border-color: var(--rsw-line);
+    --bs-btn-hover-bg: var(--rsw-head);
+    --bs-btn-hover-color: var(--rsw-ink);
+    --bs-btn-hover-border-color: var(--rsw-line);
+    --bs-btn-active-bg: var(--rsw-head);
+    --bs-btn-active-color: var(--rsw-ink);
+    --bs-btn-active-border-color: var(--rsw-ink);
+    --bs-btn-disabled-bg: var(--rsw-sheet);
+    --bs-btn-disabled-color: var(--rsw-label);
+    --bs-btn-disabled-border-color: var(--rsw-rule);
+    background: var(--bs-btn-bg);
+    color: var(--bs-btn-color);
+    border: 1px solid var(--bs-btn-border-color);
+    box-shadow: none !important;
+    transform: none !important;
+    filter: none;
+    &:hover { background: var(--bs-btn-hover-bg); color: var(--bs-btn-hover-color); border-color: var(--bs-btn-hover-border-color); }
+    &:focus-visible { @include rsw-focus; }
+}
+
+@mixin rsw-btn-filled {
+    @include rsw-btn-secondary;
+    --bs-btn-bg: var(--rsw-accent);
+    --bs-btn-color: var(--rsw-on-accent);
+    --bs-btn-border-color: var(--rsw-accent);
+    --bs-btn-hover-bg: var(--rsw-accent);
+    --bs-btn-hover-color: var(--rsw-on-accent);
+    --bs-btn-hover-border-color: var(--rsw-accent);
+    --bs-btn-active-bg: var(--rsw-accent);
+    --bs-btn-active-color: var(--rsw-on-accent);
+    --bs-btn-active-border-color: var(--rsw-accent);
+    &:hover { filter: brightness(0.92); }
+}
+
+@mixin rsw-btn-destructive {
+    @include rsw-btn-secondary;
+    --bs-btn-color: var(--rsw-alert);
+    --bs-btn-hover-color: var(--rsw-alert);
+    --bs-btn-active-color: var(--rsw-alert);
+}
+
+@mixin rsw-mark($height: 32px, $size: 12px, $spacing: 0.1em) {
+    display: inline-flex !important;
+    align-items: center;
+    height: $height;
+    padding: 0 14px !important;
+    font-size: $size !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    border-radius: var(--rsw-r) !important;
+    box-shadow: none !important;
+    &:lang(en) { text-transform: uppercase; letter-spacing: $spacing; }
+}
+
+@mixin rsw-mark-draft     { background: transparent !important; border: 1.5px dashed var(--rsw-st-draft) !important; color: var(--rsw-draft) !important; }
+@mixin rsw-mark-active    { background: var(--rsw-st-active) !important; border: 1px solid var(--rsw-st-active) !important; color: var(--rsw-on-st-active) !important; }
+@mixin rsw-mark-completed { background: var(--rsw-st-done) !important; border: 1px solid var(--rsw-st-done) !important; color: var(--rsw-on-st-done) !important; }
+@mixin rsw-mark-cancelled { background: var(--rsw-st-void) !important; border: 1px solid var(--rsw-st-void) !important; color: var(--rsw-on-st-void) !important; }
+
+@mixin rsw-table {
+    background: var(--rsw-sheet);
+    border: 1px solid var(--rsw-rule);
+    border-radius: var(--rsw-R);
+    overflow: hidden;
+
+    .o_list_table {
+        --bs-table-bg: transparent;
+        --bs-table-striped-bg: transparent;
+        --bs-table-accent-bg: transparent;
+        --bs-table-hover-bg: transparent;
+        margin: 0;
+        color: var(--rsw-ink);
+        font-variant-numeric: tabular-nums lining-nums;
+
+        thead th {
+            background: var(--rsw-head) !important;
+            color: var(--rsw-label);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: none;
+            letter-spacing: 0;
+            border-bottom: 1px solid var(--rsw-rule);
+            border-top: 0;
+        }
+        tbody tr.o_data_row {
+            height: 40px;
+            > td {
+                background: transparent;
+                border-top: 0;
+                border-left: 0;
+                border-right: 0;
+                border-bottom: 1px solid var(--rsw-rule);
+                color: var(--rsw-ink);
+                font-size: 13px;
+                box-shadow: none;
+            }
+            &:hover > td { background: var(--rsw-head); }
+            &.o_data_row_selected > td { background: var(--rsw-accent-tint); }
+        }
+        tbody tr:not(.o_data_row):not(.o_group_header) > td {
+            border: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+        td.o_list_number, th.o_list_number_th { text-align: right; }
+        .o_row_handle { color: var(--rsw-line); }
+        tfoot td { border-top: 0; background: transparent; }
+        .form-check-input:checked {
+            background-color: var(--rsw-accent);
+            border-color: var(--rsw-accent);
+        }
+    }
+}
+
+@mixin rsw-unmapped-row {
+    color: var(--rsw-ink) !important;
+    > td { background: var(--rsw-drift-tint) !important; color: var(--rsw-ink) !important; }
+}

@@ -1,0 +1,1411 @@
+# Georgian translation of the Odoo addon approvals, kept in gec_i18n_hr.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-18 17:47+0000\n"
+"PO-Revision-Date: 2026-09-30 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian (ka_GE)\n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#. module: approvals
+#: model:ir.actions.report,print_report_name:approvals.action_report_approval_request
+msgid "'Approval - %s' % object.name"
+msgstr "'დამტკიცება - %s' % object.name"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
+msgid "<i class=\"oi text-danger me-1\" data-icon=\"close\"/>Refuse"
+msgstr "<i class=\"oi text-danger me-1\" data-icon=\"close\"/>უარყოფა"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
+msgid "<i class=\"oi text-success me-1\" data-icon=\"check\"/>Approve"
+msgstr "<i class=\"oi text-success me-1\" data-icon=\"check\"/>დამტკიცება"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "<span class=\"col-2 fw-bold\">Description:</span>"
+msgstr "<span class=\"col-2 fw-bold\">აღწერა:</span>"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "<span class=\"fw-bold\">To</span>"
+msgstr "<span class=\"fw-bold\">ადრესატი</span>"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
+msgid "<span class=\"mx-1\">-</span>"
+msgstr "<span class=\"mx-1\">-</span>"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
+msgid "<span class=\"oi\" data-icon=\"warning\" title=\"Invalid minimum approvals\"/>"
+msgstr "<span class=\"oi\" data-icon=\"warning\" title=\"მინიმალური დამტკიცებების არასწორი რაოდენობა\"/>"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__message_needaction
+msgid "Action Needed"
+msgstr "საჭიროებს რეაგირებას"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__active model:ir.model.fields,field_description:approvals.field_approval_request__active
+msgid "Active"
+msgstr "აქტიური"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__activity_ids
+msgid "Activities"
+msgstr "აქტივობები"
+
+#. module: approvals
+#: model:ir.model,name:approvals.model_mail_activity
+msgid "Activity"
+msgstr "აქტივობა"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "აქტივობის გამონაკლისის აღნიშვნა"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__activity_plans_ids
+msgid "Activity Plans"
+msgstr "აქტივობის გეგმები"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__activity_state
+msgid "Activity State"
+msgstr "აქტივობის სტატუსი"
+
+#. module: approvals
+#: model:ir.model,name:approvals.model_mail_activity_type
+msgid "Activity Type"
+msgstr "აქტივობის ტიპი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "აქტივობის ტიპის ხატულა"
+
+#. module: approvals
+#: model:ir.model.fields,help:approvals.field_approval_category__has_product model:ir.model.fields,help:approvals.field_approval_request__has_product
+msgid "Additional products that should be specified on the request."
+msgstr "დამატებითი პროდუქტები, რომლებიც მოთხოვნაში უნდა იყოს მითითებული."
+
+#. module: approvals
+#: model:res.groups,name:approvals.group_approval_manager
+msgid "Administrator"
+msgstr "ადმინისტრატორი"
+
+#. module: approvals
+#: model:ir.actions.act_window,name:approvals.approval_request_action_all model:ir.ui.menu,name:approvals.approvals_approval_menu_all
+msgid "All Approvals"
+msgstr "ყველა დამტკიცება"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__amount model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
+msgid "Amount"
+msgstr "თანხა"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Amount:"
+msgstr "თანხა:"
+
+#. module: approvals
+#: model:ir.model.fields,help:approvals.field_approval_category__has_reference model:ir.model.fields,help:approvals.field_approval_request__has_reference
+msgid "An additional reference that should be specified on the request."
+msgstr "დამატებითი საიდენტიფიკაციო კოდი, რომელიც მოთხოვნაში უნდა იყოს მითითებული."
+
+#. module: approvals
+#: model:ir.model.constraint,message:approvals.constraint_approval_approver_unique_request_user
+msgid "An approver with the same user already exists for this request."
+msgstr "ამ მოთხოვნისთვის იმავე მომხმარებლის მქონე დამმტკიცებელი უკვე არსებობს."
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_category.py:0
+msgid "An user may not be in the approver list multiple times."
+msgstr "მომხმარებელი დამმტკიცებელთა სიაში რამდენჯერმე ვერ იქნება."
+
+#. module: approvals
+#: model:mail.activity.type,name:approvals.mail_activity_data_approval
+msgid "Approval"
+msgstr "დამტკიცება"
+
+#. module: approvals
+#: model:ir.actions.act_window,name:approvals.approval_category_action model:ir.ui.menu,name:approvals.approvals_category_menu_config
+msgid "Approval Categories"
+msgstr "დამტკიცების კატეგორიები"
+
+#. module: approvals
+#: model:ir.model,name:approvals.model_approval_category model:ir.model.fields,field_description:approvals.field_approval_category_approver__category_id model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
+msgid "Approval Category"
+msgstr "დამტკიცების კატეგორია"
+
+#. module: approvals
+#: model:ir.model,name:approvals.model_approval_category_approver
+msgid "Approval Category Approver"
+msgstr "დამტკიცების კატეგორიის დამმტკიცებელი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__approval_properties_definition
+msgid "Approval Properties"
+msgstr "დამტკიცების თვისებები"
+
+#. module: approvals
+#: model:ir.actions.report,name:approvals.action_report_approval_request model:ir.model,name:approvals.model_approval_request model:ir.model.fields,field_description:approvals.field_approval_product_line__approval_request_id model:ir.model.fields,field_description:approvals.field_mail_activity__approval_request_id
+msgid "Approval Request"
+msgstr "დამტკიცების მოთხოვნა"
+
+#. module: approvals
+#: model:mail.message.subtype,description:approvals.mt_approval_request_status model:mail.message.subtype,name:approvals.mt_approval_request_status
+msgid "Approval Status Change"
+msgstr "დამტკიცების სტატუსის ცვლილება"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__name
+msgid "Approval Subject"
+msgstr "დამტკიცების საგანი"
+
+#. module: approvals
+#: model:ir.module.module,shortdesc:base.module_approvals model:ir.ui.menu,name:approvals.approvals_menu_root model:res.groups.privilege,name:approvals.res_groups_privilege_approvals
+msgid "Approvals"
+msgstr "დამტკიცებები"
+
+#. module: approvals
+#: model:ir.actions.act_window,name:approvals.approval_request_action_to_review model:ir.ui.menu,name:approvals.approvals_approval_menu_to_review
+msgid "Approvals to Review"
+msgstr "დამტკიცებას ელოდება"
+
+#. module: approvals
+#: model:ir.actions.act_window,name:approvals.approval_request_action_to_review_category
+msgid "Approvals to review"
+msgstr "დამტკიცებას ელოდება"
+
+#. module: approvals
+#. odoo-javascript
+#: code:addons/approvals/static/src/web/approval.xml:0 model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+msgid "Approve"
+msgstr "დამტკიცება"
+
+#. module: approvals
+#: model:ir.model.fields.selection,name:approvals.selection__approval_approver__status__approved model:ir.model.fields.selection,name:approvals.selection__approval_request__request_status__approved model:ir.model.fields.selection,name:approvals.selection__approval_request__user_status__approved model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Approved"
+msgstr "დამტკიცებული"
+
+#. module: approvals
+#: model:ir.model,name:approvals.model_approval_approver model:ir.model.fields,field_description:approvals.field_mail_activity__approver_id model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+msgid "Approver"
+msgstr "დამმტკიცებელი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__user_ids
+msgid "Approver Users"
+msgstr "დამმტკიცებელი მომხმარებლები"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+msgid "Approver(s)"
+msgstr "დამმტკიცებელ(ებ)ი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__approver_ids model:ir.model.fields,field_description:approvals.field_approval_request__approver_ids model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
+msgid "Approvers"
+msgstr "დამმტკიცებლები"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Approvers:"
+msgstr "დამმტკიცებლები:"
+
+#. module: approvals
+#. odoo-javascript
+#: code:addons/approvals/static/src/views/kanban/approvals_category_kanban_controller.js:0 model_terms:ir.ui.view,arch_db:approvals.approval_category_view_kanban
+msgid "Archive"
+msgstr "დაარქივება"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form model_terms:ir.ui.view,arch_db:approvals.approval_category_view_kanban model_terms:ir.ui.view,arch_db:approvals.approval_category_view_search model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
+msgid "Archived"
+msgstr "დაარქივებული"
+
+#. module: approvals
+#. odoo-javascript
+#: code:addons/approvals/static/src/views/kanban/approvals_category_kanban_controller.js:0
+msgid "Are you sure that you want to archive this record?"
+msgstr "დარწმუნებული ხართ, რომ გსურთ ამ ჩანაწერის დაარქივება?"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+msgid "Attach Document"
+msgstr "დოკუმენტის მიმაგრება"
+
+#. module: approvals
+#: model:ir.model,name:approvals.model_ir_attachment
+msgid "Attachment"
+msgstr "დანართი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__message_attachment_count
+msgid "Attachment Count"
+msgstr "დანართების რაოდენობა"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__attachment_ids
+msgid "Attachments"
+msgstr "დანართები"
+
+#. module: approvals
+msgid "Automated Sequence"
+msgstr "ავტომატური თანმიმდევრობა"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+msgid "Back To Draft"
+msgstr "მონახაზში დაბრუნება"
+
+#. module: approvals
+#: model:approval.category,name:approvals.approval_category_data_borrow_items
+msgid "Borrow Items"
+msgstr "ნივთების სესხება"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Brussels"
+msgstr "ბრიუსელი"
+
+#. module: approvals
+#: model:approval.category,name:approvals.approval_category_data_business_trip
+msgid "Business Trip"
+msgstr "მივლინება"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__change_request_owner
+msgid "Can Change Request Owner"
+msgstr "შეუძლია მოთხოვნის მფლობელის შეცვლა"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_approver__can_edit
+msgid "Can Edit"
+msgstr "შეუძლია რედაქტირება"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_approver__can_edit_user_id
+msgid "Can Edit User"
+msgstr "შეუძლია მომხმარებლის რედაქტირება"
+
+#. module: approvals
+#: model:ir.model.fields.selection,name:approvals.selection__approval_approver__status__cancel model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+msgid "Cancel"
+msgstr "გაუქმება"
+
+#. module: approvals
+#: model:ir.model.fields.selection,name:approvals.selection__approval_request__request_status__cancel model:ir.model.fields.selection,name:approvals.selection__approval_request__user_status__cancel model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
+msgid "Canceled"
+msgstr "გაუქმებული"
+
+#. module: approvals
+#: model:approval.category,name:approvals.approval_category_data_car_rental_application
+msgid "Car Rental Application"
+msgstr "ავტომობილის დაქირავების მოთხოვნა"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__category_id model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
+msgid "Category"
+msgstr "კატეგორია"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_approver__category_approver
+msgid "Category Approver"
+msgstr "კატეგორიის დამმტკიცებელი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_approver__company_id model:ir.model.fields,field_description:approvals.field_approval_category__company_id model:ir.model.fields,field_description:approvals.field_approval_category_approver__company_id model:ir.model.fields,field_description:approvals.field_approval_product_line__company_id model:ir.model.fields,field_description:approvals.field_approval_request__company_id
+msgid "Company"
+msgstr "კომპანია"
+
+#. module: approvals
+#: model:ir.ui.menu,name:approvals.approvals_menu_config model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
+msgid "Configuration"
+msgstr "კონფიგურაცია"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__partner_id model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
+msgid "Contact"
+msgstr "კონტაქტი"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Contact:"
+msgstr "კონტაქტი:"
+
+#. module: approvals
+#: model:approval.category,name:approvals.approval_category_data_contract_approval
+msgid "Contract Approval"
+msgstr "ხელშეკრულების დამტკიცება"
+
+#. module: approvals
+#: model:ir.module.module,summary:base.module_approvals
+msgid "Create and validate approvals requests"
+msgstr "დამტკიცების მოთხოვნების შექმნა და დადასტურება"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_approver__create_uid model:ir.model.fields,field_description:approvals.field_approval_category__create_uid model:ir.model.fields,field_description:approvals.field_approval_category_approver__create_uid model:ir.model.fields,field_description:approvals.field_approval_product_line__create_uid model:ir.model.fields,field_description:approvals.field_approval_request__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_approver__create_date model:ir.model.fields,field_description:approvals.field_approval_category__create_date model:ir.model.fields,field_description:approvals.field_approval_category_approver__create_date model:ir.model.fields,field_description:approvals.field_approval_product_line__create_date model:ir.model.fields,field_description:approvals.field_approval_request__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: approvals
+#: model:ir.actions.act_window,name:approvals.approval_category_action_new_request model:ir.ui.menu,name:approvals.approvals_category_menu_new
+msgid "Dashboard"
+msgstr "პანელი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__date model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+msgid "Date"
+msgstr "თარიღი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__date_confirmed
+msgid "Date Confirmed"
+msgstr "დადასტურების თარიღი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__date_end
+msgid "Date end"
+msgstr "დასრულების თარიღი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__date_start
+msgid "Date start"
+msgstr "დაწყების თარიღი"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Date:"
+msgstr "თარიღი:"
+
+#. module: approvals
+#: model_terms:ir.actions.act_window,help:approvals.product_template_action
+msgid ""
+"Define the components and finished products you wish to use in\n"
+"            bill of materials and manufacturing orders."
+msgstr ""
+"განსაზღვრეთ კომპონენტები და მზა პროდუქცია, რომელთა გამოყენებაც გსურთ\n"
+"            მასალების უწყისსა და საწარმოო შეკვეთებში."
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__description model:ir.model.fields,field_description:approvals.field_approval_product_line__description model:ir.model.fields,field_description:approvals.field_approval_request__reason model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+msgid "Description"
+msgstr "აღწერა"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_approver__display_name model:ir.model.fields,field_description:approvals.field_approval_category__display_name model:ir.model.fields,field_description:approvals.field_approval_category_approver__display_name model:ir.model.fields,field_description:approvals.field_approval_product_line__display_name model:ir.model.fields,field_description:approvals.field_approval_request__display_name model:ir.model.fields,field_description:approvals.field_ir_attachment__display_name model:ir.model.fields,field_description:approvals.field_mail_activity__display_name model:ir.model.fields,field_description:approvals.field_mail_activity_type__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
+msgid "Document"
+msgstr "დოკუმენტი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__requirer_document model:ir.model.fields,field_description:approvals.field_approval_request__requirer_document model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+msgid "Documents"
+msgstr "დოკუმენტები"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Documents:"
+msgstr "დოკუმენტები:"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+msgid "E.g: Expenses Paris business trip"
+msgstr "მაგ.: ხარჯები — მივლინება პარიზში"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_kanban
+msgid "Edit"
+msgstr "რედაქტირება"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__manager_approval
+msgid "Employee's Manager"
+msgstr "თანამშრომლის მენეჯერი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_approver__existing_request_user_ids
+msgid "Existing Request User"
+msgstr "მოთხოვნის არსებული მომხმარებელი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category_approver__existing_user_ids
+msgid "Existing User"
+msgstr "არსებული მომხმარებელი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__message_follower_ids
+msgid "Followers"
+msgstr "გამომწერები"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "გამომწერები (პარტნიორები)"
+
+#. module: approvals
+#: model:ir.actions.server,name:approvals.model_approval_request_approve_admin
+msgid "Force Approval"
+msgstr "დამტკიცების იძულება"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
+msgid "Future Activities"
+msgstr "მომავალი აქტივობები"
+
+#. module: approvals
+#: model:approval.category,name:approvals.approval_category_data_general_approval
+msgid "General Approval"
+msgstr "ზოგადი დამტკიცება"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__has_access_to_request
+msgid "Has Access To Request"
+msgstr "ველი: წვდომა მოთხოვნაზე"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__has_amount model:ir.model.fields,field_description:approvals.field_approval_request__has_amount
+msgid "Has Amount"
+msgstr "აქვს თანხა"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__has_partner model:ir.model.fields,field_description:approvals.field_approval_request__has_partner
+msgid "Has Contact"
+msgstr "აქვს კონტაქტი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__has_date model:ir.model.fields,field_description:approvals.field_approval_request__has_date
+msgid "Has Date"
+msgstr "აქვს თარიღი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__has_location model:ir.model.fields,field_description:approvals.field_approval_request__has_location
+msgid "Has Location"
+msgstr "აქვს მდებარეობა"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__has_message
+msgid "Has Message"
+msgstr "აქვს შეტყობინება"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__has_payment_method model:ir.model.fields,field_description:approvals.field_approval_request__has_payment_method
+msgid "Has Payment"
+msgstr "აქვს გადახდა"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__has_period model:ir.model.fields,field_description:approvals.field_approval_request__has_period
+msgid "Has Period"
+msgstr "აქვს პერიოდი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__has_product model:ir.model.fields,field_description:approvals.field_approval_request__has_product
+msgid "Has Product"
+msgstr "აქვს პროდუქტი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__has_quantity model:ir.model.fields,field_description:approvals.field_approval_request__has_quantity
+msgid "Has Quantity"
+msgstr "აქვს რაოდენობა"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__has_reference model:ir.model.fields,field_description:approvals.field_approval_request__has_reference
+msgid "Has Reference"
+msgstr "ველი: საიდენტიფიკაციო კოდი"
+
+#. module: approvals
+msgid ""
+"How the employee's manager interacts with this type of approval.\n"
+"\n"
+"        if checked the employee's manager is a required approver of the request, along with the selected users\n"
+"    "
+msgstr ""
+"როგორ მონაწილეობს თანამშრომლის მენეჯერი ამ ტიპის დამტკიცებაში.\n"
+"\n"
+"        თუ მონიშნულია, თანამშრომლის მენეჯერი მოთხოვნის სავალდებულო დამმტკიცებელია შერჩეულ მომხმარებლებთან ერთად\n"
+"    "
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_approver__id model:ir.model.fields,field_description:approvals.field_approval_category__id model:ir.model.fields,field_description:approvals.field_approval_category_approver__id model:ir.model.fields,field_description:approvals.field_approval_product_line__id model:ir.model.fields,field_description:approvals.field_approval_request__id model:ir.model.fields,field_description:approvals.field_ir_attachment__id model:ir.model.fields,field_description:approvals.field_mail_activity__id model:ir.model.fields,field_description:approvals.field_mail_activity_type__id
+msgid "ID"
+msgstr "ID"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__activity_exception_icon
+msgid "Icon"
+msgstr "ხატულა"
+
+#. module: approvals
+#: model:ir.model.fields,help:approvals.field_approval_request__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "ხატულა გამონაკლისი აქტივობის აღსანიშნავად."
+
+#. module: approvals
+#: model:ir.model.fields,help:approvals.field_approval_request__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "თუ მონიშნულია, ახალი შეტყობინებები საჭიროებს თქვენს ყურადღებას."
+
+#. module: approvals
+#: model:ir.model.fields,help:approvals.field_approval_request__message_has_error model:ir.model.fields,help:approvals.field_approval_request__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "თუ მონიშნულია, ზოგიერთ შეტყობინებას აქვს მიწოდების ხარვეზი."
+
+#. module: approvals
+msgid "If enabled, the approval request subject will be generated automatically using the given prefix code."
+msgstr "თუ ჩართულია, დამტკიცების მოთხოვნის თემა ავტომატურად დაგენერირდება მითითებული პრეფიქსის კოდის გამოყენებით."
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__image model:ir.model.fields,field_description:approvals.field_approval_request__category_image
+msgid "Image"
+msgstr "სურათი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__invalid_minimum
+msgid "Invalid Minimum"
+msgstr "მინიმალური რაოდენობა არასწორია"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__invalid_minimum_warning
+msgid "Invalid Minimum Warning"
+msgstr "არასწორი მინიმუმის გაფრთხილება"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__message_is_follower
+msgid "Is Follower"
+msgstr "არის გამომწერი"
+
+#. module: approvals
+#: model:approval.category,name:approvals.approval_category_data_job_referral_award
+msgid "Job Referral Award"
+msgstr "ვაკანსიაზე რეკომენდაციის ჯილდო"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_approver__write_uid model:ir.model.fields,field_description:approvals.field_approval_category__write_uid model:ir.model.fields,field_description:approvals.field_approval_category_approver__write_uid model:ir.model.fields,field_description:approvals.field_approval_product_line__write_uid model:ir.model.fields,field_description:approvals.field_approval_request__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_approver__write_date model:ir.model.fields,field_description:approvals.field_approval_category__write_date model:ir.model.fields,field_description:approvals.field_approval_category_approver__write_date model:ir.model.fields,field_description:approvals.field_approval_product_line__write_date model:ir.model.fields,field_description:approvals.field_approval_request__write_date
+msgid "Last Updated on"
+msgstr "ბოლოს განახლდა"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
+msgid "Late Activities"
+msgstr "ვადაგადაცილებული აქტივობები"
+
+#. module: approvals
+#: model_terms:ir.actions.act_window,help:approvals.approval_request_action model_terms:ir.actions.act_window,help:approvals.approval_request_action_all
+msgid "Let's go to the"
+msgstr "გადავიდეთ"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__location model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
+msgid "Location"
+msgstr "მდებარეობა"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Location:"
+msgstr "მდებარეობა:"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+msgstr "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__message_main_attachment_id
+msgid "Main Attachment"
+msgstr "მთავარი დანართი"
+
+#. module: approvals
+#: model:ir.ui.menu,name:approvals.approvals_menu_manager
+msgid "Manager"
+msgstr "მენეჯერი"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Marc Demo"
+msgstr "Marc Demo"
+
+#. module: approvals
+msgid "Material Symbols icon e.g. checklist"
+msgstr "Material Symbols-ის ხატულა, მაგ. checklist"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__message_has_error
+msgid "Message Delivery error"
+msgstr "შეტყობინების მიწოდების შეცდომა"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__message_ids
+msgid "Messages"
+msgstr "შეტყობინებები"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__approval_minimum model:ir.model.fields,field_description:approvals.field_approval_request__approval_minimum
+msgid "Minimum Approval"
+msgstr "დამტკიცებების მინიმალური რაოდენობა"
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_category.py:0
+msgid "Minimum Approval must be at least 1."
+msgstr "დამტკიცებების მინიმალური რაოდენობა 1-ზე ნაკლები არ უნდა იყოს."
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_category.py:0
+msgid "Minimum Approval must be equal or superior to the sum of required Approvers."
+msgstr "დამტკიცებების მინიმალური რაოდენობა უნდა უდრიდებებოდეს სავალდებულო დამმტკიცებელთა რაოდენობას ან აღემატებოდეს მას."
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Mitchell Admin"
+msgstr "Mitchell Admin"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "ჩემი აქტივობის ვადა"
+
+#. module: approvals
+#: model:ir.ui.menu,name:approvals.approvals_approval_menu
+msgid "My Approvals"
+msgstr "ჩემი დამტკიცებები"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
+msgid "My Approvals to Review"
+msgstr "ჩემ  დამტკიცებას ელოდება"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
+msgid "My Request"
+msgstr "ჩემი მოთხოვნა"
+
+#. module: approvals
+#: model:ir.actions.act_window,name:approvals.approval_request_action model:ir.ui.menu,name:approvals.approvals_request_menu_my
+msgid "My Requests"
+msgstr "ჩემი მოთხოვნები"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__name
+msgid "Name"
+msgstr "სახელი"
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_category.py:0 model:ir.model.fields.selection,name:approvals.selection__approval_approver__status__new model:ir.model.fields.selection,name:approvals.selection__approval_request__user_status__new
+msgid "New"
+msgstr "ახალი"
+
+#. module: approvals
+#. odoo-javascript
+#: code:addons/approvals/static/src/views/kanban/approvals_category_kanban_controller.xml:0 model_terms:ir.ui.view,arch_db:approvals.approval_category_view_kanban
+msgid "New Request"
+msgstr "ახალი მოთხოვნა"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__activity_calendar_event_id
+msgid "Next Activity Calendar Event"
+msgstr "შემდეგი აქტივობის კალენდრის ღონისძიება"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "შემდეგი აქტივობის ვადა"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__activity_summary
+msgid "Next Activity Summary"
+msgstr "შემდეგი აქტივობის შეჯამება"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__activity_type_id
+msgid "Next Activity Type"
+msgstr "შემდეგი აქტივობის ტიპი"
+
+#. module: approvals
+#: model:res.groups.privilege,placeholder:approvals.res_groups_privilege_approvals
+msgid "No"
+msgstr "არა"
+
+#. module: approvals
+#: model_terms:ir.actions.act_window,help:approvals.approval_request_action_all
+msgid "No Approvals"
+msgstr "დამტკიცებები არ არის"
+
+#. module: approvals
+#: model_terms:ir.actions.act_window,help:approvals.approval_request_action
+msgid "No Approvals Requests"
+msgstr "დამტკიცების მოთხოვნები არ არის"
+
+#. module: approvals
+#: model_terms:ir.actions.act_window,help:approvals.approval_request_action_to_review model_terms:ir.actions.act_window,help:approvals.approval_request_action_to_review_category
+msgid "No new approvals to review"
+msgstr "არცერთი მოთხოვნა არ ელოდება დამტკიცებას"
+
+#. module: approvals
+#: model_terms:ir.actions.act_window,help:approvals.product_template_action
+msgid "No product found. Let's create one!"
+msgstr "პროდუქტი არ მოიძებნა. შევქმნათ!"
+
+#. module: approvals
+#: model:ir.model.fields.selection,name:approvals.selection__approval_category__has_amount__no model:ir.model.fields.selection,name:approvals.selection__approval_category__has_date__no model:ir.model.fields.selection,name:approvals.selection__approval_category__has_location__no model:ir.model.fields.selection,name:approvals.selection__approval_category__has_partner__no model:ir.model.fields.selection,name:approvals.selection__approval_category__has_payment_method__no model:ir.model.fields.selection,name:approvals.selection__approval_category__has_period__no model:ir.model.fields.selection,name:approvals.selection__approval_category__has_product__no model:ir.model.fields.selection,name:approvals.selection__approval_category__has_quantity__no model:ir.model.fields.selection,name:approvals.selection__approval_category__has_reference__no
+msgid "None"
+msgstr "არცერთი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__message_needaction_counter
+msgid "Number of Actions"
+msgstr "ქმედებების რაოდენობა"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__attachment_number
+msgid "Number of Attachments"
+msgstr "დანართების რაოდენობა"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__message_has_error_counter
+msgid "Number of errors"
+msgstr "შეცდომების რაოდენობა"
+
+#. module: approvals
+#: model:ir.model.fields,help:approvals.field_approval_request__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "შეტყობინებების რაოდენობა რომელზეც საჭიროა რეაგირება"
+
+#. module: approvals
+#: model:ir.model.fields,help:approvals.field_approval_request__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "მიწოდების შეცდომის მქონე შეტყობინებების რაოდენობა"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__request_to_validate_count
+msgid "Number of requests to validate"
+msgstr "დასამტკიცებელი მოთხოვნების რაოდენობა"
+
+#. module: approvals
+#: model:res.groups,name:approvals.group_approval_user
+msgid "Officer: Approve all requests"
+msgstr "სპეციალისტი: ყველა მოთხოვნის დამტკიცება"
+
+#. module: approvals
+#: model:ir.actions.server,name:approvals.action_open_approval_category
+msgid "Open Approval Category"
+msgstr "დამტკიცების კატეგორიის გახსნა"
+
+#. module: approvals
+#: model:ir.model.fields.selection,name:approvals.selection__approval_category__has_amount__optional model:ir.model.fields.selection,name:approvals.selection__approval_category__has_date__optional model:ir.model.fields.selection,name:approvals.selection__approval_category__has_location__optional model:ir.model.fields.selection,name:approvals.selection__approval_category__has_partner__optional model:ir.model.fields.selection,name:approvals.selection__approval_category__has_payment_method__optional model:ir.model.fields.selection,name:approvals.selection__approval_category__has_period__optional model:ir.model.fields.selection,name:approvals.selection__approval_category__has_product__optional model:ir.model.fields.selection,name:approvals.selection__approval_category__has_quantity__optional model:ir.model.fields.selection,name:approvals.selection__approval_category__has_reference__optional model:ir.model.fields.selection,name:approvals.selection__approval_category__requirer_document__optional
+msgid "Optional"
+msgstr "არასავალდებულო"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
+msgid "Options"
+msgstr "ვარიანტები"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
+msgid "Payment"
+msgstr "გადახდა"
+
+#. module: approvals
+#: model:approval.category,name:approvals.approval_category_data_payment_application
+msgid "Payment Application"
+msgstr "გადახდის მოთხოვნა"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+msgid "Period"
+msgstr "პერიოდი"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Period:"
+msgstr "პერიოდი:"
+
+#. module: approvals
+msgid "Prefix Code"
+msgstr "პრეფიქსის კოდი"
+
+#. module: approvals
+#: model:approval.category,name:approvals.approval_category_data_procurement
+msgid "Procurement"
+msgstr "შესყიდვა"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
+msgid "Product"
+msgstr "პროდუქტი"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Product Description"
+msgstr "პროდუქტის აღწერა"
+
+#. module: approvals
+#: model:ir.model,name:approvals.model_approval_product_line model:ir.model.fields,field_description:approvals.field_approval_request__product_line_ids
+msgid "Product Line"
+msgstr "პროდუქტის ხაზი"
+
+#. module: approvals
+#: model:ir.actions.act_window,name:approvals.product_template_action model:ir.model.fields,field_description:approvals.field_approval_product_line__product_id model:ir.ui.menu,name:approvals.approvals_menu_product model:ir.ui.menu,name:approvals.approvals_menu_product_template model_terms:ir.ui.view,arch_db:approvals.approval_product_kanban_mobile_view model_terms:ir.ui.view,arch_db:approvals.approval_product_line_view_form model_terms:ir.ui.view,arch_db:approvals.approval_product_line_view_tree model_terms:ir.ui.view,arch_db:approvals.approval_product_line_view_tree_independent model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+msgid "Products"
+msgstr "პროდუქტები"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__approval_properties
+msgid "Properties"
+msgstr "თვისებები"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_product_line__quantity model:ir.model.fields,field_description:approvals.field_approval_request__quantity model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Quantity"
+msgstr "რაოდენობა"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__rating_ids
+msgid "Ratings"
+msgstr "შეფასებები"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__reference model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
+msgid "Reference"
+msgstr "საიდენტიფიკაციო კოდი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__sequence_id
+msgid "Reference Sequence"
+msgstr "საიდენტიფიკაციო კოდის ნუმერაცია"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Reference:"
+msgstr "საიდენტიფიკაციო კოდი:"
+
+#. module: approvals
+#. odoo-javascript
+#: code:addons/approvals/static/src/web/approval.xml:0 model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+msgid "Refuse"
+msgstr "უარყოფა"
+
+#. module: approvals
+#: model:ir.model.fields.selection,name:approvals.selection__approval_approver__status__refused model:ir.model.fields.selection,name:approvals.selection__approval_request__request_status__refused model:ir.model.fields.selection,name:approvals.selection__approval_request__user_status__refused model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
+msgid "Refused"
+msgstr "უარყოფილი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_approver__request_id model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+msgid "Request"
+msgstr "მოთხოვნა"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Request By:"
+msgstr "მოთხოვნის ავტორი:"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__request_owner_id model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
+msgid "Request Owner"
+msgstr "მოთხოვნის ავტორი"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
+msgid "Request Start"
+msgstr "მოთხოვნის დაწყების თარიღი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__request_status model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
+msgid "Request Status"
+msgstr "მოთხოვნის სტატუსი"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
+msgid "Request To"
+msgstr "დასრულების თარიღი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_approver__required model:ir.model.fields,field_description:approvals.field_approval_category_approver__required model:ir.model.fields.selection,name:approvals.selection__approval_category__has_amount__required model:ir.model.fields.selection,name:approvals.selection__approval_category__has_date__required model:ir.model.fields.selection,name:approvals.selection__approval_category__has_location__required model:ir.model.fields.selection,name:approvals.selection__approval_category__has_partner__required model:ir.model.fields.selection,name:approvals.selection__approval_category__has_payment_method__required model:ir.model.fields.selection,name:approvals.selection__approval_category__has_period__required model:ir.model.fields.selection,name:approvals.selection__approval_category__has_product__required model:ir.model.fields.selection,name:approvals.selection__approval_category__has_quantity__required model:ir.model.fields.selection,name:approvals.selection__approval_category__has_reference__required model:ir.model.fields.selection,name:approvals.selection__approval_category__requirer_document__required
+msgid "Required"
+msgstr "სავალდებულო"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__activity_user_id
+msgid "Responsible User"
+msgstr "პასუხისმგებელი მომხმარებელი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "SMS მიწოდების შეცდომა"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__sequence
+msgid "Sequence"
+msgstr "თანმიმდევრობა"
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_category.py:0
+msgid "Sequence %(code)s"
+msgstr "მიმდევრობა %(code)s"
+
+#. module: approvals
+#: model:ir.model.fields,help:approvals.field_approval_approver__can_edit_user_id
+msgid "Simple users should not be able to remove themselves as approvers because they will lose access to the record if they misclick."
+msgstr "ჩვეულებრივ მომხმარებლებს არ უნდა შეეძლოთ საკუთარი თავის დამმტკიცებლებიდან ამოღება, რადგან შემთხვევითი დაწკაპუნების შემთხვევაში ჩანაწერზე წვდომას დაკარგავენ."
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_request.py:0
+msgid "Start date should precede the end date."
+msgstr "დაწყების თარიღი უნდა უსწრებდეს დასრულების თარიღს."
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_approver__status
+msgid "Status"
+msgstr "სტატუსი"
+
+#. module: approvals
+#: model:ir.model.fields,help:approvals.field_approval_request__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+"სტატუსი აქტივობების მიხედვით\n"
+"ვადაგადაცილებული: ვადის თარიღი უკვე გასულია\n"
+"დღეს: აქტივობის თარიღი არის დღეს\n"
+"დაგეგმილი: მომავალი აქტივობები."
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Status:"
+msgstr "სტატუსი:"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+msgid "Submit"
+msgstr "წარდგენა"
+
+#. module: approvals
+#: model:ir.model.fields.selection,name:approvals.selection__approval_request__request_status__pending model:ir.model.fields.selection,name:approvals.selection__approval_request__user_status__pending
+msgid "Submitted"
+msgstr "წარდგენილი"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
+msgid "Submitted Date"
+msgstr "წარდგენის თარიღი"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Test Category"
+msgstr "სატესტო კატეგორია"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Test Document"
+msgstr "სატესტო დოკუმენტი"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Test Product"
+msgstr "სატესტო პროდუქტი"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Test Reference"
+msgstr "სატესტო საიდენტიფიკაციო კოდი"
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_request.py:0
+msgid "The request %(request_name)s for %(request_owner)s has been approved"
+msgstr "მოთხოვნა %(request_name)s მომხმარებლისთვის %(request_owner)s დამტკიცდა"
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_request.py:0
+msgid "The request %(request_name)s for %(request_owner)s has been refused"
+msgstr "მოთხოვნა %(request_name)s მომხმარებლისთვის %(request_owner)s უარყოფილია"
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_request.py:0
+msgid "The request created on %(create_date)s by %(request_owner)s has been approved."
+msgstr "მოთხოვნა, რომელიც %(create_date)s-ს შექმნა %(request_owner)s-მა, დამტკიცდა."
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_request.py:0
+msgid "The request created on %(create_date)s by %(request_owner)s has been refused."
+msgstr "მოთხოვნა, რომელიც %(create_date)s-ს შექმნა %(request_owner)s-მა, უარყოფილია."
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_request.py:0
+msgid "The request has been approved by an Approval Officer"
+msgstr "მოთხოვნა დაამტკიცა დამტკიცების სპეციალისტმა"
+
+#. module: approvals
+#: model:res.groups,comment:approvals.group_approval_user
+msgid "The user will be able to access all requests and approve/refuse them."
+msgstr "მომხმარებელს ექნება წვდომა ყველა მოთხოვნაზე და შეეძლება მათი დამტკიცება/უარყოფა."
+
+#. module: approvals
+#: model:res.groups,comment:approvals.group_approval_manager
+msgid "The user will have access to the approvals configuration."
+msgstr "მომხმარებელს ექნება წვდომა დამტკიცებების კონფიგურაციაზე."
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_request.py:0
+msgid "This request needs to be approved by your manager. There is no manager linked to your employee profile."
+msgstr "ეს მოთხოვნა თქვენმა მენეჯერმა უნდა დაამტკიცოს. თქვენს თანამშრომლის პროფილს მენეჯერი არ აქვს მიბმული."
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_request.py:0
+msgid "This request needs to be approved by your manager. There is no user linked to your manager."
+msgstr "ეს მოთხოვნა თქვენმა მენეჯერმა უნდა დაამტკიცოს. თქვენს მენეჯერს მომხმარებელი არ აქვს მიბმული."
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_request.py:0
+msgid "This request needs to be approved by your manager. Your manager is not in the approvers list."
+msgstr "ეს მოთხოვნა თქვენმა მენეჯერმა უნდა დაამტკიცოს. თქვენი მენეჯერი დამმტკიცებელთა სიაში არ არის."
+
+#. module: approvals
+#: model:ir.model.fields.selection,name:approvals.selection__approval_approver__status__pending
+msgid "To Approve"
+msgstr "დასამტკიცებელი"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_kanban
+msgid "To Review:"
+msgstr "ელოდება დამტკიცებას:"
+
+#. module: approvals
+#: model:ir.model.fields.selection,name:approvals.selection__approval_request__request_status__new
+msgid "To Submit"
+msgstr "წარსადგენი"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
+msgid "Today Activities"
+msgstr "დღევანდელი აქტივობები"
+
+#. module: approvals
+#: model:ir.model.fields,help:approvals.field_approval_request__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "ჩანაწერზე გამონაკლისი აქტივობის ტიპი."
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_kanban
+msgid "Unarchive"
+msgstr "არქივიდან ამოღება"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_product_line__product_uom_id model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Unit"
+msgstr "ერთეული"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "Units"
+msgstr "ერთეული"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_approver__user_id model:ir.model.fields,field_description:approvals.field_approval_category_approver__user_id
+msgid "User"
+msgstr "მომხმარებელი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__user_status
+msgid "User Status"
+msgstr "მომხმარებლის სტატუსი"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__user_ids
+msgid "Users"
+msgstr "მომხმარებლები"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+msgid "Withdraw"
+msgstr "განხილვიდან გამოწვევა"
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_request.py:0
+msgid "You are not allowed to approved or refused your own approval."
+msgstr "საკუთარი მოთხოვნის დამტკიცება ან უარი არ შეგიძლიათ."
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_request.py:0
+msgid "You can't delete an approved request. Archive it instead."
+msgstr "დამტკიცებული მოთხოვნის წაშლა შეუძლებელია. სანაცვლოდ დაარქივეთ."
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_approver.py:0
+msgid "You cannot change approval request."
+msgstr "დამტკიცების მოთხოვნის შეცვლა შეუძლებელია."
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/ir_attachment.py:0
+msgid "You cannot unlink an attachment which is linked to a validated, refused or cancelled approval request."
+msgstr "ვერ მოხსნით დანართს, რომელიც დამტკიცებულ, უარყოფილ ან გაუქმებულ დამტკიცების მოთხოვნას უკავშირდება."
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_request.py:0
+msgid "You do not have the rights to execute that action."
+msgstr "ამ მოქმედების შესრულების უფლება არ გაქვთ."
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_request.py:0
+msgid "You have to add at least %s approvers to confirm your request."
+msgstr "მოთხოვნის დასადასტურებლად სულ მცირე %s დამმტკიცებელი უნდა დაამატოთ."
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_request.py:0
+msgid "You have to attach at least one document."
+msgstr "სულ მცირე ერთი დოკუმენტი უნდა მიამაგროთ."
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_request.py:0
+msgid "You must cancel and then back to draft the approval first."
+msgstr "ჯერ უნდა გააუქმოთ დამტკიცება და შემდეგ მონახაზში დააბრუნოთ."
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_category.py:0
+msgid "Your minimum approval exceeds the total of default approvers."
+msgstr "თქვენი მინიმალური დამტკიცება აღემატება ნაგულისხმევ დამმტკიცებელთა ჯამს."
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+msgid "e.g. Brussels"
+msgstr "მაგ. ბრიუსელი"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
+msgid "e.g. Procurement"
+msgstr "მაგ. შესყიდვები"
+
+#. module: approvals
+#: model_terms:ir.actions.act_window,help:approvals.approval_request_action model_terms:ir.actions.act_window,help:approvals.approval_request_action_all
+msgid "menu"
+msgstr "მენიუ"
+
+#. module: approvals
+#: model_terms:ir.actions.act_window,help:approvals.approval_request_action model_terms:ir.actions.act_window,help:approvals.approval_request_action_all
+msgid "new request"
+msgstr "ახალი მოთხოვნა"
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_request.py:0
+msgid "%s (copy)"
+msgstr "%s (ასლი)"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "07/07/2023 10:00:00"
+msgstr "07/07/2023 10:00:00"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "07/08/2023 10:00:00"
+msgstr "07/08/2023 10:00:00"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
+msgid "1200"
+msgstr "1200"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
+msgid "<i class=\"fa fa-check text-success me-1\"/>Approve"
+msgstr "<i class=\"fa fa-check text-success me-1\"/>დამტკიცება"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
+msgid "<i class=\"fa fa-times text-danger me-1\"/>Refuse"
+msgstr "<i class=\"fa fa-times text-danger me-1\"/>უარი"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
+msgid "<span class=\"fa fa-warning\" title=\"Invalid minimum approvals\"/>"
+msgstr "<span class=\"fa fa-warning\" title=\"მინიმალური დამტკიცებების არასწორი რაოდენობა\"/>"
+
+#. module: approvals
+#: model:ir.model.fields,help:approvals.field_approval_category__approval_type model:ir.model.fields,help:approvals.field_approval_request__approval_type
+msgid "Allows you to define which documents you would like to create once the request has been approved"
+msgstr "საშუალებას გაძლევთ განსაზღვროთ, რომელი დოკუმენტების შექმნა გსურთ მოთხოვნის დამტკიცების შემდეგ"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__approval_type model:ir.model.fields,field_description:approvals.field_approval_request__approval_type
+msgid "Approval Type"
+msgstr "დამტკიცების ტიპი"
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_category.py:0
+msgid "Approver Sequence can only be activated with at least 1 minimum approver."
+msgstr "დამმტკიცებელთა თანმიმდევრობის ჩართვა შესაძლებელია მხოლოდ მინიმუმ 1 დამმტკიცებლის არსებობისას."
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__approver_sequence model:ir.model.fields,field_description:approvals.field_approval_request__approver_sequence
+msgid "Approvers Sequence?"
+msgstr "დამმტკიცებელთა თანმიმდევრობა?"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__automated_sequence model:ir.model.fields,field_description:approvals.field_approval_request__automated_sequence
+msgid "Automated Sequence?"
+msgstr "ავტომატური ნუმერაცია?"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_category__sequence_code
+msgid "Code"
+msgstr "კოდი"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
+msgid "Confirm Date"
+msgstr "დასადასტურებელი თარიღი"
+
+#. module: approvals
+#: model_terms:ir.actions.act_window,help:approvals.product_product_action
+msgid "Create a new product variant"
+msgstr "ახალი პროდუქტის ვარიანტის შექმნა"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
+msgid "Fields"
+msgstr "ველები"
+
+#. module: approvals
+#: model:ir.model.fields,help:approvals.field_approval_request__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr "Font Awesome-ის ხატულა, მაგ. fa-tasks"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+msgid "From:"
+msgstr "დასაწყისი:"
+
+#. module: approvals
+#: model:ir.model.fields,help:approvals.field_approval_category__manager_approval
+msgid ""
+"How the employee's manager interacts with this type of approval.\n"
+"\n"
+"        Empty: do nothing\n"
+"        Is Approver: the employee's manager will be in the approver list\n"
+"        Is Required Approver: the employee's manager will be required to approve the request.\n"
+"    "
+msgstr ""
+"როგორ მონაწილეობს თანამშრომლის მენეჯერი ამ ტიპის დამტკიცებაში.\n"
+"\n"
+"        ცარიელი: არაფერი გაკეთდეს\n"
+"        არის დამმტკიცებელი: თანამშრომლის მენეჯერი იქნება დამმტკიცებელთა სიაში\n"
+"        არის სავალდებულო დამმტკიცებელი: თანამშრომლის მენეჯერი ვალდებული იქნება დაამტკიცოს მოთხოვნა.\n"
+"    "
+
+#. module: approvals
+#: model:ir.model.fields,help:approvals.field_approval_category__automated_sequence model:ir.model.fields,help:approvals.field_approval_request__automated_sequence
+msgid "If checked, the Approval Requests will have an automated generated name based on the given code."
+msgstr "თუ მონიშნულია, დამტკიცების მოთხოვნებს ავტომატურად მიენიჭებათ სახელი მითითებული კოდის მიხედვით."
+
+#. module: approvals
+#: model:ir.model.fields,help:approvals.field_approval_category__approver_sequence model:ir.model.fields,help:approvals.field_approval_request__approver_sequence
+msgid "If checked, the approvers have to approve in sequence (one after the other). If Employee's Manager is selected as approver, they will be the first in line."
+msgstr "თუ მონიშნულია, დამმტკიცებლებმა თანმიმდევრობით უნდა დაამტკიცონ (ერთმანეთის მიყოლებით). თუ დამმტკიცებლად არჩეულია თანამშრომლის მენეჯერი, ის იქნება პირველი რიგში."
+
+#. module: approvals
+#: model:ir.model.fields.selection,name:approvals.selection__approval_category__manager_approval__approver
+msgid "Is Approver"
+msgstr "არის დამმტკიცებელი"
+
+#. module: approvals
+#: model:ir.model.fields.selection,name:approvals.selection__approval_category__manager_approval__required
+msgid "Is Required Approver"
+msgstr "არის სავალდებულო დამმტკიცებელი"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+msgid "Print"
+msgstr "ბეჭდვა"
+
+#. module: approvals
+#: model:ir.actions.act_window,name:approvals.product_product_action model:ir.ui.menu,name:approvals.approvals_menu_product_variant
+msgid "Product Variants"
+msgstr "პროდუქტის ვარიანტები"
+
+#. module: approvals
+#: model:ir.model.fields.selection,name:approvals.selection__approval_approver__status__waiting model:ir.model.fields.selection,name:approvals.selection__approval_request__user_status__waiting
+msgid "Waiting"
+msgstr "მოლოდინში"
+
+#. module: approvals
+#: model:ir.model.fields,field_description:approvals.field_approval_request__website_message_ids
+msgid "Website Messages"
+msgstr "ვებსაიტის შეტყობინებები"
+
+#. module: approvals
+#: model:ir.model.fields,help:approvals.field_approval_request__website_message_ids
+msgid "Website communication history"
+msgstr "ვებსაიტის კომუნიკაციის ისტორია"
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_request.py:0
+msgid "You cannot approve before the previous approver."
+msgstr "წინა დამმტკიცებელზე ადრე ვერ დაამტკიცებთ."
+
+#. module: approvals
+#: model_terms:ir.actions.act_window,help:approvals.product_product_action
+msgid ""
+"You must define a product for everything you sell or purchase,\n"
+"            whether it's a storable product, a consumable or a service."
+msgstr ""
+"პროდუქტი უნდა განსაზღვროთ ყველაფრისთვის, რასაც ყიდით ან ყიდულობთ —\n"
+"            იქნება ეს დასაწყობებადი პროდუქტი, სახარჯი მასალა თუ მომსახურება."
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
+msgid "to:"
+msgstr "დასასრული:"

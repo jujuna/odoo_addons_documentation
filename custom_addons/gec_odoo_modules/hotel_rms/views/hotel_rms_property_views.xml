@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hotel_rms_property_view_list" model="ir.ui.view">
+        <field name="name">hotel.rms.property.list</field>
+        <field name="model">hotel.rms.property</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="pending_count" string="Needs decision"/>
+                <field name="otb_occ" column_invisible="1"/>
+                <field name="forecast_occ" widget="rms_occupancy" string="Forecast, next 30 nights"/>
+                <field name="last_data_at"/>
+                <field name="is_stale" widget="boolean" optional="hide"/>
+                <field name="tz" optional="hide"/>
+                <field name="horizon_days" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hotel_rms_property_view_kanban" model="ir.ui.view">
+        <field name="name">hotel.rms.property.kanban</field>
+        <field name="model">hotel.rms.property</field>
+        <field name="arch" type="xml">
+            <kanban class="o_rms_hotel_kanban" sample="1">
+                <field name="is_stale"/>
+                <field name="is_demo"/>
+                <field name="last_data_at"/>
+                <field name="pending_count"/>
+                <field name="otb_occ"/>
+                <templates>
+                    <t t-name="card">
+                        <div>
+                            <field name="name" class="d-block fw-bold fs-4"/>
+                            <div class="d-flex flex-wrap gap-1 mt-1">
+                                <span t-if="record.is_demo.raw_value" class="badge text-bg-info text-nowrap">Demo</span>
+                                <span t-if="!record.last_data_at.raw_value" class="badge text-bg-secondary text-nowrap">No booking data yet</span>
+                                <span t-elif="record.is_stale.raw_value" class="badge text-bg-warning text-nowrap">Data is old</span>
+                                <span t-else="" class="badge text-bg-success text-nowrap">Data is up to date</span>
+                            </div>
+                        </div>
+                        <div class="o_rms_hotel_needs mt-2">
+                            <t t-if="record.pending_count.raw_value">
+                                <span class="o_rms_hotel_count"><field name="pending_count"/></span>
+                                prices need a decision
+                            </t>
+                            <span t-else="" class="text-muted">Nothing to decide</span>
+                        </div>
+                        <div class="mt-3">
+                            <div class="text-muted small mb-1">Forecast occupancy, next 30 nights</div>
+                            <field name="forecast_occ" widget="rms_occupancy"/>
+                            <field name="forecast_series" widget="rms_sparkline" class="mt-2"/>
+                        </div>
+                        <div class="mt-3">
+                            <div class="text-muted small mb-1">Decisions this month</div>
+                            <field name="decision_split" widget="rms_decision_split"/>
+                        </div>
+                        <footer class="mt-3 gap-2">
+                            <button name="action_open_calendar" type="object" class="btn btn-primary btn-sm">Open calendar</button>
+                            <button name="action_open_review" type="object" class="btn btn-secondary btn-sm">Review</button>
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="hotel_rms_property_view_form" model="ir.ui.view">
+        <field name="name">hotel.rms.property.form</field>
+        <field name="model">hotel.rms.property</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_open_calendar" type="object" string="Open calendar" icon="event_available"
+                            class="btn-primary" invisible="not id"/>
+                    <button name="%(hotel_rms.action_hotel_rms_import_new)d" type="action" string="Import bookings"
+                            icon="upload" invisible="not id" context="{'default_property_id': id}"
+                            groups="hotel_rms.group_hotel_rms_revenue_manager"/>
+                    <button name="action_run_engine" type="object" string="Run now" icon="play_arrow"
+                            invisible="not id" groups="hotel_rms.group_hotel_rms_revenue_manager"/>
+                    <button name="action_learn_booking_curve" type="object" string="Learn booking curve"
+                            icon="school" invisible="not id" groups="hotel_rms.group_hotel_rms_revenue_manager"
+                            help="Replace the booking curve with the one learned from your past bookings."/>
+                    <button name="action_remove_demo" type="object" string="Remove demo hotel" icon="delete"
+                            invisible="not is_demo" groups="hotel_rms.group_hotel_rms_manager"
+                            confirm="This deletes the demo hotel and everything in it. Continue?"/>
+                </header>
+                <sheet>
+                    <field name="is_stale" invisible="1"/>
+                    <field name="is_demo" invisible="1"/>
+                    <field name="setup_rooms" invisible="1"/>
+                    <field name="setup_season" invisible="1"/>
+                    <field name="setup_bookings" invisible="1"/>
+                    <field name="setup_run" invisible="1"/>
+                    <field name="setup_done" invisible="1"/>
+                    <div class="oe_button_box" name="button_box" invisible="not id">
+                        <button class="oe_stat_button" type="action" icon="checklist"
+                                name="%(hotel_rms.action_hotel_rms_price)d"
+                                context="{'search_default_property_id': id, 'search_default_pending': 1}">
+                            <field name="pending_count" widget="statinfo" string="Needs decision"/>
+                        </button>
+                        <button class="oe_stat_button" type="action" icon="receipt_long"
+                                name="%(hotel_rms.action_hotel_rms_reservation)d"
+                                context="{'search_default_property_id': id}">
+                            <field name="reservation_count" widget="statinfo" string="Bookings"/>
+                        </button>
+                        <button class="oe_stat_button" type="action" icon="upload"
+                                name="%(hotel_rms.action_hotel_rms_import)d"
+                                context="{'search_default_property_id': id}">
+                            <field name="import_count" widget="statinfo" string="Imports"/>
+                        </button>
+                        <button class="oe_stat_button" type="action" icon="history"
+                                name="%(hotel_rms.action_hotel_rms_run)d"
+                                context="{'search_default_property_id': id}">
+                            <div class="o_stat_info">
+                                <field name="run_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Engine runs · <field name="last_run_state"/></span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="alert alert-warning" role="alert" invisible="not id or not is_stale">
+                        The booking data is out of date. Import new reservations or run the data connection,
+                        then press Run now.
+                    </div>
+                    <div class="border rounded p-3 mb-3" invisible="not id or setup_done">
+                        <div class="fw-bold mb-2">Set up your hotel</div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="text-success" invisible="not setup_rooms"><i class="oi" data-icon="check_circle" title="Done"/></span>
+                            <span class="text-muted" invisible="setup_rooms"><i class="oi" data-icon="radio_button_unchecked" title="To do"/></span>
+                            <span>1. Add your rooms, with one reference room (Rooms tab).</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="text-success" invisible="not setup_season"><i class="oi" data-icon="check_circle" title="Done"/></span>
+                            <span class="text-muted" invisible="setup_season"><i class="oi" data-icon="radio_button_unchecked" title="To do"/></span>
+                            <span>2. Add seasons that cover every night ahead (Seasons tab).</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="text-success" invisible="not setup_bookings"><i class="oi" data-icon="check_circle" title="Done"/></span>
+                            <span class="text-muted" invisible="setup_bookings"><i class="oi" data-icon="radio_button_unchecked" title="To do"/></span>
+                            <span>3. Bring in your bookings.</span>
+                            <button name="%(hotel_rms.action_hotel_rms_import_new)d" type="action" class="btn btn-link p-0"
+                                    string="Import bookings" invisible="setup_bookings"
+                                    context="{'default_property_id': id}"/>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-success" invisible="not setup_run"><i class="oi" data-icon="check_circle" title="Done"/></span>
+                            <span class="text-muted" invisible="setup_run"><i class="oi" data-icon="radio_button_unchecked" title="To do"/></span>
+                            <span>4. Run the engine for the first time.</span>
+                            <button name="action_run_engine" type="object" class="btn btn-link p-0" string="Run now"
+                                    invisible="setup_run"/>
+                        </div>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Hotel name"/></h1>
+                        <span class="badge text-bg-info" invisible="not is_demo">Demo hotel (sample data)</span>
+                        <div class="text-muted small" invisible="not id">
+                            <span invisible="not last_data_at">Booking data updated <field name="last_data_at" class="oe_inline"/><span invisible="not data_age_days">
+                                (<field name="data_age_days" class="oe_inline"/> days ago)</span></span>
+                            <span invisible="last_data_at">No booking data yet</span>
+                        </div>
+                    </div>
+                    <field name="currency_id" invisible="1"/>
+                    <notebook>
+                        <page name="rooms" string="Rooms">
+                            <field name="room_type_ids"
+                                   context="{'default_derivation': 'percent' if room_type_ids else 'reference'}">
+                                <list editable="bottom" class="o_rms_list">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name" width="[110px]"/>
+                                    <field name="code"/>
+                                    <field name="rooms"/>
+                                    <field name="derivation" width="[220px,260px]"/>
+                                    <field name="derive_value" readonly="derivation == 'reference'"/>
+                                    <field name="active" widget="boolean_toggle" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="seasons" string="Seasons">
+                            <field name="season_ids">
+                                <list editable="bottom" class="o_rms_list">
+                                    <field name="name" width="[80px,150px]"/>
+                                    <field name="date_from"/>
+                                    <field name="date_to"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="min_rate" width="[95px]"/>
+                                    <field name="base_rate" width="[95px]"/>
+                                    <field name="max_rate" width="[95px]"/>
+                                    <field name="expected_occ_pct" width="[108px]"/>
+                                    <button name="action_copy_next_year" type="object" icon="content_copy"
+                                            title="Copy to next year" width="30px"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="events" string="Events">
+                            <field name="event_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="category"/>
+                                    <field name="date_from"/>
+                                    <field name="date_to"/>
+                                    <field name="impact_pct"/>
+                                    <field name="note"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="strategy" string="Pricing rules">
+                            <group>
+                                <group string="Rounding and limits">
+                                    <field name="price_step"/>
+                                    <field name="max_step_pct"/>
+                                    <field name="min_change_pct"/>
+                                </group>
+                                <group string="Weekday price change">
+                                    <field name="dow_mon"/>
+                                    <field name="dow_tue"/>
+                                    <field name="dow_wed"/>
+                                    <field name="dow_thu"/>
+                                    <field name="dow_fri"/>
+                                    <field name="dow_sat"/>
+                                    <field name="dow_sun"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page name="advanced" string="Advanced" groups="hotel_rms.group_hotel_rms_manager">
+                            <group>
+                                <group string="Planning">
+                                    <field name="company_id" groups="base.group_multi_company"/>
+                                    <field name="tz"/>
+                                    <field name="horizon_days"/>
+                                    <field name="stale_after_days"/>
+                                </group>
+                                <group string="Demand signals">
+                                    <field name="protect_days"/>
+                                    <field name="protect_occ_pct"/>
+                                    <field name="lastmin_days"/>
+                                    <field name="lastmin_occ_pct"/>
+                                    <field name="lastmin_pct"/>
+                                    <field name="pace_threshold_pct"/>
+                                    <field name="pace_adj_pct"/>
+                                </group>
+                                <group string="Forecast from history">
+                                    <field name="min_refs"/>
+                                    <field name="ref_window_days"/>
+                                    <field name="ref_years"/>
+                                    <field name="recent_weeks"/>
+                                </group>
+                            </group>
+                            <separator string="Demand curve"/>
+                            <p class="text-muted">
+                                From which forecast occupancy (%) the price changes by how many percent.
+                            </p>
+                            <field name="demand_point_ids" context="{'default_kind': 'demand'}">
+                                <list editable="bottom" class="o_rms_list">
+                                    <field name="kind" column_invisible="1"/>
+                                    <field name="x" string="From occupancy %" width="[120px]"/>
+                                    <field name="value" string="Price change %"/>
+                                    <field name="source" readonly="1"/>
+                                </list>
+                            </field>
+                            <separator string="Booking curve"/>
+                            <p class="text-muted">
+                                How much of the final occupancy is usually booked when this many days are left.
+                                Used while there is no booking history.
+                            </p>
+                            <field name="curve_min_nights"/>
+                            <field name="booking_point_ids" context="{'default_kind': 'booking'}">
+                                <list editable="bottom" class="o_rms_list">
+                                    <field name="kind" column_invisible="1"/>
+                                    <field name="x" string="Days left"/>
+                                    <field name="value" string="Booked %"/>
+                                    <field name="source" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="hotel_rms_property_view_search" model="ir.ui.view">
+        <field name="name">hotel.rms.property.search</field>
+        <field name="model">hotel.rms.property</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hotel_rms_property" model="ir.actions.act_window">
+        <field name="name">Hotels</field>
+        <field name="res_model">hotel.rms.property</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add your first hotel</p>
+            <p>Add the rooms, the seasons with their prices and your bookings. The engine then recommends a price for every night.</p>
+        </field>
+    </record>
+
+    <record id="action_hotel_rms_demo" model="ir.actions.server">
+        <field name="name">Demo Data</field>
+        <field name="model_id" ref="model_hotel_rms_property"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_load_demo()</field>
+    </record>
+</odoo>

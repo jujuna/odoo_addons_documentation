@@ -1,0 +1,923 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* gec_localization
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-30 14:01+0000\n"
+"PO-Revision-Date: 2026-09-30 14:01+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: gec_localization
+#: model:ir.module.module,description:base.module_gec_localization
+msgid ""
+"\n"
+"Extends Odoo's Georgian localization (l10n_ge, template ge) instead of replacing it:\n"
+"extra accounts, withholding / turnover / CIT and other taxes Odoo does not ship, a\n"
+"per-company withholding certificate sequence, partner default taxes and Not Taxed\n"
+"products, a profit distribution (CIT) wizard, bank name and BIC filled from Georgian\n"
+"IBANs, and user-managed contact categories.\n"
+"\n"
+"The VAT declaration is Odoo's own l10n_ge VAT report.\n"
+"\n"
+"Full documentation: README.md and README_DEV.md in the module directory.\n"
+msgstr ""
+"\n"
+"აფართოებს Odoo-ს ქართულ ლოკალიზაციას (l10n_ge, შაბლონი ge) და არ ანაცვლებს მას:\n"
+"დამატებითი ანგარიშები, წყაროსთან დაკავების / ბრუნვის / მოგების და სხვა გადასახადები, რომლებიც Odoo-ში სტანდარტულად არ არის,\n"
+"წყაროსთან დაკავების ცნობების მიმდევრობა თითოეული კომპანიისთვის, პარტნიორის ნაგულისხმევი გადასახადები და დაუბეგრავი\n"
+"პროდუქტები, მოგების განაწილების (მოგების გადასახადის) ვიზარდი, ბანკის დასახელებისა და BIC-ის შევსება ქართული\n"
+"IBAN-ებიდან და მომხმარებლის მიერ სამართავი კონტაქტის კატეგორიები.\n"
+"\n"
+"დღგ-ს დეკლარაცია Odoo-ს საკუთარი l10n_ge დღგ-ს ანგარიშგებაა.\n"
+"\n"
+"სრული დოკუმენტაცია: README.md და README_DEV.md მოდულის საქაღალდეში.\n"
+
+#. module: gec_localization
+#: model:ir.model,name:gec_localization.model_account_chart_template
+msgid "Account Chart Template"
+msgstr "ანგარიშთა გეგმის შაბლონი"
+
+#. module: gec_localization
+#: model_terms:ir.ui.view,arch_db:gec_localization.view_l10n_ge_cit_wizard_form
+msgid "Accounts"
+msgstr "ანგარიშები"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_gec_contact_category__active
+msgid "Active"
+msgstr "აქტიური"
+
+#. module: gec_localization
+#: model_terms:ir.ui.view,arch_db:gec_localization.contact_category_view_form
+#: model_terms:ir.ui.view,arch_db:gec_localization.contact_category_view_search
+msgid "Archived"
+msgstr "დაარქივებული"
+
+#. module: gec_localization
+#: model:ir.model,name:gec_localization.model_res_partner_bank
+msgid "Bank Account"
+msgstr "საბანკო ანგარიში"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__cit_account_id
+msgid "CIT Payable Account (Cr)"
+msgstr "მოგების გადასახადის ვალდებულების ანგარიში (კტ)"
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/wizards/cit_wizard.py:0
+msgid "CIT payable (%(rate)g%%)"
+msgstr "გადასახდელი მოგების გადასახადი (%(rate)g%%)"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__cit_tax_id
+msgid "Corporate Income Tax"
+msgstr "მოგების გადასახადი"
+
+#. module: gec_localization
+#: model_terms:ir.ui.view,arch_db:gec_localization.view_l10n_ge_cit_wizard_form
+msgid "Cancel"
+msgstr "გაუქმება"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__cit_amount
+msgid "Cit Amount"
+msgstr "მოგების გადასახადის თანხა"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_gec_contact_category__color
+msgid "Color"
+msgstr "ფერი"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__company_id
+msgid "Company"
+msgstr "კომპანია"
+
+#. module: gec_localization
+#: model:ir.model,name:gec_localization.model_res_partner
+msgid "Contact"
+msgstr "კონტაქტი"
+
+#. module: gec_localization
+#: model:ir.actions.act_window,name:gec_localization.contact_category_action
+#: model:ir.model.fields,field_description:gec_localization.field_res_partner__gec_contact_category_ids
+#: model:ir.model.fields,field_description:gec_localization.field_res_users__gec_contact_category_ids
+#: model:ir.ui.menu,name:gec_localization.menu_contact_categories
+#: model_terms:ir.ui.view,arch_db:gec_localization.contact_category_view_list
+#: model_terms:ir.ui.view,arch_db:gec_localization.contact_category_view_search
+#: model_terms:ir.ui.view,arch_db:gec_localization.view_partner_search_contact_categories
+msgid "Contact Categories"
+msgstr "კონტაქტის კატეგორიები"
+
+#. module: gec_localization
+#: model:ir.model,name:gec_localization.model_gec_contact_category
+#: model_terms:ir.ui.view,arch_db:gec_localization.contact_category_view_form
+msgid "Contact Category"
+msgstr "კონტაქტის კატეგორია"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_gec_contact_category__create_uid
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_gec_contact_category__create_date
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: gec_localization
+#: model:ir.model.fields,help:gec_localization.field_l10n_ge_cit_wizard__cit_account_id
+msgid "Credited with the CIT. Typically 331110 Corporate Income Taxes."
+msgstr ""
+"ანგარიში, რომელიც კრედიტდება მოგების გადასახადის თანხით. "
+"ჩვეულებრივ, 331110 — მოგების გადასახადი."
+
+#. module: gec_localization
+#: model:ir.model.fields,help:gec_localization.field_l10n_ge_cit_wizard__payable_account_id
+msgid ""
+"Credited with the net amount due to the shareholder. Typically 340120 "
+"Accrued Dividends Payable."
+msgstr ""
+"ანგარიში, რომელიც კრედიტდება აქციონერისთვის გადასახდელი ნეტო თანხით. "
+"ჩვეულებრივ, 340120 — დარიცხული გადასახდელი დივიდენდები."
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__currency_id
+msgid "Currency"
+msgstr "ვალუტა"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__date
+msgid "Date"
+msgstr "თარიღი"
+
+#. module: gec_localization
+#: model:ir.model.fields,help:gec_localization.field_l10n_ge_cit_wizard__distribution_account_id
+msgid ""
+"Debited with the grossed-up distribution. Typically 530110 Retained "
+"Earnings."
+msgstr ""
+"ანგარიში, რომელიც დებეტდება ბრუტომდე გადაანგარიშებული განაწილების თანხით. "
+"ჩვეულებრივ, 530110 — გაუნაწილებელი მოგება."
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_res_partner__property_purchase_tax_id
+#: model:ir.model.fields,field_description:gec_localization.field_res_users__property_purchase_tax_id
+msgid "Default Purchase Tax"
+msgstr "ნაგულისხმევი შესყიდვის გადასახადი"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_res_partner__property_sale_tax_id
+#: model:ir.model.fields,field_description:gec_localization.field_res_users__property_sale_tax_id
+msgid "Default Sales Tax"
+msgstr "ნაგულისხმევი გაყიდვების გადასახადი"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_account_chart_template__display_name
+#: model:ir.model.fields,field_description:gec_localization.field_account_move_line__display_name
+#: model:ir.model.fields,field_description:gec_localization.field_account_tax__display_name
+#: model:ir.model.fields,field_description:gec_localization.field_gec_contact_category__display_name
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__display_name
+#: model:ir.model.fields,field_description:gec_localization.field_product_template__display_name
+#: model:ir.model.fields,field_description:gec_localization.field_purchase_order__display_name
+#: model:ir.model.fields,field_description:gec_localization.field_purchase_order_line__display_name
+#: model:ir.model.fields,field_description:gec_localization.field_res_partner__display_name
+#: model:ir.model.fields,field_description:gec_localization.field_res_partner_bank__display_name
+#: model:ir.model.fields,field_description:gec_localization.field_sale_order_line__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__distribution_account_id
+msgid "Distribution Account (Dr)"
+msgstr "განაწილების ანგარიში (დტ)"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__dividend_wht_rate
+msgid "Dividend WHT %"
+msgstr "დივიდენდის წყაროსთან დაკავების განაკვეთი %"
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/wizards/cit_wizard.py:0
+msgid "Dividend WHT %(rate)s%%"
+msgstr "დივიდენდის წყაროსთან დაკავება %(rate)s%%"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__dividend_wht_account_id
+msgid "Dividend WHT Account (Cr)"
+msgstr "დივიდენდის წყაროსთან დაკავების ანგარიში (კტ)"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__dividend_wht_amount
+msgid "Dividend Wht Amount"
+msgstr "დივიდენდის წყაროსთან დაკავების თანხა"
+
+#. module: gec_localization
+#: model_terms:ir.ui.view,arch_db:gec_localization.view_l10n_ge_cit_wizard_form
+msgid "Dividend Withholding (individual / non-resident shareholder)"
+msgstr ""
+"დივიდენდის წყაროსთან დაკავება (ფიზიკური პირი / არარეზიდენტი აქციონერი)"
+
+#. module: gec_localization
+#: model:ir.model.fields,help:gec_localization.field_l10n_ge_cit_wizard__apply_dividend_wht
+msgid ""
+"For individual or non-resident shareholders, withhold dividend tax (Art. "
+"134) on top of the CIT. Leave off for resident company shareholders "
+"(exempt)."
+msgstr ""
+"თუ აქციონერი ფიზიკური პირი ან არარეზიდენტია, მოგების გადასახადის "
+"გარდა დაიკავეთ დივიდენდის გადასახადიც (მუხ. 134). თუ აქციონერი რეზიდენტი "
+"საწარმოა, დატოვეთ გამორთული (გათავისუფლებულია)."
+
+#. module: gec_localization
+#: model:ir.module.module,shortdesc:base.module_gec_localization
+msgid "Georgia - Accounting Extensions (GEC)"
+msgstr "საქართველო - ბუღალტერიის გაფართოებები (GEC)"
+
+#. module: gec_localization
+#: model:ir.model,name:gec_localization.model_l10n_ge_cit_wizard
+msgid "Georgian CIT / Profit Distribution Wizard"
+msgstr "მოგების გადასახადის / მოგების განაწილების ვიზარდი (საქართველო)"
+
+#. module: gec_localization
+#: model_terms:ir.ui.view,arch_db:gec_localization.view_l10n_ge_cit_wizard_form
+msgid "Georgian Profit Distribution (CIT)"
+msgstr "მოგების განაწილება (მოგების გადასახადი, საქართველო)"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__gross_amount
+msgid "Gross Amount"
+msgstr "მთლიანი თანხა"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_account_chart_template__id
+#: model:ir.model.fields,field_description:gec_localization.field_account_move_line__id
+#: model:ir.model.fields,field_description:gec_localization.field_account_tax__id
+#: model:ir.model.fields,field_description:gec_localization.field_gec_contact_category__id
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__id
+#: model:ir.model.fields,field_description:gec_localization.field_product_template__id
+#: model:ir.model.fields,field_description:gec_localization.field_purchase_order__id
+#: model:ir.model.fields,field_description:gec_localization.field_purchase_order_line__id
+#: model:ir.model.fields,field_description:gec_localization.field_res_partner__id
+#: model:ir.model.fields,field_description:gec_localization.field_res_partner_bank__id
+#: model:ir.model.fields,field_description:gec_localization.field_sale_order_line__id
+msgid "ID"
+msgstr "ID"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__journal_id
+msgid "Journal"
+msgstr "ჟურნალი"
+
+#. module: gec_localization
+#: model:ir.model,name:gec_localization.model_account_move_line
+msgid "Journal Item"
+msgstr "საბუღალტრო სტრიქონი"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_gec_contact_category__write_uid
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_gec_contact_category__write_date
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__write_date
+msgid "Last Updated on"
+msgstr "ბოლო განახლების თარიღი"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_gec_contact_category__name
+msgid "Name"
+msgstr "სახელი"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__net_amount
+msgid "Net Distribution"
+msgstr "ნეტო განაწილება"
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/wizards/cit_wizard.py:0
+msgid "Net distribution must be greater than zero."
+msgstr "ნეტო განაწილება ნულზე მეტი უნდა იყოს."
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/wizards/cit_wizard.py:0
+msgid "Net payable to shareholder"
+msgstr "აქციონერისთვის გადასახდელი ნეტო თანხა"
+
+#. module: gec_localization
+#: model:ir.model.fields,help:gec_localization.field_product_product__not_taxed
+#: model:ir.model.fields,help:gec_localization.field_product_template__not_taxed
+msgid ""
+"No tax is proposed for this product on orders, invoices and bills. A tax can"
+" still be added by hand on the line."
+msgstr ""
+"ამ პროდუქტისთვის შეკვეთებში, მომხმარებლისა და მომწოდებლის ანგარიშ-ფაქტურებში"
+" გადასახადი ავტომატურად არ ივსება. სტრიქონზე გადასახადის ხელით დამატება "
+"მაინც შესაძლებელია."
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_product_product__not_taxed
+#: model:ir.model.fields,field_description:gec_localization.field_product_template__not_taxed
+msgid "Not Taxed"
+msgstr "დაუბეგრავი"
+
+#. module: gec_localization
+#: model:ir.module.module,summary:base.module_gec_localization
+msgid ""
+"Our accounts and taxes on top of Odoo's Georgian chart (l10n_ge), plus "
+"Georgian business helpers"
+msgstr ""
+"ჩვენი ანგარიშები და გადასახადები Odoo-ს ქართული ანგარიშთა გეგმის (l10n_ge) "
+"დამატებით, ასევე ქართული ბიზნესის დამხმარე ფუნქციები"
+
+#. module: gec_localization
+#: model_terms:ir.ui.view,arch_db:gec_localization.view_l10n_ge_cit_wizard_form
+msgid "Post Distribution"
+msgstr "განაწილების გატარება"
+
+#. module: gec_localization
+#: model:ir.model,name:gec_localization.model_product_template
+msgid "Product"
+msgstr "პროდუქტი"
+
+#. module: gec_localization
+#: model:ir.actions.act_window,name:gec_localization.action_l10n_ge_cit_wizard
+#: model:ir.ui.menu,name:gec_localization.menu_l10n_ge_cit_wizard
+msgid "Profit Distribution (CIT)"
+msgstr "მოგების განაწილება (მოგების გადასახადი)"
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/wizards/cit_wizard.py:0
+msgid "Profit distribution (gross)"
+msgstr "მოგების განაწილება (ბრუტო)"
+
+#. module: gec_localization
+#: model:ir.model.fields,help:gec_localization.field_l10n_ge_cit_wizard__cit_tax_id
+msgid "Its rate grosses up the net distribution: gross = net / (1 - rate)."
+msgstr ""
+"ამ გადასახადის განაკვეთით ნეტო განაწილება გადაიანგარიშება ბრუტომდე: "
+"ბრუტო = ნეტო / (1 - განაკვეთი)."
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/wizards/cit_wizard.py:0
+msgid "Profit distribution + CIT %(rate)g%% (net %(net)s)"
+msgstr "მოგების განაწილება + მოგების გადასახადი %(rate)g%% (ნეტო %(net)s)"
+
+#. module: gec_localization
+#: model:ir.model,name:gec_localization.model_purchase_order
+msgid "Purchase Order"
+msgstr "შესყიდვის ორდერი"
+
+#. module: gec_localization
+#: model:ir.model,name:gec_localization.model_purchase_order_line
+msgid "Purchase Order Line"
+msgstr "შესყიდვის ორდერის სტრიქონი"
+
+#. module: gec_localization
+#: model:ir.model.fields,help:gec_localization.field_res_partner__property_purchase_tax_id
+#: model:ir.model.fields,help:gec_localization.field_res_users__property_purchase_tax_id
+msgid ""
+"Replaces the product's purchase taxes on purchase orders and vendor bills "
+"for this contact: a VAT, a withholding tax (the person bears it or the "
+"company pays it) or a 0% \"no withholding\" label. For a VAT Payer, a "
+"withholding tax or label is added to the product's taxes instead of "
+"replacing them. One tax only; add any other tax on the line by hand."
+msgstr ""
+"ამ კონტაქტის შესყიდვის შეკვეთებსა და მომწოდებლის ანგარიშ-ფაქტურებში ცვლის "
+"პროდუქტის შესყიდვის გადასახადებს. შეიძლება იყოს დღგ, წყაროსთან დაკავებული "
+"გადასახადი (პირს დაეკავება ან კომპანია ზემოდან გადაიხდის) ან 0%-იანი "
+"„დაკავების გარეშე“ აღნიშვნა. დღგ-ის გადამხდელისთვის წყაროსთან დაკავებული "
+"გადასახადი ან აღნიშვნა პროდუქტის გადასახადებს ემატება და არ ცვლის მათ. "
+"მხოლოდ ერთი გადასახადი; სხვა გადასახადი სტრიქონზე ხელით დაამატეთ."
+
+#. module: gec_localization
+#: model:ir.model.fields,help:gec_localization.field_res_partner__gec_vat_payer
+#: model:ir.model.fields,help:gec_localization.field_res_users__gec_vat_payer
+msgid ""
+"Registered for VAT: purchase orders and vendor bills keep the product's VAT "
+"and add this contact's Default Purchase Tax when it is a withholding tax or "
+"a \"no withholding\" label. Unticked, that default replaces the product's "
+"taxes. Bills pulled from rs.ge keep only their own VAT: add the label by "
+"hand."
+msgstr ""
+"დღგ-ის გადამხდელად რეგისტრირებული: შესყიდვის შეკვეთებსა და მომწოდებლის "
+"ანგარიშ-ფაქტურებში პროდუქტის დღგ რჩება და მას ემატება ამ კონტაქტის "
+"ნაგულისხმევი შესყიდვის გადასახადი (წყაროსთან დაკავებული გადასახადი ან "
+"„დაკავების გარეშე“ აღნიშვნა). თუ მონიშნული არ არის, ნაგულისხმევი "
+"გადასახადი პროდუქტის გადასახადებს ცვლის. rs.ge-დან ჩამოტვირთულ "
+"ანგარიშ-ფაქტურებში მხოლოდ მათი დღგ რჩება: აღნიშვნა ხელით დაამატეთ."
+
+#. module: gec_localization
+#: model:ir.model.fields,help:gec_localization.field_res_partner__property_sale_tax_id
+#: model:ir.model.fields,help:gec_localization.field_res_users__property_sale_tax_id
+msgid ""
+"Replaces the product's sales taxes on quotations, sales orders and customer "
+"invoices for this contact. The fiscal position still applies afterwards."
+msgstr ""
+"ამ კონტაქტის შეთავაზებებში, გაყიდვის შეკვეთებსა და მომხმარებლის ანგარიშ-"
+"ფაქტურებში ცვლის პროდუქტის გაყიდვის გადასახადებს. ამის შემდეგ ფისკალური "
+"პოზიცია მაინც გამოიყენება."
+
+#. module: gec_localization
+#: model:ir.model,name:gec_localization.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "გაყიდვის შეკვეთის სტრიქონი (SOL)"
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/wizards/cit_wizard.py:0
+msgid "Select a Dividend WHT account, or turn off dividend withholding."
+msgstr ""
+"აირჩიეთ დივიდენდის წყაროსთან დაკავების ანგარიში ან გამორთეთ დივიდენდის "
+"წყაროსთან დაკავება."
+
+#. module: gec_localization
+#: model:ir.model.fields,help:gec_localization.field_res_partner__gec_treasury_code
+#: model:ir.model.fields,help:gec_localization.field_res_users__gec_treasury_code
+msgid ""
+"Set on budget recipients such as the State Treasury (taxes: 101001000). Pay "
+"Salaries pays such a contact by this code instead of a bank account, and the"
+" bank sends a treasury transfer."
+msgstr ""
+"მიუთითეთ ბიუჯეტის მიმღებებისთვის, მაგალითად, სახელმწიფო ხაზინისთვის "
+"(გადასახადები: 101001000). ხელფასების გადახდისას ასეთ კონტაქტს თანხა საბანკო"
+" ანგარიშის ნაცვლად ამ კოდით ერიცხება, ბანკი კი სახაზინო გადარიცხვას "
+"აგზავნის."
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__partner_id
+msgid "Shareholder"
+msgstr "აქციონერი"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__payable_account_id
+msgid "Shareholder Payable Account (Cr)"
+msgstr "აქციონერთან ვალდებულების ანგარიში (კტ)"
+
+#. module: gec_localization
+#: model:ir.model,name:gec_localization.model_account_tax
+msgid "Tax"
+msgstr "გადასახადი"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_res_partner__gec_treasury_code
+#: model:ir.model.fields,field_description:gec_localization.field_res_users__gec_treasury_code
+msgid "Treasury Code"
+msgstr "სახაზინო კოდი"
+
+#. module: gec_localization
+#: model:ir.model.fields,help:gec_localization.field_res_partner__gec_contact_category_ids
+#: model:ir.model.fields,help:gec_localization.field_res_users__gec_contact_category_ids
+msgid ""
+"User-defined contact categories. Child contacts inherit their parent’s "
+"categories."
+msgstr ""
+"მომხმარებლის მიერ განსაზღვრული კონტაქტის კატეგორიები. შვილობილი კონტაქტები "
+"მშობელი კონტაქტის კატეგორიებს მემკვიდრეობით იღებენ."
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/models/account_move_line.py:0
+msgid "This line cannot be paid from the journal entry."
+msgstr "ამ ხაზის გადახდა ბუღალტრული გატარებიდან შეუძლებელია."
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/models/account_move_line.py:0
+msgid ""
+"Nothing is owed to %(partner)s on this account: the debits of this entry "
+"cover the credit."
+msgstr ""
+"ამ ანგარიშზე პარტნიორის (%(partner)s) მიმართ დავალიანება არ არის: ამ "
+"გატარების დებეტი ფარავს კრედიტს."
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/wizards/bill_pay_choice.py:0
+msgid ""
+"Payment method %(method)s of %(journal)s has no Outstanding Payments "
+"account, so this payment would not settle the journal entry line. Set one on"
+" the journal's Outgoing Payments tab."
+msgstr ""
+"გადახდის მეთოდს %(method)s (ჟურნალი %(journal)s) არ აქვს „გადასახდელი "
+"გადახდების“ ანგარიში, ამიტომ ეს გადახდა ბუღალტრული გატარების ხაზს ვერ "
+"დაფარავს. მიუთითეთ ის ჟურნალის „გამავალი გადახდების“ ჩანართზე."
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/models/account_payment_register.py:0
+msgid ""
+"Payment method %(method)s of %(journal)s has no Outstanding account, so this"
+" payment would not settle the journal entry line. Set one on the journal's "
+"Incoming or Outgoing Payments tab."
+msgstr ""
+"გადახდის მეთოდს %(method)s (ჟურნალი %(journal)s) არ აქვს „გადასახდელი "
+"ანგარიში“, ამიტომ ეს გადახდა ბუღალტრული გატარების ხაზს ვერ "
+"დაფარავს. მიუთითეთ ის ჟურნალის „შემომავალი გადახდების“ ან „გამავალი "
+"გადახდების“ ჩანართზე."
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/models/account_payment_register.py:0
+msgid ""
+"%(bills)s still have an early payment discount, which Odoo would take off "
+"the withholding tax. Pay the vendor first, or pay the State Treasury after "
+"the discount date."
+msgstr ""
+"%(bills)s ჯერ კიდევ აქვს ადრეული გადახდის ფასდაკლება, რომელსაც Odoo "
+"წყაროსთან დაკავებულ გადასახადს გამოაკლებდა. ჯერ მომწოდებელს გადაუხადეთ ან "
+"სახელმწიფო ხაზინას გადაუხადეთ ფასდაკლების თარიღის შემდეგ."
+
+#. module: gec_localization
+#: model_terms:ir.ui.view,arch_db:gec_localization.view_move_form_gec_pay_entry_line
+msgid "Pay"
+msgstr "გადახდა"
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/models/account_move_line.py:0
+msgid ""
+"%(entry)s: line %(line)s books withholding tax %(tax)s, so it is paid to the"
+" State Treasury. Reset the entry to draft and set a contact with a Treasury "
+"Code as the partner of that line."
+msgstr ""
+"%(entry)s: ხაზი %(line)s ასახავს წყაროსთან დაკავებულ გადასახადს %(tax)s, "
+"ამიტომ მისი გადახდა სახელმწიფო ხაზინაში ხდება. დააბრუნეთ გატარება მონახაზზე "
+"და ამ ხაზზე პარტნიორად მიუთითეთ სახაზინო კოდის მქონე კონტაქტი."
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/models/account_move_line.py:0
+msgid ""
+"Lines %(lines)s are on the same account with no partner or another contact "
+"of %(partner)s. Reset the entry to draft, give each line its real partner "
+"(the State Treasury on tax lines), then pay again."
+msgstr ""
+"ხაზები %(lines)s იმავე ანგარიშზეა, მაგრამ პარტნიორი არ აქვს ან მითითებულია "
+"იმავე კონტრაჰენტის (%(partner)s) სხვა კონტაქტი. დააბრუნეთ გატარება "
+"მონახაზზე, თითოეულ ხაზზე მიუთითეთ მისი ნამდვილი პარტნიორი (გადასახადის "
+"ხაზებზე — სახელმწიფო ხაზინა) და ხელახლა გადაიხადეთ."
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/models/account_move_line.py:0
+msgid ""
+"These lines are in different currencies, so one payment cannot settle them. "
+"Split the entry by currency."
+msgstr ""
+"ეს ხაზები სხვადასხვა ვალუტაშია, ამიტომ ერთი გადახდით მათ ვერ დაფარავთ. "
+"გაყავით გატარება ვალუტების მიხედვით."
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/wizards/cit_wizard.py:0
+msgid "Select the Dividend Withholding Tax, or turn off dividend withholding."
+msgstr ""
+"აირჩიეთ დივიდენდზე წყაროსთან დაკავებული გადასახადი ან გამორთეთ დივიდენდის "
+"გადასახადის დაკავება."
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_account_move_line__gec_withholding_tax_id
+msgid "Withholding Tax"
+msgstr "წყაროსთან დაკავებული გადასახადი"
+
+#. module: gec_localization
+#: model:ir.model.fields,help:gec_localization.field_account_move_line__gec_withholding_tax_id
+msgid ""
+"The withholding tax this line books: the income tax withheld from the person"
+" paid in this entry. A line with it is paid only to a contact with a "
+"Treasury Code (the State Treasury)."
+msgstr ""
+"წყაროსთან დაკავებული გადასახადი, რომელსაც ეს ხაზი ასახავს: ამ გატარებით "
+"გადახდილი პირის შემოსავლიდან დაკავებული საშემოსავლო გადასახადი. ასეთი ხაზის "
+"გადახდა მხოლოდ სახაზინო კოდის მქონე კონტაქტზე (სახელმწიფო ხაზინაზე) "
+"შეიძლება."
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__treasury_partner_id
+msgid "State Treasury"
+msgstr "სახელმწიფო ხაზინა"
+
+#. module: gec_localization
+#: model:ir.model.fields,help:gec_localization.field_l10n_ge_cit_wizard__treasury_partner_id
+msgid "Partner of the CIT and withholding lines: the taxes are paid to it."
+msgstr ""
+"მოგების გადასახადისა და წყაროსთან დაკავების ხაზების პარტნიორი: გადასახადები "
+"მას გადაეხდება."
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__dividend_wht_tax_id
+msgid "Dividend Withholding Tax"
+msgstr "დივიდენდზე წყაროსთან დაკავებული გადასახადი"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_l10n_ge_cit_wizard__apply_dividend_wht
+msgid "Withhold Dividend Tax"
+msgstr "დივიდენდის გადასახადის დაკავება"
+
+#. module: gec_localization
+#: model:ir.model.fields,help:gec_localization.field_l10n_ge_cit_wizard__dividend_wht_account_id
+msgid ""
+"Credited with the tax withheld from the dividend. Default 331210: pay it to "
+"the State Treasury by a bank entry booked on this account."
+msgstr ""
+"ანგარიში, რომელიც კრედიტდება დივიდენდიდან დაკავებული გადასახადით. "
+"ნაგულისხმევია 331210: თანხა სახელმწიფო ხაზინას ამ ანგარიშზე გატარებული "
+"საბანკო გატარებით გადაუხადეთ."
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/models/account_payment_register.py:0
+msgid ""
+"%(documents)s books withholding tax, so it is paid to the State Treasury, "
+"but the payee %(payee)s has no Treasury Code 101001000. Pay the State "
+"Treasury contact, or set that Treasury Code on the payee."
+msgstr ""
+"%(documents)s შეიცავს წყაროსთან დაკავებულ გადასახადს, ამიტომ ის სახელმწიფო "
+"ხაზინას გადაეხდება, მაგრამ მიმღებს %(payee)s სახაზინო კოდი 101001000 არ "
+"აქვს. გადაუხადეთ სახელმწიფო ხაზინის კონტაქტს ან მიმღებს მიუთითეთ ეს "
+"სახაზინო კოდი."
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/models/account_tax.py:0
+msgid ""
+"%s: a Georgian withholding tax must be a percent tax with a negative or zero"
+" amount, not ticked Withhold, and Included in Price set (Tax Excluded or Tax"
+" Included)."
+msgstr ""
+"%s: საქართველოს წყაროსთან დაკავებული გადასახადი უნდა იყოს პროცენტული, "
+"უარყოფითი ან ნულოვანი ოდენობით, „დაკავება“ არ უნდა იყოს მონიშნული და „ფასში "
+"ჩართვა“ უნდა იყოს მითითებული (გადასახადის გარეშე ან გადასახადის ჩათვლით)."
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/models/account_payment_register.py:0
+msgid "(none)"
+msgstr "(არ არის)"
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/models/account_payment_register.py:0
+msgid ""
+"A withholding tax payment cannot write off a difference. Pay the amount due,"
+" or a part of it and keep the difference open."
+msgstr ""
+"წყაროსთან დაკავებული გადასახადის გადახდისას სხვაობის ჩამოწერა არ შეიძლება. "
+"გადაიხადეთ გადასახდელი თანხა ან მისი ნაწილი და სხვაობა ღიად დატოვეთ."
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_gec_bill_pay_choice__move_ids
+msgid "Bills"
+msgstr "ანგარიშ-ფაქტურები"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_gec_bill_pay_choice__can_pay_both
+msgid "Can Pay Both"
+msgstr "ორივეს გადახდა შესაძლებელია"
+
+#. module: gec_localization
+#: model_terms:ir.ui.view,arch_db:gec_localization.view_gec_bill_pay_choice_form
+msgid "Continue"
+msgstr "გაგრძელება"
+
+#. module: gec_localization
+#: model_terms:ir.ui.view,arch_db:gec_localization.view_gec_bill_pay_choice_form
+msgid "Create Payments"
+msgstr "გადახდების შექმნა"
+
+#. module: gec_localization
+#: model:ir.model.fields,help:gec_localization.field_product_product__supplier_taxes_id
+#: model:ir.model.fields,help:gec_localization.field_product_template__supplier_taxes_id
+msgid "Default taxes used when buying the product"
+msgstr "პროდუქტის შეძენისას ნაგულისხმევად გამოყენებული გადასახადები"
+
+#. module: gec_localization
+#: model_terms:ir.ui.view,arch_db:gec_localization.view_gec_bill_pay_choice_form
+msgid "Discard"
+msgstr "გაუქმება"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_account_move_line__gec_can_pay
+msgid "Gec Can Pay"
+msgstr "გადახდა შესაძლებელია"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_account_bank_statement_line__gec_show_pay_withholding
+#: model:ir.model.fields,field_description:gec_localization.field_account_move__gec_show_pay_withholding
+msgid "Gec Show Pay Withholding"
+msgstr "წყაროსთან დაკავებული გადასახადის გადახდის ჩვენება"
+
+#. module: gec_localization
+#: model:ir.model.fields,help:gec_localization.field_account_tax__gec_is_withholding
+msgid ""
+"Georgian withholding tax: a negative percent tax booked on the vendor bill "
+"line. 'Included in Price' = Tax Excluded: the person bears the tax (deducted"
+" from the payable). Tax Included: the company pays it on top. On journal "
+"entries it is only a label."
+msgstr ""
+"საქართველოს წყაროსთან დაკავებული გადასახადი: უარყოფითი პროცენტული "
+"გადასახადი, რომელიც მომწოდებლის ანგარიშ-ფაქტურის სტრიქონზე ტარდება. „ფასში "
+"ჩართვა“ = გადასახადის გარეშე: გადასახადს პირი იხდის (გადასახდელ თანხას "
+"აკლდება). გადასახადის ჩათვლით: კომპანია მას ზემოდან იხდის. ბუღალტრულ "
+"გატარებაზე ის მხოლოდ აღნიშვნაა."
+
+#. module: gec_localization
+#: model:ir.model,name:gec_localization.model_account_move
+msgid "Journal Entry"
+msgstr "ბუღალტრული გატარება"
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/wizards/bill_pay_choice.py:0
+msgid "No single State Treasury contact with Treasury Code 101001000."
+msgstr ""
+"სახაზინო კოდის 101001000 მქონე სახელმწიფო ხაზინის კონტაქტი ან არ არსებობს, "
+"ან რამდენიმეა."
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/models/account_payment_register.py:0
+msgid ""
+"No contact with Treasury Code 101001000 was found for %(company)s. Set that "
+"Treasury Code on the State Treasury contact."
+msgstr ""
+"კომპანიისთვის %(company)s სახაზინო კოდის 101001000 მქონე კონტაქტი ვერ "
+"მოიძებნა. სახელმწიფო ხაზინის კონტაქტს მიუთითეთ ეს სახაზინო კოდი."
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/wizards/bill_pay_choice.py:0
+msgid "Nothing is left to pay to the vendor."
+msgstr "მომწოდებლისთვის გადასახდელი აღარაფერი დარჩა."
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_gec_bill_pay_choice__pay_both_note
+msgid "Pay Both Note"
+msgstr "ორივეს გადახდის შენიშვნა"
+
+#. module: gec_localization
+#: model_terms:ir.ui.view,arch_db:gec_localization.view_move_form_gec_pay_withholding
+msgid "Pay Withholding Tax"
+msgstr "წყაროსთან დაკავებული გადასახადის გადახდა"
+
+#. module: gec_localization
+#: model:ir.model,name:gec_localization.model_gec_bill_pay_choice
+msgid "Pay a Bill and its Withholding Tax"
+msgstr "ანგარიშ-ფაქტურისა და მისი წყაროსთან დაკავებული გადასახადის გადახდა"
+
+#. module: gec_localization
+#: model:ir.model,name:gec_localization.model_account_payment
+msgid "Payment"
+msgstr "გადახდა"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_gec_bill_pay_choice__payment_date
+msgid "Payment Date"
+msgstr "გადახდის თარიღი"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_gec_bill_pay_choice__payment_method_line_id
+msgid "Payment Method"
+msgstr "გადახდის მეთოდი"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_product_product__supplier_taxes_id
+#: model:ir.model.fields,field_description:gec_localization.field_product_template__supplier_taxes_id
+msgid "Purchase Taxes"
+msgstr "შესყიდვის გადასახადები"
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/models/account_payment_register.py:0
+msgid ""
+"Several contacts have Treasury Code 101001000 for %(company)s: %(partners)s. "
+"Keep that Treasury Code on the State Treasury only."
+msgstr ""
+"კომპანიაში %(company)s სახაზინო კოდი 101001000 რამდენიმე კონტაქტს აქვს: "
+"%(partners)s. ეს სახაზინო კოდი მხოლოდ სახელმწიფო ხაზინას დაუტოვეთ."
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_gec_bill_pay_choice__tax_amount
+msgid "Tax Amount"
+msgstr "გადასახადის თანხა"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_gec_bill_pay_choice__tax_line_ids
+msgid "Tax Line"
+msgstr "გადასახადის სტრიქონი"
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/wizards/bill_pay_choice.py:0
+msgid ""
+"The bill has a payment that is not matched yet: pay the vendor and the tax "
+"separately."
+msgstr ""
+"ანგარიშ-ფაქტურას აქვს ჯერ შეუჯერებელი გადახდა: მომწოდებლის თანხა და "
+"გადასახადი ცალ-ცალკე გადაიხადეთ."
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/wizards/bill_pay_choice.py:0
+msgid ""
+"The bill has installments or an early payment discount: pay the vendor and "
+"the tax separately."
+msgstr ""
+"ანგარიშ-ფაქტურას აქვს განვადება ან ადრეული გადახდის ფასდაკლება: მომწოდებლის "
+"თანხა და გადასახადი ცალ-ცალკე გადაიხადეთ."
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/wizards/bill_pay_choice.py:0
+msgid ""
+"The bill is already partly paid: pay the vendor and the tax separately."
+msgstr ""
+"ანგარიშ-ფაქტურა უკვე ნაწილობრივ გადახდილია: მომწოდებლის თანხა და გადასახადი "
+"ცალ-ცალკე გადაიხადეთ."
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/wizards/bill_pay_choice.py:0
+msgid ""
+"The bill is not in %(currency)s: pay the vendor and the tax separately."
+msgstr ""
+"ანგარიშ-ფაქტურის ვალუტა არ არის %(currency)s: მომწოდებლის თანხა და "
+"გადასახადი ცალ-ცალკე გადაიხადეთ."
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/wizards/bill_pay_choice.py:0
+msgid ""
+"The vendor or the withholding tax is already paid: pay what is left "
+"separately."
+msgstr ""
+"მომწოდებლის თანხა ან წყაროსთან დაკავებული გადასახადი უკვე გადახდილია: "
+"დარჩენილი თანხა ცალკე გადაიხადეთ."
+
+#. module: gec_localization
+#. odoo-python
+#: code:addons/gec_localization/models/account_move_line.py:0
+msgid "This withholding tax is already paid or offset by credit notes."
+msgstr ""
+"ეს წყაროსთან დაკავებული გადასახადი უკვე გადახდილია ან საკრედიტო ანგარიშ-"
+"ფაქტურებით არის გაქვითული."
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_res_partner__gec_vat_payer
+#: model:ir.model.fields,field_description:gec_localization.field_res_users__gec_vat_payer
+msgid "VAT Payer"
+msgstr "დღგ-ის გადამხდელი"
+
+#. module: gec_localization
+#: model_terms:ir.ui.view,arch_db:gec_localization.view_gec_bill_pay_choice_form
+msgid "Vendor"
+msgstr "მომწოდებელი"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_gec_bill_pay_choice__vendor_amount
+msgid "Vendor Amount"
+msgstr "მომწოდებლის თანხა"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_gec_bill_pay_choice__vendor_line_ids
+msgid "Vendor Line"
+msgstr "მომწოდებლის სტრიქონი"
+
+#. module: gec_localization
+#: model:ir.model.fields.selection,name:gec_localization.selection__gec_bill_pay_choice__pay_choice__vendor
+msgid "Vendor Only"
+msgstr "მხოლოდ მომწოდებელი"
+
+#. module: gec_localization
+#: model:ir.model.fields.selection,name:gec_localization.selection__gec_bill_pay_choice__pay_choice__both
+msgid "Vendor and Withholding Tax"
+msgstr "მომწოდებელი და წყაროსთან დაკავებული გადასახადი"
+
+#. module: gec_localization
+#: model:ir.model.fields,field_description:gec_localization.field_account_tax__gec_is_withholding
+msgid "Withholding Tax (GE)"
+msgstr "წყაროსთან დაკავებული გადასახადი (GE)"
+
+#. module: gec_localization
+#: model:ir.model.fields.selection,name:gec_localization.selection__gec_bill_pay_choice__pay_choice__tax
+msgid "Withholding Tax Only"
+msgstr "მხოლოდ წყაროსთან დაკავებული გადასახადი"

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_employee_form_inherit_employee_registry_rs" model="ir.ui.view">
+        <field name="name">hr.employee.form.inherit.employee.registry.rs</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="rs_registry" string="RS Registry" groups="hr.group_hr_user">
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not rs_needs_sync">
+                        This employee's RS status is out of sync. Target:
+                        <field name="rs_target_status" readonly="1" class="oe_inline"/>
+                        — Last pushed:
+                        <field name="rs_status" readonly="1" class="oe_inline"/>.
+                    </div>
+                    <group>
+                        <group string="Sync State">
+                            <field name="rs_sync_mode" widget="radio"/>
+                            <field name="rs_registry_id" readonly="1"/>
+                            <field name="rs_status" readonly="1"/>
+                            <field name="rs_target_status" readonly="1"
+                                   invisible="rs_sync_mode != 'auto'"/>
+                            <field name="rs_last_sync_date" readonly="1"/>
+                            <field name="rs_needs_sync" invisible="1"/>
+                            <field name="rs_is_foreigner" invisible="1"/>
+                        </group>
+                        <group string="RS Attributes">
+                            <field name="rs_work_type"/>
+                        </group>
+                    </group>
+                    <group string="Last Error" invisible="not rs_sync_error">
+                        <field name="rs_sync_error" readonly="1" nolabel="1"/>
+                    </group>
+                    <div class="oe_button_box" invisible="rs_sync_mode == 'off'">
+                        <button name="action_rs_sync_now"
+                                type="object"
+                                string="Sync Now"
+                                class="btn-primary"
+                                icon="cloud_upload"
+                                help="Push the current employee data and computed target status (derived from contract) to RS."/>
+                        <button name="action_rs_activate"
+                                type="object"
+                                string="Activate in RS"
+                                class="btn-primary"
+                                icon="play_arrow"
+                                invisible="rs_sync_mode != 'manual' or rs_status == '1'"
+                                confirm="Force-mark this employee as active (STATUS=1) in the Revenue Service Employee Registry?"/>
+                        <button name="action_rs_suspend"
+                                type="object"
+                                string="Suspend in RS"
+                                class="btn-secondary"
+                                icon="pause"
+                                invisible="rs_status == '-1'"
+                                confirm="Force-mark this employee as suspended (STATUS=-1) in the Revenue Service Employee Registry?"/>
+                        <button name="action_rs_terminate"
+                                type="object"
+                                string="Terminate in RS"
+                                class="btn-secondary"
+                                icon="stop"
+                                invisible="rs_sync_mode != 'manual' or rs_status == '0'"
+                                confirm="Force-mark this employee as terminated (STATUS=0) in the Revenue Service Employee Registry?"/>
+                        <button name="action_rs_fetch"
+                                type="object"
+                                string="Fetch from RS"
+                                class="btn-secondary"
+                                icon="cloud_download"
+                                invisible="not identification_id"
+                                help="Pull data from RS by stored RS id, or by TIN if no id yet."/>
+                    </div>
+                    <separator string="Sync History"/>
+                    <field name="rs_log_ids" nolabel="1" readonly="1">
+                        <list create="false" edit="false" delete="false"
+                              decoration-danger="not success" decoration-success="success"
+                              limit="10">
+                            <field name="create_date"/>
+                            <field name="endpoint"/>
+                            <field name="status_id"/>
+                            <field name="status_text"/>
+                            <field name="success"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

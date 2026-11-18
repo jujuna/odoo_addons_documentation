@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_bsc_period_list" model="ir.ui.view">
+        <field name="name">bsc.period.list</field>
+        <field name="model">bsc.period</field>
+        <field name="arch" type="xml">
+            <list string="Periods" decoration-bf="is_current == True"
+                  decoration-muted="state == 'closed'">
+                <field name="scorecard_id" optional="show" options="{'no_quick_create': True}" />
+                <field name="name"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="filled_count" string="Reported"/>
+                <field name="measurement_count" string="Expected"/>
+                <field name="completion_rate" widget="progressbar"/>
+                <field name="state" widget="badge" decoration-success="state == 'open'"/>
+                <field name="is_current" column_invisible="1"/>
+                <button name="action_open_measurements" type="object"
+                        string="Figures" icon="table"/>
+                <button name="action_prepare_measurements" type="object"
+                        string="Prepare rows" icon="refresh"
+                        invisible="state == 'closed'"/>
+                <button name="action_notify_owners" type="object"
+                        string="Remind owners" icon="notifications"
+                        invisible="state == 'closed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bsc_period_form" model="ir.ui.view">
+        <field name="name">bsc.period.form</field>
+        <field name="model">bsc.period</field>
+        <field name="arch" type="xml">
+            <form string="Period">
+                <header>
+                    <button name="action_prepare_measurements" type="object"
+                            string="Prepare Rows" invisible="state == 'closed'"
+                            help="Creates an empty row for every active KPI that has none yet."/>
+                    <button name="action_notify_owners" type="object"
+                            string="Remind Data Owners" invisible="state == 'closed'"/>
+                    <button name="action_close" type="object" string="Close Period"
+                            class="btn-primary" invisible="state == 'closed'"/>
+                    <button name="action_force_close" type="object" string="Close Anyway"
+                            invisible="state == 'closed'"
+                            confirm="Some figures are still missing. Close the period regardless?"/>
+                    <button name="action_reopen" type="object" string="Reopen"
+                            groups="bsc_strategy.group_bsc_admin"
+                            invisible="state == 'open'"
+                            confirm="Reopening a closed period changes numbers people have already seen. Continue?"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="scorecard_id" options="{'no_quick_create': True}" />
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="is_current"/>
+                        </group>
+                        <group>
+                            <field name="filled_count" string="Reported"/>
+                            <field name="measurement_count" string="Expected"/>
+                            <field name="completion_rate" widget="progressbar"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Figures" name="measurements">
+                            <field name="measurement_ids" readonly="state == 'closed'">
+                                <list editable="bottom" create="false" delete="false">
+                                    <field name="kpi_id" readonly="1"/>
+                                    <field name="uom_name" string="Unit" readonly="1"/>
+                                    <field name="target_value"/>
+                                    <field name="actual_value"/>
+                                    <field name="actual_value_set" string="Reported"
+                                           widget="boolean_toggle"/>
+                                    <field name="achievement" string="Achievement %"
+                                           digits="[16,1]" readonly="1"/>
+                                    <field name="status" widget="badge" readonly="1"
+                                           decoration-success="status == 'green'"
+                                           decoration-warning="status == 'amber'"
+                                           decoration-danger="status == 'red'"/>
+                                    <field name="comment"
+                                           required="status == 'red'"/>
+                                    <field name="owner_id" widget="many2one_avatar_user"
+                                           readonly="1" optional="show"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bsc_period" model="ir.actions.act_window">
+        <field name="name">Periods</field>
+        <field name="res_model">bsc.period</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

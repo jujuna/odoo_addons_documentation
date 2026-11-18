@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_template_form_rs_spec_invoice" model="ir.ui.view">
+        <field name="name">product.template.form.rs.spec.invoice</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <field name="default_code" position="after">
+                <field name="rs_spec_rs_id" readonly="1" invisible="not rs_spec_rs_id"/>
+                <field name="rs_spec_ssf_code" readonly="1" invisible="not rs_spec_rs_id"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="product_template_search_rs_spec_invoice" model="ir.ui.view">
+        <field name="name">product.template.search.rs.spec.invoice</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+            <filter name="filter_to_purchase" position="after">
+                <filter string="Petroleum (rs.ge)" name="filter_rs_spec" domain="[('rs_spec_rs_id', '!=', False)]"/>
+            </filter>
+        </field>
+    </record>
+
+    <record id="action_rs_spec_sync_products" model="ir.actions.server">
+        <field name="name">Sync Petroleum Products</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_rs_spec_sync()</field>
+    </record>
+</odoo>

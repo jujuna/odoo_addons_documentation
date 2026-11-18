@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="hotel_rms.PriceChange">
+        <span t-att-class="{ o_rms_price_change: true, o_rms_compact: this.props.compact }">
+            <span t-att-class="{ o_rms_pc_price: true, o_rms_pc_empty: !this.props.recommended }" t-out="this.price"/>
+            <span t-if="this.delta" t-attf-class="o_rms_delta o_rms_delta_{{ this.delta.kind }}">
+                <i t-if="this.delta.icon" class="oi" t-att-data-icon="this.delta.icon"/>
+                <t t-out="this.delta.label"/>
+            </span>
+        </span>
+    </t>
+
+    <t t-name="hotel_rms.PriceChangeField">
+        <PriceChange recommended="this.props.record.data[this.props.name]" current="this.current"
+                     currency="this.currency" compact="true" plain="this.props.plain"/>
+    </t>
+</templates>

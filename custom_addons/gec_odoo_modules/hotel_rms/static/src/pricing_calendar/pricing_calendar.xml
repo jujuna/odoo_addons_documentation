@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="hotel_rms.PricingCalendar">
+        <div class="o_rms_calendar">
+            <div class="o_rms_main" t-ref="this.mainRef">
+                <t t-set="data" t-value="this.state.data"/>
+                <t t-if="data">
+                    <header class="o_rms_header">
+                        <div class="o_rms_header_left">
+                            <select t-if="this.state.properties.length > 1" class="o_rms_property"
+                                    t-on-change="this.onPropertyChange">
+                                <option t-foreach="this.state.properties" t-as="property" t-key="property.id"
+                                        t-att-value="property.id" t-att-selected="property.id === this.state.propertyId"
+                                        t-out="property.name"/>
+                            </select>
+                            <h1 t-else="" class="o_rms_hotel" t-out="data.property.name"/>
+                            <span t-attf-class="o_rms_chip {{ this.freshness.stale ? 'o_rms_chip_stale' : '' }}">
+                                <i class="o_rms_fresh_dot"/><span t-out="this.freshness.label"/>
+                            </span>
+                        </div>
+                        <div t-if="data.can_decide" class="o_rms_header_right">
+                            <button t-if="!this.compact" type="button" class="btn btn-secondary"
+                                    t-att-disabled="this.state.busy" t-on-click="this.runNow">
+                                <i t-if="this.state.busy === 'run'" class="oi oi-spin me-1" data-icon="progress_activity"/>
+                                <i t-else="" class="oi me-1" data-icon="refresh"/>Run now
+                            </button>
+                            <button t-if="this.decisionIds.length and !this.ui.isSmall" type="button" class="btn btn-primary"
+                                    t-on-click="this.startReview" t-out="this.reviewLabel"/>
+                            <button t-if="!this.ui.isSmall" type="button" t-att-disabled="!data.to_export_count or this.state.busy"
+                                    t-attf-class="btn {{ this.decisionIds.length ? 'btn-secondary' : 'btn-primary' }} {{ data.to_export_count ? 'o_rms_attention' : '' }}"
+                                    t-on-click="this.publish">
+                                <i t-if="this.state.busy === 'publish'" class="oi oi-spin me-1" data-icon="progress_activity"/>
+                                <span t-out="data.publish.label"/>
+                                <span class="o_rms_count" t-key="data.to_export_count" t-out="data.to_export_count"/>
+                            </button>
+                            <Dropdown t-if="this.compact">
+                                <button type="button" class="btn btn-secondary" title="More">
+                                    <i class="oi" data-icon="more_vert"/>
+                                </button>
+                                <t t-set-slot="content">
+                                    <DropdownItem onSelected="() => this.runNow()">
+                                        <i class="oi me-2" data-icon="refresh"/>Run now
+                                    </DropdownItem>
+                                    <DropdownItem t-if="this.ui.isSmall and data.to_export_count"
+                                                  onSelected="() => this.publish()">
+                                        <i class="oi me-2" data-icon="download"/><t t-out="data.publish.label"/>
+                                    </DropdownItem>
+                                </t>
+                            </Dropdown>
+                        </div>
+                    </header>
+
+                    <nav class="o_rms_tabs">
+                        <button type="button" t-att-class="{ active: this.state.tab === 'calendar' }"
+                                t-on-click="() => this.setTab('calendar')">Calendar</button>
+                        <button type="button" t-att-class="{ active: this.state.tab === 'insights' }"
+                                t-on-click="() => this.setTab('insights')">Insights</button>
+                    </nav>
+                </t>
+                <t t-if="data and this.state.tab === 'calendar'">
+                    <div class="o_rms_toolbar">
+                        <div class="o_rms_segmented">
+                            <button type="button" title="Previous" t-on-click="() => this.shift(-this.state.days)">
+                                <i class="oi" data-icon="chevron_left"/>
+                            </button>
+                            <button type="button" t-on-click="() => this.onChange('dateFrom', false)">Today</button>
+                            <button type="button" title="Next" t-on-click="() => this.shift(this.state.days)">
+                                <i class="oi" data-icon="chevron_right"/>
+                            </button>
+                        </div>
+                        <input type="date" class="o_rms_date" t-att-value="this.state.dateFrom"
+                               t-on-change="this.onStartChange"/>
+                        <div class="o_rms_segmented">
+                            <button t-foreach="this.dayOptions" t-as="option" t-key="option.key" type="button"
+                                    t-att-class="{ active: this.isActiveDays(option) }"
+                                    t-on-click="() => this.setDays(option)">
+                                <t t-if="option.fit">Fit</t>
+                                <t t-else=""><t t-out="option.days"/> nights</t>
+                            </button>
+                        </div>
+                        <div class="o_rms_segmented o_rms_filter">
+                            <button t-foreach="this.filterOptions" t-as="option" t-key="option.key" type="button"
+                                    t-att-class="{ active: this.state.onlyPending === option.pending }"
+                                    t-on-click="() => this.onChange('onlyPending', option.pending)" t-out="option.label"/>
+                        </div>
+                        <div t-if="!this.ui.isSmall" class="o_rms_segmented">
+                            <button t-foreach="this.modes" t-as="mode" t-key="mode.key" type="button"
+                                    t-att-class="{ active: this.state.mode === mode.key }"
+                                    t-on-click="() => this.setMode(mode.key)" t-out="mode.label"/>
+                        </div>
+                        <button t-if="this.wide" type="button" class="o_rms_dock_toggle ms-auto"
+                                t-att-title="this.dockToggleTitle"
+                                t-on-click="this.toggleDock">
+                            <i class="oi" data-icon="dock_to_right"/>
+                        </button>
+                    </div>
+
+                    <div t-if="this.decisionIds.length and data.can_decide and !this.showSetup" class="o_rms_decisionbar">
+                        <span t-out="this.decisionMessage"/>
+                        <button type="button" class="btn btn-link p-0" t-att-disabled="this.state.busy"
+                                t-on-click="this.acceptAll">Accept all</button>
+                    </div>
+
+                    <div t-if="!this.showSetup" class="o_rms_kpis">
+                        <div t-foreach="this.kpis" t-as="kpi" t-key="kpi.label" class="o_rms_kpi">
+                            <div class="o_rms_kpi_value" t-out="kpi.value"/>
+                            <div class="o_rms_kpi_label" t-out="kpi.label"/>
+                            <div t-if="kpi.delta" t-attf-class="o_rms_kpi_delta o_rms_kpi_delta_{{ kpi.delta.tone }}"
+                                 t-out="kpi.delta.text"/>
+                            <OccupancyBar t-if="kpi.pct !== undefined" booked_pct="kpi.pct"/>
+                            <Sparkline t-if="kpi.series" values="kpi.series"/>
+                        </div>
+                    </div>
+                </t>
+
+                <PricingInsights t-if="data and this.state.tab === 'insights'" t-key="this.state.propertyId"
+                                 propertyId="this.state.propertyId" onNightClick="(date) => this.openNight(date)"/>
+                <div t-elif="this.state.skeleton" class="o_rms_skeleton" aria-busy="true">
+                    <div t-foreach="this.skeletonRows" t-as="row" t-key="row" class="o_rms_skeleton_row">
+                        <span t-foreach="this.skeletonCols" t-as="col" t-key="col" class="o_rms_skel"/>
+                    </div>
+                </div>
+                <div t-elif="!this.state.properties.length" class="o_rms_card o_rms_empty">
+                    <h2>Set up your hotel</h2>
+                    <p class="text-muted">Create your hotel to get a price recommendation for every night.</p>
+                    <button type="button" class="btn btn-primary" t-on-click="this.openHotel">Create hotel</button>
+                </div>
+                <div t-elif="this.showSetup" class="o_rms_card o_rms_empty">
+                    <h2>Set up your hotel</h2>
+                    <p class="text-muted">Finish these steps to see price recommendations.</p>
+                    <ul class="o_rms_steps">
+                        <li t-foreach="this.setupSteps" t-as="step" t-key="step_index">
+                            <i t-if="step.done" class="oi o_rms_step_done" data-icon="check_circle" title="Done"/>
+                            <i t-else="" class="oi text-muted" data-icon="radio_button_unchecked" title="To do"/>
+                            <span t-out="step.label"/>
+                            <button t-if="!step.done" type="button" class="btn btn-link p-0 ms-auto"
+                                    t-on-click="step.run" t-out="step.button"/>
+                        </li>
+                    </ul>
+                </div>
+                <t t-elif="data">
+                    <p t-if="this.coldStartNote" class="o_rms_note">
+                        <i class="oi me-1" data-icon="info" title="Info"/>
+                        Forecast uses your season settings until enough booking history exists.
+                    </p>
+
+                    <div t-if="this.layout === 'list' and this.state.onlyPending" class="o_rms_feed">
+                        <p t-if="this.state.hint and data.can_decide and this.feed.length" class="o_rms_hint">
+                            <span>Swipe right to accept, left to reject.</span>
+                            <button type="button" class="btn-close" aria-label="Dismiss" t-on-click="this.dismissHint"/>
+                        </p>
+                        <p t-if="!this.feed.length" class="o_rms_card text-muted">All caught up. No price needs a decision.</p>
+                        <div t-foreach="this.feed" t-as="item" t-key="item.cell.id" class="o_rms_swipe">
+                            <div class="o_rms_swipe_bg o_rms_swipe_accept"><i class="oi" data-icon="check"/>Accept</div>
+                            <div class="o_rms_swipe_bg o_rms_swipe_reject">Reject<i class="oi" data-icon="close"/></div>
+                            <article role="button" tabindex="0"
+                                     t-att-class="{ o_rms_feed_card: true, o_rms_selected: this.state.selected === item.cell.id }"
+                                     t-on-pointerdown="this.onSwipeStart" t-on-pointermove="this.onSwipeMove"
+                                     t-on-pointerup="() => this.onSwipeEnd(item.cell)"
+                                     t-on-pointercancel="() => this.onSwipeEnd(item.cell)"
+                                     t-on-click="(ev) => this.onCellClick(ev, item.cell)">
+                                <div class="o_rms_feed_head">
+                                    <div class="o_rms_min0">
+                                        <div class="o_rms_room_name" t-out="item.room.name"/>
+                                        <div class="o_rms_muted"><t t-out="item.night.title"/> · <t t-out="this.daysLeft(item.cell)"/></div>
+                                    </div>
+                                    <PriceChange recommended="this.shown(item.cell)" current="item.cell.current"
+                                                 currency="this.currency"/>
+                                </div>
+                                <div t-if="item.cell.reason" class="o_rms_reason" t-out="item.cell.reason"/>
+                                <div t-if="item.night.events.length" class="o_rms_muted" t-out="item.night.events.join(', ')"/>
+                                <OccupancyBar t-if="item.night.forecast_occ !== null" booked_pct="item.night.otb_share"
+                                              forecast_pct="item.night.forecast_occ" confidence="item.night.confidence_level"/>
+                            </article>
+                        </div>
+                    </div>
+
+                    <div t-elif="this.layout === 'list'" class="o_rms_list">
+                        <t t-foreach="data.nights" t-as="night" t-key="night.date">
+                            <t t-set="items" t-value="this.nightCells(night)"/>
+                            <article t-if="items.length or !this.state.onlyPending"
+                                     t-att-class="{ o_rms_night_card: true, o_rms_weekend: night.weekend, o_rms_today: night.today }">
+                                <header>
+                                    <span class="o_rms_night_title" t-out="night.title"/>
+                                    <span t-if="night.event_label" class="o_rms_event" t-att-title="night.events.join(', ')"
+                                          t-out="night.event_label"/>
+                                    <t t-if="night.forecast_occ !== null">
+                                        <span class="o_rms_pct" t-out="this.percent(night.forecast_occ)"/>
+                                        <OccupancyBar booked_pct="night.otb_share" forecast_pct="night.forecast_occ"
+                                                      confidence="night.confidence_level"/>
+                                    </t>
+                                </header>
+                                <button t-foreach="items" t-as="item" t-key="item.cell.id" type="button"
+                                        t-att-class="this.cellClass(item.cell) + ' o_rms_listrow'"
+                                        t-att-title="this.cellTitle(item.cell)"
+                                        t-on-click="(ev) => this.onCellClick(ev, item.cell)">
+                                    <span class="o_rms_listroom">
+                                        <span class="o_rms_room_name" t-out="item.room.name"/>
+                                        <span class="o_rms_muted" t-out="item.room.caption"/>
+                                    </span>
+                                    <i t-if="item.cell.locked" class="oi o_rms_lock" data-icon="lock" title="Locked"/>
+                                    <span t-if="item.cell.not_for_sale" class="o_rms_muted">Not for sale</span>
+                                    <span t-elif="!item.cell.has_season" class="o_rms_muted">No season</span>
+                                    <PriceChange t-else="" compact="true" recommended="this.shown(item.cell)"
+                                                 current="item.cell.current" currency="this.currency"/>
+                                    <i t-if="item.cell.state === 'accepted' or item.cell.state === 'edited'"
+                                       class="oi o_rms_check" t-att-data-icon="item.cell.state === 'edited' ? 'edit' : 'check'"
+                                       title="Decided"/>
+                                </button>
+                                <span t-if="!items.length" class="o_rms_muted">No season</span>
+                            </article>
+                        </t>
+                    </div>
+
+                    <div t-else="" class="o_rms_scroll">
+                        <table class="o_rms_grid" t-on-mouseleave="this.clearHover">
+                            <thead>
+                                <tr t-if="data.months.length > 1">
+                                    <th class="o_rms_room"/>
+                                    <th t-foreach="data.months" t-as="month" t-key="month.label" t-att-colspan="month.span"
+                                        class="o_rms_month_head" t-out="month.label"/>
+                                </tr>
+                                <tr>
+                                    <th class="o_rms_room"/>
+                                    <th t-foreach="data.nights" t-as="night" t-key="night.date" scope="col"
+                                        t-att-class="{ o_rms_weekend: night.weekend, o_rms_today: night.today, o_rms_week_start: night.week_start, o_rms_highlight: night.date === this.state.highlight }">
+                                        <div t-if="data.months.length === 1" class="o_rms_month" t-out="night.month"/>
+                                        <div class="o_rms_weekday" t-out="night.weekday_label"/>
+                                        <div class="o_rms_day" t-out="night.day"/>
+                                        <div class="o_rms_event" t-att-title="night.events.join(', ')"
+                                             t-out="night.event_label"/>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th class="o_rms_room o_rms_muted">Forecast</th>
+                                    <td t-foreach="data.nights" t-as="night" t-key="night.date"
+                                        t-att-class="{ o_rms_weekend: night.weekend, o_rms_week_start: night.week_start }">
+                                        <t t-if="night.forecast_occ !== null">
+                                            <div class="o_rms_pct" t-out="this.percent(night.forecast_occ)"/>
+                                            <OccupancyBar booked_pct="night.otb_share" forecast_pct="night.forecast_occ"
+                                                          confidence="night.confidence_level"/>
+                                        </t>
+                                    </td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="data.room_types" t-as="room" t-key="room.id">
+                                    <th scope="row" class="o_rms_room">
+                                        <div class="o_rms_room_name" t-out="room.name"/>
+                                        <div class="o_rms_muted" t-out="room.caption"/>
+                                    </th>
+                                    <td t-foreach="data.nights" t-as="night" t-key="night.date"
+                                        t-att-class="this.crossClass(room, night)"
+                                        t-on-mouseenter="() => this.setHover(room, night)">
+                                        <t t-set="cell" t-value="this.getCell(room, night)"/>
+                                        <button t-if="cell" type="button" t-att-title="this.cellTitle(cell)"
+                                                t-att-class="this.cellClass(cell)"
+                                                t-on-pointerdown="(ev) => this.onCellDown(ev, cell)"
+                                                t-on-pointerup="this.cancelLongPress" t-on-pointercancel="this.cancelLongPress"
+                                                t-on-pointerleave="this.cancelLongPress"
+                                                t-on-click="(ev) => this.onCellClick(ev, cell)">
+                                            <span t-if="this.needsDecision(cell)" class="o_rms_dot"/>
+                                            <i t-if="cell.locked" class="oi o_rms_lock" data-icon="lock" title="Locked"/>
+                                            <i t-if="cell.state === 'accepted' or cell.state === 'edited'"
+                                               class="oi o_rms_check" t-att-data-icon="cell.state === 'edited' ? 'edit' : 'check'"
+                                               title="Decided"/>
+                                            <span t-if="cell.not_for_sale" class="o_rms_muted">Not for sale</span>
+                                            <span t-elif="!cell.has_season" class="o_rms_muted">No season</span>
+                                            <t t-else="">
+                                                <t t-set="pct" t-value="this.levelValue(cell)"/>
+                                                <PriceChange recommended="this.shown(cell)" current="cell.current"
+                                                             currency="this.currency" plain="pct !== null"/>
+                                                <span t-if="pct !== null" class="o_rms_level_row">
+                                                    <span class="o_rms_level_text" t-out="pct + '%'"/>
+                                                    <span class="o_rms_level_bar"><i t-att-style="'width: ' + pct + '%'"/></span>
+                                                </span>
+                                            </t>
+                                        </button>
+                                        <span t-elif="!night.has_season" class="o_rms_muted">No season</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="o_rms_legend o_rms_legend_items">
+                        <t t-if="this.state.mode === 'changes' or this.layout === 'list'">
+                            <span class="o_rms_legend_item"><span class="o_rms_dot"/>Needs decision</span>
+                            <span class="o_rms_legend_item"><span class="o_rms_swatch o_rms_cell_accepted"/>Accepted</span>
+                            <span class="o_rms_legend_item"><span class="o_rms_swatch o_rms_cell_edited"/>Own price</span>
+                            <span class="o_rms_legend_item"><span class="o_rms_swatch o_rms_cell_nfs"/>Not for sale</span>
+                        </t>
+                        <span t-else="" class="o_rms_level_legend o_rms_legend_items">
+                            <span t-foreach="this.levels" t-as="level" t-key="level" class="o_rms_legend_item">
+                                <span t-attf-class="o_rms_swatch o_rms_level_{{ level }}"/><t t-out="level * 25"/>%
+                            </span>
+                            <span t-out="this.levelCaption"/>
+                        </span>
+                        <span>Bar: booked, then forecast (hatched: low confidence)</span>
+                        <span class="o_rms_kbd o_rms_legend_item" title="Arrow keys move, Enter opens, A accepts, R rejects, L locks or unlocks, J and K go to the next or previous price in review, Esc closes">
+                            <i class="oi" data-icon="keyboard" title="Keyboard"/>Keyboard shortcuts
+                        </span>
+                        <span class="ms-auto">Prices in <t t-out="data.property.currency.symbol"/></span>
+                    </div>
+                </t>
+
+                <div t-if="this.ui.isSmall and data and data.can_decide and !this.showSetup and (this.decisionIds.length or data.to_export_count)"
+                     class="o_rms_phone_bar">
+                    <button t-if="this.decisionIds.length" type="button" class="btn btn-primary w-100"
+                            t-on-click="this.startReview" t-out="this.reviewLabel"/>
+                    <button t-else="" type="button" class="btn btn-primary w-100" t-att-disabled="this.state.busy"
+                            t-on-click="this.publish">
+                        <i t-if="this.state.busy === 'publish'" class="oi oi-spin me-1" data-icon="progress_activity"/>
+                        <span t-out="data.publish.label"/>
+                        <span class="o_rms_count" t-out="data.to_export_count"/>
+                    </button>
+                </div>
+
+                <div t-if="this.state.multi.length" class="o_rms_bulkbar">
+                    <span><t t-out="this.state.multi.length"/> selected</span>
+                    <button type="button" class="btn btn-primary btn-sm" t-att-disabled="this.state.busy"
+                            t-on-click="() => this.act('action_accept', this.state.multi)">Accept</button>
+                    <button t-foreach="this.bulkPcts" t-as="bulk" t-key="bulk.pct" type="button"
+                            class="btn btn-secondary btn-sm" t-out="bulk.label" t-att-disabled="this.state.busy"
+                            t-on-click="() => this.act('action_quick_price', this.state.multi, [bulk.pct])"/>
+                    <button type="button" class="btn btn-secondary btn-sm" t-att-disabled="this.state.busy"
+                            t-on-click="() => this.act('action_lock', this.state.multi)">Lock</button>
+                    <button type="button" class="btn btn-link btn-sm" t-on-click="this.clearMulti">Clear</button>
+                </div>
+            </div>
+
+            <div t-if="this.state.tab === 'calendar'"
+                 t-attf-class="o_rms_panel_wrap {{ this.panelVisible ? 'o_rms_open' : '' }}">
+                <PricePanel t-if="this.state.selected and !this.reviewDone"
+                            t-key="this.state.selected + '_' + this.state.version"
+                            priceId="this.state.selected" currency="this.currency" busy="this.state.busy"
+                            review="this.panelReview"
+                            onAction="(method, args) => this.act(method, [this.state.selected], args)"
+                            onSkip="() => this.reviewStep(1)" onPrevious="() => this.reviewStep(-1)"
+                            onClose="() => this.closePanel()"/>
+                <aside t-elif="this.reviewDone" class="o_rms_panel o_rms_done" role="dialog" aria-label="Review finished">
+                    <header class="o_rms_panel_header">
+                        <h2 class="o_rms_panel_title">All done</h2>
+                        <button type="button" class="btn-close" aria-label="Close" t-on-click="this.endReview"/>
+                    </header>
+                    <section class="o_rms_panel_section">
+                        <DecisionSplit accepted="this.state.review.accepted" edited="this.state.review.edited"
+                                       rejected="this.state.review.rejected"/>
+                        <button type="button" class="btn btn-primary mt-3"
+                                t-att-disabled="!this.state.data.to_export_count or this.state.busy"
+                                t-on-click="this.publish">
+                            <span t-out="this.state.data.publish.label"/>
+                            <span class="o_rms_count" t-out="this.state.data.to_export_count"/>
+                        </button>
+                    </section>
+                </aside>
+                <aside t-else="" class="o_rms_panel o_rms_panel_empty">
+                    <p class="text-muted">Select a price to see why it is recommended.</p>
+                </aside>
+            </div>
+        </div>
+    </t>
+</templates>

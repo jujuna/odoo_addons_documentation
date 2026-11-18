@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_basisbank_root"
+              name="Basis Bank"
+              sequence="55"
+              groups="basis_bank.group_basisbank_user"
+              web_icon="basis_bank,static/description/icon.png"/>
+
+    <menuitem id="menu_basisbank_operations"
+              name="Operations"
+              parent="menu_basisbank_root"
+              sequence="10"/>
+
+    <menuitem id="menu_basisbank_batches"
+              name="Batches"
+              parent="menu_basisbank_operations"
+              action="action_basisbank_batch_payment"
+              sequence="10"/>
+
+    <menuitem id="menu_basisbank_payments"
+              name="Payments"
+              parent="menu_basisbank_operations"
+              action="action_basisbank_payment"
+              sequence="20"/>
+
+    <menuitem id="menu_basisbank_pending_approval"
+              name="Batches Awaiting Approval"
+              parent="menu_basisbank_operations"
+              action="action_basisbank_pending_approval"
+              sequence="30"/>
+
+    <menuitem id="menu_basisbank_statement_import"
+              name="Import Statement"
+              parent="menu_basisbank_operations"
+              action="action_basisbank_statement_import"
+              sequence="40"/>
+
+    <menuitem id="menu_basisbank_configuration"
+              name="Configuration"
+              parent="menu_basisbank_root"
+              sequence="90"
+              groups="basis_bank.group_basisbank_manager"/>
+
+    <menuitem id="menu_basisbank_connections"
+              name="Connections"
+              parent="menu_basisbank_configuration"
+              action="action_basisbank_connection"
+              sequence="10"/>
+
+    <menuitem id="menu_basisbank_approvals"
+              name="Approvers &amp; Delegates"
+              parent="menu_basisbank_configuration"
+              action="action_basisbank_approval"
+              sequence="20"/>
+
+    <menuitem id="menu_basisbank_api_logs"
+              name="API Logs"
+              parent="menu_basisbank_configuration"
+              action="action_basisbank_api_log"
+              sequence="30"/>
+</odoo>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="gec_access_manager.PreviewBanner">
+        <div class="o_gec_preview_banner d-flex align-items-center gap-2 px-3 py-2 shadow" role="status">
+            <i class="oi" data-icon="visibility" aria-hidden="true"/>
+            <span t-if="this.preview.ended">
+                The preview of <strong t-out="this.preview.name"/> has ended · nothing is saved
+            </span>
+            <span t-else="">
+                Previewing as <strong t-out="this.preview.name"/>
+                <t t-if="this.preview.profiles.length">
+                    (<t t-out="this.preview.profiles.join(', ')"/>)
+                </t>
+                <t t-else=""> (no access profile)</t>
+                · read only
+            </span>
+            <button type="button" class="btn btn-sm btn-light ms-2" t-on-click="() => this.exit()">
+                Exit preview
+            </button>
+        </div>
+    </t>
+
+</templates>

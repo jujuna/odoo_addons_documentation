@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="business_process_tag_view_list" model="ir.ui.view">
+        <field name="name">business.process.tag.list</field>
+        <field name="model">business.process.tag</field>
+        <field name="arch" type="xml">
+            <list string="Tags" editable="bottom">
+                <field name="name"/>
+                <field name="color" widget="color_picker"/>
+                <field name="active" widget="boolean_toggle" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="business_process_tag_action" model="ir.actions.act_window">
+        <field name="name">Process Tags</field>
+        <field name="res_model">business.process.tag</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a tag</p>
+            <p>Tags group processes across the hierarchy, e.g. ISO 9001, Customer facing, Critical.</p>
+        </field>
+    </record>
+
+    <record id="business_process_ack_view_list" model="ir.ui.view">
+        <field name="name">business.process.ack.list</field>
+        <field name="model">business.process.ack</field>
+        <field name="arch" type="xml">
+            <list string="Read Confirmations" create="0" edit="0">
+                <field name="process_id"/>
+                <field name="version"/>
+                <field name="user_id" widget="many2one_avatar_user"/>
+                <field name="date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="business_process_ack_view_search" model="ir.ui.view">
+        <field name="name">business.process.ack.search</field>
+        <field name="model">business.process.ack</field>
+        <field name="arch" type="xml">
+            <search string="Read Confirmations">
+                <field name="process_id"/>
+                <field name="user_id"/>
+                <group>
+                    <filter name="group_version" string="Version" context="{'group_by': 'version'}"/>
+                    <filter name="group_process" string="Process" context="{'group_by': 'process_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="business_process_ack_action" model="ir.actions.act_window">
+        <field name="name">Read Confirmations</field>
+        <field name="res_model">business.process.ack</field>
+        <field name="view_mode">list</field>
+        <field name="context">{'search_default_group_process': 1}</field>
+    </record>
+
+    <record id="action_bpmn_process_dashboard" model="ir.actions.client">
+        <field name="name">Process Dashboard</field>
+        <field name="tag">bpmn_process_dashboard</field>
+    </record>
+
+    <record id="action_bpmn_user_guide" model="ir.actions.act_url">
+        <field name="name">User Guide</field>
+        <field name="url">/bpmn_process_management/guide</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

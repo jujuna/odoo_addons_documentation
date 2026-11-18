@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_rs_form15_land_plot_list" model="ir.ui.view">
+        <field name="name">rs.form15.land.plot.list</field>
+        <field name="model">rs.form15.land.plot</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" js_class="rs_form15_land_plot_list" decoration-warning="not asset_id">
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                <field name="land_territory_id" widget="rs_form15_land_territory"/>
+                <field name="land_type_id"/>
+                <field name="name"/>
+                <field name="area"/>
+                <field name="unit"/>
+                <field name="exemption_basis_id" domain="['|', ('valid_to', '=', False), ('valid_to', '&gt;=', context_today().year - 1)]"
+                       placeholder="შეღავათით არ ვსარგებლობ"/>
+                <field name="taxable_area"/>
+                <field name="date_acquired" optional="show" readonly="asset_id"/>
+                <field name="date_sold" optional="show" readonly="asset_id"/>
+                <field name="asset_id" optional="show" options="{'no_create': True}"
+                       domain="[('main_variant_id.model_id.method', '=', 'no_depreciation'), ('rs_form15_land_plot_ids', '=', False)]"/>
+                <button name="action_rs_form15_create_asset" type="object" string="Create Asset"
+                        icon="add" invisible="asset_id or not id"
+                        groups="account.group_account_user"/>
+                <field name="supporting_document" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rs_form15_land_plot_form" model="ir.ui.view">
+        <field name="name">rs.form15.land.plot.form</field>
+        <field name="model">rs.form15.land.plot</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_rs_form15_create_asset" type="object" string="Create Asset"
+                            class="btn-primary" invisible="asset_id or not id"
+                            groups="account.group_account_user"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="land_territory_id" widget="rs_form15_land_territory"/>
+                            <field name="land_type_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" invisible="1"/>
+                            <field name="asset_id" options="{'no_create': True}"
+                                   domain="[('main_variant_id.model_id.method', '=', 'no_depreciation'), ('rs_form15_land_plot_ids', '=', False)]"/>
+                            <field name="date_acquired" readonly="asset_id"/>
+                            <field name="date_sold" readonly="asset_id"/>
+                        </group>
+                        <group>
+                            <field name="area"/>
+                            <field name="unit"/>
+                            <field name="exemption_basis_id"
+                                   domain="['|', ('valid_to', '=', False), ('valid_to', '&gt;=', context_today().year - 1)]"
+                                   placeholder="შეღავათით არ ვსარგებლობ"/>
+                            <field name="taxable_area" invisible="not exemption_basis_id"/>
+                            <field name="supporting_document" invisible="not exemption_basis_id"/>
+                            <field name="note"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_rs_form15_land_plot_search" model="ir.ui.view">
+        <field name="name">rs.form15.land.plot.search</field>
+        <field name="model">rs.form15.land.plot</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="land_territory_id"/>
+                <field name="land_type_id"/>
+                <filter name="exempt" string="With Exemption"
+                        domain="[('exemption_basis_id', '!=', False)]"/>
+                <filter name="no_asset" string="Without Asset" domain="[('asset_id', '=', False)]"/>
+                <filter name="sold" string="Sold" domain="[('date_sold', '!=', False)]"/>
+                <filter name="inactive" string="Archived" domain="[('active', '=', False)]"/>
+                <filter name="group_territory" string="Territorial Unit"
+                        context="{'group_by': 'land_territory_id'}"/>
+                <filter name="group_type" string="Land Type"
+                        context="{'group_by': 'land_type_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_rs_form15_land_plot" model="ir.actions.act_window">
+        <field name="name">Land Plots</field>
+        <field name="res_model">rs.form15.land.plot</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Register a taxable land plot</p>
+            <p>Part IV of the declaration is built from this register: one row per plot owned
+               on the declaration's "Land as at" date. If the land is also booked in Fixed
+               Assets, link the asset: its dates are used and it is kept out of part III.</p>
+        </field>
+    </record>
+
+</odoo>

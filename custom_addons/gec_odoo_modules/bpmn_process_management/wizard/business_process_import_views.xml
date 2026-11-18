@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="business_process_import_view_form" model="ir.ui.view">
+        <field name="name">business.process.import.form</field>
+        <field name="model">business.process.import</field>
+        <field name="arch" type="xml">
+            <form string="Import Diagram">
+                <div class="alert alert-info mb-3" role="status">
+                    Supported files: <b>.bpmn</b> (Camunda, Signavio, bpmn.io, Bizagi...),
+                    <b>.drawio / .xml / .svg / .png</b> exported from draw.io with the diagram
+                    included, and <b>.vsdx</b> (Microsoft Visio 2013 or later).
+                    Converted diagrams are flagged for review: lanes need a department or role,
+                    guessed shapes should be checked.
+                    <a href="/bpmn_process_management/guide#import" target="_blank">How to prepare the file</a>
+                </div>
+                <group>
+                    <group>
+                        <field name="file" filename="filename"/>
+                        <field name="demo_loaded" invisible="1"/>
+                        <field name="filename" invisible="1"/>
+                        <field name="mode" widget="radio"/>
+                        <field name="process_id" invisible="mode != 'replace'"
+                               required="mode == 'replace'" options="{'no_create': True}"/>
+                    </group>
+                    <group>
+                        <field name="pages" widget="radio" invisible="mode == 'replace'"/>
+                        <field name="category" invisible="mode == 'replace'"/>
+                        <field name="parent_id" invisible="mode == 'replace'"
+                               options="{'no_create': True}"/>
+                        <field name="match_responsibles"/>
+                    </group>
+                </group>
+                <div class="o_bpmn_demo_box mt-2 p-3 border rounded bg-light">
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <div class="flex-grow-1">
+                            <b>Demo data</b>
+                            <div class="text-muted small" invisible="demo_loaded">
+                                No file at hand? Load ready-made example processes (in Georgian) to try
+                                every feature: lanes with responsibles, links, versions, review queue,
+                                dashboard, read confirmations and diagrams imported from draw.io and Visio.
+                                <a href="/bpmn_process_management/guide#demo" target="_blank">What is included</a>
+                            </div>
+                            <div class="text-muted small" invisible="not demo_loaded">
+                                Demo data is loaded (tag "დემო"). Removing it deletes only the demo
+                                records and the versions made from them.
+                            </div>
+                        </div>
+                        <button name="action_load_demo" type="object" string="Load demo data" class="btn-secondary" invisible="demo_loaded"/>
+                        <button name="action_remove_demo" type="object" string="Remove demo data" class="btn-secondary" invisible="not demo_loaded"
+                                confirm="Delete all demo processes and the records created with them?"/>
+                    </div>
+                </div>
+                <footer>
+                    <button name="action_import" type="object" string="Import" class="btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="business_process_import_action" model="ir.actions.act_window">
+        <field name="name">Import Diagram</field>
+        <field name="res_model">business.process.import</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

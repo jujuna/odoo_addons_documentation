@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sale_order_form_rs_invoice_from_waybill" model="ir.ui.view">
+        <field name="name">sale.order.form.rs.invoice.from.waybill</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+
+            <xpath expr="//button[@id='create_invoice']" position="after">
+                <button name="action_open_rs_invoice_from_waybill_wizard"
+                        string="Create RS Invoice"
+                        type="object"
+                        invisible="state not in ('sale', 'done') or not waybill_id"
+                        help="Build a customer invoice from the rs.ge waybills already delivered for this sale order, and attach them to the rs.ge invoice."/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

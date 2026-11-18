@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_rs_replace_preview_wizard_form" model="ir.ui.view">
+        <field name="name">rs.einvoice.replace.preview.form</field>
+        <field name="model">rs.einvoice.replace.preview</field>
+        <field name="arch" type="xml">
+            <form string="Cancel and Reissue from rs.ge Corrections">
+                <sheet>
+                    <div class="alert alert-warning mb-3" role="alert">
+                        <strong>Supplier corrections.</strong>
+                        On <em>Confirm</em>, every row below is processed
+                        in sequence: a new draft bill carrying the rs.ge
+                        correction's lines is created and linked to its
+                        original bill. Each new draft is left in Draft so
+                        you can review it and click <em>Accept on rs.ge</em>;
+                        the original bill is cancelled once the correction
+                        is accepted. Rows that fail (rs.ge state changed,
+                        accounting blocker re-appeared) leave their
+                        original bill untouched.
+                    </div>
+
+                    <field name="line_count" invisible="1"/>
+                    <field name="line_ids" nolabel="1">
+                        <list create="false" delete="false">
+                            <field name="parent_move_id" readonly="1"/>
+                            <field name="parent_rs_id" readonly="1" optional="show"/>
+                            <field name="parent_state" readonly="1" optional="show"/>
+                            <field name="parent_amount" readonly="1"
+                                   sum="Total original"/>
+                            <field name="correction_rs_id" readonly="1"/>
+                            <field name="correction_k_type" readonly="1"
+                                   optional="show"/>
+                            <field name="correction_status" readonly="1"
+                                   optional="show"/>
+                            <field name="correction_amount" readonly="1"
+                                   sum="Total corrected"/>
+                        </list>
+                    </field>
+                </sheet>
+                <footer>
+                    <button name="action_confirm" string="Confirm"
+                            type="object" class="btn-primary"
+                            confirm="This creates a new draft from each rs.ge correction listed above; each original bill is cancelled once its correction is accepted. Continue?"/>
+                    <button string="Cancel" class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,1971 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* basis_bank
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-13 16:39+0000\n"
+"PO-Revision-Date: 2026-09-13 16:39+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: basis_bank
+#: model:ir.module.module,description:base.module_basis_bank
+msgid ""
+"\n"
+"Send outbound payments to Basis Bank (bis.bankonline.ge) with a Digipass OTP, alone or\n"
+"in batches, and import account statements back into Odoo.\n"
+"\n"
+"A bank journal is a Basis Bank journal when its bank account BIC is CBASGE22 and its\n"
+"company, or a parent company, has a Basis Bank connection. A sent payment stays Paid\n"
+"until its line in an imported bank statement is matched with it, and then becomes\n"
+"Reconciled; a resync or the hourly 48-hour check only confirms that the bank has the\n"
+"transfer. Standard Odoo posts the payments and creates the statement lines; this module\n"
+"transmits the payments and records the bank's answer.\n"
+"\n"
+"Full documentation: README.md and README_DEV.md in the module directory.\n"
+msgstr ""
+"\n"
+"გამავალი გადახდების გაგზავნა ბაზისბანკში (bis.bankonline.ge) Digipass-ის ერთჯერადი კოდით (OTP),\n"
+"ცალ-ცალკე ან სერიებად, და ანგარიშის ამონაწერების იმპორტი Odoo-ში.\n"
+"\n"
+"საბანკო ჟურნალი ბაზისბანკის ჟურნალია, როცა მისი საბანკო ანგარიშის BIC არის CBASGE22 და მის\n"
+"კომპანიას ან მშობელ კომპანიას ბაზისბანკთან კავშირი აქვს. გაგზავნილი გადახდა რჩება „გადახდილი“,\n"
+"სანამ იმპორტირებული ამონაწერის ხაზი მას არ დაუკავშირდება, შემდეგ კი ხდება „შეჯერებული“; ხელახალი\n"
+"სინქრონიზაცია ან ყოველსაათობრივი 48-საათიანი შემოწმება მხოლოდ ადასტურებს, რომ გადარიცხვა ბანკშია.\n"
+"სტანდარტული Odoo ატარებს გადახდებს და ქმნის ამონაწერის ხაზებს; ეს მოდული გადახდებს ბანკს\n"
+"გადასცემს და ბანკის პასუხს ინახავს.\n"
+"\n"
+"სრული დოკუმენტაცია: README.md და README_DEV.md მოდულის საქაღალდეში.\n"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid ""
+"%(user)s reset this batch to draft. Only its pending payments will be sent "
+"again: %(names)s."
+msgstr ""
+"ეს სერია მონახაზზე დააბრუნა მომხმარებელმა %(user)s. ხელახლა გაიგზავნება "
+"მხოლოდ მისი მოლოდინში მყოფი გადახდები: %(names)s."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment_method_line.py:0
+msgid "%s has no payment purpose/description."
+msgstr "%s: არ აქვს გადახდის დანიშნულება/აღწერა."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment_method_line.py:0
+msgid "%s has no receiver bank BIC."
+msgstr "%s: არ აქვს მიმღები ბანკის BIC."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/wizard/basisbank_statement_import_wizard.py:0
+msgid "'From' date must be earlier than or equal to 'To' date."
+msgstr "საწყისი თარიღი უნდა იყოს საბოლოო თარიღის ტოლი ან მასზე ადრინდელი."
+
+#. module: basis_bank
+#: model:ir.model.constraint,message:basis_bank.constraint_account_batch_payment_basisbank_pkg_uniq
+msgid ""
+"A package with the same name already exists for this journal and endpoint."
+msgstr ""
+"ამავე სახელის მქონე პაკეტი ამ ჟურნალისა და ენდპოინტისთვის უკვე არსებობს."
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__api_host
+msgid "API Host"
+msgstr "API ჰოსტი"
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_api_log_form
+msgid "API Log"
+msgstr "API ლოგი"
+
+#. module: basis_bank
+#: model:ir.actions.act_window,name:basis_bank.action_basisbank_api_log
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__log_ids
+#: model:ir.ui.menu,name:basis_bank.menu_basisbank_api_logs
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_api_log_list
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_connection_form
+msgid "API Logs"
+msgstr "API ლოგები"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__api_version
+msgid "API Version"
+msgstr "API ვერსია"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__message_needaction
+msgid "Action Needed"
+msgstr "საჭიროა მოქმედება"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_approval__active
+msgid "Active"
+msgstr "აქტიური"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid "All transfers were rejected by the bank."
+msgstr "ბანკმა ყველა გადარიცხვა უარყო."
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__allow_self_approval
+msgid "Allow Self-Approval"
+msgstr "საკუთარი გადარიცხვის დამტკიცების ნებართვა"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/basisbank_connection.py:0
+msgid ""
+"An approver is required when processing mode is 'Approve in Odoo first'."
+msgstr ""
+"დამმტკიცებელი აუცილებელია, როცა დამუშავების რეჟიმია „ჯერ Odoo-ში "
+"დამტკიცება“."
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_account_batch_payment_form_basisbank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_account_payment_form_basisbank
+msgid "Approve"
+msgstr "დამტკიცება"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/basisbank_sendable.py:0
+msgid "Approved for Basis Bank by %s."
+msgstr "ბაზისბანკისთვის დაამტკიცა: %s."
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_account_batch_payment__basisbank_approval_id
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment__basisbank_approval_id
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__approval_id
+msgid "Approver"
+msgstr "დამმტკიცებელი"
+
+#. module: basis_bank
+#: model:ir.actions.act_window,name:basis_bank.action_basisbank_approval
+#: model:ir.ui.menu,name:basis_bank.menu_basisbank_approvals
+msgid "Approvers & Delegates"
+msgstr "დამმტკიცებლები და დელეგატები"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__message_attachment_count
+msgid "Attachment Count"
+msgstr "დანართების რაოდენობა"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/basisbank_connection.py:0
+msgid "Authentication failed: %s"
+msgstr "ავტორიზაცია ვერ მოხერხდა: %s"
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_batch_payment__basisbank_state__awaiting_approval
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_payment__basisbank_state__awaiting_approval
+msgid "Awaiting Approval"
+msgstr "დამტკიცების მოლოდინში"
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_batch_payment__basisbank_state__awaiting_ib_confirmation
+msgid "Awaiting Confirmation in Internet Banking"
+msgstr "ინტერნეტ-ბანკში დადასტურების მოლოდინში"
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_batch_payment__basisbank_state__awaiting_otp
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_payment__basisbank_state__awaiting_otp
+msgid "Awaiting OTP"
+msgstr "OTP-ის მოლოდინში"
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_payment__basisbank_detail_of_charges__ben
+msgid "Receiver pays all fees (BEN)"
+msgstr "ყველა საფასურს მიმღები იხდის (BEN)"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment__basisbank_bank_internal_id
+msgid "Bank Internal ID"
+msgstr "ბანკის შიდა ID"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_statement_import_wizard__journal_id
+msgid "Bank Journal"
+msgstr "ბანკის ჟურნალი"
+
+#. module: basis_bank
+#: model:ir.model,name:basis_bank.model_account_bank_statement_line
+msgid "Bank Transaction"
+msgstr "ბანკის ამონაწერის სტრიქონი"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/services/basisbank_service.py:0
+msgid "Bank error %s"
+msgstr "ბანკის შეცდომა %s"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/services/basisbank_service.py:0
+msgid "Bank technical issue"
+msgstr "ბანკის ტექნიკური ხარვეზი"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_journal.py:0
+#: code:addons/basis_bank/models/basisbank_connection.py:0
+#: code:addons/basis_bank/models/basisbank_sendable.py:0
+#: code:addons/basis_bank/wizard/basisbank_change_password_wizard.py:0
+#: code:addons/basis_bank/wizard/basisbank_statement_import_wizard.py:0
+#: model:ir.module.category,name:basis_bank.module_category_basisbank
+#: model:ir.ui.menu,name:basis_bank.menu_basisbank_root
+#: model:res.groups.privilege,name:basis_bank.basisbank_privilege
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_account_batch_payment_form_basisbank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_account_journal_form_basisbank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_account_payment_form_basisbank
+msgid "Basis Bank"
+msgstr "ბაზისბანკი"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/wizard/basisbank_statement_import_wizard.py:0
+msgid "Basis Bank %(start)s - %(end)s"
+msgstr "ბაზისბანკი %(start)s - %(end)s"
+
+#. module: basis_bank
+#: model:ir.model,name:basis_bank.model_basisbank_api_log
+msgid "Basis Bank API Log"
+msgstr "ბაზისბანკის API ლოგი"
+
+#. module: basis_bank
+#: model:ir.model,name:basis_bank.model_basisbank_approval
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_approval_form
+msgid "Basis Bank Approver"
+msgstr "ბაზისბანკის დამმტკიცებელი"
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_approval_list
+msgid "Basis Bank Approvers"
+msgstr "ბაზისბანკის დამმტკიცებლები"
+
+#. module: basis_bank
+#: model:ir.model,name:basis_bank.model_basisbank_change_password_wizard
+msgid "Basis Bank Change Password Wizard"
+msgstr "ბაზისბანკის პაროლის შეცვლის ვიზარდი"
+
+#. module: basis_bank
+#: model:ir.model,name:basis_bank.model_basisbank_connection
+#: model:ir.model.fields,field_description:basis_bank.field_account_journal__basisbank_connection_id
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_connection_form
+msgid "Basis Bank Connection"
+msgstr "ბაზისბანკის კავშირი"
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_connection_list
+msgid "Basis Bank Connections"
+msgstr "ბაზისბანკის კავშირები"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_account_batch_payment__basisbank_endpoint
+msgid "Basis Bank Endpoint"
+msgstr "ბაზისბანკის ენდპოინტი"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/services/basisbank_service.py:0
+msgid "Basis Bank HTTP error %s."
+msgstr "ბაზისბანკის HTTP შეცდომა %s."
+
+#. module: basis_bank
+#: model:ir.module.module,shortdesc:base.module_basis_bank
+msgid "Basis Bank Integration"
+msgstr "ბაზისბანკის ინტეგრაცია"
+
+#. module: basis_bank
+#: model:ir.model,name:basis_bank.model_basisbank_otp_wizard
+msgid "Basis Bank OTP Wizard"
+msgstr "ბაზისბანკის OTP ვიზარდი"
+
+#. module: basis_bank
+#: model:ir.model,name:basis_bank.model_basisbank_service
+msgid "Basis Bank REST Client"
+msgstr "ბაზისბანკის REST კლიენტი"
+
+#. module: basis_bank
+#: model:ir.model,name:basis_bank.model_basisbank_resync_wizard
+msgid "Basis Bank Resync Wizard"
+msgstr "ბაზისბანკის ხელახალი სინქრონიზაციის ვიზარდი"
+
+#. module: basis_bank
+#: model:ir.model,name:basis_bank.model_basisbank_sendable
+msgid "Basis Bank Sendable Mixin"
+msgstr "ბაზისბანკის გასაგზავნი მიქსინი"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_account_batch_payment__basisbank_state
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment__basisbank_state
+msgid "Basis Bank State"
+msgstr "ბაზისბანკის მდგომარეობა"
+
+#. module: basis_bank
+#: model:ir.model,name:basis_bank.model_basisbank_statement_import_wizard
+msgid "Basis Bank Statement Import Wizard"
+msgstr "ბაზისბანკის ამონაწერის იმპორტის ვიზარდი"
+
+#. module: basis_bank
+#: model:account.payment.method,name:basis_bank.account_payment_method_basisbank
+msgid "Basis Bank Transfer"
+msgstr "ბაზისბანკის გადარიცხვა"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment__basisbank_transfer_type
+msgid "Basis Bank Transfer Type"
+msgstr "ბაზისბანკის გადარიცხვის ტიპი"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/services/basisbank_service.py:0
+msgid "Basis Bank authentication failed: %s"
+msgstr "ბაზისბანკში ავტორიზაცია ვერ მოხერხდა: %s"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid ""
+"Basis Bank confirmation check: these payments were not found in the bank "
+"report %(hours)s hours after sending; their journal entries were left as "
+"they are: %(names)s. Check with the bank, then use Resync, or Reset to "
+"Pending to send them again."
+msgstr ""
+"ბაზისბანკის დადასტურების შემოწმება: გაგზავნიდან %(hours)s საათის შემდეგ ეს "
+"გადახდები ბანკის ამონაწერში ვერ მოიძებნა; მათი ბუღალტრული გატარებები "
+"უცვლელად დარჩა: %(names)s. გადაამოწმეთ ბანკთან, შემდეგ გაუშვით ხელახალი "
+"სინქრონიზაცია ან ხელახლა გასაგზავნად გამოიყენეთ „მოლოდინში დაბრუნება“."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/basisbank_connection.py:0
+msgid "Basis Bank could not change the password: %s"
+msgstr "ბაზისბანკმა პაროლი ვერ შეცვალა: %s"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid ""
+"Basis Bank did not report these payments in the response; run the Resync "
+"wizard to confirm them: %s"
+msgstr ""
+"ბაზისბანკმა ეს გადახდები პასუხში არ მიუთითა; მათ დასადასტურებლად გაუშვით "
+"ხელახალი სინქრონიზაციის ვიზარდი: %s"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/services/basisbank_service.py:0
+msgid "Basis Bank is unreachable."
+msgstr "ბაზისბანკი მიუწვდომელია."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment_method_line.py:0
+msgid ""
+"Basis Bank needs the bank (BIC) of these recipients' accounts. Enter the "
+"full Georgian IBAN, which fills in the bank, or set the BIC on the account: "
+"%s"
+msgstr ""
+"Basis Bank-ს ამ მიმღებების ანგარიშების ბანკი (BIC) სჭირდება. შეიყვანეთ სრული"
+" ქართული IBAN — ბანკი ავტომატურად შეივსება — ან ანგარიშზე BIC მიუთითეთ: %s"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/basisbank_connection.py:0
+msgid "Basis Bank password changed."
+msgstr "ბაზისბანკის პაროლი შეიცვალა."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid ""
+"Basis Bank payments require a partner (vendor, employee, customer or "
+"treasury)."
+msgstr ""
+"ბაზისბანკის გადახდას სჭირდება პარტნიორი (მომწოდებელი, დასაქმებული, "
+"მომხმარებელი ან ხაზინა)."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid ""
+"Basis Bank rejected this transfer, so the payment is marked Rejected. To "
+"send it again, reset it to draft, correct it, use Reset to Pending and send "
+"it; otherwise cancel it."
+msgstr ""
+"ბაზისბანკმა ეს გადარიცხვა უარყო, ამიტომ გადახდა მონიშნულია, როგორც "
+"უარყოფილი. ხელახლა გასაგზავნად დააბრუნეთ ის მონახაზზე, შეასწორეთ, გამოიყენეთ"
+" „მოლოდინში დაბრუნება“ და გაგზავნეთ; წინააღმდეგ შემთხვევაში გააუქმეთ."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid ""
+"Basis Bank reported a technical issue. Run Resync to confirm whether the "
+"transfer went through."
+msgstr ""
+"ბაზისბანკმა ტექნიკური ხარვეზი დააფიქსირა. გაუშვით ხელახალი სინქრონიზაცია "
+"იმის დასადასტურებლად, შესრულდა თუ არა გადარიცხვა."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid ""
+"Basis Bank reported a technical issue. Run the Resync wizard to confirm "
+"whether the transfer went through."
+msgstr ""
+"ბაზისბანკმა ტექნიკური ხარვეზი დააფიქსირა. გაუშვით ხელახალი სინქრონიზაციის "
+"ვიზარდი იმის დასადასტურებლად, შესრულდა თუ არა გადარიცხვა."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid ""
+"Basis Bank reported success but returned no transfer details. Run Resync to "
+"confirm whether the transfer went through."
+msgstr ""
+"ბაზისბანკმა წარმატება დაადასტურა, მაგრამ გადარიცხვის დეტალები არ დააბრუნა. "
+"გაუშვით ხელახალი სინქრონიზაცია იმის დასადასტურებლად, შესრულდა თუ არა "
+"გადარიცხვა."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid ""
+"Basis Bank request failed unexpectedly. Run Resync to find out whether the "
+"bank received it."
+msgstr ""
+"ბაზისბანკის მოთხოვნა მოულოდნელად ჩაიშალა. გაუშვით ხელახალი სინქრონიზაცია "
+"იმის გასარკვევად, მიიღო თუ არა ის ბანკმა."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid ""
+"Basis Bank request failed unexpectedly. Run the Resync wizard to find out "
+"whether the bank received it."
+msgstr ""
+"ბაზისბანკის მოთხოვნა მოულოდნელად ჩაიშალა. გაუშვით ხელახალი სინქრონიზაციის "
+"ვიზარდი იმის გასარკვევად, მიიღო თუ არა ის ბანკმა."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/services/basisbank_service.py:0
+msgid "Basis Bank request failed."
+msgstr "ბაზისბანკის მოთხოვნა ჩაიშალა."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/services/basisbank_service.py:0
+msgid "Basis Bank request timed out. Please try again."
+msgstr "ბაზისბანკის მოთხოვნას ვადა გაუვიდა. სცადეთ ხელახლა."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "Basis Bank state: %(old)s → %(new)s"
+msgstr "ბაზისბანკის მდგომარეობა: %(old)s → %(new)s"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "Basis Bank transfer not confirmed"
+msgstr "ბაზისბანკის გადარიცხვა არ დადასტურდა"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "Basis Bank transfer type is not set on payment %s."
+msgstr "გადახდაზე %s არ არის მითითებული ბაზისბანკის გადარიცხვის ტიპი."
+
+#. module: basis_bank
+#: model:ir.actions.server,name:basis_bank.cron_basisbank_confirm_or_reset_ir_actions_server
+msgid "Basis Bank — 48h report confirmation check"
+msgstr "ბაზისბანკი — 48-საათიანი ამონაწერის დადასტურების შემოწმება"
+
+#. module: basis_bank
+#: model:ir.actions.server,name:basis_bank.cron_basisbank_daily_statement_sync_ir_actions_server
+msgid "Basis Bank — Daily statement sync"
+msgstr "ბაზისბანკი — ამონაწერის ყოველდღიური სინქრონიზაცია"
+
+#. module: basis_bank
+#: model:ir.actions.server,name:basis_bank.action_server_basisbank_reset_to_pending
+msgid "Basis Bank: Reset to Pending"
+msgstr "ბაზისბანკი: მოლოდინში დაბრუნება"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment_method_line.py:0
+msgid "Basis payroll payments must be in GEL: %s"
+msgstr "Basis-ის სახელფასო გადახდები უნდა იყოს ლარში: %s"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_account_batch_payment__basisbank_approved_by
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment__basisbank_approved_by
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_sendable__basisbank_approved_by
+msgid "Basis Bank Approved By"
+msgstr "ბაზისბანკი — დამმტკიცებელი"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_account_batch_payment__basisbank_approved_date
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment__basisbank_approved_date
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_sendable__basisbank_approved_date
+msgid "Basis Bank Approved On"
+msgstr "ბაზისბანკი — დამტკიცების თარიღი"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_account_batch_payment__basisbank_bank_response
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment__basisbank_bank_response
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_sendable__basisbank_bank_response
+msgid "Basis Bank Answer"
+msgstr "ბაზისბანკი — ბანკის პასუხი"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_account_batch_payment__basisbank_can_approve
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment__basisbank_can_approve
+msgid "Basisbank Can Approve"
+msgstr "ბაზისბანკი — დამტკიცება შესაძლებელია"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_account_batch_payment__basisbank_salary
+msgid "Basisbank Salary"
+msgstr "ბაზისბანკი — ხელფასი"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_account_batch_payment__basisbank_sent_date
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment__basisbank_sent_date
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_sendable__basisbank_sent_date
+msgid "Sent to Basis Bank On"
+msgstr "ბაზისბანკი — გაგზავნის თარიღი"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_otp_wizard__batch_id
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_resync_wizard__batch_id
+msgid "Batch"
+msgstr "სერია"
+
+#. module: basis_bank
+#: model:ir.model,name:basis_bank.model_account_batch_payment
+msgid "Batch Payment"
+msgstr "სერიული გადახდა"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid "Batch sent to Basis Bank."
+msgstr "სერია გაიგზავნა ბაზისბანკში."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid "Batch submitted for approval."
+msgstr "სერია გაიგზავნა დასამტკიცებლად."
+
+#. module: basis_bank
+#: model:ir.actions.act_window,name:basis_bank.action_basisbank_batch_payment
+#: model:ir.ui.menu,name:basis_bank.menu_basisbank_batches
+msgid "Batches"
+msgstr "სერიები"
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_change_password_wizard_form
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_otp_wizard_form
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_statement_import_wizard_form
+msgid "Cancel"
+msgstr "გაუქმება"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/basisbank_connection.py:0
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_change_password_wizard_form
+msgid "Change Basis Bank Password"
+msgstr "ბაზისბანკის პაროლის შეცვლა"
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_change_password_wizard_form
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_connection_form
+msgid "Change Password"
+msgstr "პაროლის შეცვლა"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment__basisbank_detail_of_charges
+msgid "Charges"
+msgstr "საფასურები"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "Charges (SHA/OUR/BEN)"
+msgstr "საფასურები (SHA/OUR/BEN)"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/services/basisbank_service.py:0
+msgid "Client is blocked by the bank"
+msgstr "კლიენტი დაბლოკილია ბანკის მიერ"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/services/basisbank_service.py:0
+msgid "Client is blocked due to incorrect attempts"
+msgstr "კლიენტი დაბლოკილია არასწორი მცდელობების გამო"
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_resync_wizard_form
+msgid "Close"
+msgstr "დახურვა"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_api_log__company_id
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_approval__company_id
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__company_id
+msgid "Company"
+msgstr "კომპანია"
+
+#. module: basis_bank
+#: model:ir.ui.menu,name:basis_bank.menu_basisbank_configuration
+msgid "Configuration"
+msgstr "კონფიგურაცია"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_change_password_wizard__confirm_password
+msgid "Confirm New Password"
+msgstr "დაადასტურეთ ახალი პაროლი"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/wizard/basisbank_resync_wizard.py:0
+msgid "Confirmed %s payments. Still unmatched: %s"
+msgstr "დადასტურდა %s გადახდა. კვლავ დაუმთხვეველია: %s"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_statement_import_wizard__confirmed_count
+msgid "Confirmed Count"
+msgstr "დადასტურებულთა რაოდენობა"
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_payment__basisbank_state__confirmed
+msgid "Confirmed by Statement"
+msgstr "ამონაწერით დადასტურებული"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_api_log__connection_id
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_change_password_wizard__connection_id
+msgid "Connection"
+msgstr "კავშირი"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/basisbank_connection.py:0
+msgid "Connection successful."
+msgstr "კავშირი წარმატებით დამყარდა."
+
+#. module: basis_bank
+#: model:ir.actions.act_window,name:basis_bank.action_basisbank_connection
+#: model:ir.ui.menu,name:basis_bank.menu_basisbank_connections
+msgid "Connections"
+msgstr "კავშირები"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/basisbank_sendable.py:0
+msgid "Could not authenticate with Basis Bank: %s"
+msgstr "ბაზისბანკში ავტორიზაცია ვერ მოხერხდა: %s"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_api_log__create_uid
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_approval__create_uid
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_change_password_wizard__create_uid
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__create_uid
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_otp_wizard__create_uid
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_resync_wizard__create_uid
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_statement_import_wizard__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_api_log__create_date
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_approval__create_date
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_change_password_wizard__create_date
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__create_date
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_otp_wizard__create_date
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_resync_wizard__create_date
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_statement_import_wizard__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_connection_form
+msgid "Credentials"
+msgstr "ავტორიზაციის მონაცემები"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_statement_import_wizard__currency_code
+msgid "Currency"
+msgstr "ვალუტა"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/basisbank_connection.py:0
+msgid "Daily statement sync failed for %s; see API log."
+msgstr "ამონაწერის ყოველდღიური სინქრონიზაცია ჩაიშალა: %s; იხილეთ API ლოგი."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/basisbank_connection.py:0
+msgid "Daily statement sync skipped: Basis Bank authentication failed."
+msgstr ""
+"გამოტოვებულია ამონაწერის ყოველდღიური სინქრონიზაცია: ბაზისბანკში ავტორიზაცია "
+"ვერ მოხერხდა."
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_approval__delegate_ids
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_approval_form
+msgid "Delegates"
+msgstr "დელეგატები"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_change_password_wizard__otp
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_otp_wizard__otp
+msgid "Digipass OTP"
+msgstr "Digipass OTP"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_account_bank_statement_line__display_name
+#: model:ir.model.fields,field_description:basis_bank.field_account_batch_payment__display_name
+#: model:ir.model.fields,field_description:basis_bank.field_account_journal__display_name
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment__display_name
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment_method__display_name
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment_method_line__display_name
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_api_log__display_name
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_approval__display_name
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_change_password_wizard__display_name
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__display_name
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_otp_wizard__display_name
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_resync_wizard__display_name
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_sendable__display_name
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_service__display_name
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_statement_import_wizard__display_name
+msgid "Display Name"
+msgstr "სახელწოდება"
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_batch_payment__basisbank_state__done
+msgid "Done"
+msgstr "დასრულდა"
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_batch_payment__basisbank_state__draft
+msgid "Draft"
+msgstr "მონახაზი"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_api_log__duration_ms
+msgid "Duration (ms)"
+msgstr "ხანგრძლივობა (მწმ)"
+
+#. module: basis_bank
+#: model:ir.model.constraint,message:basis_bank.constraint_account_payment_basisbank_internal_id_uniq
+msgid "Each Basis Bank reference can attach to only one payment per company."
+msgstr ""
+"ბაზისბანკის თითოეული მითითება კომპანიის ფარგლებში მხოლოდ ერთ გადახდას "
+"შეიძლება დაუკავშირდეს."
+
+#. module: basis_bank
+#: model:ir.model.constraint,message:basis_bank.constraint_basisbank_connection_company_uniq
+msgid "Each company can have only one Basis Bank connection."
+msgstr "თითოეულ კომპანიას შეიძლება ჰქონდეს მხოლოდ ერთი ბაზისბანკის კავშირი."
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_resync_wizard__end_date
+msgid "End Date"
+msgstr "დასრულების თარიღი"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_api_log__endpoint
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_connection_form
+msgid "Endpoint"
+msgstr "ენდპოინტი"
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_otp_wizard_form
+msgid "Enter Digipass OTP"
+msgstr "შეიყვანეთ Digipass OTP"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/basisbank_sendable.py:0
+msgid "Enter OTP"
+msgstr "შეიყვანეთ OTP"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_api_log__error_code
+msgid "Error Code"
+msgstr "შეცდომის კოდი"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_api_log__error_message
+msgid "Error Message"
+msgstr "შეცდომის შეტყობინება"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/services/basisbank_service.py:0
+msgid "Error in one of the batch transactions"
+msgstr "შეცდომა სერიის ერთ-ერთ ოპერაციაში"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid ""
+"Every payment of this batch is already confirmed by the bank; there is "
+"nothing to send."
+msgstr ""
+"ამ სერიის ყველა გადახდა ბანკს უკვე დადასტურებული აქვს; გასაგზავნი არაფერია."
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_batch_payment__basisbank_state__failed
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_payment__basisbank_state__failed
+msgid "Failed"
+msgstr "წარუმატებელი"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__message_follower_ids
+msgid "Followers"
+msgstr "გამომწერები"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "გამომწერები (პარტნიორები)"
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_payment__basisbank_transfer_type__foreign
+msgid "Foreign (SWIFT)"
+msgstr "საერთაშორისო (SWIFT)"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_bank_statement_line.py:0
+msgid ""
+"Found in the imported bank statement but could not be confirmed "
+"automatically. Check and confirm it manually (e.g. via Resync)."
+msgstr ""
+"მოიძებნა შეტვირთულ ბანკის ამონაწერში, მაგრამ ავტომატურად ვერ დადასტურდა. "
+"შეამოწმეთ და დაადასტურეთ ხელით (მაგალითად, ხელახალი სინქრონიზაციით)."
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_statement_import_wizard__start_date
+msgid "From"
+msgstr "საწყისი თარიღი"
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_batch_payment__basisbank_endpoint__package_gel
+msgid "GEL Package"
+msgstr "ლარის პაკეტი"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_api_log__http_status
+msgid "HTTP Status"
+msgstr "HTTP სტატუსი"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__has_message
+msgid "Has Message"
+msgstr "აქვს შეტყობინება"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_account_bank_statement_line__id
+#: model:ir.model.fields,field_description:basis_bank.field_account_batch_payment__id
+#: model:ir.model.fields,field_description:basis_bank.field_account_journal__id
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment__id
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment_method__id
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment_method_line__id
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_api_log__id
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_approval__id
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_change_password_wizard__id
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__id
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_otp_wizard__id
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_resync_wizard__id
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_sendable__id
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_service__id
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_statement_import_wizard__id
+msgid "ID"
+msgstr "იდენტიფიკატორი"
+
+#. module: basis_bank
+#: model:ir.model.fields,help:basis_bank.field_basisbank_connection__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "თუ მონიშნულია, ახალი შეტყობინებები საჭიროებს თქვენს ყურადღებას."
+
+#. module: basis_bank
+#: model:ir.model.fields,help:basis_bank.field_basisbank_connection__message_has_error
+#: model:ir.model.fields,help:basis_bank.field_basisbank_connection__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "თუ მონიშნულია, ზოგიერთ შეტყობინებას აქვს მიწოდების შეცდომა."
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_statement_import_wizard_form
+msgid "Import"
+msgstr "იმპორტი"
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_statement_import_wizard_form
+msgid "Import Basis Bank Statement"
+msgstr "ბაზისბანკის ამონაწერის იმპორტი"
+
+#. module: basis_bank
+#: model:ir.actions.act_window,name:basis_bank.action_basisbank_statement_import
+#: model:ir.ui.menu,name:basis_bank.menu_basisbank_statement_import
+msgid "Import Statement"
+msgstr "ამონაწერის იმპორტი"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/wizard/basisbank_statement_import_wizard.py:0
+msgid "Imported %(imp)s lines, skipped %(skp)s, confirmed %(conf)s payments."
+msgstr ""
+"შეიტვირთა %(imp)s სტრიქონი, გამოტოვებულ იქნა %(skp)s, დადასტურდა %(conf)s "
+"გადახდა."
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_statement_import_wizard__imported_count
+msgid "Imported Count"
+msgstr "დაიმპორტებულთა რაოდენობა"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/services/basisbank_service.py:0
+msgid "Insufficient funds"
+msgstr "არასაკმარისი თანხა"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment__basisbank_intermediate_bank_code
+msgid "Intermediate Bank BIC"
+msgstr "შუამავალი ბანკის BIC"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment__basisbank_intermediate_bank_name
+msgid "Intermediate Bank Name"
+msgstr "შუამავალი ბანკის დასახელება"
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_payment__basisbank_transfer_type__internal
+msgid "Internal (within Basis Bank)"
+msgstr "შიდა (ბაზისბანკის ფარგლებში)"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_account_batch_payment__is_basisbank
+#: model:ir.model.fields,field_description:basis_bank.field_account_journal__is_basisbank
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment__is_basisbank
+msgid "Is Basis Bank Journal"
+msgstr "არის ბაზისბანკის ჟურნალი"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__message_is_follower
+msgid "Is Follower"
+msgstr "არის გამომწერი"
+
+#. module: basis_bank
+#: model:ir.model,name:basis_bank.model_account_journal
+msgid "Journal"
+msgstr "ჟურნალი"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/wizard/basisbank_resync_wizard.py:0
+msgid "Journal has no Basis Bank connection."
+msgstr "ჟურნალს არ აქვს ბაზისბანკის კავშირი."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/wizard/basisbank_statement_import_wizard.py:0
+msgid "Journal has no IBAN configured."
+msgstr "ჟურნალზე IBAN არ არის მითითებული."
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment__basisbank_error_message
+msgid "Last Bank Error"
+msgstr "ბანკის ბოლო შეცდომა"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment__basisbank_error_code
+msgid "Last Bank Error Code"
+msgstr "ბანკის ბოლო შეცდომის კოდი"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__last_error_message
+msgid "Last Error"
+msgstr "ბოლო შეცდომა"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__last_error_code
+msgid "Last Error Code"
+msgstr "ბოლო შეცდომის კოდი"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_api_log__write_uid
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_approval__write_uid
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_change_password_wizard__write_uid
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__write_uid
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_otp_wizard__write_uid
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_resync_wizard__write_uid
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_statement_import_wizard__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_api_log__write_date
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_approval__write_date
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_change_password_wizard__write_date
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__write_date
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_otp_wizard__write_date
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_resync_wizard__write_date
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_statement_import_wizard__write_date
+msgid "Last Updated on"
+msgstr "ბოლოს განახლდა"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__log_retention_days
+msgid "Log Retention (days)"
+msgstr "ჟურნალის შენახვის ვადა (დღე)"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/basisbank_connection.py:0
+msgid "Logged out of Basis Bank."
+msgstr "ბაზისბანკიდან გამოსვლა დასრულდა."
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__login_name
+msgid "Login Name"
+msgstr "მომხმარებლის სახელი"
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_connection_form
+msgid "Logout"
+msgstr "გამოსვლა"
+
+#. module: basis_bank
+#: model:res.groups,name:basis_bank.group_basisbank_manager
+msgid "Manager"
+msgstr "მენეჯერი"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_resync_wizard__matched_count
+msgid "Matched Count"
+msgstr "დაკავშირებულთა რაოდენობა"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__message_has_error
+msgid "Message Delivery error"
+msgstr "შეტყობინების მიწოდების შეცდომა"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__message_ids
+msgid "Messages"
+msgstr "შეტყობინებები"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_approval__name
+msgid "Name"
+msgstr "სახელი"
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_payment__basisbank_transfer_type__national
+msgid "National (GEL to other GE bank)"
+msgstr "ეროვნული (ლარი სხვა ქართულ ბანკში)"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "National and Treasury transfers must be in GEL: %s"
+msgstr "ეროვნული და სახაზინო გადარიცხვები უნდა იყოს ლარში: %s"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_change_password_wizard__new_password
+msgid "New Password"
+msgstr "ახალი პაროლი"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/basisbank_connection.py:0
+#: code:addons/basis_bank/wizard/basisbank_change_password_wizard.py:0
+msgid "New password is required."
+msgstr "ახალი პაროლი სავალდებულოა."
+
+#. module: basis_bank
+#: model:res.groups.privilege,placeholder:basis_bank.basisbank_privilege
+msgid "No"
+msgstr "არა"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/wizard/basisbank_otp_wizard.py:0
+msgid "No batch or payment to send."
+msgstr "გასაგზავნი სერია ან გადახდა არ არის."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid "No payment of this batch needs to be sent again."
+msgstr "ამ სერიაში ხელახლა გასაგზავნი გადახდა არ არის."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/services/basisbank_service.py:0
+msgid "No such account exists"
+msgstr "ასეთი ანგარიში არ არსებობს"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid ""
+"Not found in the %(start)s – %(end)s Basis Bank report %(hours)s hours after"
+" sending. The journal entry was left as it is, because the bank may still "
+"book the transfer. Check with the bank, then use Resync, or Reset to Pending"
+" to send it again."
+msgstr ""
+"გაგზავნიდან %(hours)s საათის შემდეგ ვერ მოიძებნა ბაზისბანკის %(start)s – "
+"%(end)s პერიოდის ამონაწერში. ბუღალტრული გატარება უცვლელად დარჩა, რადგან "
+"ბანკმა გადარიცხვა შესაძლოა მოგვიანებით ასახოს. გადაამოწმეთ ბანკთან, შემდეგ "
+"გაუშვით ხელახალი სინქრონიზაცია ან ხელახლა გასაგზავნად გამოიყენეთ „მოლოდინში "
+"დაბრუნება“."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "Not found on the statement yet. The transfer may still be pending."
+msgstr "ამონაწერში ჯერ არ მოიძებნა. შესაძლოა, გადარიცხვა კვლავ მუშავდება."
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_payment__basisbank_state__not_in_report
+msgid "Not in Bank Report"
+msgstr "არ არის ბანკის ამონაწერში"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__message_needaction_counter
+msgid "Number of Actions"
+msgstr "ქმედებების რაოდენობა"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__message_has_error_counter
+msgid "Number of errors"
+msgstr "შეცდომების რაოდენობა"
+
+#. module: basis_bank
+#: model:ir.model.fields,help:basis_bank.field_basisbank_connection__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "მოქმედების მომთხოვნი შეტყობინებების რაოდენობა"
+
+#. module: basis_bank
+#: model:ir.model.fields,help:basis_bank.field_basisbank_connection__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "მიწოდების შეცდომის მქონე შეტყობინებების რაოდენობა"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/services/basisbank_service.py:0
+msgid "OTP code is wrong"
+msgstr "OTP კოდი არასწორია"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/basisbank_connection.py:0
+#: code:addons/basis_bank/wizard/basisbank_change_password_wizard.py:0
+msgid "OTP is required."
+msgstr "OTP სავალდებულოა."
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_payment__basisbank_detail_of_charges__our
+msgid "We pay all fees (OUR)"
+msgstr "ყველა საფასურს ჩვენ ვიხდით (OUR)"
+
+#. module: basis_bank
+#: model:ir.model.fields,help:basis_bank.field_basisbank_connection__allow_self_approval
+msgid ""
+"Off (recommended): the user who created a transfer cannot approve it, so "
+"releasing money always takes two people. Turn it on only if your team has "
+"nobody else to approve."
+msgstr ""
+"გამორთული (რეკომენდებული): გადარიცხვის შემქმნელი მომხმარებელი მას ვერ "
+"დაამტკიცებს, ამიტომ თანხის გაშვებას ყოველთვის ორი ადამიანი სჭირდება. ჩართეთ "
+"მხოლოდ მაშინ, თუ გუნდში დამტკიცება სხვას არავის შეუძლია."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid "Only a batch in state Unknown or Failed can be reset to pending."
+msgstr ""
+"მოლოდინში დაბრუნება შესაძლებელია მხოლოდ იმ სერიის, რომლის მდგომარეობაა "
+"„უცნობი“ ან „წარუმატებელი“."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid "Only draft batches can be submitted for approval."
+msgstr ""
+"დასამტკიცებლად გაგზავნა შესაძლებელია მხოლოდ მონახაზის სტატუსში მყოფი "
+"სერიების."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid "Only outbound batches can be sent to Basis Bank."
+msgstr "ბაზისბანკში მხოლოდ გამავალი სერიების გაგზავნაა შესაძლებელი."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "Only outbound payments can be sent to Basis Bank."
+msgstr "ბაზისბანკში მხოლოდ გამავალი გადახდების გაგზავნაა შესაძლებელი."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid "Only outbound payments can be sent to Basis Bank: %s"
+msgstr "ბაზისბანკში მხოლოდ გამავალი გადახდების გაგზავნაა შესაძლებელი: %s"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid ""
+"Only payments flagged 'Not in Bank Report' or 'Failed' can be reset to "
+"pending (%s)."
+msgstr ""
+"მოლოდინში დაბრუნება შესაძლებელია მხოლოდ იმ გადახდების, რომლებიც მონიშნულია "
+"როგორც „არ არის ბანკის ამონაწერში“ ან „წარუმატებელი“ (%s)."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "Only pending payments can be submitted for approval."
+msgstr ""
+"დასამტკიცებლად მხოლოდ მოლოდინში მყოფი გადახდების გაგზავნაა შესაძლებელი."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/basisbank_sendable.py:0
+msgid "Only transfers awaiting approval can be approved."
+msgstr ""
+"მხოლოდ დამტკიცების მოლოდინში მყოფი გადარიცხვების დამტკიცებაა შესაძლებელი."
+
+#. module: basis_bank
+#: model:ir.ui.menu,name:basis_bank.menu_basisbank_operations
+msgid "Operations"
+msgstr "ოპერაციები"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__password
+msgid "Password"
+msgstr "პაროლი"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/wizard/basisbank_change_password_wizard.py:0
+msgid "Password changed successfully."
+msgstr "პაროლი წარმატებით შეიცვალა."
+
+#. module: basis_bank
+#: model:ir.model,name:basis_bank.model_account_payment
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_otp_wizard__payment_id
+msgid "Payment"
+msgstr "გადახდა"
+
+#. module: basis_bank
+#: model:ir.model,name:basis_bank.model_account_payment_method
+msgid "Payment Method"
+msgstr "გადახდის მეთოდები"
+
+#. module: basis_bank
+#: model:ir.model,name:basis_bank.model_account_payment_method_line
+msgid "Payment Method Line"
+msgstr "გადახდის მეთოდები"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "Payment confirmed by the bank statement."
+msgstr "გადახდა დადასტურდა ბანკის ამონაწერით."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "Payment sent to Basis Bank."
+msgstr "გადახდა გაიგზავნა ბაზისბანკში."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "Payment submitted for Basis Bank approval."
+msgstr "ბაზისბანკის გადახდა გაიგზავნა დასამტკიცებლად."
+
+#. module: basis_bank
+#: model:ir.actions.act_window,name:basis_bank.action_basisbank_payment
+#: model:ir.ui.menu,name:basis_bank.menu_basisbank_payments
+msgid "Payments"
+msgstr "გადახდები"
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_payment__basisbank_state__pending
+msgid "Pending"
+msgstr "მოლოდინში"
+
+#. module: basis_bank
+#: model:ir.actions.act_window,name:basis_bank.action_basisbank_pending_approval
+#: model:ir.ui.menu,name:basis_bank.menu_basisbank_pending_approval
+msgid "Batches Awaiting Approval"
+msgstr "დასამტკიცებელი სერიები"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_approval__approver_id
+msgid "Primary Approver"
+msgstr "მთავარი დამმტკიცებელი"
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_connection_form
+msgid "Processing"
+msgstr "დამუშავება"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__processing_mode
+msgid "Processing Mode"
+msgstr "დამუშავების რეჟიმი"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment__basisbank_purpose_code
+msgid "Purpose Code"
+msgstr "დანიშნულების კოდი"
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_connection_form
+msgid "Re-authenticate"
+msgstr "ხელახლა ავტორიზაცია"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment__basisbank_receiver_address
+msgid "Receiver Address"
+msgstr "მიმღების მისამართი"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment__basisbank_receiver_city
+msgid "Receiver City"
+msgstr "მიმღების ქალაქი"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment__basisbank_receiver_country
+msgid "Receiver Country"
+msgstr "მიმღების ქვეყანა"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_api_log__request_payload
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_api_log_form
+msgid "Request"
+msgstr "მოთხოვნა"
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_account_payment_form_basisbank
+msgid ""
+"Resending creates a new transfer at the bank. Only continue if Resync from "
+"Bank confirmed the original transfer is not in the report. Reset this "
+"payment to pending?"
+msgstr ""
+"ხელახლა გაგზავნა ბანკში ქმნის ახალ გადარიცხვას. გააგრძელეთ მხოლოდ იმ "
+"შემთხვევაში, თუ „ბანკიდან ხელახლა სინქრონიზაციამ“ დაადასტურა, რომ "
+"თავდაპირველი გადარიცხვა ამონაწერში არ არის. დაბრუნდეს ეს გადახდა მოლოდინის "
+"სტატუსზე?"
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_account_batch_payment_form_basisbank
+msgid ""
+"Resending creates new transfers at the bank for the payments the bank report"
+" does not show. Only continue if Resync from Bank confirmed they are "
+"missing. Reset this batch to draft?"
+msgstr ""
+"ხელახლა გაგზავნა ბანკში ახალ გადარიცხვებს შექმნის იმ გადახდებისთვის, "
+"რომლებიც ბანკის ამონაწერში არ ჩანს. გააგრძელეთ მხოლოდ იმ შემთხვევაში, თუ "
+"„ბანკიდან ხელახლა სინქრონიზაციამ“ დაადასტურა, რომ ისინი ამონაწერში არ არის. "
+"დავაბრუნოთ ეს სერია მონახაზზე?"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "Reset the journal entry of %s to draft before resetting it to pending."
+msgstr ""
+"მოლოდინის სტატუსზე დაბრუნებამდე დააბრუნეთ მონახაზზე ბუღალტრული გატარება: %s."
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_account_batch_payment_form_basisbank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_account_payment_form_basisbank
+msgid "Reset to Pending"
+msgstr "მოლოდინში დაბრუნება"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_api_log__response_payload
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_api_log_form
+msgid "Response"
+msgstr "პასუხი"
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_account_batch_payment_form_basisbank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_account_payment_form_basisbank
+msgid "Resync from Bank"
+msgstr "ბანკიდან ხელახლა სინქრონიზაცია"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_resync_wizard_form
+msgid "Resync from Basis Bank"
+msgstr "ბაზისბანკიდან ხელახლა სინქრონიზაცია"
+
+#. module: basis_bank
+#: model:ir.model.fields,help:basis_bank.field_basisbank_connection__log_retention_days
+msgid ""
+"Routine API log entries older than this are removed by Odoo's daily vacuum, "
+"so the log table cannot grow without bound. Set 0 to keep everything. "
+"Transfer logs are never deleted - they are the audit trail for money "
+"movement."
+msgstr ""
+"ამაზე ძველ რიგით API ჩანაწერებს Odoo-ს ყოველდღიური გასუფთავება შლის, რომ "
+"ჟურნალი უსასრულოდ არ გაიზარდოს. ყველაფრის შესანახად მიუთითეთ 0. "
+"გადარიცხვების ჩანაწერები არასოდეს იშლება — ისინი თანხის მოძრაობის აუდიტის "
+"კვალია."
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_resync_wizard_form
+msgid "Run Resync"
+msgstr "სინქრონიზაციის გაშვება"
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_payment__basisbank_detail_of_charges__sha
+msgid "Each side pays its bank (SHA)"
+msgstr "თითოეული მხარე თავის ბანკს უხდის (SHA)"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "SMS მიწოდების შეცდომა"
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_batch_payment__basisbank_endpoint__package_salary
+msgid "Salary Package"
+msgstr "ხელფასის პაკეტი"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/wizard/basisbank_statement_import_wizard.py:0
+msgid "Selected journal has no Basis Bank connection."
+msgstr "არჩეულ ჟურნალს არ აქვს ბაზისბანკის კავშირი."
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_otp_wizard_form
+msgid "Send"
+msgstr "გაგზავნა"
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_account_batch_payment_form_basisbank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_account_payment_form_basisbank
+msgid "Send to Basis Bank"
+msgstr "ბაზისბანკში გაგზავნა"
+
+#. module: basis_bank
+#: model:ir.module.module,summary:base.module_basis_bank
+msgid ""
+"Send transfers and import statements from Basis Bank (bis.bankonline.ge)"
+msgstr ""
+"გადარიცხვების გაგზავნა და ამონაწერების იმპორტი ბაზისბანკიდან "
+"(bis.bankonline.ge)"
+
+#. module: basis_bank
+#: model:ir.module.category,description:basis_bank.module_category_basisbank
+msgid "Send transfers and import statements via Basis Bank API."
+msgstr "გადარიცხვების გაგზავნა და ამონაწერების იმპორტი ბაზისბანკის API-ით."
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_batch_payment__basisbank_state__sending
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_payment__basisbank_state__sending
+msgid "Sending"
+msgstr "იგზავნება"
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_batch_payment__basisbank_state__sent_pending_confirm
+msgid "Sent (Pending Confirmation)"
+msgstr "გაგზავნილი (დადასტურების მოლოდინში)"
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_payment__basisbank_state__sent
+msgid "Sent to Bank"
+msgstr "ბანკში გაგზავნილი"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/services/basisbank_service.py:0
+msgid "Service suspended"
+msgstr "სერვისი შეჩერებულია"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/services/basisbank_service.py:0
+msgid "Session ticket is invalid"
+msgstr "სესიის ტიკეტი არასწორია"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "Set a Basis Bank transfer type before sending."
+msgstr "გაგზავნამდე მიუთითეთ ბაზისბანკის გადარიცხვის ტიპი."
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_batch_payment__basisbank_endpoint__single_batch
+msgid "Single Transfers Batch"
+msgstr "ცალკეული გადარიცხვების სერია"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_statement_import_wizard__skipped_count
+msgid "Skipped Count"
+msgstr "გამოტოვებულთა რაოდენობა"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid "Some transfers were not reported by the bank. Run the Resync wizard."
+msgstr ""
+"ზოგიერთი გადარიცხვა ბანკმა არ დააფიქსირა. გაუშვით ხელახალი სინქრონიზაციის "
+"ვიზარდი."
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_resync_wizard__start_date
+msgid "Start Date"
+msgstr "დაწყების თარიღი"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__state
+msgid "State"
+msgstr "მდგომარეობა"
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_connection_form
+msgid "Status"
+msgstr "სტატუსი"
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_account_batch_payment_form_basisbank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_account_payment_form_basisbank
+msgid "Submit for Approval"
+msgstr "დასამტკიცებლად გაგზავნა"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/services/basisbank_service.py:0
+msgid "Successful"
+msgstr "წარმატებული"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_resync_wizard__summary
+msgid "Summary"
+msgstr "შეჯამება"
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_basisbank_connection_form
+msgid "Test Connection"
+msgstr "კავშირის ტესტი"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/wizard/basisbank_otp_wizard.py:0
+msgid "The Digipass OTP is required."
+msgstr "Digipass OTP სავალდებულოა."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/basisbank_sendable.py:0
+msgid ""
+"The approval was reset because the amount, recipient or purpose changed "
+"after approval. Submit it for approval again before sending."
+msgstr ""
+"დამტკიცება გაუქმდა, რადგან დამტკიცების შემდეგ შეიცვალა თანხა, მიმღები ან "
+"დანიშნულება. გაგზავნამდე ხელახლა გააგზავნეთ დასამტკიცებლად."
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_account_payment_form_basisbank
+msgid ""
+"The bank report did not show this payment within 48 hours. Its journal entry was left as it is, because the bank may still book the transfer.\n"
+"                    Use <b>Resync from Bank</b> to re-check; if it is still missing, <b>Reset to Pending</b> to resend, or investigate with the bank."
+msgstr ""
+"ბანკის ამონაწერში ეს გადახდა 48 საათის განმავლობაში არ გამოჩნდა. მისი ბუღალტრული გატარება უცვლელად დარჩა, რადგან ბანკმა გადარიცხვა შესაძლოა მოგვიანებით ასახოს.\n"
+"                    ხელახლა შესამოწმებლად გამოიყენეთ <b>ბანკიდან ხელახლა სინქრონიზაცია</b>; თუ ის კვლავ არ იძებნება, ხელახლა გასაგზავნად დააჭირეთ <b>მოლოდინში დაბრუნება</b>, ან გამოიკვლიეთ ბანკთან ერთად."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/wizard/basisbank_change_password_wizard.py:0
+msgid "The new password and its confirmation do not match."
+msgstr "ახალი პაროლი და მისი დადასტურება ერთმანეთს არ ემთხვევა."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "These national/foreign payments have no receiver bank BIC: %s"
+msgstr "ამ ეროვნულ/საერთაშორისო გადახდებს არ აქვს მიმღები ბანკის BIC: %s"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid ""
+"These payments are not in a fresh 'Pending' state and may already be at the "
+"bank. Do not re-send them; run Resync or Reset to Pending first: %s"
+msgstr ""
+"ეს გადახდები არ არის ახალ „მოლოდინის“ მდგომარეობაში და შესაძლოა უკვე "
+"ბანკშია. ხელახლა ნუ გააგზავნით; ჯერ გაუშვით ხელახალი სინქრონიზაცია ან "
+"მოლოდინის სტატუსზე დაბრუნება: %s"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "These payments have no receiver bank account: %s"
+msgstr "ამ გადახდებს არ აქვს მიმღების საბანკო ანგარიში: %s"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid ""
+"These payments may still be at the bank. Run Resync, or wait for the 48-hour"
+" check, before resetting the batch: %s"
+msgstr ""
+"ეს გადახდები შესაძლოა ჯერ კიდევ ბანკში იყოს. სერიის დაბრუნებამდე გაუშვით "
+"ხელახალი სინქრონიზაცია ან დაელოდეთ 48-საათიან შემოწმებას: %s"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "These payments need a description/purpose before sending: %s"
+msgstr "ამ გადახდებს გაგზავნამდე სჭირდება აღწერა/დანიშნულება: %s"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid "These payments were already sent: %s"
+msgstr "ეს გადახდები უკვე გაგზავნილია: %s"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid ""
+"These payments were found in the bank report and confirmed instead of reset;"
+" do NOT resend them: %s"
+msgstr ""
+"ეს გადახდები მოიძებნა ბანკის ამონაწერში და დაბრუნების ნაცვლად დადასტურდა; "
+"ხელახლა ნუ გააგზავნით: %s"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid ""
+"These receiver accounts are not trusted for outbound payments (allow "
+"outgoing payments on the bank account first): %s"
+msgstr ""
+"ეს მიმღები ანგარიშები სანდო არ არის გამავალი გადახდებისთვის (ჯერ დაუშვით "
+"გამავალი გადახდები საბანკო ანგარიშზე): %s"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid "This batch cannot be sent from its current state."
+msgstr "ამ სერიის გაგზავნა მისი ამჟამინდელი მდგომარეობიდან შეუძლებელია."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid "This batch cannot be sent in its current state."
+msgstr "ამ სერიის გაგზავნა მის ამჟამინდელ მდგომარეობაში შეუძლებელია."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid "This batch has no payments to send."
+msgstr "ამ სერიას გასაგზავნი გადახდები არ აქვს."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid "This batch is already being processed. Try again in a moment."
+msgstr "ეს სერია უკვე მუშავდება. სცადეთ ცოტა ხანში."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid ""
+"This batch is in an unknown state. Run the Resync wizard before sending "
+"again."
+msgstr ""
+"ეს სერია უცნობ მდგომარეობაშია. ხელახლა გაგზავნამდე გაუშვით ხელახალი "
+"სინქრონიზაციის ვიზარდი."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid "This batch is not on a Basis Bank journal; it cannot be sent."
+msgstr "ეს სერია არ არის ბაზისბანკის ჟურნალზე; მისი გაგზავნა შეუძლებელია."
+
+#. module: basis_bank
+#: model_terms:ir.ui.view,arch_db:basis_bank.view_account_batch_payment_form_basisbank
+msgid ""
+"This batch needs attention: the last send returned an unexpected error, or some sent payments were never confirmed by the bank report.\n"
+"                    Use <b>Resync from Bank</b> to re-check, then review the payments (see the log below).\n"
+"                    <b>Reset to Pending</b> resets the payments the bank never confirmed and lets you send the batch again for them only."
+msgstr ""
+"ეს სერია ყურადღებას საჭიროებს: ბოლო გაგზავნამ მოულოდნელი შეცდომა დააბრუნა, ან ზოგიერთი გაგზავნილი გადახდა ბანკის ამონაწერმა არასოდეს დაადასტურა.\n"
+"                    ხელახლა შესამოწმებლად გამოიყენეთ <b>ბანკიდან ხელახლა სინქრონიზაცია</b>, შემდეგ გადაამოწმეთ გადახდები (იხილეთ ქვემოთ მოცემული ლოგი).\n"
+"                    <b>მოლოდინში დაბრუნება</b> ბანკის მიერ დაუდასტურებელ გადახდებს მოლოდინში დააბრუნებს და მხოლოდ მათთვის დაუშვებს სერიის ხელახლა გაგზავნას."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "This connection does not require Odoo approval."
+msgstr "ამ კავშირს Odoo-ში დამტკიცება არ სჭირდება."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/basisbank_connection.py:0
+msgid "This connection has no current password set."
+msgstr "ამ კავშირზე მიმდინარე პაროლი არ არის მითითებული."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid ""
+"This payment belongs to a Basis Bank batch. Send it from the batch, not "
+"individually."
+msgstr ""
+"ეს გადახდა ბაზისბანკის სერიას ეკუთვნის. გააგზავნეთ სერიიდან და არა ცალკე."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "This payment cannot be sent from its current state."
+msgstr "ამ გადახდის გაგზავნა მისი ამჟამინდელი მდგომარეობიდან შეუძლებელია."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "This payment cannot be sent in its current state."
+msgstr "ამ გადახდის გაგზავნა მის ამჟამინდელ მდგომარეობაში შეუძლებელია."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid ""
+"This payment is already being sent, was already sent, or its outcome is "
+"unknown (run Resync). Reload it to see its current state."
+msgstr ""
+"ეს გადახდა უკვე იგზავნება, უკვე გაიგზავნა ან მისი შედეგი უცნობია (გაუშვით "
+"ხელახალი სინქრონიზაცია). მიმდინარე სტატუსის სანახავად განაახლეთ გადახდა."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "This payment is in an unknown state. Run Resync before sending again."
+msgstr ""
+"ეს გადახდა უცნობ მდგომარეობაშია. ხელახლა გაგზავნამდე გაუშვით ხელახალი "
+"სინქრონიზაცია."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "This payment is not on a Basis Bank journal."
+msgstr "ეს გადახდა არ არის ბაზისბანკის ჟურნალზე."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "This payment was already sent."
+msgstr "ეს გადახდა უკვე გაგზავნილია."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/basisbank_sendable.py:0
+msgid "This transfer must be approved in Odoo before it can be sent."
+msgstr "ამ გადარიცხვის გაგზავნამდე იგი უნდა დამტკიცდეს Odoo-ში."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/basisbank_sendable.py:0
+msgid ""
+"This transfer was not approved by an authorized approver. Have an approver "
+"approve it before sending."
+msgstr ""
+"ეს გადარიცხვა არ დაუმტკიცებია უფლებამოსილ დამამტკიცებელს. გაგზავნამდე "
+"დარწმუნდით, რომ დამტკიცება შესრულდა."
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__ticket_expiry
+msgid "Ticket Expiry"
+msgstr "ტიკეტის ვადა"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__ticket_id
+msgid "Ticket Id"
+msgstr "ტიკეტის ID"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_statement_import_wizard__end_date
+msgid "To"
+msgstr "საბოლოო თარიღი"
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_payment__basisbank_transfer_type__treasury
+msgid "Treasury"
+msgstr "ხაზინა"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_account_payment__basisbank_treasury_code
+msgid "Treasury Code"
+msgstr "სახაზინო კოდი"
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_batch_payment__basisbank_endpoint__package_treasury
+msgid "Treasury Package"
+msgstr "სახაზინო პაკეტი"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "Treasury payments require a Treasury Code."
+msgstr "სახაზინო გადახდებს სჭირდება სახაზინო კოდი."
+
+#. module: basis_bank
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_batch_payment__basisbank_state__unknown
+#: model:ir.model.fields.selection,name:basis_bank.selection__account_payment__basisbank_state__unknown
+msgid "Unknown"
+msgstr "უცნობი"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_batch_payment.py:0
+msgid "Unknown Basis Bank endpoint."
+msgstr "ბაზისბანკის უცნობი ენდპოინტი."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/services/basisbank_service.py:0
+msgid "Unknown package kind: %s"
+msgstr "პაკეტის უცნობი სახე: %s"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_resync_wizard__unmatched_count
+msgid "Unmatched Count"
+msgstr "დაუმთხვეველთა რაოდენობა"
+
+#. module: basis_bank
+#: model:res.groups,name:basis_bank.group_basisbank_user
+msgid "User"
+msgstr "მომხმარებელი"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/services/basisbank_service.py:0
+msgid "Wrong amount"
+msgstr "არასწორი თანხა"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/services/basisbank_service.py:0
+msgid "Wrong receiver account"
+msgstr "მიმღების არასწორი ანგარიში"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/services/basisbank_service.py:0
+msgid "Wrong receiver bank BIC"
+msgstr "მიმღები ბანკის არასწორი BIC"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/services/basisbank_service.py:0
+msgid "Wrong treasury code"
+msgstr "არასწორი სახაზინო კოდი"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/services/basisbank_service.py:0
+msgid "Wrong username or password"
+msgstr "არასწორი მომხმარებლის სახელი ან პაროლი"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/services/basisbank_service.py:0
+msgid "check the connection credentials."
+msgstr "შეამოწმეთ კავშირის ავტორიზაციის მონაცემები."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/basisbank_sendable.py:0
+msgid "check the connection."
+msgstr "შეამოწმეთ კავშირი."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/wizard/basisbank_resync_wizard.py:0
+msgid "none"
+msgstr "არცერთი"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/basisbank_connection.py:0
+msgid "unknown error"
+msgstr "უცნობი შეცდომა"
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid ""
+"Set a Basis Bank transfer type before sending. Payments without one: %s"
+msgstr ""
+"გაგზავნამდე მიუთითეთ ბაზისბანკის გადარიცხვის ტიპი. გადახდები ტიპის გარეშე: "
+"%s"
+
+#. module: basis_bank
+#: model:ir.model.fields,field_description:basis_bank.field_basisbank_connection__rating_ids
+msgid "Ratings"
+msgstr "შეფასებები"
+
+#. module: basis_bank
+#: model:ir.model.fields,help:basis_bank.field_account_payment__basisbank_transfer_type
+msgid ""
+"Set from the recipient: a Treasury Code gives Treasury, otherwise the bank of the recipient's account (Basis Bank: Internal; "
+"another Georgian bank in GEL: National; anything else: Foreign). You can change it."
+msgstr ""
+"ივსება მიმღების მიხედვით: სახაზინო კოდის შემთხვევაში — ხაზინა, სხვა შემთხვევაში მიმღების ანგარიშის ბანკის მიხედვით "
+"(ბაზისბანკი: შიდა; სხვა ქართული ბანკი, ლარში: ეროვნული; ყველა სხვა შემთხვევაში: საერთაშორისო). შეგიძლიათ შეცვალოთ."
+
+#. module: basis_bank
+#: model:ir.model.fields,help:basis_bank.field_account_payment__basisbank_receiver_country
+msgid "Two-letter country code, such as DE; filled from the contact."
+msgstr "ქვეყნის ორასოიანი კოდი, მაგალითად DE; ივსება კონტაქტიდან."
+
+#. module: basis_bank
+#. odoo-python
+#: code:addons/basis_bank/models/account_payment.py:0
+msgid "%s: a foreign transfer needs %s; fill them in the payment's Basis Bank section."
+msgstr "%s: საერთაშორისო გადარიცხვას სჭირდება %s; შეავსეთ ისინი გადახდის „ბაზისბანკი“ განყოფილებაში."

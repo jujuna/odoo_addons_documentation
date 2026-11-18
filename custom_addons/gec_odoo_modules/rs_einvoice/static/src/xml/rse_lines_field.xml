@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="rs_einvoice.RseLinesField">
+        <div class="rse-lines">
+            <table class="rse-table">
+                <thead>
+                    <tr>
+                        <th class="rse-col-num">N</th>
+                        <t t-foreach="this.columns" t-as="col" t-key="col.field">
+                            <th t-att-class="'rse-align-' + col.align"
+                                t-out="col.label"/>
+                        </t>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-if="this.lines.length === 0">
+                        <tr>
+                            <td t-att-colspan="this.columns.length + 1" class="rse-empty">
+                                No lines
+                            </td>
+                        </tr>
+                    </t>
+                    <t t-foreach="this.lines" t-as="row" t-key="row_index">
+                        <tr>
+                            <td class="rse-col-num" t-out="row._num"/>
+                            <t t-foreach="this.columns" t-as="col" t-key="col.field">
+                                <td t-if="col.type === 'badge'" t-att-class="'rse-align-' + col.align">
+                                    <span t-att-class="'badge ' + (row._rs_state_class or (row._rs_synced ? 'text-bg-success' : 'text-bg-warning'))"
+                                          t-out="row[col.field]"/>
+                                </td>
+                                <td t-else="" t-att-class="'rse-align-' + col.align"
+                                    t-out="row[col.field]"/>
+                            </t>
+                        </tr>
+                    </t>
+                </tbody>
+                <tfoot t-if="this.lines.length > 0">
+                    <tr>
+                        <td/>
+                        <t t-foreach="this.columns" t-as="col" t-key="col.field">
+                            <td t-att-class="'rse-align-' + col.align"
+                                t-out="this.totals[col.field] or ''"/>
+                        </t>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </t>
+
+</templates>

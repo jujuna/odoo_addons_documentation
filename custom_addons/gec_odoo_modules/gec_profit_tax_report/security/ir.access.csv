@@ -1,0 +1,21 @@
+id,name,model_id,group_id/id,operation,domain
+access_rs_cit_cell_user,rs.cit.cell user,rs.cit.cell,base.group_user,r,
+access_rs_cit_cell_manager,rs.cit.cell manager,rs.cit.cell,account.group_account_manager,crud,
+access_rs_cit_declaration_readonly,rs.cit.declaration readonly,rs.cit.declaration,account.group_account_readonly,r,
+access_rs_cit_declaration_user,rs.cit.declaration user,rs.cit.declaration,account.group_account_user,crud,
+rule_rs_cit_declaration_company,Profit Tax Declaration: multi-company,rs.cit.declaration,,crud,"[('company_id', 'in', company_ids)]"
+access_rs_cit_declaration_line_readonly,rs.cit.declaration.line readonly,rs.cit.declaration.line,account.group_account_readonly,r,
+access_rs_cit_declaration_line_user,rs.cit.declaration.line user,rs.cit.declaration.line,account.group_account_user,crud,
+rule_rs_cit_declaration_line_company,Profit Tax Declaration Line: multi-company,rs.cit.declaration.line,,crud,"[('company_id', 'in', company_ids)]"
+access_rs_cit_taxed_item_readonly,rs.cit.taxed.item readonly,rs.cit.taxed.item,account.group_account_readonly,r,
+access_rs_cit_taxed_item_user,rs.cit.taxed.item user,rs.cit.taxed.item,account.group_account_user,crud,
+rule_rs_cit_taxed_item_company,Profit Tax Taxed Item: multi-company,rs.cit.taxed.item,,crud,"[('company_id', 'in', company_ids)]"
+access_rs_cit_recovery_readonly,rs.cit.recovery readonly,rs.cit.recovery,account.group_account_readonly,r,
+access_rs_cit_recovery_user,rs.cit.recovery user,rs.cit.recovery,account.group_account_user,crud,
+rule_rs_cit_recovery_company,Profit Tax Recovery: multi-company,rs.cit.recovery,,crud,"[('company_id', 'in', company_ids)]"
+access_rs_cit_annex_line_readonly,rs.cit.annex.line readonly,rs.cit.annex.line,account.group_account_readonly,r,
+access_rs_cit_annex_line_user,rs.cit.annex.line user,rs.cit.annex.line,account.group_account_user,crud,
+rule_rs_cit_annex_line_company,Profit Tax Annex Line: multi-company,rs.cit.annex.line,,crud,"[('company_id', 'in', company_ids)]"
+access_rs_cit_entry_readonly,rs.cit.entry readonly,rs.cit.entry,account.group_account_readonly,r,
+access_rs_cit_entry_user,rs.cit.entry user,rs.cit.entry,account.group_account_user,crud,
+rule_rs_cit_entry_company,Profit Tax rs.ge Entry: multi-company,rs.cit.entry,,crud,"[('company_id', 'in', company_ids)]"

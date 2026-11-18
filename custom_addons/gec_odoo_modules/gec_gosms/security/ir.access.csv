@@ -1,0 +1,7 @@
+id,name,model_id,group_id/id,operation,domain
+access_gosms_confirm_wizard_user,gosms.confirm.wizard user,gosms.confirm.wizard,base.group_user,cru,
+gosms_confirm_wizard_own,SMS code dialog: own records only,gosms.confirm.wizard,,crud,"[('create_uid', '=', user.id)]"
+access_gosms_send_wizard_user,gosms.send.wizard user,gosms.send.wizard,base.group_user,cru,
+gosms_send_wizard_own,SMS screen: own records only,gosms.send.wizard,,crud,"[('create_uid', '=', user.id)]"
+access_gosms_message_system,gosms.message system,gosms.message,base.group_system,crud,
+gosms_message_company,SMS message: own companies only,gosms.message,,crud,"[('company_id', 'in', company_ids)]"

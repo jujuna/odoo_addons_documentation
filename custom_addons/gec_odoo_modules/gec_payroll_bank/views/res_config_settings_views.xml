@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_gec_payroll_bank" model="ir.ui.view">
+        <field name="name">res.config.settings.form.gec.payroll.bank</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="hr_payroll.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@id='hr_payroll_accountant']" position="inside">
+                <setting string="Default Salary Bank" id="gec_payroll_channel"
+                         help="Bank channel proposed when paying a payslip run. Each employee can override it.">
+                    <field name="gec_payroll_channel_id" options="{'no_create': True}"/>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>

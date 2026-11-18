@@ -1,0 +1,926 @@
+# Georgian translation of the Odoo addon website_generator, kept in gec_i18n_website.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-11 17:57+0000\n"
+"PO-Revision-Date: 2026-09-30 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian (ka_GE)\n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#. module: website_generator
+#: model:ir.module.module,description:base.module_website_generator
+msgid ""
+"\n"
+"Generates a new website in Odoo, with the goal of recreating an external website as close as possible.\n"
+msgstr ""
+"\n"
+"აგენერირებს ახალ ვებსაიტს Odoo-ში, გარე ვებსაიტის მაქსიმალურად ზუსტად ხელახლა შექმნის მიზნით.\n"
+
+#. module: website_generator
+#: model:mail.template,body_html:website_generator.email_template_website_scrapped
+msgid ""
+"<div>\n"
+"                    <t t-if=\"ctx.get('website_url') and ctx.get('nbr_products_created') and ctx.get('nbr_products_created') &gt; 0 and ctx.get('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
+"                        <p><b>Great news!</b> Your website has been generated, and <t t-out=\"ctx.get('nbr_products_created')\"/> products and <t t-out=\"ctx.get('nbr_blogs_created')\"/> blog posts have been created.</p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('website_url') and ctx.get('nbr_products_created') and ctx.get('nbr_products_created') &gt; 0\">\n"
+"                        <p><b>Great news!</b> Your website has been generated and <t t-out=\"ctx.get('nbr_products_created')\"/> product(s) have been created.</p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('website_url') and ctx.get('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
+"                        <p><b>Great news!</b> Your website has been generated and <t t-out=\"ctx.get('nbr_blogs_created')\"/> blog posts have been created.</p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('website_url')\">\n"
+"                        <p><b>Great news!</b> Your website has been successfully generated.</p>\n"
+"                    </t>    \n"
+"                    <t t-elif=\"ctx.get('nbr_products_created') and ctx.get('nbr_products_created') &gt; 0 and ctx.get('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
+"                        <p><b>Great news!</b> The import tool successfully created <t t-out=\"ctx.get('nbr_products_created')\"/> products and <t t-out=\"ctx.get('nbr_blogs_created')\"/> blog posts.</p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('nbr_products_created') and ctx.get('nbr_products_created') &gt; 0\">\n"
+"                        <p><b>Great news!</b> The import tool successfully created <t t-out=\"ctx.get('nbr_products_created')\"/> product(s).</p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
+"                        <p><b>Great news!</b> The import tool successfully created <t t-out=\"ctx.get('nbr_blogs_created')\"/> blog post(s).</p>\n"
+"                    </t>\n"
+"                    <t t-else=\"\">\n"
+"                        <p><b>Update:</b> We were unable to generate your website or products this time.</p>\n"
+"                        <p>This may happen for a variety of reasons, such as:</p>\n"
+"                        <ul>\n"
+"                            <li>Protection mechanisms on your website preventing automated access,</li>\n"
+"                            <li>Temporary maintenance or limited availability on our servers,</li>\n"
+"                            <li>Custom code or configurations on your website that are not fully compatible with our process.</li>\n"
+"                        </ul>\n"
+"                        <p>Feel free to try again later or contact us if the issue persists — we’re here to help!</p>\n"
+"                    </t>\n"
+"\n"
+"            <t t-if=\"ctx.get('website_url')\">\n"
+"                <p>You can access your website by clicking the button below:</p>\n"
+"                <div style=\"margin: 16px 0px 16px 0px;\">\n"
+"                    <a t-att-href=\"ctx.get('website_url')\" style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
+"                        Go to Website\n"
+"                    </a>\n"
+"                </div>\n"
+"            </t>\n"
+"            \n"
+"            <p>Thank you for choosing Odoo for your web integration!</p>\n"
+"            <p>Best regards,</p>\n"
+"            <br/>\n"
+"            <p>Odoo - The best open source website builder.</p>\n"
+"            </div>\n"
+"            "
+msgstr ""
+"<div>\n"
+"                    <t t-if=\"ctx.get('website_url') and ctx.get('nbr_products_created') and ctx.get('nbr_products_created') &gt; 0 and ctx.get('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
+"                        <p><b>კარგი ამბავი!</b> თქვენი ვებსაიტი დაგენერირდა, ასევე შეიქმნა <t t-out=\"ctx.get('nbr_products_created')\"/> პროდუქტი და <t t-out=\"ctx.get('nbr_blogs_created')\"/> ბლოგპოსტი.</p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('website_url') and ctx.get('nbr_products_created') and ctx.get('nbr_products_created') &gt; 0\">\n"
+"                        <p><b>კარგი ამბავი!</b> თქვენი ვებსაიტი დაგენერირდა და შეიქმნა <t t-out=\"ctx.get('nbr_products_created')\"/> პროდუქტი.</p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('website_url') and ctx.get('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
+"                        <p><b>კარგი ამბავი!</b> თქვენი ვებსაიტი დაგენერირდა და შეიქმნა <t t-out=\"ctx.get('nbr_blogs_created')\"/> ბლოგპოსტი.</p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('website_url')\">\n"
+"                        <p><b>კარგი ამბავი!</b> თქვენი ვებსაიტი წარმატებით დაგენერირდა.</p>\n"
+"                    </t>    \n"
+"                    <t t-elif=\"ctx.get('nbr_products_created') and ctx.get('nbr_products_created') &gt; 0 and ctx.get('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
+"                        <p><b>კარგი ამბავი!</b> იმპორტის ხელსაწყომ წარმატებით შექმნა <t t-out=\"ctx.get('nbr_products_created')\"/> პროდუქტი და <t t-out=\"ctx.get('nbr_blogs_created')\"/> ბლოგპოსტი.</p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('nbr_products_created') and ctx.get('nbr_products_created') &gt; 0\">\n"
+"                        <p><b>კარგი ამბავი!</b> იმპორტის ხელსაწყომ წარმატებით შექმნა <t t-out=\"ctx.get('nbr_products_created')\"/> პროდუქტი.</p>\n"
+"                    </t>\n"
+"                    <t t-elif=\"ctx.get('nbr_blogs_created') and ctx.get('nbr_blogs_created') &gt; 0\">\n"
+"                        <p><b>კარგი ამბავი!</b> იმპორტის ხელსაწყომ წარმატებით შექმნა <t t-out=\"ctx.get('nbr_blogs_created')\"/> ბლოგპოსტი.</p>\n"
+"                    </t>\n"
+"                    <t t-else=\"\">\n"
+"                        <p><b>განახლება:</b> ამჯერად თქვენი ვებსაიტის ან პროდუქტების დაგენერირება ვერ მოვახერხეთ.</p>\n"
+"                        <p>ეს შეიძლება მოხდეს სხვადასხვა მიზეზით, მაგალითად:</p>\n"
+"                        <ul>\n"
+"                            <li>თქვენი ვებსაიტის დაცვის მექანიზმები, რომლებიც ავტომატურ წვდომას ხელს უშლის,</li>\n"
+"                            <li>დროებითი ტექმომსახურება ან შეზღუდული ხელმისაწვდომობა ჩვენს სერვერებზე,</li>\n"
+"                            <li>თქვენი ვებსაიტის მორგებული კოდი ან კონფიგურაციები, რომლებიც სრულად არ არის თავსებადი ჩვენს პროცესთან.</li>\n"
+"                        </ul>\n"
+"                        <p>სცადეთ ხელახლა მოგვიანებით ან დაგვიკავშირდით, თუ პრობლემა კვლავ გრძელდება — სიამოვნებით დაგეხმარებით!</p>\n"
+"                    </t>\n"
+"\n"
+"            <t t-if=\"ctx.get('website_url')\">\n"
+"                <p>თქვენს ვებსაიტზე გადასვლა შეგიძლიათ ქვემოთ მოცემულ ღილაკზე დაწკაპუნებით:</p>\n"
+"                <div style=\"margin: 16px 0px 16px 0px;\">\n"
+"                    <a t-att-href=\"ctx.get('website_url')\" style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
+"                        ვებსაიტზე გადასვლა\n"
+"                    </a>\n"
+"                </div>\n"
+"            </t>\n"
+"            \n"
+"            <p>გმადლობთ, რომ ვებინტეგრაციისთვის Odoo აირჩიეთ!</p>\n"
+"            <p>პატივისცემით,</p>\n"
+"            <br/>\n"
+"            <p>Odoo - საუკეთესო ღია კოდის ვებსაიტის კონსტრუქტორი.</p>\n"
+"            </div>\n"
+"            "
+
+#. module: website_generator
+#: model_terms:ir.ui.view,arch_db:website_generator.res_config_settings_view_form
+msgid "<i class=\"oi me-1\" data-icon=\"download\" aria-hidden=\"true\"/>Import Website"
+msgstr "<i class=\"oi me-1\" data-icon=\"download\" aria-hidden=\"true\"/>ვებსაიტის იმპორტი"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "API Check failed"
+msgstr "API-ის შემოწმება ვერ შესრულდა"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "API Key is not valid"
+msgstr "API გასაღები არასწორია"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "API Key is valid."
+msgstr "API გასაღები სწორია."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "API authentication not setup"
+msgstr "API-ის ავთენტიფიკაცია არ არის დაყენებული"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "API key has either expired, is invalid or there is no content to extract. Please provide a new API key."
+msgstr "API გასაღებს ან ვადა გაუვიდა, ან არასწორია, ან ამოსაღები შიგთავსი არ არის. გთხოვთ, მიუთითოთ ახალი API გასაღები."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
+msgid "Adapting building blocks."
+msgstr "ბლოკების მორგება."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Add your Ghost API key here"
+msgstr "აქ დაამატეთ თქვენი Ghost API გასაღები"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Add your PrestaShop API key here"
+msgstr "აქ დაამატეთ თქვენი PrestaShop API გასაღები"
+
+#. module: website_generator
+#: model:ir.model.fields,field_description:website_generator.field_website_generator_request__additional_urls
+msgid "Additional URLs"
+msgstr "დამატებითი URL-ები"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "All"
+msgstr "ყველა"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Already connected on"
+msgstr "უკვე დაკავშირებულია:"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "An error occurred"
+msgstr "მოხდა შეცდომა"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "Attachment not found"
+msgstr "დანართი ვერ მოიძებნა"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Authorization"
+msgstr "ავტორიზაცია"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "Banned url"
+msgstr "აკრძალული URL"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "By clicking \"Import my website\", you confirm that you are the owner of the website and all associated components (such as images and other content), and you take full responsibility for their use and any potential legal implications."
+msgstr "ღილაკზე \"ჩემი ვებსაიტის იმპორტი\" დაჭერით ადასტურებთ, რომ ხართ ვებსაიტისა და მასთან დაკავშირებული ყველა კომპონენტის (მაგალითად, სურათებისა და სხვა შიგთავსის) მფლობელი და სრულ პასუხისმგებლობას იღებთ მათ გამოყენებასა და ნებისმიერ შესაძლო იურიდიულ შედეგზე."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Click to authenticate with WooCommerce."
+msgstr "დააწკაპუნეთ WooCommerce-ით ავთენტიფიკაციისთვის."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Connect via WooCommerce"
+msgstr "WooCommerce-ით დაკავშირება"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
+msgid "Copying your text."
+msgstr "თქვენი ტექსტის კოპირება."
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "Could not fetch result, invalid output uuid or result expired"
+msgstr "შედეგის მოტანა ვერ მოხერხდა, გამოსავლის uuid არასწორია ან შედეგს ვადა გაუვიდა"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "Could not generate WooCommerce URL"
+msgstr "WooCommerce-ის URL-ის გენერირება ვერ მოხერხდა"
+
+#. module: website_generator
+#: model:ir.model.fields,field_description:website_generator.field_website_generator_request__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: website_generator
+#: model:ir.model.fields,field_description:website_generator.field_website_generator_request__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Creates a new website and imports the foreign website pages onto this website."
+msgstr "ქმნის ახალ ვებსაიტს და ამ ვებსაიტზე გარე ვებსაიტის გვერდების იმპორტს ახდენს."
+
+#. module: website_generator
+#: model:ir.model.fields,field_description:website_generator.field_website__display_name model:ir.model.fields,field_description:website_generator.field_website_generator_request__display_name model:ir.model.fields,field_description:website_generator.field_website_page__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "Done, website generated"
+msgstr "მზადაა, ვებსაიტი დაგენერირდა"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "Draft, record created but request not yet accepted by the server"
+msgstr "მონახაზი, ჩანაწერი შეიქმნა, მაგრამ სერვერს მოთხოვნა ჯერ არ მიუღია"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "Error"
+msgstr "შეცდომა"
+
+#. module: website_generator
+#: model:ir.model.fields,field_description:website_generator.field_website_generator_request__generation_progress
+msgid "Generation Progress"
+msgstr "გენერაციის პროგრესი"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Ghost API Key"
+msgstr "Ghost API გასაღები"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Ghost API detected, please provide an API key. For more info, visit:"
+msgstr "აღმოჩენილია Ghost API, გთხოვთ, მიუთითოთ API გასაღები. დამატებითი ინფორმაციისთვის ეწვიეთ:"
+
+#. module: website_generator
+#: model:ir.model.fields,field_description:website_generator.field_website__id model:ir.model.fields,field_description:website_generator.field_website_generator_request__id model:ir.model.fields,field_description:website_generator.field_website_page__id
+msgid "ID"
+msgstr "ID"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Import Blogs"
+msgstr "ბლოგების იმპორტი"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Import Products"
+msgstr "პროდუქტების იმპორტი"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Import Website"
+msgstr "ვებსაიტის იმპორტი"
+
+#. module: website_generator
+#: model:ir.actions.client,name:website_generator.action_open_website_import_form
+msgid "Import Your Pages and Products"
+msgstr "თქვენი გვერდებისა და პროდუქტების იმპორტი"
+
+#. module: website_generator
+#: model:ir.module.module,summary:base.module_website_generator
+msgid "Import a pre-existing website"
+msgstr "უკვე არსებული ვებსაიტის იმპორტი"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_website_cog_menu/import_website_cog_menu.xml:0
+msgid "Import from website"
+msgstr "ვებსაიტიდან იმპორტი"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Import my website"
+msgstr "ჩემი ვებსაიტის იმპორტი"
+
+#. module: website_generator
+#: model:ir.model.fields,field_description:website_generator.field_website_generator_request__import_website
+msgid "Import website"
+msgstr "ვებსაიტის იმპორტი"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/builder/imported_footer_template_choice.xml:0
+msgid "Imported"
+msgstr "იმპორტირებული"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/builder/imported_footer_plugin.js:0
+msgid "Imported Footer"
+msgstr "იმპორტირებული ქვედა კოლონტიტული"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
+msgid "Importing your colors and design."
+msgstr "თქვენი ფერებისა და დიზაინის იმპორტი."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Imports products found on the website into your Odoo database. This means potentially installing the ecommerce app and creating products."
+msgstr "ვებსაიტზე ნაპოვნ პროდუქტებს თქვენს Odoo ბაზაში აიმპორტირებს. ეს შესაძლოა ელკომერციის აპლიკაციის დაყენებასა და პროდუქტების შექმნას გულისხმობდეს."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Imports the blogs. This means potentially installing the blogs app."
+msgstr "ახდენს ბლოგების იმპორტს. ეს შესაძლოა ბლოგების აპლიკაციის დაყენებას გულისხმობდეს."
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "Invalid dbuuid"
+msgstr "არასწორი dbuuid"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "Invalid import products"
+msgstr "პროდუქტების არასწორი იმპორტი"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "Invalid token"
+msgstr "არასწორი ტოკენი"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "Invalid url"
+msgstr "არასწორი URL"
+
+#. module: website_generator
+#: model:ir.model.fields,field_description:website_generator.field_website_generator_request__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: website_generator
+#: model:ir.model.fields,field_description:website_generator.field_website_generator_request__write_date
+msgid "Last Updated on"
+msgstr "ბოლოს განახლდა"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Loading..."
+msgstr "იტვირთება..."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "Make sure that you have set the website URL first."
+msgstr "დარწმუნდით, რომ ჯერ ვებსაიტის URL მიუთითეთ."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "No blog platform detected. Please select at least Import Website or Import Products to continue."
+msgstr "ბლოგის პლატფორმა ვერ მოიძებნა. გასაგრძელებლად, გთხოვთ, აირჩიოთ მინიმუმ ვებსაიტის იმპორტი ან პროდუქტების იმპორტი."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "No supported API platform detected, we will search the pages for products metadata."
+msgstr "მხარდაჭერილი API პლატფორმა არ აღმოჩენილა, პროდუქტების მეტამონაცემებს გვერდებზე მოვძებნით."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "No supported blog API found."
+msgstr "მხარდაჭერილი ბლოგის API ვერ მოიძებნა."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "No supported blog API platform detected. No blogs will be imported."
+msgstr "მხარდაჭერილი ბლოგის API პლატფორმა არ აღმოჩენილა. ბლოგების იმპორტი არ მოხდება."
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "Number of allowed requests exhausted"
+msgstr "დაშვებული მოთხოვნების რაოდენობა ამოიწურა"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "Number of concurrent requests exceeded"
+msgstr "ერთდროული მოთხოვნების რაოდენობა გადაჭარბებულია"
+
+#. module: website_generator
+#: model:ir.model.fields,field_description:website_generator.field_website_generator_request__page_count
+msgid "Number of pages"
+msgstr "გვერდების რაოდენობა"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Odoo's website import documentation"
+msgstr "Odoo-ს ვებსაიტის იმპორტის დოკუმენტაცია"
+
+#. module: website_generator
+#: model:ir.model.fields,field_description:website_generator.field_website_generator_request__out_json_attachment_id
+msgid "Out Json Attachment"
+msgstr "გამომავალი Json დანართი"
+
+#. module: website_generator
+#: model:ir.model.fields,field_description:website_generator.field_website_generator_request__uuid
+msgid "Output UUID generated from Website Scraper Server"
+msgstr "ვებსაიტის შიგთავსის ამოღების სერვერის მიერ დაგენერირებული გამომავალი UUID"
+
+#. module: website_generator
+#: model:ir.model,name:website_generator.model_website_page
+msgid "Page"
+msgstr "გვერდი"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "Please make sure the URL is correct and try again."
+msgstr "გთხოვთ, დარწმუნდეთ, რომ URL სწორია, და სცადოთ ხელახლა."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "Please select at least one option: Import Website, Import Products or Import Blogs."
+msgstr "გთხოვთ, აირჩიოთ სულ მცირე ერთი ვარიანტი: ვებსაიტის იმპორტი, პროდუქტების იმპორტი ან ბლოგების იმპორტი."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "Please wait for the API check to finish."
+msgstr "გთხოვთ, დაელოდოთ API-ის შემოწმების დასრულებას."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "PrestaShop API Key"
+msgstr "PrestaShop API გასაღები"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "PrestaShop API detected, please provide an API key. For more info, visit:"
+msgstr "აღმოჩენილია PrestaShop API, გთხოვთ, მიუთითოთ API გასაღები. დამატებითი ინფორმაციისთვის ეწვიეთ:"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "Processing"
+msgstr "მუშავდება"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Reconnect via WooCommerce"
+msgstr "WooCommerce-ით ხელახლა დაკავშირება"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "Request is still processing, result not available yet"
+msgstr "მოთხოვნა ჯერ კიდევ მუშავდება, შედეგი ჯერ ხელმისაწვდომი არ არის"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Select the website of which you want to create the products/blogs for."
+msgstr "აირჩიეთ ვებსაიტი, რომლისთვისაც გსურთ პროდუქტების/ბლოგების შექმნა."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Sending request..."
+msgstr "მოთხოვნა იგზავნება..."
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "Server is currently under maintenance. Please retry later"
+msgstr "სერვერზე ამჟამად მიმდინარეობს ტექმომსახურება. გთხოვთ, სცადოთ მოგვიანებით"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Shopify API detected."
+msgstr "აღმოჩენილია Shopify API."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.xml:0
+msgid "Something went wrong"
+msgstr "მოხდა შეცდომა"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "Something went wrong applying your API key. Please check your API key and try again."
+msgstr "თქვენი API გასაღების გამოყენებისას რაღაც ვერ მოხერხდა. გთხოვთ, შეამოწმოთ API გასაღები და სცადოთ ხელახლა."
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Something went wrong during the import"
+msgstr "იმპორტის დროს რაღაც შეცდომა მოხდა"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "Something went wrong while importing your website"
+msgstr "თქვენი ვებსაიტის იმპორტისას რაღაც ვერ მოხერხდა"
+
+#. module: website_generator
+#: model:ir.model.fields,field_description:website_generator.field_website_generator_request__status
+msgid "Status"
+msgstr "სტატუსი"
+
+#. module: website_generator
+#: model:ir.model.fields,field_description:website_generator.field_website_generator_request__status_message
+msgid "Status Message"
+msgstr "სტატუსის შეტყობინება"
+
+#. module: website_generator
+#. odoo-javascript
+#. odoo-python
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0 code:addons/website_generator/utils/constants.py:0
+msgid "Success"
+msgstr "წარმატება"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "The URL is not reachable."
+msgstr "URL მიუწვდომელია."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "The URL is reachable."
+msgstr "URL ხელმისაწვდომია."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "The number of pages is limited. If you need more, contact us at"
+msgstr "გვერდების რაოდენობა შეზღუდულია. თუ მეტი გჭირდებათ, დაგვიკავშირდით მისამართზე"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "The provided URL is empty"
+msgstr "მითითებული URL ცარიელია"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "The provided URL is not allowed"
+msgstr "მითითებული URL დაშვებული არ არის"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "The provided URL is not reachable"
+msgstr "მითითებული URL მიუწვდომელია"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "The request asks for too many pages"
+msgstr "მოთხოვნა ძალიან ბევრ გვერდს ითხოვს"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "The requested url redirected to another url, try again with the redirected url"
+msgstr "მოთხოვნილი url სხვა url-ზე გადამისამართდა, სცადეთ ხელახლა გადამისამართებული url-ით"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "The requested url took too long to load and is probably unreachable from the server"
+msgstr "მოთხოვნილი url-ის ჩატვირთვას ძალიან დიდი დრო დასჭირდა და, სავარაუდოდ, სერვერისთვის მიუწვდომელია"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "The same request has just been made, please wait before sending another identical request"
+msgstr "იგივე მოთხოვნა ახლახან გაიგზავნა, გთხოვთ, მოიცადოთ, სანამ კიდევ ერთ იდენტურ მოთხოვნას გაგზავნით"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "The search for blogs API is done."
+msgstr "ბლოგების API-ის ძიება დასრულდა."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "The search for products API is done."
+msgstr "პროდუქტების API-ის ძიება დასრულდა."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.xml:0
+msgid "This can take a few minutes."
+msgstr "ამას შეიძლება რამდენიმე წუთი დასჭირდეს."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "Too many requests"
+msgstr "ძალიან ბევრი მოთხოვნაა"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/page.py:0
+msgid "Top Menu for Website %s"
+msgstr "ზედა მენიუ ვებსაიტისთვის %s"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "URL redirection"
+msgstr "URL-ის გადამისამართება"
+
+#. module: website_generator
+#: model:ir.model.fields,field_description:website_generator.field_website_generator_request__target_url
+msgid "URL to scrape"
+msgstr "შიგთავსის ამოსაღები URL"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "URL unreachable"
+msgstr "URL მიუწვდომელია"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
+msgid "Uploading your images."
+msgstr "თქვენი სურათების ატვირთვა."
+
+#. module: website_generator
+#: model:ir.model.fields,field_description:website_generator.field_website_generator_request__version
+msgid "Version"
+msgstr "ვერსია"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "Version is unsupported"
+msgstr "ვერსია მხარდაუჭერელია"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "Waiting for the server to process the request"
+msgstr "ველოდებით სერვერის მიერ მოთხოვნის დამუშავებას"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.xml:0
+msgid "We could not convert your website, please try again later"
+msgstr "თქვენი ვებსაიტის კონვერტაცია ვერ მოვახერხეთ, გთხოვთ, სცადოთ მოგვიანებით"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0 model:ir.model,name:website_generator.model_website model:ir.model.fields,field_description:website_generator.field_website_generator_request__website_id
+msgid "Website"
+msgstr "ვებსაიტი"
+
+#. module: website_generator
+#: model:ir.actions.client,name:website_generator.website_generator_screen model:ir.module.module,shortdesc:base.module_website_generator
+msgid "Website Generator"
+msgstr "ვებსაიტის გენერატორი"
+
+#. module: website_generator
+#: model:ir.actions.server,name:website_generator.action_convert_scraping_request_ICP
+msgid "Website Generator After Install"
+msgstr "ვებსაიტის გენერატორი დაყენების შემდეგ"
+
+#. module: website_generator
+#: model:ir.model,name:website_generator.model_website_generator_request
+msgid "Website Generator Request"
+msgstr "ვებსაიტის გენერატორის მოთხოვნა"
+
+#. module: website_generator
+#: model:ir.actions.server,name:website_generator.cron_generate_site_ir_actions_server
+msgid "Website Generator: Create the website"
+msgstr "ვებსაიტის გენერატორი: ვებსაიტის შექმნა"
+
+#. module: website_generator
+#: model:ir.actions.server,name:website_generator.cron_get_result_ir_actions_server
+msgid "Website Generator: Get website scraper results"
+msgstr "ვებსაიტის გენერატორი: ვებსაიტის შიგთავსის ამოღების შედეგების მიღება"
+
+#. module: website_generator
+#: model:mail.template,name:website_generator.email_template_website_scrapped
+msgid "Website Scraped"
+msgstr "ვებსაიტის შიგთავსი ამოღებულია"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Website URL"
+msgstr "ვებსაიტის URL"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "Website blocked or unreachable"
+msgstr "ვებსაიტი დაბლოკილია ან მიუწვდომელია"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/utils/constants.py:0
+msgid "Website not supported"
+msgstr "ვებსაიტი მხარდაჭერილი არ არის"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "WooCommerce API detected, please authenticate to import WooCommerce Products."
+msgstr "აღმოჩენილია WooCommerce API, გთხოვთ, გაიაროთ ავთენტიფიკაცია WooCommerce-ის პროდუქტების იმპორტისთვის."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "WordPress Blog API detected."
+msgstr "აღმოჩენილია WordPress ბლოგის API."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "You must add a Ghost API key before trying to import Ghost Blogs."
+msgstr "Ghost-ის ბლოგების იმპორტის მცდელობამდე უნდა დაამატოთ Ghost API გასაღები."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "You must add a PrestaShop API key before trying to import PrestaShop products."
+msgstr "PrestaShop-ის პროდუქტების იმპორტის მცდელობამდე უნდა დაამატოთ PrestaShop API გასაღები."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.js:0
+msgid "You must authenticate the WooCommerce API before trying to import WooCommerce Products."
+msgstr "WooCommerce პროდუქტების იმპორტის მცდელობამდე WooCommerce API-ის ავთენტიფიკაცია უნდა გაიაროთ."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.xml:0
+msgid "You will be redirected once your website is ready."
+msgstr "გადამისამართდებით, როგორც კი თქვენი ვებსაიტი მზად იქნება."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "You will receive an"
+msgstr "თქვენ მიიღებთ"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Your blogs have been imported!"
+msgstr "თქვენი ბლოგების იმპორტი დასრულდა!"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Your new blogs and products are ready!"
+msgstr "თქვენი ახალი ბლოგები და პროდუქტები მზადაა!"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Your new website and blogs are ready!"
+msgstr "თქვენი ახალი ვებსაიტი და ბლოგები მზადაა!"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Your new website and products are ready!"
+msgstr "თქვენი ახალი ვებსაიტი და პროდუქტები მზადაა!"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Your new website is ready!"
+msgstr "თქვენი ახალი ვებსაიტი მზადაა!"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Your new website, blogs and products are ready!"
+msgstr "თქვენი ახალი ვებსაიტი, ბლოგები და პროდუქტები მზადაა!"
+
+#. module: website_generator
+#. odoo-python
+#: code:addons/website_generator/models/generator.py:0
+msgid "Your products have been imported!"
+msgstr "თქვენი პროდუქტების იმპორტი დასრულდა!"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "Your request has been submitted!"
+msgstr "თქვენი მოთხოვნა გაიგზავნა!"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/generator_wait/generator.js:0
+msgid "Your website, now customizable effortless."
+msgstr "თქვენი ვებსაიტი, ახლა ძალისხმევის გარეშე მორგებადი."
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "email notification"
+msgstr "ელფოსტით შეტყობინებას,"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "https://www.odoo.com/"
+msgstr "https://www.odoo.com/"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "odoo.com/help"
+msgstr "odoo.com/help"
+
+#. module: website_generator
+#. odoo-javascript
+#: code:addons/website_generator/static/src/client_actions/import_form/import_form.xml:0
+msgid "once your website and/or products are ready."
+msgstr "როგორც კი თქვენი ვებსაიტი და/ან პროდუქტები მზად იქნება."
+
+#. module: website_generator
+#: model:mail.template,subject:website_generator.email_template_website_scrapped
+msgid "{{ ctx.get('subject') }}"
+msgstr "{{ ctx.get('subject') }}"

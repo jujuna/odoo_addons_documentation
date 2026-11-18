@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_employee_work_log_view_form" model="ir.ui.view">
+        <field name="name">hr.employee.work.log.form</field>
+        <field name="model">hr.employee.work.log</field>
+        <field name="arch" type="xml">
+            <form string="Work Log">
+                <header>
+                    <button name="action_submit" type="object" string="Submit" class="oe_highlight"
+                            invisible="state not in ('draft', 'rejected')"/>
+                    <button name="action_approve" type="object" string="Approve" class="oe_highlight"
+                            invisible="state not in ('draft', 'submitted') or not can_approve"/>
+                    <button name="action_reject" type="object" string="Reject"
+                            invisible="state != 'submitted' or not can_approve"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            groups="hr_payroll.group_hr_payroll_officer"
+                            invisible="state == 'draft'"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            groups="!hr_payroll.group_hr_payroll_officer"
+                            invisible="state not in ('submitted', 'rejected') or user_id != uid"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            groups="hr_payroll.group_hr_payroll_officer"
+                            invisible="state in ('cancelled', 'rejected')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id" readonly="state != 'draft'"/>
+                            <field name="date" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="type" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="hours" invisible="type != 'overtime'"
+                                   readonly="state not in ('draft', 'rejected')" widget="float_time"/>
+                            <field name="units" invisible="type != 'daily'"
+                                   readonly="state not in ('draft', 'rejected')"/>
+                            <field name="percentage" invisible="type != 'overtime'"
+                                   readonly="state not in ('draft', 'rejected', 'submitted')"/>
+                            <field name="work_unit_id" invisible="type != 'unit'"
+                                   readonly="state not in ('draft', 'rejected')"
+                                   options="{'no_create': True}"/>
+                            <field name="unit_uom_id" invisible="type != 'unit'"/>
+                            <field name="unit_qty" invisible="type != 'unit'"
+                                   readonly="state not in ('draft', 'rejected')"/>
+                            <field name="unit_price_display" invisible="type != 'unit'"/>
+                            <field name="unit_amount_display" invisible="type != 'unit'"/>
+                        </group>
+                        <group>
+                            <field name="project_id" readonly="state not in ('draft', 'rejected')"
+                                   domain="[('allow_timesheets', '=', True)] if type == 'overtime' else []"/>
+                            <field name="task_id" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="name" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="rejection_reason" invisible="state not in ('submitted', 'rejected')"/>
+                            <field name="approved_by_id" invisible="not approved_by_id"/>
+                            <field name="approved_at" invisible="not approved_at"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group groups="hr_payroll.group_hr_payroll_user" name="payroll_snapshot">
+                        <group string="Pay at Approval">
+                            <field name="version_id"/>
+                            <field name="rate_snapshot"/>
+                            <field name="amount_snapshot"/>
+                            <field name="unit_uom_snapshot_id" invisible="type != 'unit'"/>
+                            <field name="settlement_state"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_employee_work_log_view_list" model="ir.ui.view">
+        <field name="name">hr.employee.work.log.list</field>
+        <field name="model">hr.employee.work.log</field>
+        <field name="arch" type="xml">
+            <list string="Work Logs" default_order="date desc">
+                <field name="date"/>
+                <field name="employee_id"/>
+                <field name="type"/>
+                <field name="project_id" optional="show"/>
+                <field name="task_id" optional="hide"/>
+                <field name="hours" optional="show" widget="float_time"/>
+                <field name="units" optional="show"/>
+                <field name="percentage" optional="show"/>
+                <field name="work_unit_id" optional="show"/>
+                <field name="unit_uom_id" optional="hide"/>
+                <field name="unit_qty" optional="show"/>
+                <field name="unit_price_display" optional="hide"/>
+                <field name="unit_amount_display" optional="hide"/>
+                <field name="name"/>
+                <field name="amount_snapshot" groups="hr_payroll.group_hr_payroll_user" optional="hide"/>
+                <field name="settlement_state" groups="hr_payroll.group_hr_payroll_user" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'approved'"
+                       decoration-info="state == 'submitted'"
+                       decoration-danger="state == 'rejected'"
+                       decoration-muted="state == 'cancelled'"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_employee_work_log_view_search" model="ir.ui.view">
+        <field name="name">hr.employee.work.log.search</field>
+        <field name="model">hr.employee.work.log</field>
+        <field name="arch" type="xml">
+            <search string="Work Logs">
+                <field name="employee_id"/>
+                <field name="project_id"/>
+                <field name="name"/>
+                <separator/>
+                <filter name="filter_overtime" string="Overtime" domain="[('type', '=', 'overtime')]"/>
+                <filter name="filter_daily" string="Daily Work" domain="[('type', '=', 'daily')]"/>
+                <separator/>
+                <filter name="filter_submitted" string="To Approve" domain="[('state', '=', 'submitted')]"/>
+                <filter name="filter_approved" string="Approved" domain="[('state', '=', 'approved')]"/>
+                <separator/>
+                <filter name="filter_date" string="Date" date="date"/>
+                <separator/>
+                <filter name="groupby_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+                <filter name="groupby_project" string="Project" context="{'group_by': 'project_id'}"/>
+                <filter name="groupby_type" string="Type" context="{'group_by': 'type'}"/>
+                <filter name="groupby_state" string="Status" context="{'group_by': 'state'}"/>
+                <filter name="groupby_date" string="Month" context="{'group_by': 'date:month'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_new_work_log_dialog" model="ir.actions.act_window">
+        <field name="name">New Work Log</field>
+        <field name="res_model">hr.employee.work.log</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_employee_id': active_id}</field>
+    </record>
+
+    <record id="action_team_work_logs" model="ir.actions.act_window">
+        <field name="name">Work Log Approvals</field>
+        <field name="res_model">hr.employee.work.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('employee_id.parent_id.user_id', '=', uid)]</field>
+        <field name="context">{'search_default_filter_submitted': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No work logs to approve</p>
+            <p>Submitted work logs of your direct reports appear here.</p>
+        </field>
+    </record>
+
+    <record id="action_all_work_logs" model="ir.actions.act_window">
+        <field name="name">Work Logs</field>
+        <field name="res_model">hr.employee.work.log</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_team_work_logs" name="Work Log Approvals" parent="hr.menu_hr_root"
+              action="action_team_work_logs" sequence="40"/>
+    <menuitem id="menu_payroll_work_logs" name="Work Logs"
+              parent="hr_payroll.menu_hr_payroll_root"
+              action="action_all_work_logs" sequence="45"
+              groups="hr_payroll.group_hr_payroll_user"/>
+
+    <!-- Employee's own directory card: hr.employee.public is a read-only view, so rows come from the dialog. -->
+    <record id="hr_employee_public_view_form_geo" model="ir.ui.view">
+        <field name="name">hr.employee.public.form.geo.payroll</field>
+        <field name="model">hr.employee.public</field>
+        <field name="inherit_id" ref="hr.hr_employee_public_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="work_logs" string="Work Logs" invisible="user_id != uid">
+                    <button name="%(action_new_work_log_dialog)d" type="action" string="New Work Log"
+                            class="btn btn-primary mb-2"/>
+                    <field name="work_log_ids" readonly="1">
+                        <list default_order="date desc">
+                            <field name="date"/>
+                            <field name="type"/>
+                            <field name="project_id"/>
+                            <field name="task_id"/>
+                            <field name="name"/>
+                            <field name="hours" widget="float_time"/>
+                            <field name="units"/>
+                            <field name="percentage"/>
+                            <field name="work_unit_id"/>
+                            <field name="unit_uom_id"/>
+                            <field name="unit_qty"/>
+                            <field name="unit_price_display"/>
+                            <field name="unit_amount_display"/>
+                            <field name="state" widget="badge"
+                                   decoration-success="state == 'approved'"
+                                   decoration-info="state == 'submitted'"
+                                   decoration-danger="state == 'rejected'"/>
+                            <button name="action_submit" type="object" string="Submit" icon="send"
+                                    invisible="state not in ('draft', 'rejected')"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="res_users_view_form_preferences_geo" model="ir.ui.view">
+        <field name="name">res.users.preferences.form.geo.payroll</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="hr.res_users_view_form_preferences"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='private_information']" position="after">
+                <page name="work_logs" string="Work Logs">
+                    <field name="work_log_ids">
+                        <list editable="bottom" default_order="date desc">
+                            <field name="date" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="type" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="project_id" readonly="state not in ('draft', 'rejected')"
+                                   domain="[('allow_timesheets', '=', True)] if type == 'overtime' else []"/>
+                            <field name="task_id" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="name" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="hours" widget="float_time" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="units" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="percentage" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="work_unit_id" readonly="state not in ('draft', 'rejected')"
+                                   options="{'no_create': True}"/>
+                            <field name="unit_uom_id"/>
+                            <field name="unit_qty" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="unit_price_display"/>
+                            <field name="unit_amount_display"/>
+                            <field name="state" widget="badge"
+                                   decoration-success="state == 'approved'"
+                                   decoration-info="state == 'submitted'"
+                                   decoration-danger="state == 'rejected'"/>
+                            <button name="action_submit" type="object" string="Submit" icon="send"
+                                    invisible="state not in ('draft', 'rejected')"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_employee_form_geo" model="ir.ui.view">
+        <field name="name">hr.employee.form.geo.payroll.worklogs</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='hr_settings']" position="before">
+                <page name="work_logs" string="Work Logs" groups="hr.group_hr_user">
+                    <field name="work_log_ids">
+                        <list editable="bottom" default_order="date desc">
+                            <field name="date" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="type" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="project_id" readonly="state not in ('draft', 'rejected')"
+                                   domain="[('allow_timesheets', '=', True)] if type == 'overtime' else []"/>
+                            <field name="task_id" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="name" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="hours" widget="float_time" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="units" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="percentage" readonly="state not in ('draft', 'rejected', 'submitted')"/>
+                            <field name="work_unit_id" readonly="state not in ('draft', 'rejected')"
+                                   options="{'no_create': True}"/>
+                            <field name="unit_uom_id" optional="show"/>
+                            <field name="unit_qty" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="unit_price_display" optional="show"/>
+                            <field name="unit_amount_display" optional="show"/>
+                            <field name="amount_snapshot" groups="hr_payroll.group_hr_payroll_user" optional="hide"/>
+                            <field name="settlement_state" groups="hr_payroll.group_hr_payroll_user" optional="hide"/>
+                            <field name="state" widget="badge"
+                                   decoration-success="state == 'approved'"
+                                   decoration-info="state == 'submitted'"
+                                   decoration-danger="state == 'rejected'"/>
+                            <button name="action_submit" type="object" string="Submit" icon="send"
+                                    invisible="state not in ('draft', 'rejected')"/>
+                            <button name="action_approve" type="object" string="Approve" icon="check"
+                                    invisible="state not in ('draft', 'submitted') or not can_approve"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

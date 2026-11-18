@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- RS.GE waybill units: each RS UNIT_ID is bound to its Odoo uom.uom (source: get_waybill_units SOAP call).
+             noupdate: set once at install; upgrades keep what users archived, renamed or re-coded. -->
+
+        <record id="uom.product_uom_unit" model="uom.uom">
+            <field name="rs_unit_id">1</field>
+        </record>
+
+        <record id="uom.product_uom_kgm" model="uom.uom">
+            <field name="rs_unit_id">2</field>
+        </record>
+
+        <record id="uom.product_uom_gram" model="uom.uom">
+            <field name="rs_unit_id">3</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="uom.product_uom_litre" model="uom.uom">
+            <field name="rs_unit_id">4</field>
+        </record>
+
+        <record id="uom.product_uom_ton" model="uom.uom">
+            <field name="rs_unit_id">5</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="uom.product_uom_cm" model="uom.uom">
+            <field name="rs_unit_id">7</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="uom.product_uom_meter" model="uom.uom">
+            <field name="rs_unit_id">8</field>
+        </record>
+
+        <record id="uom.product_uom_km" model="uom.uom">
+            <field name="rs_unit_id">9</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="uom.product_uom_square_meter" model="uom.uom">
+            <field name="rs_unit_id">11</field>
+        </record>
+
+        <record id="uom.product_uom_cubic_meter" model="uom.uom">
+            <field name="rs_unit_id">12</field>
+        </record>
+
+        <record id="uom.product_uom_milliliter" model="uom.uom">
+            <field name="rs_unit_id">13</field>
+            <field name="active" eval="True"/>
+        </record>
+
+
+        <!-- 10: კვ.სმ (cm²) — 1 cm² = 0.0001 m² -->
+        <record id="uom_rs_square_centimeter" model="uom.uom">
+            <field name="name">cm²</field>
+            <field name="relative_factor" eval="0.0001"/>
+            <field name="relative_uom_id" ref="uom.product_uom_square_meter"/>
+            <field name="rs_unit_id">10</field>
+        </record>
+
+        <!-- 14: შეკვრა — for a product stocked by the bundle (its base unit). 1 Bundle = 1 Unit, so never sell a
+             Units product in it: make a "Pack of N" unit (reference Units, factor N, RS code 14) instead. -->
+        <record id="uom_rs_bundle" model="uom.uom">
+            <field name="name">Bundle (base unit)</field>
+            <field name="relative_factor" eval="1"/>
+            <field name="relative_uom_id" ref="uom.product_uom_unit"/>
+            <field name="rs_unit_id">14</field>
+        </record>
+
+        <!-- 99: სხვა (Other) — generic placeholder for RS custom units -->
+        <record id="uom_rs_other" model="uom.uom">
+            <field name="name">Other</field>
+            <field name="relative_factor" eval="1"/>
+            <field name="relative_uom_id" ref="uom.product_uom_unit"/>
+            <field name="rs_unit_id">99</field>
+        </record>
+
+
+    </data>
+</odoo>

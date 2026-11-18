@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form_wolt_drive" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.pos_wolt_drive</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <block id="pos_connected_devices_section" position="after">
+                <block title="Wolt Drive" id="pos_wolt_drive_section">
+                    <setting string="Wolt Couriers" help="Book Wolt couriers for paid delivery orders of this Point of Sale">
+                        <div class="content-group">
+                            <div class="row mt8">
+                                <label string="Venue ID" for="pos_wolt_drive_venue_id" class="col-lg-4 o_light_label"/>
+                                <field name="pos_wolt_drive_venue_id"/>
+                            </div>
+                            <div class="row" invisible="not pos_wolt_drive_venue_id" groups="base.group_system">
+                                <label string="Merchant ID" for="pos_wolt_drive_merchant_id" class="col-lg-4 o_light_label"/>
+                                <field name="pos_wolt_drive_merchant_id"/>
+                            </div>
+                            <div class="row" invisible="not pos_wolt_drive_venue_id" groups="base.group_system">
+                                <label string="API Key" for="pos_wolt_drive_api_key" class="col-lg-4 o_light_label"/>
+                                <field name="pos_wolt_drive_api_key" password="True"/>
+                            </div>
+                            <div class="row" invisible="not pos_wolt_drive_venue_id">
+                                <label string="Preparation (min)" for="pos_wolt_drive_preparation_minutes" class="col-lg-4 o_light_label"/>
+                                <field name="pos_wolt_drive_preparation_minutes"/>
+                            </div>
+                            <div class="row" invisible="not pos_wolt_drive_venue_id" groups="base.group_system">
+                                <label string="Test Mode" for="pos_wolt_drive_test_mode" class="col-lg-4 o_light_label"/>
+                                <field name="pos_wolt_drive_test_mode"/>
+                            </div>
+                            <div class="row" invisible="not pos_wolt_drive_venue_id" groups="base.group_system">
+                                <label string="Status Updates Set Up" for="pos_wolt_drive_webhook_ready" class="col-lg-4 o_light_label"/>
+                                <field name="pos_wolt_drive_webhook_ready"/>
+                            </div>
+                            <button name="action_wolt_drive_register_webhook" type="object" string="Register Status Webhook"
+                                icon="link" class="btn-link" invisible="not pos_wolt_drive_venue_id" groups="base.group_system"/>
+                        </div>
+                    </setting>
+                </block>
+            </block>
+        </field>
+    </record>
+
+</odoo>

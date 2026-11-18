@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates>
+    <!-- Built-in filter templates inherit this one, so one extension reaches every standard report. -->
+    <t t-inherit="account_reports.AccountReportFiltersCustomizable" t-inherit-mode="extension">
+        <xpath expr="." position="inside">
+            <t t-if="'currencies' in this.controller.cachedFilterOptions">
+                <div class="o_currency_filter" id="filter_currency">
+                    <t t-call="dps_account_report_filter.AccountReportCurrenciesData"/>
+                </div>
+            </t>
+        </xpath>
+    </t>
+</templates>

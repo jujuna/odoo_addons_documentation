@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="gec_property_tax_report.LandTerritoryField">
+        <div class="d-flex align-items-center gap-1 o_rsf15_land_territory_field">
+            <div class="flex-grow-1 min-w-0">
+                <Many2One t-props="this.m2oProps"/>
+            </div>
+            <button t-if="!this.props.readonly" type="button"
+                    class="btn btn-link p-0 flex-shrink-0 o_rsf15_land_territory_tree_button"
+                    title="Browse by region and municipality"
+                    t-on-click.stop="this.openTree">
+                <i class="oi" data-icon="account_tree" aria-hidden="true"/>
+            </button>
+        </div>
+    </t>
+
+    <t t-name="gec_property_tax_report.LandTerritoryTreeDialog">
+        <Dialog title="this.title" size="'lg'">
+            <input type="search" class="form-control mb-3"
+                   placeholder="Search a region, municipality or zone"
+                   t-att-value="this.state.search" t-on-input="this.onSearch"/>
+            <div class="o_rsf15_land_territory_tree">
+                <t t-foreach="this.rows" t-as="row" t-key="row.node.key">
+                    <div class="d-flex align-items-start py-1 o_rsf15_tree_row"
+                         t-attf-style="padding-left: {{ row.depth * 1.5 }}rem">
+                        <button t-if="row.node.children.length" type="button"
+                                class="btn btn-link p-0 me-1 flex-shrink-0"
+                                t-on-click="() => this.toggle(row.node)">
+                            <i class="oi" t-att-data-icon="row.isOpen ? 'expand_more' : 'chevron_forward'"
+                               aria-hidden="true"/>
+                        </button>
+                        <span t-else="" class="d-inline-block me-1 flex-shrink-0" style="width: 1rem"/>
+                        <a t-if="row.node.id" href="#"
+                           t-att-class="{ 'fw-bold': row.node.id === this.props.selectedId }"
+                           t-on-click.prevent="() => this.select(row.node)" t-out="row.node.label"/>
+                        <span t-else="" role="button" class="text-body"
+                              t-on-click="() => this.toggle(row.node)" t-out="row.node.label"/>
+                    </div>
+                </t>
+                <div t-if="!this.rows.length" class="text-muted">No territorial unit matches.</div>
+            </div>
+            <t t-set-slot="footer">
+                <button type="button" class="btn btn-secondary" t-on-click="this.props.close">Close</button>
+            </t>
+        </Dialog>
+    </t>
+
+</templates>

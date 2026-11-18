@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+<t t-name="gec_home_menu.HomeMenu" t-inherit="web_enterprise.HomeMenu" t-inherit-mode="primary">
+    <xpath expr="//div[hasclass('o_home_menu')]" position="attributes">
+        <attribute name="class" add="o_gec_home_menu" separator=" "/>
+    </xpath>
+
+    <xpath expr="//input[hasclass('o_home_menu_search_input')]" position="replace">
+        <div class="o_gec_hm_header position-sticky top-0 z-2 py-3">
+            <div class="o_gec_hm_search position-relative">
+                <i class="oi o_gec_hm_search_icon position-absolute top-50 translate-middle-y" data-icon="search" aria-hidden="true"/>
+                <input t-ref="this.inputRef" type="text"
+                    class="o_gec_hm_search_input form-control rounded-pill"
+                    data-allow-hotkeys="true"
+                    t-on-input="this.gecOnInput" t-on-keydown="this.gecOnInputKeydown" t-on-blur="this._onInputBlur"
+                    role="combobox" aria-autocomplete="list" aria-haspopup="listbox"
+                    t-att-aria-expanded="this.gecState.query ? 'true' : 'false'"
+                    t-att-aria-activedescendant="this.state.focusedIndex !== null ? 'gec_hm_item_' + this.state.focusedIndex : ''"
+                    t-att-placeholder="this.gecSearchPlaceholder" autocomplete="off"/>
+            </div>
+            <div class="o_gec_hm_actions d-flex align-items-center gap-1">
+                <button type="button" class="o_gec_hm_customize btn btn-sm d-flex align-items-center gap-1"
+                    t-att-class="this.gecState.customizing ? 'btn-primary' : 'btn-link o_gec_hm_control'"
+                    t-att-title="this.gecCustomizeTitle"
+                    t-att-aria-label="this.gecCustomizeTitle"
+                    t-on-click="() => this.gecToggleCustomize()">
+                    <i class="oi" t-att-data-icon="this.gecState.customizing ? 'check' : 'edit'" aria-hidden="true"/>
+                    <span class="d-none d-md-inline" t-out="this.gecCustomizeTitle"/>
+                </button>
+                <button type="button" class="o_gec_hm_control btn btn-link p-2 lh-1"
+                    t-on-click="() => this.gecToggleView()" t-att-title="this.gecViewToggleTitle" t-att-aria-label="this.gecViewToggleTitle">
+                    <i class="oi oi-lg" t-att-data-icon="this.gecState.view === 'all' ? 'view_list' : 'apps'" aria-hidden="true"/>
+                </button>
+                <button t-if="this.homeMenuService.hasBackgroundAction" type="button" class="o_gec_hm_control btn btn-link p-2 lh-1"
+                    t-on-click="() => this.homeMenuService.toggle(false)" title="Close" aria-label="Close">
+                    <i class="oi oi-lg" data-icon="close" aria-hidden="true"/>
+                </button>
+            </div>
+        </div>
+    </xpath>
+
+    <xpath expr="//div[hasclass('container')]" position="attributes">
+        <attribute name="class" remove="container" add="o_gec_hm_container" separator=" "/>
+        <attribute name="t-att-class">{o_gec_hm_customizing: this.gecState.customizing}</attribute>
+    </xpath>
+
+    <xpath expr="//div[hasclass('o_apps')]" position="replace">
+        <!-- Keeps the parent's "No result" t-elif attached to a conditional; our layout handles empty results. -->
+        <t t-if="true">
+            <t t-set="sections" t-value="this.gecSections"/>
+            <div t-if="this.gecState.query.trim()" class="o_gec_hm_results" role="listbox">
+                <t t-foreach="sections" t-as="section" t-key="section.key">
+                    <div t-if="section.kind === 'result_apps'" class="o_apps o_gec_hm_tiles d-flex flex-wrap justify-content-center align-items-start user-select-none mb-3">
+                        <t t-foreach="section.items" t-as="entry" t-key="entry.record.id">
+                            <div class="o_gec_hm_tile position-relative mb-2">
+                                <t t-call="gec_home_menu.HomeMenu.Tile"/>
+                            </div>
+                        </t>
+                    </div>
+                    <div t-else="" class="d-flex flex-column mb-3">
+                        <t t-foreach="section.groups" t-as="group" t-key="group.key">
+                            <t t-set="groupLabel" t-value="group.app ? group.app.label : this.gecParents(group.items[0].record)[0]"/>
+                            <div class="o_gec_hm_result_group" role="group" t-att-aria-label="groupLabel">
+                                <div class="o_gec_hm_result_app d-flex align-items-center gap-2 px-3 pt-2 pb-1">
+                                    <t t-if="group.app">
+                                        <img t-if="group.app.webIconData" class="o_gec_hm_result_icon rounded-2"
+                                            t-attf-src="{{group.app.webIconData}}" alt=""/>
+                                        <div t-else="" class="o_gec_hm_result_icon d-flex justify-content-center align-items-center rounded-2"
+                                            t-attf-style="background-color: {{group.app.webIcon.backgroundColor}};">
+                                            <i class="oi" t-att-data-icon="group.app.webIcon.icon" t-attf-style="color: {{group.app.webIcon.color}};"/>
+                                        </div>
+                                    </t>
+                                    <span class="fw-semibold" t-out="groupLabel"/>
+                                </div>
+                                <t t-foreach="group.items" t-as="entry" t-key="entry.record.id">
+                                    <a t-att-id="'gec_hm_item_' + entry.index" role="option" t-att-data-gec-index="entry.index"
+                                        t-att-aria-selected="this.state.focusedIndex === entry.index ? 'true' : 'false'"
+                                        class="o_gec_hm_result o_menuitem d-flex align-items-center gap-2 rounded-3 pe-3 py-2 text-decoration-none"
+                                        t-att-class="{o_focused: this.state.focusedIndex === entry.index, o_disabled_offline: !this._isAvailable(entry.record)}"
+                                        t-att-href="entry.record.href"
+                                        t-on-click.prevent="() => this._onAppClick(entry.record)">
+                                        <span class="d-flex align-items-center flex-wrap">
+                                            <t t-foreach="this.gecParents(entry.record).slice(1)" t-as="part" t-key="part_index">
+                                                <span class="o_gec_hm_crumb text-muted" t-out="part"/>
+                                                <i class="oi o_gec_hm_crumb_sep" data-icon="chevron_forward" aria-hidden="true"/>
+                                            </t>
+                                            <span class="o_gec_hm_crumb fw-medium" t-out="entry.record.label"/>
+                                        </span>
+                                    </a>
+                                </t>
+                            </div>
+                        </t>
+                    </div>
+                </t>
+                <div t-if="!sections.length" class="o_gec_hm_empty text-center text-muted">No results</div>
+            </div>
+            <t t-else="">
+                <div t-if="this.gecState.customizing" class="o_gec_hm_customize_hint d-flex justify-content-center align-items-center gap-2 text-muted mb-3">
+                    <i class="oi" data-icon="star" aria-hidden="true"/>
+                    <span>Click the star on an app to pin it.</span>
+                    <span t-if="this.gecState.view === 'groups'">Drag a card by its title to move it.</span>
+                </div>
+                <t t-foreach="sections" t-as="section" t-key="section.key">
+                    <div t-if="section.kind === 'pinned'" class="d-flex justify-content-center">
+                        <section class="o_gec_hm_card o_gec_hm_card_pinned">
+                            <div class="o_gec_hm_title" role="heading" aria-level="2" t-out="section.title"/>
+                            <div class="o_apps o_gec_hm_tiles d-flex flex-wrap justify-content-center align-items-start user-select-none" role="listbox">
+                                <t t-foreach="section.items" t-as="entry" t-key="entry.record.id">
+                                    <div class="o_gec_hm_tile position-relative mb-2">
+                                        <t t-call="gec_home_menu.HomeMenu.Tile"/>
+                                    </div>
+                                </t>
+                            </div>
+                        </section>
+                    </div>
+                    <section t-elif="section.kind === 'all'" class="o_gec_hm_all">
+                        <div class="o_gec_hm_title" role="heading" aria-level="2" t-out="section.title"/>
+                        <div class="o_apps o_gec_hm_grid d-flex flex-wrap align-items-start user-select-none" role="listbox">
+                            <div t-foreach="section.items" t-as="entry" t-key="entry.record.id" class="o_draggable o_gec_hm_tile position-relative mb-2">
+                                <t t-call="gec_home_menu.HomeMenu.Tile"/>
+                            </div>
+                        </div>
+                    </section>
+                </t>
+                <t t-if="this.gecState.view === 'groups'">
+                    <t t-set="groupsSection" t-value="sections.find((s) => s.kind === 'groups')"/>
+                    <div class="o_gec_hm_masonry">
+                        <div t-foreach="groupsSection.columns" t-as="column" t-key="column_index" class="o_gec_hm_masonry_col" t-att-data-gec-col="column_index">
+                            <t t-foreach="column" t-as="section" t-key="section.key">
+                                <t t-call="gec_home_menu.HomeMenu.GroupCard"/>
+                            </t>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </xpath>
+</t>
+
+<t t-name="gec_home_menu.HomeMenu.GroupCard">
+    <section class="o_gec_hm_card o_gec_hm_group_card" t-att-data-gec-group="section.key">
+        <div class="o_gec_hm_title" role="heading" aria-level="2" t-att-title="this.gecDragTitle">
+            <i t-if="this.gecState.customizing" class="oi o_gec_hm_drag_icon" data-icon="drag_indicator" aria-hidden="true"/>
+            <span t-out="section.title"/>
+        </div>
+        <div class="o_apps o_gec_hm_tiles d-flex flex-wrap justify-content-center align-items-start user-select-none" role="listbox">
+            <t t-foreach="section.items" t-as="entry" t-key="entry.record.id">
+                <div class="o_gec_hm_tile position-relative mb-2">
+                    <t t-call="gec_home_menu.HomeMenu.Tile"/>
+                </div>
+            </t>
+        </div>
+    </section>
+</t>
+
+<t t-name="gec_home_menu.HomeMenu.Tile">
+    <a t-att-id="'gec_hm_item_' + entry.index" role="option" t-att-data-gec-index="entry.index"
+        t-att-aria-selected="this.state.focusedIndex === entry.index ? 'true' : 'false'"
+        class="o_app o_menuitem d-flex flex-column rounded-4 justify-content-start align-items-center w-100 px-0 py-1 py-md-2"
+        t-att-title="entry.record.label"
+        t-att-class="{o_focused: this.state.focusedIndex === entry.index, o_disabled_offline: !this._isAvailable(entry.record)}"
+        t-att-data-menu-xmlid="entry.record.xmlid" t-att-href="entry.record.href"
+        t-on-click.prevent="() => this._onAppClick(entry.record)">
+        <img t-if="entry.record.webIconData" class="o_app_icon rounded-3"
+            t-attf-src="{{entry.record.webIconData}}"
+        />
+        <div t-else="" class="o_app_icon position-relative d-flex justify-content-center align-items-center p-2 rounded-3 ratio ratio-1x1"
+            t-attf-style="background-color: {{entry.record.webIcon.backgroundColor}};"
+        >
+            <i class="oi position-relative w-auto h-auto" t-att-data-icon="entry.record.webIcon.icon" t-attf-style="color: {{entry.record.webIcon.color}};"/>
+        </div>
+        <div class="o_caption o_gec_hm_caption fw-medium w-100 text-center mt-2" t-out="entry.record.label"/>
+        <t t-set="badge" t-value="this.gecAppBadge(entry.record)"/>
+        <span t-if="badge" class="o_gec_hm_badge position-absolute top-0 start-0 d-flex align-items-center rounded-pill" t-att-title="badge.title">
+            <span t-if="badge.overdue" class="o_gec_hm_badge_dot rounded-circle" aria-hidden="true"/>
+            <span aria-hidden="true" t-out="badge.total"/>
+            <span class="visually-hidden" t-out="badge.title"/>
+        </span>
+    </a>
+    <button t-if="this.gecState.customizing" type="button" class="o_gec_hm_pin o_gec_hm_control btn btn-link position-absolute top-0 end-0 p-1 lh-1"
+        t-att-class="{o_gec_hm_pinned: this.gecIsPinned(entry.record)}"
+        t-att-title="this.gecPinTitle(entry.record)" aria-label="Pin"
+        t-att-aria-pressed="this.gecIsPinned(entry.record) ? 'true' : 'false'"
+        t-on-click.stop="() => this.gecTogglePin(entry.record)">
+        <i class="oi" data-icon="star" t-att-class="{'oi-filled': this.gecIsPinned(entry.record)}" aria-hidden="true"/>
+    </button>
+</t>
+
+</templates>

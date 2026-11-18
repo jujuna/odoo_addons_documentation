@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+      <menuitem id="menu_rs_waybill_root" name="Waybills" sequence="50" web_icon="rs_waybill,static/description/icon.png"
+                groups="rs_waybill.group_waybill_user"/>
+
+      <menuitem id="menu_rs_waybill_given"
+          name="Sent"
+          parent="menu_rs_waybill_root"
+          action="action_rs_waybill_given"
+          sequence="10"/>
+
+      <menuitem id="menu_rs_waybill_received"
+          name="Received"
+          parent="menu_rs_waybill_root"
+          action="action_rs_waybill_received"
+          sequence="20"/>
+
+      <menuitem id="menu_rs_waybill_saved"
+          name="Saved"
+          parent="menu_rs_waybill_root"
+          action="action_rs_waybill_saved"
+          sequence="30"/>
+
+      <menuitem id="menu_rs_waybill_template"
+                name="Templates"
+                parent="menu_rs_waybill_root"
+                action="action_rs_waybill_template"
+                sequence="40"/>
+
+      <menuitem id="menu_rs_waybill_transporter"
+                name="Transporter"
+                parent="menu_rs_waybill_root"
+                action="action_rs_waybill_transporter"
+                sequence="50"/>
+
+
+      <menuitem id="menu_rs_waybill_config"
+          name="Configuration"
+          parent="menu_rs_waybill_root"
+          sequence="90"/>
+
+      <menuitem id="menu_rs_waybill_products" name="Products"
+            parent="menu_rs_waybill_config"
+            action="product.product_template_action_all"
+            sequence="10"/>
+
+
+      <menuitem id="menu_rs_waybill_driver"
+          name="Car Plates"
+          parent="menu_rs_waybill_config"
+          action="action_rs_drivers_fleet"
+          sequence="20"
+          groups="fleet.fleet_group_user"/>
+
+      <menuitem id="menu_rs_waybill_settings"
+          name="Settings"
+          parent="menu_rs_waybill_config"
+          action="action_rs_waybill_settings"
+          sequence="99"
+          groups="base.group_system"/>
+
+</odoo>

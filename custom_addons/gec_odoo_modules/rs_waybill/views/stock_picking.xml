@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="waybill_stock_picking" model="ir.ui.view">
+            <field name="name">stock.picking.form.inherit.waybill</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+                <field name="sale_id" position="before">
+                   <field name="waybill_id" readonly="1"/>
+                   <field name="rs_waybill_locked" invisible="1"/>
+                   <field name="rs_waybill_direction" invisible="1"/>
+                </field>
+                <div name="button_box" position="before">
+                    <div class="d-flex justify-content-end" invisible="not waybill_id">
+                        <div class="d-inline-flex align-items-center gap-2 mb-2 border rounded px-2 py-1"
+                             role="status">
+                            <span class="fw-bold text-nowrap">RS Waybill:</span>
+                            <field name="rs_progress" widget="statusbar"
+                                   statusbar_visible="draft,waiting,reserved,pending,delivered"
+                                   nolabel="1"/>
+                        </div>
+                    </div>
+                </div>
+                <div name="button_box" position="inside">
+                    <button name="action_view_waybill" type="object"
+                            class="oe_stat_button" icon="description"
+                            invisible="not waybill_id">
+                        <field name="waybill_count" widget="statinfo" string="Waybill"/>
+                    </button>
+                </div>
+                <div name="button_box" position="before">
+                    <div class="alert alert-warning mb-2" role="alert"
+                         invisible="not rs_waybill_locked or rs_waybill_direction == 'buyer'">
+                        This delivery is linked to an RS.GE waybill. To change the customer, products or
+                        quantities, open the waybill and use <b>Adjustment</b> — direct changes here will
+                        not sync to RS.GE.
+                    </div>
+                    <div class="alert alert-warning mb-2" role="alert"
+                         invisible="not rs_waybill_locked or rs_waybill_direction != 'buyer'">
+                        This receipt mirrors a vendor-issued RS.GE waybill. Products and quantities
+                        cannot be edited here — changes arrive from the vendor via RS sync; use
+                        <b>Receive</b> or <b>Reject</b> on the waybill.
+                    </div>
+                </div>
+                <!-- RS.GE fixes the type of an active waybill: its delivery's Operation Type too. -->
+                <field name="picking_type_id" position="attributes">
+                    <attribute name="readonly">state in ('done', 'cancel') or rs_waybill_state in ('active', 'completed')</attribute>
+                </field>
+                <xpath expr="//field[@name='partner_id'][not(ancestor::list)]" position="attributes">
+                    <attribute name="readonly">state in ['cancel', 'done'] or rs_waybill_locked</attribute>
+                </xpath>
+                <!-- product_id sits inside an unnamed <column> in the move list. -->
+                <xpath expr="//field[@name='move_ids']/list//field[@name='product_id']" position="attributes">
+                    <attribute name="readonly">(state != 'draft' and not additional) or move_lines_count &gt; 0 or parent.rs_waybill_locked</attribute>
+                </xpath>
+                <xpath expr="//field[@name='move_ids']/list/field[@name='product_uom_qty']" position="attributes">
+                    <attribute name="readonly">not is_initial_demand_editable or parent.rs_waybill_locked</attribute>
+                </xpath>
+                <xpath expr="//field[@name='move_ids']/list/field[@name='quantity']" position="attributes">
+                    <attribute name="readonly">not is_quantity_done_editable or parent.rs_waybill_locked</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_picking_type_form_inherit_rs" model="ir.ui.view">
+            <field name="name">stock.picking.type.form.inherit.rs</field>
+            <field name="model">stock.picking.type</field>
+            <field name="inherit_id" ref="stock.view_picking_type_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='general']" position="inside">
+                    <group string="RS.ge Waybill" name="rs_waybill_group">
+                        <field name="rs_create_waybill"/>
+                        <field name="rs_waybill_type" invisible="not rs_create_waybill"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

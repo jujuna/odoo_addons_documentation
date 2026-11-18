@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hotel_rms_price_view_list" model="ir.ui.view">
+        <field name="name">hotel.rms.price.list</field>
+        <field name="model">hotel.rms.price</field>
+        <field name="arch" type="xml">
+            <list class="o_rms_price_list" create="0" delete="0" edit="0"
+                  decoration-muted="state in ('hold', 'rejected')">
+                <header>
+                    <button name="action_accept" type="object" string="Accept" icon="check"
+                            groups="hotel_rms.group_hotel_rms_revenue_manager"/>
+                    <button name="action_quick_price" type="object" string="+5%" context="{'quick_pct': 5}"
+                            groups="hotel_rms.group_hotel_rms_revenue_manager"/>
+                    <button name="action_quick_price" type="object" string="-5%" context="{'quick_pct': -5}"
+                            groups="hotel_rms.group_hotel_rms_revenue_manager"/>
+                    <button name="action_lock" type="object" string="Lock" icon="lock"
+                            groups="hotel_rms.group_hotel_rms_revenue_manager"/>
+                </header>
+                <field name="stay_date" widget="rms_night" width="110px"/>
+                <field name="property_id" optional="hide"/>
+                <field name="room_type_id" width="160px"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="published_rate" string="Current" widget="rms_price_change" options="{'plain': true}"
+                       width="110px" optional="show"/>
+                <field name="recommended_rate" string="Recommended" widget="rms_price_change" width="150px"/>
+                <field name="state" widget="badge" decoration-warning="state == 'pending'"
+                       decoration-success="state == 'accepted'" decoration-info="state == 'edited'"
+                       decoration-muted="state in ('hold', 'rejected')" width="[220px]"/>
+                <field name="locked" string=" " widget="rms_lock" width="36px"/>
+                <field name="otb_occ" column_invisible="True"/>
+                <field name="confidence_level" optional="hide"/>
+                <field name="forecast_occ" string="Forecast occupancy" widget="rms_occupancy" optional="show"/>
+                <field name="action" optional="hide"/>
+                <field name="to_export" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hotel_rms_price_view_form" model="ir.ui.view">
+        <field name="name">hotel.rms.price.form</field>
+        <field name="model">hotel.rms.price</field>
+        <field name="arch" type="xml">
+            <form class="o_rms_price_form" create="0" delete="0">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="pending,accepted,edited,rejected"/>
+                </header>
+                <sheet>
+                    <field name="currency_id" invisible="1"/>
+                    <widget name="rms_price_panel"/>
+                    <notebook>
+                        <page name="technical" string="Technical details">
+                            <group>
+                                <group>
+                                    <field name="property_id" readonly="1"/>
+                                    <field name="raw_target_rate" readonly="1"/>
+                                    <field name="run_id" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="confidence_score" readonly="1"/>
+                                    <field name="to_export" readonly="1"/>
+                                    <field name="decided_by" readonly="1"/>
+                                    <field name="decided_at" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="hotel_rms_price_view_search" model="ir.ui.view">
+        <field name="name">hotel.rms.price.search</field>
+        <field name="model">hotel.rms.price</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="property_id"/>
+                <field name="room_type_id"/>
+                <field name="stay_date"/>
+                <filter name="pending" string="Needs decision" domain="[('state', '=', 'pending')]"/>
+                <filter name="accepted" string="Accepted" domain="[('state', '=', 'accepted')]"/>
+                <filter name="edited" string="Own price" domain="[('state', '=', 'edited')]"/>
+                <filter name="rejected" string="Rejected" domain="[('state', '=', 'rejected')]"/>
+                <separator/>
+                <filter name="locked" string="Locked" domain="[('locked', '=', True)]"/>
+                <filter name="to_export" string="To publish" domain="[('to_export', '=', True)]"/>
+                <separator/>
+                <filter name="this_week" string="This week"
+                        domain="[('stay_date', '&gt;=', (context_today() - relativedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
+                                 ('stay_date', '&lt;', (context_today() + relativedelta(days=7 - context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                <filter name="next_30" string="Next 30 nights"
+                        domain="[('stay_date', '&gt;=', context_today().strftime('%Y-%m-%d')),
+                                 ('stay_date', '&lt;', (context_today() + relativedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                <group>
+                    <filter name="group_week" string="Week" context="{'group_by': 'stay_date:week'}"/>
+                    <filter name="group_night" string="Night" context="{'group_by': 'stay_date:day'}"/>
+                    <filter name="group_room_type" string="Room type" context="{'group_by': 'room_type_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_property" string="Hotel" context="{'group_by': 'property_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hotel_rms_price" model="ir.actions.act_window">
+        <field name="name">Prices</field>
+        <field name="res_model">hotel.rms.price</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_pending': 1, 'search_default_next_30': 1, 'search_default_group_week': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No price needs a decision</p>
+            <p>The engine recommends a price for every night each time it runs. Remove the filters to see all prices.</p>
+        </field>
+    </record>
+</odoo>

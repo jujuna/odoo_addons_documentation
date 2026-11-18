@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_tbc_statement_list" model="ir.ui.view">
+        <field name="name">tbc.statement.list</field>
+        <field name="model">tbc.statement</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false">
+                <field name="journal_id"/>
+                <field name="account_number"/>
+                <field name="currency_code"/>
+                <field name="snapshot_type"/>
+                <field name="period_from"/>
+                <field name="period_to"/>
+                <field name="opening_balance"/>
+                <field name="credit_sum"/>
+                <field name="debit_sum"/>
+                <field name="closing_balance"/>
+                <field name="fetched_on"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_tbc_statement_form" model="ir.ui.view">
+        <field name="name">tbc.statement.form</field>
+        <field name="model">tbc.statement</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false">
+                <sheet>
+                    <div class="alert alert-info" role="status">
+                        Balances as reported by TBC Bank — not Odoo's book balance.
+                    </div>
+                    <group>
+                        <group>
+                            <field name="journal_id"/>
+                            <field name="account_number"/>
+                            <field name="currency_code"/>
+                            <field name="snapshot_type"/>
+                        </group>
+                        <group>
+                            <field name="period_from"/>
+                            <field name="period_to"/>
+                            <field name="fetched_on"/>
+                        </group>
+                    </group>
+                    <group string="Balances (as per TBC)">
+                        <field name="opening_balance"/>
+                        <field name="credit_sum"/>
+                        <field name="debit_sum"/>
+                        <field name="closing_balance"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_tbc_statement" model="ir.actions.act_window">
+        <field name="name">TBC Statements</field>
+        <field name="res_model">tbc.statement</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_tbc_statement_fetch_wizard_form" model="ir.ui.view">
+        <field name="name">tbc.statement.fetch.wizard.form</field>
+        <field name="model">tbc.statement.fetch.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Fetch TBC Statement">
+                <group>
+                    <field name="journal_id"/>
+                    <field name="period_from"/>
+                    <field name="period_to"/>
+                </group>
+                <footer>
+                    <button name="action_fetch" type="object" string="Fetch" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_tbc_statement_fetch" model="ir.actions.act_window">
+        <field name="name">Fetch Statement</field>
+        <field name="res_model">tbc.statement.fetch.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

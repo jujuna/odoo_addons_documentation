@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="module_category_bsc" model="ir.module.category">
+        <field name="name">Balanced Scorecard</field>
+        <field name="description">Strategy management with the Balanced Scorecard.</field>
+        <field name="sequence">40</field>
+    </record>
+
+    <record id="privilege_bsc" model="res.groups.privilege">
+        <field name="name">Balanced Scorecard</field>
+        <field name="category_id" ref="module_category_bsc"/>
+        <field name="description">Access level in the Balanced Scorecard application.</field>
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="group_bsc_contributor" model="res.groups">
+        <field name="name">Contributor</field>
+        <field name="privilege_id" ref="privilege_bsc"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">Reads the strategy and reports the figures for the KPIs they own. May propose initiatives.</field>
+    </record>
+
+    <record id="group_bsc_manager" model="res.groups">
+        <field name="name">Manager</field>
+        <field name="privilege_id" ref="privilege_bsc"/>
+        <field name="implied_ids" eval="[(4, ref('bsc_strategy.group_bsc_contributor'))]"/>
+        <field name="comment">Designs objectives, KPIs and initiatives, validates reported figures, runs the reviews.</field>
+    </record>
+
+    <record id="group_bsc_admin" model="res.groups">
+        <field name="name">Administrator</field>
+        <field name="privilege_id" ref="privilege_bsc"/>
+        <field name="implied_ids" eval="[(4, ref('bsc_strategy.group_bsc_manager'))]"/>
+        <field name="comment">Configures perspectives and stages, reopens closed periods, deletes records.</field>
+    </record>
+
+    <!-- The installing administrator can set it up; everyone else is granted access explicitly. -->
+    <record id="base.user_admin" model="res.users">
+        <field name="group_ids" eval="[(4, ref('bsc_strategy.group_bsc_admin'))]"/>
+    </record>
+
+</odoo>

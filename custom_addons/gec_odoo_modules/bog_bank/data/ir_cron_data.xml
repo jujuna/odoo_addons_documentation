@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="cron_bog_daily_statement_sync" model="ir.cron">
+            <field name="name">Bank of Georgia — Daily statement sync</field>
+            <field name="model_id" ref="model_bog_connection"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_daily_statement_sync()</field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="cron_bog_live_statements" model="ir.cron">
+            <field name="name">Bank of Georgia — Live statement snapshots</field>
+            <field name="model_id" ref="model_bog_statement"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_fetch_live_statements()</field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">2</field>
+            <field name="interval_type">hours</field>
+            <field name="active" eval="False"/>
+        </record>
+
+        <record id="cron_bog_status_poll" model="ir.cron">
+            <field name="name">Bank of Georgia — Document status poll</field>
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_bog_status_poll()</field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="cron_bog_bulk_status_poll" model="ir.cron">
+            <field name="name">Bank of Georgia — Batch status poll</field>
+            <field name="model_id" ref="account_batch_payment.model_account_batch_payment"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_bog_bulk_status_poll()</field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>

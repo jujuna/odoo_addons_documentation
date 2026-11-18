@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <record id="product_template_form_view_ge_not_taxed" model="ir.ui.view">
+    <field name="name">product.template.form.ge.not.taxed</field>
+    <field name="model">product.template</field>
+    <field name="inherit_id" ref="account.product_template_form_view"/>
+    <field name="arch" type="xml">
+      <label for="taxes_id" position="before">
+        <field name="not_taxed"/>
+      </label>
+      <label for="taxes_id" position="attributes">
+        <attribute name="invisible">type == 'combo' or not_taxed</attribute>
+      </label>
+      <div name="taxes_div" position="attributes">
+        <attribute name="invisible">type == 'combo' or not_taxed</attribute>
+      </div>
+      <field name="supplier_taxes_id" position="attributes">
+        <attribute name="invisible">not purchase_ok or type == 'combo' or not_taxed</attribute>
+      </field>
+    </field>
+  </record>
+
+</odoo>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hotel_rms_event_view_list" model="ir.ui.view">
+        <field name="name">hotel.rms.event.list</field>
+        <field name="model">hotel.rms.event</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="property_id"/>
+                <field name="name"/>
+                <field name="category" widget="badge" decoration-info="category == 'event'"
+                       decoration-warning="category == 'holiday'"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="impact_pct"/>
+                <field name="note" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hotel_rms_event_view_form" model="ir.ui.view">
+        <field name="name">hotel.rms.event.form</field>
+        <field name="model">hotel.rms.event</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="property_id"/>
+                            <field name="name"/>
+                            <field name="category"/>
+                        </group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="impact_pct"/>
+                            <field name="note"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="hotel_rms_event_view_calendar" model="ir.ui.view">
+        <field name="name">hotel.rms.event.calendar</field>
+        <field name="model">hotel.rms.event</field>
+        <field name="arch" type="xml">
+            <calendar string="Events" date_start="date_from" date_stop="date_to" color="category" mode="month"
+                      scales="month,year" quick_create="1" show_date_picker="0"
+                      quick_create_view_id="%(hotel_rms.hotel_rms_event_view_form)d" event_limit="4">
+                <field name="property_id"/>
+                <field name="impact_pct"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="hotel_rms_event_view_search" model="ir.ui.view">
+        <field name="name">hotel.rms.event.search</field>
+        <field name="model">hotel.rms.event</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="property_id"/>
+                <filter name="events" string="Events" domain="[('category', '=', 'event')]"/>
+                <filter name="holidays" string="Holidays" domain="[('category', '=', 'holiday')]"/>
+                <group>
+                    <filter name="group_property" string="Hotel" context="{'group_by': 'property_id'}"/>
+                    <filter name="group_category" string="Category" context="{'group_by': 'category'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hotel_rms_event" model="ir.actions.act_window">
+        <field name="name">Events</field>
+        <field name="res_model">hotel.rms.event</field>
+        <field name="view_mode">calendar,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add an event or a holiday</p>
+            <p>Click a day or drag over several days. Events and holidays raise or lower the price of their nights.</p>
+        </field>
+    </record>
+</odoo>

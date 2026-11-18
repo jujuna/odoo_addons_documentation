@@ -1,0 +1,701 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_rs_einvoice" model="ir.ui.view">
+        <field name="name">account.move.form.rs.einvoice</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_rs_view_reversals"
+                        class="oe_stat_button"
+                        icon="undo"
+                        type="object"
+                        invisible="rs_einv_reversal_count == 0">
+                    <field name="rs_einv_reversal_count" widget="statinfo" string="Credit Notes"/>
+                </button>
+                <button name="action_rs_view_replacement"
+                        class="oe_stat_button"
+                        icon="arrow_circle_right"
+                        type="object"
+                        invisible="not rs_einv_replaced_by_id">
+                    <field name="rs_einv_replaced_by_id" invisible="1"/>
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Replaced By</span>
+                    </div>
+                </button>
+                <button name="action_rs_view_replaces"
+                        class="oe_stat_button"
+                        icon="arrow_circle_left"
+                        type="object"
+                        invisible="not rs_einv_replaces_id">
+                    <field name="rs_einv_replaces_id" invisible="1"/>
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Replaces</span>
+                    </div>
+                </button>
+            </xpath>
+
+            <!-- Vendor bills linked to rs.ge: the operator uses Accept / Reject on rs.ge instead, and Confirm only once rs.ge shows them confirmed. A draft seller correction is posted when the buyer accepts it. -->
+            <xpath expr="//header/button[@name='action_post'][2]" position="attributes">
+                <attribute name="invisible">hide_post_button or move_type == 'entry' or display_inactive_currency_warning or (rs_einv_id and move_type in ['in_invoice', 'in_receipt'] and rs_einv_status not in ('2', '8')) or (move_type == 'out_invoice' and rs_einv_replaces_id and rs_einv_replacement_mode == 'correction')</attribute>
+            </xpath>
+            <xpath expr="//header/button[@name='button_cancel'][2]" position="attributes">
+                <attribute name="invisible">not id or state != 'draft' or move_type == 'entry' or (rs_einv_id and move_type in ['in_invoice', 'in_receipt'])</attribute>
+            </xpath>
+
+            <xpath expr="//sheet" position="inside">
+                <widget name="web_ribbon"
+                        title="Skip rs.ge"
+                        bg_color="text-bg-warning"
+                        invisible="not rs_einv_skip"/>
+            </xpath>
+
+            <xpath expr="//page[@name='other_info']" position="after">
+                <page string="RS E-Invoice" name="rs_einvoice_tab"
+                      invisible="move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund')">
+                    <div class="rse-tab">
+                        <field name="rs_einv_can_clear_cancelled_replacement" invisible="1"/>
+                        <field name="rs_einv_has_downpayment_offsets" invisible="1"/>
+                        <field name="rs_einv_advance_sync_state" invisible="1"/>
+                        <field name="rs_einv_correction_in_flight" invisible="1"/>
+                        <field name="rs_einv_reversal_pending_at" invisible="1"/>
+                        <field name="rs_einv_is_spec" invisible="1"/>
+
+                        <div class="alert alert-info mb-2" role="alert"
+                             invisible="not rs_einv_is_buyer_side">
+                            <strong>Vendor document.</strong>
+                            The supplier issues this invoice on rs.ge — paste the RS Invoice ID
+                            they give you below, click <em>Pull from rs.ge</em>, then Accept or
+                            Reject after reviewing.
+                        </div>
+
+                        <div class="rse-skip-banner alert alert-warning mb-2" role="alert"
+                             invisible="not rs_einv_skip">
+                            <i class="oi me-2" data-icon="block" title="Skip rs.ge" role="img" aria-label="Skip rs.ge"/>
+                            <strong>VAT-NEUTRAL — Skip rs.ge active.</strong>
+                            No correction will be filed.
+                            Reason: <field name="rs_einv_skip_reason" readonly="1" nolabel="1" class="d-inline fw-bold"/>.
+                            <div invisible="move_type not in ('out_refund', 'in_refund')">Uncheck the toggle below to re-enable RS actions.</div>
+                        </div>
+
+                        <div class="alert alert-danger mb-2" role="alert"
+                             invisible="not rs_einv_rejection_note or rs_einv_is_buyer_side">
+                            <i class="oi me-2" data-icon="warning" role="img" aria-label="Rejection"/>
+                            <strong>Likely buyer rejection on rs.ge.</strong>
+                            <div class="small mt-1">
+                                <field name="rs_einv_rejection_note" readonly="1" nolabel="1"/>
+                            </div>
+                            <div class="small mt-1">
+                                Pick the right path for what changed:
+                                <ul class="mb-0">
+                                    <li><strong>Resend as-is</strong> (rs.ge note only / no Odoo change): click <em>Update on RS</em>, then <em>Send to buyer</em>.</li>
+                                    <li><strong>Change invoice data</strong>: click <em>Reset to Draft</em>, edit the lines, <em>Confirm</em>, then <em>Update on RS</em> and <em>Send to buyer</em>. No correction is filed — rs.ge reopened this same record.</li>
+                                    <li><strong>Drop this invoice entirely</strong>: click <em>Delete on RS</em>.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-danger mb-2" role="alert"
+                             invisible="not rs_einv_rejection_note or not rs_einv_is_buyer_side">
+                            <i class="oi me-2" data-icon="cancel" role="img" aria-label="Rejection"/>
+                            <strong>You rejected this on rs.ge.</strong>
+                            <div class="small mt-1">
+                                <field name="rs_einv_rejection_note" readonly="1" nolabel="1"/>
+                            </div>
+                            <div class="small mt-1">
+                                The supplier must edit and re-send the invoice on rs.ge,
+                                or delete it, before any further action is possible.
+                            </div>
+                        </div>
+
+                        <!-- rs.ge voided or superseded it (status 7, or its correction at 8); Odoo could not cancel. -->
+                        <div class="alert alert-danger mb-2" role="alert"
+                             invisible="not rs_einv_reversal_pending_at or state == 'cancel' or payment_state == 'reversed'">
+                            <i class="oi me-2" data-icon="error" role="img" aria-label="Not cancelled"/>
+                            <strong>rs.ge no longer counts this document, but Odoo could not cancel it.</strong>
+                            It stays in the books until the blocker is fixed (payments or credit notes applied, locked period).
+                            Follow the To-Do activity, then click <em>Check Status</em>.
+                        </div>
+
+                        <div class="alert alert-warning mb-2" role="alert"
+                             invisible="not rs_einv_correction_in_flight or rs_einv_reversal_pending_at or rs_einv_is_buyer_side">
+                            <i class="oi me-2" data-icon="autorenew" role="img" aria-label="Replacement in flight"/>
+                            <strong>Replacement in progress.</strong>
+                            This invoice stays posted until rs.ge accepts its replacement (see <em>Replaced By</em>);
+                            until then both count in the sale order, and once the replacement is posted also in
+                            revenue and VAT. Exclude it at month-end close.
+                        </div>
+
+                        <div class="alert alert-secondary mb-2" role="alert"
+                             invisible="rs_einv_status != '7' or state != 'cancel'">
+                            <i class="oi me-2" data-icon="archive" role="img" aria-label="Settled"/>
+                            <strong>Cancelled on rs.ge — document is settled.</strong>
+                            <div class="small mt-1">
+                                The cancellation was confirmed on rs.ge. Odoo automatically
+                                set this document to Cancelled so the books match rs.ge.
+                            </div>
+                            <div class="small mt-1">
+                                <strong>Do not try to reopen it.</strong>
+                                Reset to Draft and Post are blocked. If you need a new
+                                document, create a fresh invoice/bill.
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning mb-2" role="alert"
+                             invisible="rs_einv_is_buyer_side or rs_einv_overdue_state != 'warning'">
+                            <i class="oi me-2" data-icon="hourglass_top" role="img" aria-label="Deadline approaching"/>
+                            <strong>Deadline approaching — <field name="rs_einv_overdue_days" readonly="1" nolabel="1"
+                                       class="d-inline fw-bold"/> days since operation.</strong>
+                            #996 Art.54 requires the e-invoice to reach the buyer within 30 days.
+                            Click <em>Send to Buyer</em> promptly to avoid a tax penalty.
+                        </div>
+                        <div class="alert alert-danger mb-2" role="alert"
+                             invisible="rs_einv_is_buyer_side or rs_einv_overdue_state != 'overdue'">
+                            <i class="oi me-2" data-icon="error" role="img" aria-label="Deadline missed"/>
+                            <strong>Overdue — <field name="rs_einv_overdue_days" readonly="1" nolabel="1"
+                                       class="d-inline fw-bold"/> days since operation.</strong>
+                            Past the 30-day deadline of #996 Art.54.
+                            Send to RS and Send to Buyer immediately — each day increases fine exposure.
+                        </div>
+
+                        <div class="alert alert-warning mb-2" role="alert"
+                             invisible="not rs_einv_supplier_k_id or not rs_einv_is_buyer_side">
+                            <i class="oi me-2" data-icon="notifications" role="img" aria-label="New supplier correction"/>
+                            <strong>Supplier issued a correction on rs.ge</strong>
+                            (correction ID <field name="rs_einv_supplier_k_id" readonly="1" nolabel="1" class="d-inline fw-bold"/>).
+                            Click <em>Import Supplier Correction</em> to pull it as a vendor credit note.
+                        </div>
+
+                        <div class="alert alert-warning mb-2" role="alert"
+                             invisible="rs_einv_is_buyer_side or rs_einv_latest_status != '6'">
+                            <i class="oi me-2" data-icon="schedule" role="img" aria-label="Cancellation pending"/>
+                            <strong>Cancellation pending buyer confirmation on rs.ge.</strong>
+                            Odoo accounting has not been reversed yet. Follow up with the buyer if this stays pending.
+                        </div>
+
+                        <div class="alert alert-danger mb-2" role="alert"
+                             invisible="rs_einv_lines_sync_state != 'partial'">
+                            <i class="oi me-2" data-icon="warning" role="img" aria-label="Partial sync"/>
+                            <strong>rs.ge holds a partial line update.</strong>
+                            A previous Update on RS aborted mid-sync — rs.ge now contains a mix of old and new lines.
+                            Do NOT send to the buyer yet. Click <em>Update on RS</em> again — the next sync resyncs from the current Odoo state.
+                        </div>
+
+                        <div class="alert alert-danger mb-2" role="alert"
+                             invisible="rs_einv_advance_sync_state not in ('partial', 'error')">
+                            <i class="oi me-2" data-icon="warning" role="img" aria-label="Advance settlement"/>
+                            <strong>rs.ge advance settlement is not clean.</strong>
+                            Do NOT send to the buyer yet. Check the Advance Settlements audit table below,
+                            fix the advance invoice/state issue, then click <em>Update on RS</em>.
+                        </div>
+
+                        <div class="alert alert-danger mb-2" role="alert"
+                             invisible="not rs_einv_pending_action or (rs_einv_pending_action == 'correction' and rs_einv_id)">
+                            <i class="oi me-2" data-icon="error" role="img" aria-label="Pending RS action"/>
+                            <strong>Pending rs.ge action did not complete.</strong>
+                            Action <field name="rs_einv_pending_action" readonly="1" nolabel="1" class="d-inline fw-bold"/>
+                            started at <field name="rs_einv_pending_action_at" readonly="1" nolabel="1" class="d-inline"/>.
+                            A network timeout may have left an orphan draft on rs.ge.
+                            Click <em>Resolve Orphan</em> after checking your rs.ge drafts list.
+                        </div>
+
+                        <div class="alert alert-warning mb-2" role="alert"
+                             invisible="rs_einv_pending_action != 'correction' or not rs_einv_id">
+                            <i class="oi me-2" data-icon="warning" role="img" aria-label="Pending correction"/>
+                            <strong>Pending correction did not complete.</strong>
+                            A correction started at
+                            <field name="rs_einv_pending_action_at" readonly="1" nolabel="1" class="d-inline"/>
+                            did not finish — a correction may have been created on rs.ge but is not visible in Odoo.
+                            Check your rs.ge drafts list for an orphan correction against this invoice and delete it on rs.ge,
+                            then click <em>Dismiss Pending</em> here to clear the marker.
+                        </div>
+
+                        <div class="rse-row"
+                             invisible="not rs_einv_is_buyer_side or rs_einv_skip or rs_einv_status">
+                            <div class="rse-field" style="flex: 1;">
+                                <span class="rse-label">RS Invoice ID (from supplier)</span>
+                                <div class="rse-value">
+                                    <field name="rs_einv_id" nolabel="1"
+                                           placeholder="Paste the rs.ge invoice ID supplied by the vendor"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rse-status-card" invisible="not rs_einv_id">
+                            <span class="rse-status-card__accent rse-status-card__accent--success"
+                                  invisible="rs_einv_rejection_note or rs_einv_latest_status not in ('2', '8')"/>
+                            <span class="rse-status-card__accent rse-status-card__accent--warning"
+                                  invisible="rs_einv_rejection_note or rs_einv_latest_status not in ('1', '5', '6')"/>
+                            <span class="rse-status-card__accent rse-status-card__accent--danger"
+                                  invisible="not rs_einv_rejection_note and rs_einv_latest_status not in ('-1', '7')"/>
+                            <span class="rse-status-card__accent rse-status-card__accent--info"
+                                  invisible="rs_einv_rejection_note or rs_einv_latest_status not in ('0', '4')"/>
+                            <span class="rse-status-card__accent rse-status-card__accent--muted"
+                                  invisible="rs_einv_rejection_note or rs_einv_latest_status != '3'"/>
+
+                            <div class="rse-status-card__body">
+                                <div class="rse-status-card__id-block">
+                                    <span class="rse-status-card__id-label">RS Invoice ID</span>
+                                    <span class="rse-status-card__id-value">
+                                        <field name="rs_einv_id" nolabel="1" readonly="1" class="d-inline"/>
+                                    </span>
+                                </div>
+
+                                <div class="rse-status-card__status-block">
+                                    <i class="oi rse-status-card__icon rse-status-card__icon--success" data-icon="check_circle"
+                                       title="Confirmed" role="img" aria-label="Confirmed"
+                                       invisible="rs_einv_rejection_note or rs_einv_latest_status not in ('2', '8')"/>
+                                    <i class="oi rse-status-card__icon rse-status-card__icon--warning rse-status-card__icon--pulse" data-icon="schedule"
+                                       title="Pending" role="img" aria-label="Pending"
+                                       invisible="rs_einv_rejection_note or rs_einv_latest_status not in ('1', '5', '6')"/>
+                                    <i class="oi rse-status-card__icon rse-status-card__icon--danger" data-icon="cancel"
+                                       title="Rejected or deleted" role="img" aria-label="Rejected or deleted"
+                                       invisible="not rs_einv_rejection_note and rs_einv_latest_status not in ('-1', '7')"/>
+                                    <i class="oi rse-status-card__icon rse-status-card__icon--info" data-icon="edit_square"
+                                       title="Draft on rs.ge" role="img" aria-label="Draft on rs.ge"
+                                       invisible="rs_einv_rejection_note or rs_einv_latest_status not in ('0', '4')"/>
+                                    <i class="oi rse-status-card__icon rse-status-card__icon--muted" data-icon="history"
+                                       title="Superseded by correction" role="img" aria-label="Superseded by correction"
+                                       invisible="rs_einv_rejection_note or rs_einv_latest_status != '3'"/>
+
+                                    <div class="rse-status-card__status-text">
+                                        <span class="rse-status-card__status-label">Current Status</span>
+                                        <field name="rs_einv_latest_status" readonly="1" widget="badge" nolabel="1"
+                                               class="rse-status-card__status-value"
+                                               invisible="rs_einv_rejection_note and rs_einv_is_buyer_side"
+                                               decoration-success="rs_einv_latest_status in ('2', '8')"
+                                               decoration-warning="rs_einv_latest_status in ('1', '5', '6')"
+                                               decoration-danger="rs_einv_latest_status in ('-1', '7')"
+                                               decoration-info="rs_einv_latest_status in ('0', '4')"
+                                               decoration-muted="rs_einv_latest_status == '3'"/>
+                                        <span class="badge text-bg-danger rse-status-card__status-value"
+                                              invisible="not rs_einv_rejection_note or not rs_einv_is_buyer_side">
+                                            Rejected
+                                        </span>
+                                        <span class="rse-status-card__hint rse-status-card__hint--danger"
+                                              invisible="not rs_einv_rejection_note or rs_einv_is_buyer_side">
+                                            Rejected by buyer on rs.ge — see the rejection banner above.
+                                        </span>
+                                        <span class="rse-status-card__hint rse-status-card__hint--danger"
+                                              invisible="not rs_einv_rejection_note or not rs_einv_is_buyer_side">
+                                            You rejected this on rs.ge — see the rejection banner above.
+                                        </span>
+                                        <span class="rse-status-card__hint rse-status-card__hint--success"
+                                              invisible="rs_einv_rejection_note or rs_einv_latest_status not in ('2', '8')">
+                                            Confirmed on rs.ge — buyer accepted.
+                                        </span>
+                                        <span class="rse-status-card__hint rse-status-card__hint--warning"
+                                              invisible="rs_einv_rejection_note or rs_einv_latest_status not in ('1', '5', '6')">
+                                            Awaiting buyer action on rs.ge.
+                                        </span>
+                                        <span class="rse-status-card__hint rse-status-card__hint--danger"
+                                              invisible="rs_einv_rejection_note or rs_einv_latest_status not in ('-1', '7')">
+                                            No longer valid on rs.ge.
+                                        </span>
+                                        <span class="rse-status-card__hint rse-status-card__hint--info"
+                                              invisible="rs_einv_rejection_note or rs_einv_latest_status not in ('0', '4')">
+                                            Saved on rs.ge — not yet sent to buyer.
+                                        </span>
+                                        <span class="rse-status-card__hint rse-status-card__hint--muted"
+                                              invisible="rs_einv_rejection_note or rs_einv_latest_status != '3'">
+                                            Superseded by a confirmed correction.
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="rse-status-card__footer"
+                                 invisible="rs_einv_status == rs_einv_latest_status or not rs_einv_latest_id">
+                                <span class="rse-status-card__footer-label">Original status</span>
+                                <field name="rs_einv_status" readonly="1" widget="badge" nolabel="1"
+                                       class="rse-status-card__footer-value"
+                                       decoration-muted="rs_einv_status == '3'"/>
+                            </div>
+                        </div>
+
+                        <div class="rse-actions"
+                             invisible="rs_einv_skip or rs_einv_is_buyer_side or rs_einv_is_spec">
+                            <button name="action_rs_create"
+                                    string="Send to RS"
+                                    type="object"
+                                    class="btn btn-success"
+                                    icon="send"
+                                    invisible="rs_einv_id or (state != 'posted' and not (state == 'draft' and rs_einv_replaces_id and rs_einv_replacement_mode == 'correction')) or rs_einv_pending_action"/>
+                            <button name="action_rs_edit"
+                                    string="Update on RS"
+                                    type="object"
+                                    class="btn btn-warning"
+                                    icon="edit"
+                                    invisible="not rs_einv_id or rs_einv_status not in ('0', '1', '4') or (state != 'posted' and not (state == 'draft' and rs_einv_replaces_id and rs_einv_replacement_mode == 'correction'))"/>
+                            <button name="action_rs_send"
+                                    string="Send to buyer"
+                                    type="object"
+                                    class="btn btn-primary"
+                                    icon="send"
+                                    invisible="not rs_einv_id or rs_einv_status not in ('0', '4') or (state != 'posted' and not (state == 'draft' and rs_einv_replaces_id and rs_einv_replacement_mode == 'correction'))"/>
+                            <button name="action_rs_delete"
+                                    string="Delete on RS"
+                                    type="object"
+                                    class="btn btn-danger"
+                                    icon="delete"
+                                    invisible="not rs_einv_id or rs_einv_status not in ('0', '4')"
+                                    confirm="This will mark the invoice as deleted on RS. Continue?"/>
+                            <button name="action_rs_cancel"
+                                    string="Cancel on RS"
+                                    type="object"
+                                    class="btn btn-danger"
+                                    icon="block"
+                                    invisible="not rs_einv_id or rs_einv_status not in ('2', '3', '8')"
+                                    confirm="This will request cancellation of THIS invoice on rs.ge. The buyer must accept or reject. Continue?"/>
+                            <button name="action_rs_clear_cancelled_replacement_link"
+                                    string="Clear Cancelled Replacement"
+                                    type="object"
+                                    class="btn btn-secondary"
+                                    icon="link_off"
+                                    invisible="not rs_einv_can_clear_cancelled_replacement"
+                                    confirm="Clear the cancelled replacement link? Only continue if the replacement invoice was cancelled and has no live rs.ge record."/>
+                            <button name="action_rs_refresh_status"
+                                    string="Check Status"
+                                    type="object"
+                                    class="btn btn-secondary"
+                                    icon="refresh"
+                                    invisible="not rs_einv_id"/>
+                            <button name="action_rs_resolve_orphan"
+                                    string="Resolve Orphan"
+                                    type="object"
+                                    class="btn btn-danger"
+                                    icon="support"
+                                    invisible="not rs_einv_pending_action or rs_einv_id"/>
+                            <button name="action_rs_clear_pending"
+                                    string="Dismiss Pending"
+                                    type="object"
+                                    class="btn btn-secondary"
+                                    icon="close"
+                                    invisible="not rs_einv_pending_action"
+                                    confirm="Dismiss the pending RS action marker without linking? Only do this if you have verified separately that no rs.ge record was created."/>
+                        </div>
+
+                        <div class="rse-actions"
+                             invisible="rs_einv_skip or not rs_einv_is_buyer_side">
+                            <button name="action_rs_buyer_pull"
+                                    string="Pull from rs.ge"
+                                    type="object"
+                                    class="btn btn-primary"
+                                    icon="download"
+                                    invisible="not rs_einv_id or rs_einv_status"/>
+                            <button name="action_rs_buyer_reimport_lines"
+                                    string="Reimport Lines"
+                                    type="object"
+                                    class="btn btn-warning"
+                                    icon="refresh"
+                                    invisible="not rs_einv_id or not rs_einv_status or state != 'draft'"
+                                    confirm="Re-sync this bill's product lines from rs.ge. Matching lines keep their product, account and analytic links — quantity, price and tax are refreshed. Lines that came from rs.ge and are no longer there are removed; lines you added yourself stay (purchase-order lines no longer on rs.ge are set to quantity 0). Continue?"/>
+                            <button name="action_rs_buyer_accept"
+                                    string="Accept on rs.ge"
+                                    type="object"
+                                    class="btn btn-success"
+                                    icon="check"
+                                    invisible="rs_einv_status not in ('1', '5', '6')"
+                                    confirm="Confirm this record on rs.ge? You're certifying the data matches reality. For status 6 (cancellation request), confirming removes the document."/>
+                            <button name="action_rs_buyer_reject"
+                                    string="Reject on rs.ge"
+                                    type="object"
+                                    class="btn btn-danger"
+                                    icon="close"
+                                    invisible="rs_einv_status not in ('1', '5')"/>
+                            <button name="action_rs_import_supplier_correction"
+                                    string="Import Supplier Correction"
+                                    type="object"
+                                    class="btn btn-warning"
+                                    icon="download"
+                                    invisible="not rs_einv_supplier_k_id or rs_einv_replaced_by_id or state == 'cancel'"
+                                    confirm="This creates a replacement bill from the supplier's corrected rs.ge lines. The current bill is cancelled once the correction is accepted on rs.ge. Continue?"/>
+                            <button name="action_rs_clear_cancelled_replacement_link"
+                                    string="Clear Cancelled Replacement"
+                                    type="object"
+                                    class="btn btn-secondary"
+                                    icon="link_off"
+                                    invisible="not rs_einv_can_clear_cancelled_replacement"
+                                    confirm="Clear the cancelled replacement link? Only continue if the replacement bill was cancelled and has no live rs.ge record."/>
+                            <button name="action_rs_refresh_status"
+                                    string="Check Status"
+                                    type="object"
+                                    class="btn btn-secondary"
+                                    icon="refresh"
+                                    invisible="not rs_einv_id or not rs_einv_status"/>
+                        </div>
+
+                        <div class="rse-section-title">General Information</div>
+                        <div class="rse-row">
+                            <div class="rse-field">
+                                <span class="rse-label">Operation Month</span>
+                                <div class="rse-value">
+                                    <field name="rs_einv_operation_month" nolabel="1" readonly="1"/>
+                                </div>
+                            </div>
+                            <div class="rse-field">
+                                <span class="rse-label">Operation Year</span>
+                                <div class="rse-value">
+                                    <field name="rs_einv_operation_year" nolabel="1" readonly="1"/>
+                                </div>
+                            </div>
+                            <div class="rse-field">
+                                <span class="rse-label">S/F Number</span>
+                                <div class="rse-value">
+                                    <field name="rs_einv_series" nolabel="1" readonly="1"/>
+                                </div>
+                            </div>
+                            <div class="rse-field">
+                                <span class="rse-label">S/F Number (N)</span>
+                                <div class="rse-value">
+                                    <field name="rs_einv_number" nolabel="1" readonly="1"/>
+                                </div>
+                            </div>
+                            <div class="rse-field">
+                                <span class="rse-label">Declaration Number</span>
+                                <div class="rse-value">
+                                    <field name="rs_einv_overhead_no" nolabel="1" readonly="1"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rse-row"
+                             invisible="not rs_einv_replaces_id and not rs_einv_replaced_by_id">
+                            <div class="rse-field" invisible="not rs_einv_replaces_id">
+                                <span class="rse-label">Replaces Invoice</span>
+                                <div class="rse-value">
+                                    <field name="rs_einv_replaces_id" nolabel="1" readonly="1"/>
+                                </div>
+                            </div>
+                            <div class="rse-field" invisible="not rs_einv_replaces_id">
+                                <span class="rse-label">Replacement Mode</span>
+                                <div class="rse-value">
+                                    <field name="rs_einv_replacement_mode" nolabel="1" readonly="1"/>
+                                </div>
+                            </div>
+                            <div class="rse-field"
+                                 invisible="not rs_einv_replaces_id or rs_einv_replacement_mode != 'correction'">
+                                <span class="rse-label">RS correction reason</span>
+                                <div class="rse-value">
+                                    <field name="rs_einv_k_type" nolabel="1"
+                                           readonly="rs_einv_id"/>
+                                </div>
+                            </div>
+                            <div class="rse-field" invisible="not rs_einv_replaced_by_id">
+                                <span class="rse-label">Replaced By</span>
+                                <div class="rse-value">
+                                    <field name="rs_einv_replaced_by_id" nolabel="1" readonly="1"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rse-parties">
+                            <div class="rse-party">
+                                <div class="rse-section-title">Seller</div>
+                                <div class="rse-row">
+                                    <div class="rse-field">
+                                        <span class="rse-label">Identification N</span>
+                                        <div class="rse-value">
+                                            <field name="rs_einv_seller_tin" nolabel="1" readonly="1"/>
+                                        </div>
+                                    </div>
+                                    <div class="rse-field" style="flex: 1;">
+                                        <span class="rse-label">Company Name</span>
+                                        <div class="rse-value">
+                                            <field name="rs_einv_seller_name" nolabel="1" readonly="1"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="rse-party">
+                                <div class="rse-section-title">Buyer</div>
+                                <div class="rse-row">
+                                    <div class="rse-field">
+                                        <span class="rse-label">Identification N</span>
+                                        <div class="rse-value">
+                                            <field name="rs_einv_buyer_tin" nolabel="1" readonly="1"/>
+                                        </div>
+                                    </div>
+                                    <div class="rse-field" style="flex: 1;">
+                                        <span class="rse-label">Company Name</span>
+                                        <div class="rse-value">
+                                            <field name="rs_einv_buyer_name" nolabel="1" readonly="1"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rse-row"
+                             invisible="rs_einv_is_buyer_side or move_type not in ('out_invoice', 'out_refund')">
+                            <div class="rse-field">
+                                <span class="rse-label">Advance Invoice</span>
+                                <div class="rse-value">
+                                    <field name="rs_einv_is_advance" nolabel="1"
+                                           widget="boolean_toggle"
+                                           readonly="rs_einv_id or rs_einv_skip"/>
+                                </div>
+                            </div>
+                            <div class="rse-field" style="flex: 2;">
+                                <span class="rse-label">RS Note</span>
+                                <div class="rse-value">
+                                    <field name="rs_einv_note" nolabel="1"
+                                           placeholder="Optional annotation written into rs.ge (e.g. 'Q4 2025 rebate')"
+                                           readonly="rs_einv_skip"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rse-row"
+                             invisible="rs_einv_is_buyer_side or move_type != 'out_invoice' or not rs_einv_has_downpayment_offsets">
+                            <div class="rse-field">
+                                <span class="rse-label">Advance Settlement</span>
+                                <div class="rse-value">
+                                    <field name="rs_einv_advance_settlement_mode" nolabel="1"
+                                           readonly="(rs_einv_id and rs_einv_status != '0') or rs_einv_skip"/>
+                                </div>
+                            </div>
+                            <div class="rse-field">
+                                <span class="rse-label">Advance Sync</span>
+                                <div class="rse-value">
+                                    <field name="rs_einv_advance_sync_state" nolabel="1" readonly="1"
+                                           widget="badge"
+                                           decoration-success="rs_einv_advance_sync_state == 'synced'"
+                                           decoration-warning="rs_einv_advance_sync_state == 'partial'"
+                                           decoration-danger="rs_einv_advance_sync_state == 'error'"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rse-row"
+                             invisible="move_type not in ('out_refund', 'in_refund')">
+                            <div class="rse-field">
+                                <span class="rse-label">Skip rs.ge</span>
+                                <div class="rse-value rse-skip-toggle">
+                                    <field name="rs_einv_skip" nolabel="1"
+                                           widget="boolean_toggle"
+                                           options="{'autosave': false}"
+                                           readonly="rs_einv_id"/>
+                                </div>
+                            </div>
+                            <div class="rse-field" invisible="not rs_einv_skip">
+                                <span class="rse-label">Skip Reason</span>
+                                <div class="rse-value">
+                                    <field name="rs_einv_skip_reason" nolabel="1"
+                                           required="rs_einv_skip"
+                                           readonly="rs_einv_id"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rse-section-title">Goods / Services</div>
+                        <field name="invoice_line_ids" widget="rse_lines_table" nolabel="1" readonly="1">
+                            <list decoration-danger="rs_sync_state == 'pending_edit'"
+                                  decoration-muted="rs_sync_state in ('superseded', 'cancelled')">
+                                <field name="display_type"/>
+                                <field name="name"/>
+                                <field name="product_id"/>
+                                <field name="product_uom_id"/>
+                                <field name="quantity"/>
+                                <field name="price_total"/>
+                                <field name="price_subtotal"/>
+                                <field name="tax_ids"/>
+                                <field name="rs_einv_vat_class" column_invisible="1"/>
+                                <field name="rs_einv_vat_amount" column_invisible="1"/>
+                                <field name="rs_einv_goods" column_invisible="1"/>
+                                <field name="rs_synced"/>
+                                <field name="rs_sync_state"/>
+                            </list>
+                        </field>
+
+                        <!-- Refreshed on every Pull and Check Status. -->
+                        <div class="rse-logs rse-pulled-lines"
+                             invisible="not rs_einv_is_buyer_side or not rs_einv_status">
+                            <div class="rse-section-title">rs.ge Source Lines (from supplier)</div>
+                            <p class="rse-pulled-help">
+                                Read-only snapshot from rs.ge. Compare with the bill lines above —
+                                Reject if they don't match.
+                            </p>
+                            <field name="rs_einv_pulled_line_ids" readonly="1" nolabel="1">
+                                <list>
+                                    <field name="goods" string="Goods / Service"/>
+                                    <field name="g_unit" string="Unit"/>
+                                    <field name="g_number" string="Qty" sum="Total Qty"/>
+                                    <field name="full_amount" string="Total (VAT+Excise)" sum="Total"/>
+                                    <field name="drg_amount" string="VAT" sum="Total VAT"/>
+                                    <field name="rs_line_id" string="RS Line ID" optional="hide"/>
+                                </list>
+                            </field>
+                        </div>
+
+                        <div class="rse-logs"
+                             invisible="not rs_einv_advance_settlement_ids or rs_einv_is_buyer_side">
+                            <div class="rse-section-title">Advance Settlements</div>
+                            <field name="rs_einv_advance_settlement_ids" readonly="1" nolabel="1">
+                                <list decoration-success="rs_status == '200'"
+                                      decoration-danger="rs_status and rs_status != '200'">
+                                    <field name="synced_at"/>
+                                    <field name="action" widget="badge"
+                                           decoration-success="action in ('attached', 'already')"
+                                           decoration-info="action == 'updated'"/>
+                                    <field name="advance_move_id"/>
+                                    <field name="advance_rs_id"/>
+                                    <field name="vat_amount" sum="VAT"/>
+                                    <field name="rs_status"/>
+                                    <field name="rs_message"/>
+                                </list>
+                            </field>
+                        </div>
+
+                        <div class="rse-logs"
+                             invisible="not rs_einv_advance_usage_ids or rs_einv_is_buyer_side">
+                            <div class="rse-section-title">Settled On Final Invoices</div>
+                            <field name="rs_einv_advance_usage_ids" readonly="1" nolabel="1">
+                                <list decoration-success="rs_status == '200'"
+                                      decoration-danger="rs_status and rs_status != '200'">
+                                    <field name="synced_at"/>
+                                    <field name="final_move_id"/>
+                                    <field name="action" widget="badge"
+                                           decoration-success="action in ('attached', 'already')"
+                                           decoration-info="action == 'updated'"/>
+                                    <field name="vat_amount" sum="VAT"/>
+                                    <field name="rs_status"/>
+                                    <field name="rs_message"/>
+                                </list>
+                            </field>
+                        </div>
+
+                        <div class="rse-logs">
+                            <div class="rse-section-title">RS Logs</div>
+                            <field name="rs_einv_log_ids" readonly="1" nolabel="1">
+                                <list>
+                                    <field name="create_date" string="Date"/>
+                                    <field name="level" widget="badge"
+                                           decoration-success="level == 'info'"
+                                           decoration-warning="level == 'warning'"
+                                           decoration-danger="level == 'error'"/>
+                                    <field name="name" string="Message"/>
+                                </list>
+                            </field>
+                        </div>
+
+                    </div>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="view_account_invoice_filter_rs_einvoice" model="ir.ui.view">
+        <field name="name">account.move.filter.rs.einvoice</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <filter name="cancel" position="after">
+                <filter name="rs_einv_correction_in_flight"
+                        string="rs.ge Replacement In Flight"
+                        domain="[('rs_einv_correction_in_flight', '=', True)]"/>
+            </filter>
+        </field>
+    </record>
+</odoo>

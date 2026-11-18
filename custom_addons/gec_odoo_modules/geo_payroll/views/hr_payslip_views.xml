@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_payroll_component_settlement_view_list" model="ir.ui.view">
+        <field name="name">hr.payroll.component.settlement.list</field>
+        <field name="model">hr.payroll.component.settlement</field>
+        <field name="arch" type="xml">
+            <list string="Work Logs and Timesheets" create="0" delete="0" edit="0">
+                <field name="date"/>
+                <field name="employee_id" optional="hide"/>
+                <field name="work_log_id" optional="show"/>
+                <field name="timesheet_line_id" optional="show"/>
+                <field name="project_id" optional="show"/>
+                <field name="task_id" optional="hide"/>
+                <field name="component_code"/>
+                <field name="source_version_id" optional="hide"/>
+                <field name="quantity" optional="show"/>
+                <field name="uom_id" optional="show"/>
+                <field name="rate" optional="show"/>
+                <field name="amount" sum="Total"/>
+                <field name="payslip_id" optional="hide"/>
+                <field name="payslip_ref" optional="hide"/>
+                <field name="active_claim"/>
+                <field name="release_reason" optional="hide"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_payroll_component_settlement_view_form" model="ir.ui.view">
+        <field name="name">hr.payroll.component.settlement.form</field>
+        <field name="model">hr.payroll.component.settlement</field>
+        <field name="arch" type="xml">
+            <form string="Work Log or Timesheet" create="0" delete="0" edit="0">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="work_log_id"/>
+                            <field name="timesheet_line_id"/>
+                            <field name="project_id"/>
+                            <field name="task_id"/>
+                            <field name="employee_id"/>
+                            <field name="component_code"/>
+                            <field name="source_version_id"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="payslip_id"/>
+                            <field name="payslip_ref"/>
+                            <field name="quantity"/>
+                            <field name="uom_id"/>
+                            <field name="rate"/>
+                            <field name="amount"/>
+                            <field name="active_claim"/>
+                            <field name="release_reason"/>
+                            <field name="released_at"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_payroll_component_settlement_view_search" model="ir.ui.view">
+        <field name="name">hr.payroll.component.settlement.search</field>
+        <field name="model">hr.payroll.component.settlement</field>
+        <field name="arch" type="xml">
+            <search string="Work Logs and Timesheets">
+                <field name="employee_id"/>
+                <field name="work_log_id"/>
+                <field name="timesheet_line_id"/>
+                <field name="payslip_id"/>
+                <filter name="live_claims" string="Included" domain="[('active_claim', '=', True)]"
+                        help="Work logs and timesheets this payslip pays"/>
+                <filter name="released_claims" string="Removed" domain="[('active_claim', '=', False)]"/>
+                <separator/>
+                <filter name="work_logs" string="Work Logs" domain="[('work_log_id', '!=', False)]"/>
+                <filter name="timesheets" string="Timesheets" domain="[('timesheet_line_id', '!=', False)]"/>
+                <group>
+                    <filter name="group_component" string="Pay Type" context="{'group_by': 'component_code'}"/>
+                    <filter name="group_date" string="Work Date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_hr_payslip_form_geo" model="ir.ui.view">
+        <field name="name">hr.payslip.form.geo.payroll</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="hr_payroll.view_hr_payslip_form"/>
+        <field name="arch" type="xml">
+            <!-- Core has no payslip Register Payment button; geo_payroll keeps its own action. -->
+            <button name="action_payslip_payment_report" position="after">
+                <button name="action_register_payment" string="Register Payment" type="object"
+                        data-hotkey="w"
+                        context="{'dont_redirect_to_payments': True, 'hr_payroll_payment_register': True}"
+                        invisible="state != 'validated' or not move_id or batch_payroll_move_lines"
+                        groups="account.group_account_invoice"/>
+            </button>
+            <button name="action_payslip_payment_report" position="attributes">
+                <attribute name="class" remove="oe_highlight" separator=" "/>
+            </button>
+            <div name="button_box" position="inside">
+                <button name="action_open_gec_settlements" type="object" class="oe_stat_button"
+                        icon="format_list_bulleted" groups="hr_payroll.group_hr_payroll_user"
+                        invisible="gec_settlement_count == 0">
+                    <field name="gec_settlement_count" widget="statinfo" string="Work Logs and Timesheets"/>
+                </button>
+            </div>
+            <xpath expr="//div[@name='payslip_summary_widget']/div[1]" position="before">
+                <div class="flex-basis-50 flex-basis-sm-auto min-w-0 bg-100 p-2 px-lg-4 border rounded text-center"
+                     invisible="not gec_settlement_count">
+                    <div class="mb-2 fw-bold">Work Logs and Timesheets</div>
+                    <div>
+                        <field name="gec_work_item_amount" nolabel="1"
+                               class="justify-content-center mb-1 fs-2 lh-1 text-break"/>
+                    </div>
+                    <div class="text-muted">
+                        <field name="gec_work_item_summary" nolabel="1"/>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

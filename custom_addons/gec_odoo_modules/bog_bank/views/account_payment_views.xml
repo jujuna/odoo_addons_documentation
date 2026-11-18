@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_payment_form_bog" model="ir.ui.view">
+        <field name="name">account.payment.form.bog</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <header position="inside">
+                <field name="bog_processing_mode" invisible="1"/>
+
+                <button name="action_bog_submit_approval" type="object"
+                        string="Submit for Approval" class="btn-secondary"
+                        invisible="gec_bank_code != 'bog_transfer' or state != 'paid' or gec_bank_state != 'pending'
+                                   or bog_processing_mode != 'odoo_approve'"/>
+                <button name="action_bog_approve" type="object"
+                        string="Approve" class="btn-primary"
+                        invisible="gec_bank_code != 'bog_transfer' or gec_bank_state != 'awaiting_approval'"/>
+                <button name="action_bog_send" type="object"
+                        groups="bog_bank.group_bog_user"
+                        string="Send to BOG" class="btn-primary"
+                        confirm="This sends a real payment order to Bank of Georgia. Continue?"
+                        invisible="gec_bank_code != 'bog_transfer' or state != 'paid' or gec_bank_state not in ('pending', 'approved')
+                                   or (bog_processing_mode == 'odoo_approve' and gec_bank_state != 'approved')"/>
+                <button name="action_bog_create_anyway" type="object"
+                        groups="bog_bank.group_bog_user"
+                        string="Create Anyway" class="btn-warning"
+                        confirm="Bank of Georgia declined this document with a warning and did not create it. Submit it again with the same request id?"
+                        invisible="gec_bank_code != 'bog_transfer' or gec_bank_state != 'awaiting_confirmation'"/>
+                <button name="action_bog_upload_attachments" type="object"
+                        groups="bog_bank.group_bog_user"
+                        string="Upload Attachments" class="btn-secondary"
+                        invisible="gec_bank_code != 'bog_transfer' or not bog_attachment_ids
+                                   or gec_bank_state in ('created', 'sent', 'confirmed')"/>
+                <button name="action_bog_reset_to_pending" type="object"
+                        groups="bog_bank.group_bog_user"
+                        string="Reset to Pending" class="btn-secondary"
+                        confirm="Only reset this after checking Business Online. If the document is there, a new send pays twice: Bank of Georgia blocks a repeat of the same request for 7 days only."
+                        invisible="gec_bank_code != 'bog_transfer' or state == 'rejected'
+                                   or gec_bank_state not in ('failed', 'awaiting_confirmation', 'sending', 'unknown')"/>
+                <button name="action_bog_refresh_status" type="object"
+                        string="Refresh Status" class="btn-secondary"
+                        invisible="gec_bank_code != 'bog_transfer' or not gec_bank_reference
+                                   or gec_bank_state not in ('created', 'sent', 'unknown')"/>
+                <button name="action_bog_recover" type="object"
+                        groups="bog_bank.group_bog_user"
+                        string="Recover from BOG" class="btn-warning"
+                        invisible="gec_bank_code != 'bog_transfer' or gec_bank_state not in ('sending', 'unknown')"/>
+                <button name="action_bog_cancel_document" type="object"
+                        groups="bog_bank.group_bog_user"
+                        string="Cancel at Bank" class="btn-secondary"
+                        confirm="This deletes the unsigned document at Bank of Georgia. Continue?"
+                        invisible="gec_bank_code != 'bog_transfer' or not gec_bank_reference or gec_bank_state != 'created'"/>
+                <button name="action_bog_confirm_manual" type="object"
+                        groups="bog_bank.group_bog_user"
+                        string="Confirm Manually" class="btn-secondary"
+                        confirm="Only confirm a transfer you can see executed in Business Online. Odoo then stops checking it with the bank."
+                        invisible="gec_bank_code != 'bog_transfer' or gec_bank_state != 'sent'"/>
+
+                <field name="gec_bank_state" widget="statusbar"
+                       statusbar_visible="pending,approved,created,sent,confirmed"
+                       invisible="gec_bank_code != 'bog_transfer'"/>
+            </header>
+
+            <sheet position="inside">
+                <div class="alert alert-warning" role="alert"
+                     invisible="gec_bank_code != 'bog_transfer' or gec_bank_state != 'created'">
+                    The document exists at Bank of Georgia but is not yet reported as executed.
+                    If your API application does not have signing rights, it must be signed in
+                    Business Online before the money moves.
+                </div>
+                <div class="alert alert-danger" role="alert"
+                     invisible="gec_bank_code != 'bog_transfer' or gec_bank_state != 'unknown'">
+                    Bank of Georgia never confirmed this send. Use "Recover from BOG" before
+                    resending — resending blind can pay twice.
+                </div>
+                <div class="alert alert-warning" role="alert"
+                     invisible="gec_bank_code != 'bog_transfer' or gec_bank_state != 'awaiting_confirmation'">
+                    Bank of Georgia returned a warning and did <b>not</b> create the document.
+                    Fix the cause (funds, value date, validation) and then use "Create Anyway".
+                </div>
+
+                <notebook invisible="gec_bank_code != 'bog_transfer'">
+                    <page string="Bank of Georgia" name="bog">
+                        <group>
+                            <group string="Transfer">
+                                <field name="bog_transfer_type"/>
+                                <field name="bog_dispatch_type"/>
+                                <field name="bog_value_date"/>
+                                <field name="bog_is_salary"/>
+                                <field name="bog_check_inn"/>
+                            </group>
+                            <group string="Beneficiary">
+                                <field name="bog_beneficiary_name"/>
+                                <field name="bog_beneficiary_inn"/>
+                                <field name="bog_beneficiary_bank_code"/>
+                                <field name="bog_additional_information"
+                                       invisible="bog_transfer_type != 'foreign'"/>
+                            </group>
+                        </group>
+                        <group string="Bank References">
+                            <group>
+                                <field name="bog_document_no"/>
+                                <field name="gec_bank_reference"/>
+                                <field name="gec_bank_request_id" groups="base.group_no_one"/>
+                            </group>
+                            <group>
+                                <field name="bog_bank_status" groups="base.group_no_one"/>
+                                <field name="bog_result_code" groups="base.group_no_one"/>
+                                <field name="bog_reject_code" groups="base.group_no_one"/>
+                                <field name="bog_match_percent" groups="base.group_no_one"/>
+                                <field name="bog_warn_code" groups="base.group_no_one"/>
+                                <field name="gec_bank_confirmed_source"/>
+                            </group>
+                        </group>
+                        <group string="Attachments">
+                            <field name="bog_attachment_ids" nolabel="1"
+                                   widget="many2many_binary"/>
+                            <field name="bog_attachment_hashes" groups="base.group_no_one"/>
+                        </group>
+                        <group string="Approval">
+                            <field name="gec_bank_approved_by"/>
+                            <field name="gec_bank_approved_date"/>
+                        </group>
+                        <group string="Last Error" invisible="not gec_bank_error">
+                            <field name="gec_bank_error" nolabel="1"/>
+                        </group>
+                    </page>
+                </notebook>
+            </sheet>
+        </field>
+    </record>
+
+    <record id="action_bog_payment" model="ir.actions.act_window">
+        <field name="name">Bank of Georgia Transfers</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_bog', '=', True), ('payment_type', '=', 'outbound')]</field>
+    </record>
+
+    <record id="action_bog_pending_approval" model="ir.actions.act_window">
+        <field name="name">Pending Approval</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('payment_method_line_id.payment_method_id.code', '=', 'bog_transfer'), ('gec_bank_state', '=', 'awaiting_approval')]</field>
+    </record>
+</odoo>

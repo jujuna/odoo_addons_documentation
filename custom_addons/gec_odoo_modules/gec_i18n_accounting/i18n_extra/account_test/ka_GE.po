@@ -1,0 +1,263 @@
+# Georgian translation of the Odoo addon account_test, kept in gec_i18n_accounting.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-08-26 08:16+0000\n"
+"PO-Revision-Date: 2026-09-30 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian (ka_GE)\n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#. module: account_test
+#: model_terms:ir.ui.view,arch_db:account_test.report_accounttest
+msgid ""
+"<br/>\n"
+"                        <strong>Description:</strong>"
+msgstr ""
+"<br/>\n"
+"                        <strong>აღწერა:</strong>"
+
+#. module: account_test
+#: model_terms:ir.ui.view,arch_db:account_test.report_accounttest
+msgid "<strong>Name:</strong>"
+msgstr "<strong>სახელი:</strong>"
+
+#. module: account_test
+#: model:ir.model,name:account_test.model_report_account_test_report_accounttest
+msgid "Account Test Report"
+msgstr "ანგარიშის ტესტის ანგარიში"
+
+#. module: account_test
+#: model:ir.model,name:account_test.model_accounting_assert_test
+msgid "Accounting Assert Test"
+msgstr "ბუღალტრული შემოწმების ტესტი"
+
+#. module: account_test
+#: model:ir.actions.act_window,name:account_test.action_accounting_assert model:ir.actions.report,name:account_test.account_assert_test_report model:ir.ui.menu,name:account_test.menu_action_license
+msgid "Accounting Tests"
+msgstr "ბუღალტრული ტესტები"
+
+#. module: account_test
+#: model_terms:ir.ui.view,arch_db:account_test.report_accounttest
+msgid "Accounting tests on"
+msgstr "ბუღალტრული ტესტები:"
+
+#. module: account_test
+#: model:ir.model.fields,field_description:account_test.field_accounting_assert_test__active
+msgid "Active"
+msgstr "აქტიური"
+
+#. module: account_test
+#: model_terms:ir.ui.view,arch_db:account_test.accounting_assert_test_view_search
+msgid "Archived"
+msgstr "დაარქივებული"
+
+#. module: account_test
+#: model:accounting.assert.test,desc:account_test.account_test_03
+msgid "Check if movement lines are balanced and have the same date and period"
+msgstr "შეამოწმეთ, გატარების სტრიქონები დაბალანსებულია და აქვს იგივე თარიღი და პერიოდი"
+
+#. module: account_test
+#: model:accounting.assert.test,desc:account_test.account_test_07
+msgid "Check on bank statement that the Closing Balance = Starting Balance + sum of statement lines"
+msgstr "შეამოწმეთ ბანკის ამონაწერზე, რომ საბოლოო ნაშთი = საწყისი ნაშთი + ამონაწერის სტრიქონების ჯამი"
+
+#. module: account_test
+#: model:accounting.assert.test,desc:account_test.account_test_06
+msgid "Check that paid/reconciled invoices are not in 'Open' state"
+msgstr "შეამოწმეთ, რომ გადახდილი/შეჯერებული ანგარიშ-ფაქტურები არ არის „ღია“ მდგომარეობაში"
+
+#. module: account_test
+#: model:accounting.assert.test,desc:account_test.account_test_05_2
+msgid "Check that reconciled account moves, that define Payable and Receivable accounts, are belonging to reconciled invoices"
+msgstr "შეამოწმეთ, რომ შეჯერებული ბუღალტრული გატარებები, რომლებიც განსაზღვრავს გადასახდელ და მისაღებ ანგარიშებს, ეკუთვნის შეჯერებულ ანგარიშ-ფაქტურებს"
+
+#. module: account_test
+#: model:accounting.assert.test,desc:account_test.account_test_05
+msgid "Check that reconciled invoice for Sales/Purchases has reconciled entries for Payable and Receivable Accounts"
+msgstr "შეამოწმეთ, რომ გაყიდვების/შესყიდვების შეჯერებულ ანგარიშ-ფაქტურას აქვს შეჯერებული ჩანაწერები გადასახდელი და მისაღები ანგარიშებისთვის"
+
+#. module: account_test
+#: model:accounting.assert.test,desc:account_test.account_test_01
+msgid "Check the balance: Debit sum = Credit sum"
+msgstr "შეამოწმეთ ნაშთი: დებეტის ჯამი = კრედიტის ჯამი"
+
+#. module: account_test
+#: model_terms:ir.ui.view,arch_db:account_test.account_assert_form
+msgid "Code Help"
+msgstr "კოდის დახმარება"
+
+#. module: account_test
+#: model_terms:ir.ui.view,arch_db:account_test.account_assert_form
+msgid ""
+"Code should always set a variable named `result` with the result of your test, that can be a list or\n"
+"a dictionary. If `result` is an empty list, it means that the test was successful. Otherwise it will\n"
+"try to translate and print what is inside `result`.\n"
+"\n"
+"If the result of your test is a dictionary, you can set a variable named `column_order` to choose in\n"
+"what order you want to print `result`'s content.\n"
+"\n"
+"Should you need them, you can also use the following variables into your code:\n"
+"    * cr: cursor to the database\n"
+"    * uid: ID of the current user\n"
+"\n"
+"In any ways, the code must be legal python statements with correct indentation (if needed).\n"
+"\n"
+"Example: \n"
+"    sql = '''SELECT id, name, ref, date\n"
+"             FROM account_move_line \n"
+"             WHERE account_id IN (SELECT id FROM account_account WHERE type = 'view')\n"
+"          '''\n"
+"    cr.execute(sql)\n"
+"    result = cr.dictfetchall()"
+msgstr ""
+"კოდმა ყოველთვის უნდა მიანიჭოს ცვლადს სახელით `result` თქვენი ტესტის შედეგი, რომელიც შეიძლება იყოს სია ან\n"
+"ლექსიკონი. თუ `result` ცარიელი სიაა, ეს ნიშნავს, რომ ტესტი წარმატებული იყო. წინააღმდეგ შემთხვევაში ის\n"
+"შეეცდება თარგმნოს და დაბეჭდოს ის, რაც `result`-შია.\n"
+"\n"
+"თუ თქვენი ტესტის შედეგი ლექსიკონია, შეგიძლიათ მიანიჭოთ ცვლადს სახელით `column_order`, რათა აირჩიოთ\n"
+"რა თანმიმდევრობით გსურთ `result`-ის შინაარსის დაბეჭდვა.\n"
+"\n"
+"თუ დაგჭირდებათ, თქვენს კოდში ასევე შეგიძლიათ გამოიყენოთ შემდეგი ცვლადები:\n"
+"    * cr: კურსორი ბაზაზე\n"
+"    * uid: მიმდინარე მომხმარებლის ID\n"
+"\n"
+"ნებისმიერ შემთხვევაში, კოდი უნდა იყოს ვალიდური python-ის ბრძანებები სწორი აბზაცებით (საჭიროების შემთხვევაში).\n"
+"\n"
+"მაგალითი: \n"
+"    sql = '''SELECT id, name, ref, date\n"
+"             FROM account_move_line \n"
+"             WHERE account_id IN (SELECT id FROM account_account WHERE type = 'view')\n"
+"          '''\n"
+"    cr.execute(sql)\n"
+"    result = cr.dictfetchall()"
+
+#. module: account_test
+#: model_terms:ir.actions.act_window,help:account_test.action_accounting_assert
+msgid "Create a new accounting test"
+msgstr "შექმენით ახალი ბუღალტრული ტესტი"
+
+#. module: account_test
+#: model:ir.model.fields,field_description:account_test.field_accounting_assert_test__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: account_test
+#: model:ir.model.fields,field_description:account_test.field_accounting_assert_test__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: account_test
+#: model_terms:ir.ui.view,arch_db:account_test.account_assert_form model_terms:ir.ui.view,arch_db:account_test.accounting_assert_test_view_search
+msgid "Description"
+msgstr "აღწერა"
+
+#. module: account_test
+#: model:ir.model.fields,field_description:account_test.field_accounting_assert_test__display_name model:ir.model.fields,field_description:account_test.field_report_account_test_report_accounttest__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: account_test
+#: model_terms:ir.ui.view,arch_db:account_test.account_assert_form
+msgid "Expression"
+msgstr "გამოსახულება"
+
+#. module: account_test
+#: model:ir.model.fields,field_description:account_test.field_accounting_assert_test__id model:ir.model.fields,field_description:account_test.field_report_account_test_report_accounttest__id
+msgid "ID"
+msgstr "ID"
+
+#. module: account_test
+#: model:ir.model.fields,field_description:account_test.field_accounting_assert_test____last_update model:ir.model.fields,field_description:account_test.field_report_account_test_report_accounttest____last_update
+msgid "Last Modified on"
+msgstr "ბოლოს განახლებულია"
+
+#. module: account_test
+#: model:ir.model.fields,field_description:account_test.field_accounting_assert_test__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: account_test
+#: model:ir.model.fields,field_description:account_test.field_accounting_assert_test__write_date
+msgid "Last Updated on"
+msgstr "ბოლოს განახლდა"
+
+#. module: account_test
+#: model_terms:ir.ui.view,arch_db:account_test.accounting_assert_test_view_search
+msgid "Name"
+msgstr "სახელი"
+
+#. module: account_test
+#: model_terms:ir.ui.view,arch_db:account_test.account_assert_form
+msgid "Python Code"
+msgstr "Python კოდი"
+
+#. module: account_test
+#: model:ir.model.fields,field_description:account_test.field_accounting_assert_test__code_exec
+msgid "Python code"
+msgstr "Python კოდი"
+
+#. module: account_test
+#: model_terms:ir.ui.view,arch_db:account_test.accounting_assert_test_view_search
+msgid "Search Account Test"
+msgstr "ანგარიშის ტესტის ძიება"
+
+#. module: account_test
+#: model:ir.model.fields,field_description:account_test.field_accounting_assert_test__sequence
+msgid "Sequence"
+msgstr "მიმდევრობა"
+
+#. module: account_test
+#: model:accounting.assert.test,name:account_test.account_test_01
+msgid "Test 1: General balance"
+msgstr "ტესტი 1: ზოგადი ნაშთი"
+
+#. module: account_test
+#: model:accounting.assert.test,name:account_test.account_test_03
+msgid "Test 3: Movement lines"
+msgstr "ტესტი 3: გატარების სტრიქონები"
+
+#. module: account_test
+#: model:accounting.assert.test,name:account_test.account_test_05
+msgid "Test 5.1 : Payable and Receivable accountant lines of reconciled invoices"
+msgstr "ტესტი 5.1 : შეჯერებული ანგარიშ-ფაქტურების გადასახდელი და მისაღები ბუღალტრული სტრიქონები"
+
+#. module: account_test
+#: model:accounting.assert.test,name:account_test.account_test_05_2
+msgid "Test 5.2 : Reconcilied invoices and Payable/Receivable accounts"
+msgstr "ტესტი 5.2 : შეჯერებული ანგარიშ-ფაქტურები და გადასახდელი/მისაღები ანგარიშები"
+
+#. module: account_test
+#: model:accounting.assert.test,name:account_test.account_test_06
+msgid "Test 6 : Invoices status"
+msgstr "ტესტი 6 : ანგარიშ-ფაქტურების სტატუსი"
+
+#. module: account_test
+#: model:accounting.assert.test,name:account_test.account_test_07
+msgid "Test 7 : Closing balance on bank statements"
+msgstr "ტესტი 7 : საბოლოო ნაშთი ბანკის ამონაწერებზე"
+
+#. module: account_test
+#: model:ir.model.fields,field_description:account_test.field_accounting_assert_test__desc
+msgid "Test Description"
+msgstr "ტესტის აღწერა"
+
+#. module: account_test
+#: model:ir.model.fields,field_description:account_test.field_accounting_assert_test__name
+msgid "Test Name"
+msgstr "ტესტის სახელი"
+
+#. module: account_test
+#: model_terms:ir.ui.view,arch_db:account_test.account_assert_form model_terms:ir.ui.view,arch_db:account_test.account_assert_tree
+msgid "Tests"
+msgstr "ტესტები"
+
+#. module: account_test
+#: code:addons/account_test/report/report_account_test.py:0
+msgid "The test was passed successfully"
+msgstr "ტესტი წარმატებით გაიარა"

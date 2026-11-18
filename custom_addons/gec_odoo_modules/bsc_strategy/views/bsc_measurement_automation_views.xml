@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_bsc_measurement_list_source" model="ir.ui.view">
+        <field name="name">bsc.measurement.list.source</field>
+        <field name="model">bsc.measurement</field>
+        <field name="inherit_id" ref="bsc_strategy.view_bsc_measurement_list"/>
+        <field name="arch" type="xml">
+            <list position="attributes">
+                <attribute name="decoration-info">auto_needs_attention == True</attribute>
+            </list>
+            <field name="actual_value" position="after">
+                <field name="is_automated" widget="boolean_toggle" readonly="1"
+                       string="Auto" optional="hide"/>
+                <field name="auto_state" widget="badge" readonly="1" string="Sync"
+                       optional="hide"
+                       decoration-success="auto_state == 'ok'"
+                       decoration-warning="auto_state == 'deviation'"
+                       decoration-danger="auto_state in ['error', 'no_data']"/>
+                <field name="auto_pending_value" readonly="1" string="Held"
+                       optional="hide"/>
+                <field name="auto_message" readonly="1" string="Sync Note" optional="hide"/>
+                <field name="source_note" readonly="1" optional="hide"/>
+                <field name="auto_needs_attention" column_invisible="1"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_bsc_measurement_form_source" model="ir.ui.view">
+        <field name="name">bsc.measurement.form.source</field>
+        <field name="model">bsc.measurement</field>
+        <field name="inherit_id" ref="bsc_strategy.view_bsc_measurement_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_accept_pending" type="object"
+                        string="Confirm Held Figure" class="btn-primary"
+                        invisible="auto_state != 'deviation' or state == 'validated' or period_state != 'open'"
+                        help="Publishes the figure the source produced."/>
+                <button name="action_discard_pending" type="object"
+                        string="Reject and Enter by Hand"
+                        invisible="auto_state != 'deviation' or period_state != 'open'"/>
+                <button name="action_refresh_automated" type="object"
+                        string="Refresh from Source"
+                        invisible="is_automated == False" groups="bsc_strategy.group_bsc_manager"/>
+            </xpath>
+            <xpath expr="//sheet/group[1]" position="before">
+                <div class="alert alert-warning" role="alert"
+                     invisible="auto_state != 'deviation'">
+                    <strong>This figure was held back.</strong>
+                    <field name="auto_pending_value" readonly="1" class="oe_inline"/>
+                    is too far from the previous period to publish on its own.
+                    <field name="auto_message" readonly="1" nolabel="1"/>
+                </div>
+                <div class="alert alert-danger" role="alert"
+                     invisible="auto_state not in ['error', 'no_data']">
+                    <field name="auto_message" readonly="1" nolabel="1"/>
+                </div>
+                <group string="Automation" invisible="not is_automated">
+                    <group>
+                        <field name="is_automated" readonly="1"/>
+                        <field name="auto_state" readonly="1"/>
+                        <field name="auto_record_count" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="auto_synced_on" readonly="1"/>
+                        <field name="source_note" readonly="1"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_bsc_measurement_search_source" model="ir.ui.view">
+        <field name="name">bsc.measurement.search.source</field>
+        <field name="model">bsc.measurement</field>
+        <field name="inherit_id" ref="bsc_strategy.view_bsc_measurement_search"/>
+        <field name="arch" type="xml">
+            <filter name="filter_missing" position="before">
+                <filter name="filter_attention" string="Needs Attention"
+                        domain="[('auto_needs_attention', '=', True)]"/>
+                <filter name="filter_held" string="Held for Confirmation"
+                        domain="[('auto_state', '=', 'deviation')]"/>
+                <separator/>
+            </filter>
+        </field>
+    </record>
+
+</odoo>

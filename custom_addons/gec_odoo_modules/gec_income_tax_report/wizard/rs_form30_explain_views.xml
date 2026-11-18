@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_rs_form30_explain_form" model="ir.ui.view">
+        <field name="name">rs.form30.explain.form</field>
+        <field name="model">rs.form30.explain</field>
+        <field name="arch" type="xml">
+            <form string="How this cell was calculated">
+                <field name="declaration_id" invisible="1"/>
+                <field name="cell_code" invisible="1"/>
+                <field name="explanation" nolabel="1" readonly="1"/>
+                <footer>
+                    <button string="Close" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <template id="main_part_explanation" name="Form 30 main part explanation">
+        <div class="o_rsf30_explain">
+            <div class="d-flex align-items-baseline">
+                <span class="badge text-bg-dark me-2 flex-shrink-0" t-out="cell['code']"/>
+                <span class="flex-grow-1">
+                    <t t-out="cell['name']"/>
+                    <span t-if="cell['note']" class="text-muted"> · <t t-out="cell['note']"/></span>
+                </span>
+                <span class="fw-bold ms-3 text-nowrap" t-out="cell['display']"/>
+            </div>
+            <div class="small text-muted mt-1"><b>Formula:</b> <t t-out="cell['formula']"/></div>
+            <div class="small mt-1" t-att-class="'text-danger fw-bold' if cell['stale'] else 'text-muted'" t-out="cell['state']"/>
+            <table t-if="cell['items']" class="table table-sm table-borderless mb-0 mt-2 small">
+                <tr t-foreach="cell['items']" t-as="item">
+                    <td class="ps-0">
+                        <a t-if="item['url']" t-att-href="item['url']" target="_blank" t-out="item['label']"/>
+                        <t t-else="" t-out="item['label']"/>
+                    </td>
+                    <td class="text-muted">
+                        <div t-out="item['detail']"/>
+                        <div t-if="item.get('math')" class="font-monospace" t-out="item['math']"/>
+                    </td>
+                    <td class="text-end text-nowrap" t-out="item['display']"/>
+                </tr>
+            </table>
+        </div>
+    </template>
+</odoo>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Beside the analytic account it is stored on: an internal product project marked R&D feeds the R&D line. -->
+    <record id="edit_project_gec_function" model="ir.ui.view">
+        <field name="name">project.project.form.gec.function</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='analytic']/field[@name='account_id']" position="after">
+                <field name="gec_function_component_id"
+                       invisible="not account_id"
+                       options="{'no_create': True}"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Margin Forecast" name="gec_margin_forecast"
+                      groups="analytic.group_analytic_accounting"
+                      invisible="not account_id">
+                    <group>
+                        <group string="Inputs">
+                            <field name="gec_contract_value"/>
+                            <field name="gec_remaining_other_cost"/>
+                            <field name="gec_hourly_cost"/>
+                            <field name="allocated_hours" widget="float_time" readonly="1"/>
+                        </group>
+                        <group string="Forecast">
+                            <field name="gec_forecast_status" widget="badge"
+                                   decoration-danger="gec_forecast_status == 'loss'"
+                                   decoration-warning="gec_forecast_status == 'eroding'"
+                                   decoration-success="gec_forecast_status == 'on_track'"/>
+                            <field name="gec_contract_value_effective"/>
+                            <field name="gec_actual_cost"/>
+                            <field name="gec_remaining_hours" widget="float_time"/>
+                            <field name="gec_cost_rate"/>
+                            <field name="gec_remaining_overhead"/>
+                            <field name="gec_estimate_to_complete"/>
+                            <field name="gec_forecast_cost"/>
+                            <field name="gec_forecast_margin"/>
+                            <field name="gec_forecast_margin_pct" widget="percentage"/>
+                            <field name="gec_budget_margin_pct" widget="percentage"/>
+                            <field name="gec_actual_revenue"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Backlog and billing">
+                            <field name="gec_backlog"/>
+                            <field name="gec_percent_complete" widget="percentage"/>
+                            <field name="gec_earned_revenue"/>
+                            <field name="gec_unbilled"/>
+                        </group>
+                        <group string="Cash">
+                            <field name="gec_collected"/>
+                            <field name="gec_cash_margin"
+                                   decoration-danger="gec_cash_margin &lt; 0"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Go-live">
+                            <field name="gec_golive_planned"/>
+                            <field name="gec_golive_actual"/>
+                            <field name="gec_template_id" options="{'no_create': True}"/>
+                        </group>
+                        <group string="Completion">
+                            <field name="date" string="Planned End" readonly="1"/>
+                            <field name="gec_burn_rate"/>
+                            <field name="gec_end_forecast"/>
+                            <field name="gec_end_delay_days"
+                                   decoration-danger="gec_end_delay_days &gt; 0"
+                                   decoration-success="gec_end_delay_days &lt; 0"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

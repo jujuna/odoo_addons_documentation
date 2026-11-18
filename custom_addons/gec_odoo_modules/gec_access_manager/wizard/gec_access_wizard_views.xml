@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="gec_access_load_models_view_form" model="ir.ui.view">
+        <field name="name">gec.access.load.models.form</field>
+        <field name="model">gec.access.load.models</field>
+        <field name="arch" type="xml">
+            <form string="Load Models">
+                <p class="text-muted">
+                    Adds one row for each model that users can open from the menus this profile still shows. Models that already have a row are skipped.
+                </p>
+                <group>
+                    <field name="profile_id" readonly="1"/>
+                    <field name="menu_ids" widget="many2many_tags"
+                           options="{'no_create': True}"/>
+                    <field name="readonly"/>
+                </group>
+                <footer>
+                    <button name="action_load" type="object" string="Load"
+                            class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"
+                            data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="gec_access_import_view_form" model="ir.ui.view">
+        <field name="name">gec.access.import.form</field>
+        <field name="model">gec.access.import</field>
+        <field name="arch" type="xml">
+            <form string="Import Access Profiles">
+                <p class="text-muted">
+                    A file made with <strong>Export Profiles</strong> in another database. Anything this database does not have (an app, a menu, a journal) is skipped. The skipped items are listed in the profile's chatter.
+                </p>
+                <group>
+                    <field name="file" filename="filename"/>
+                    <field name="filename" invisible="1"/>
+                    <field name="replace"/>
+                    <field name="with_users"/>
+                </group>
+                <footer>
+                    <button name="action_import" type="object" string="Import"
+                            class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="gec_access_import_action" model="ir.actions.act_window">
+        <field name="name">Import Access Profiles</field>
+        <field name="res_model">gec.access.import</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="gec_access_profile_export_action" model="ir.actions.server">
+        <field name="name">Export Profiles</field>
+        <field name="model_id" ref="gec_access_manager.model_gec_access_profile"/>
+        <field name="binding_model_id" ref="gec_access_manager.model_gec_access_profile"/>
+        <field name="binding_view_types">list,form</field>
+        <field name="group_ids" eval="[(4, ref('group_access_manager'))]"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_export_profiles()</field>
+    </record>
+
+    <record id="gec_access_template_wizard_view_form" model="ir.ui.view">
+        <field name="name">gec.access.template.wizard.form</field>
+        <field name="model">gec.access.template.wizard</field>
+        <field name="arch" type="xml">
+            <form string="New from Template">
+                <p class="text-muted">
+                    Only templates for installed apps are shown. The new profile is a normal profile: you can change anything in it later.
+                </p>
+                <group>
+                    <field name="template_key" widget="radio"/>
+                </group>
+                <div class="alert alert-info" role="alert" invisible="not template_key">
+                    <field name="description" nolabel="1"/>
+                    <div class="mt-1 small" invisible="not uses">
+                        Apps: <field name="uses" nolabel="1" class="d-inline"/>
+                    </div>
+                </div>
+                <group invisible="not template_key">
+                    <field name="any_app" invisible="1"/>
+                    <field name="app_id" invisible="not any_app" required="any_app"
+                           options="{'no_create': True, 'no_open': True}"/>
+                    <field name="name"/>
+                    <field name="user_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                </group>
+                <footer>
+                    <button name="action_create" type="object" string="Create the Profile"
+                            class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"
+                            data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="gec_access_template_wizard_action" model="ir.actions.act_window">
+        <field name="name">New from Template</field>
+        <field name="res_model">gec.access.template.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="gec_access_assign_view_form" model="ir.ui.view">
+        <field name="name">gec.access.assign.form</field>
+        <field name="model">gec.access.assign</field>
+        <field name="arch" type="xml">
+            <form string="Set Access Profiles">
+                <group>
+                    <field name="user_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                    <field name="mode" widget="radio"/>
+                    <field name="profile_ids" widget="many2many_tags" options="{'no_create': True}"
+                           required="mode != 'replace'"/>
+                </group>
+                <div class="text-muted" invisible="mode != 'replace' or profile_ids">
+                    If you replace with no profile, these users lose every profile. This module then no longer limits them.
+                </div>
+                <footer>
+                    <button name="action_apply" type="object" string="Apply"
+                            class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"
+                            data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="gec_access_assign_action" model="ir.actions.act_window">
+        <field name="name">Set Access Profiles</field>
+        <field name="res_model">gec.access.assign</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="group_ids" eval="[(4, ref('group_access_manager'))]"/>
+        <field name="binding_model_id" ref="base.model_res_users"/>
+        <field name="binding_view_types">list,form</field>
+    </record>
+
+    <record id="gec_access_copy_access_view_form" model="ir.ui.view">
+        <field name="name">gec.access.copy.access.form</field>
+        <field name="model">gec.access.copy.access</field>
+        <field name="arch" type="xml">
+            <form string="Copy Access">
+                <group>
+                    <group>
+                        <field name="source_user_id" options="{'no_create': True}"/>
+                        <field name="user_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                        <field name="mode" widget="radio"/>
+                    </group>
+                    <group string="What">
+                        <field name="with_profiles"/>
+                        <field name="with_assignments"/>
+                        <field name="with_allowed"/>
+                    </group>
+                </group>
+                <field name="summary" nolabel="1" readonly="1"/>
+                <div class="text-muted" invisible="mode != 'move'">
+                    Moving takes the ticked access away from the 'From' user. Use it when someone changes job. Their Odoo groups do not change.
+                </div>
+                <footer>
+                    <button name="action_apply" type="object" string="Apply"
+                            class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"
+                            data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="gec_access_copy_access_action" model="ir.actions.act_window">
+        <field name="name">Copy Access</field>
+        <field name="res_model">gec.access.copy.access</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="group_ids" eval="[(4, ref('group_access_manager'))]"/>
+        <field name="binding_model_id" ref="base.model_res_users"/>
+        <field name="binding_view_types">form</field>
+    </record>
+
+    <record id="gec_access_app_wizard_view_form" model="ir.ui.view">
+        <field name="name">gec.access.app.wizard.form</field>
+        <field name="model">gec.access.app.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Restrict an App">
+                <group>
+                    <group>
+                        <field name="profile_id" readonly="1" force_save="1"/>
+                        <field name="app_id" options="{'no_create': True, 'no_open': True}"
+                               placeholder="Pick an app..."/>
+                    </group>
+                    <group invisible="not app_id">
+                        <field name="level" widget="radio"/>
+                        <field name="own_records"/>
+                    </group>
+                </group>
+                <div class="alert alert-info" role="alert" invisible="not app_id or not other_additive">
+                    Some users of this profile also have other additive profiles. A limit then works only if all their profiles have it. Check the result with <strong>Preview as User</strong> on the profile.
+                </div>
+                <notebook invisible="not app_id">
+                    <page string="Menus" name="menus">
+                        <div class="text-muted mb-2">
+                            Untick a menu to hide it and its sub-menus. Hiding a menu does not block its records. To block them, use the 'Data' tab.
+                        </div>
+                        <field name="menu_line_ids" nolabel="1">
+                            <list editable="bottom" create="0" delete="0"
+                                  decoration-muted="is_config">
+                                <field name="menu_id" column_invisible="1" force_save="1"/>
+                                <field name="label" readonly="1" force_save="1"/>
+                                <field name="is_config" readonly="1" force_save="1" optional="show"/>
+                                <field name="visible" widget="boolean_toggle"/>
+                            </list>
+                        </field>
+                    </page>
+                    <page string="Data" name="data">
+                        <div class="text-muted mb-2">
+                            What users can do with this app's records. Odoo checks it on every action, not only on the screen. Rows marked <em>Also Used by</em> are used by other apps too. The level does not change them. Change them here only if you want it for every app.
+                        </div>
+                        <field name="model_line_ids" nolabel="1">
+                            <list editable="bottom" create="0" delete="0"
+                                  decoration-muted="not owned">
+                                <field name="model_id" column_invisible="1" force_save="1"/>
+                                <field name="owned" column_invisible="1" force_save="1"/>
+                                <field name="is_config" column_invisible="1" force_save="1"/>
+                                <field name="owner_field" column_invisible="1" force_save="1"/>
+                                <field name="custom_domain" column_invisible="1" force_save="1"/>
+                                <field name="label" readonly="1" force_save="1"/>
+                                <field name="perm_read"/>
+                                <field name="perm_create"/>
+                                <field name="perm_write"/>
+                                <field name="perm_unlink"/>
+                                <field name="scope" readonly="not owner_field and scope != 'custom'"/>
+                                <field name="shared_with" readonly="1" force_save="1"/>
+                                <field name="parent_label" readonly="1" force_save="1" optional="hide"/>
+                            </list>
+                        </field>
+                    </page>
+                    <page string="Reports" name="reports" invisible="not report_line_ids">
+                        <field name="report_line_ids" nolabel="1">
+                            <list editable="bottom" create="0" delete="0">
+                                <field name="report_id" readonly="1" force_save="1"
+                                       options="{'no_open': True}"/>
+                                <field name="model_label" readonly="1" force_save="1"/>
+                                <field name="visible" widget="boolean_toggle"/>
+                            </list>
+                        </field>
+                    </page>
+                    <page string="Actions" name="actions" invisible="not action_line_ids">
+                        <div class="text-muted mb-2">
+                            Entries of the Action menu in this app's screens.
+                        </div>
+                        <field name="action_line_ids" nolabel="1">
+                            <list editable="bottom" create="0" delete="0">
+                                <field name="action_ref" readonly="1" force_save="1"
+                                       options="{'no_open': True}"/>
+                                <field name="model_label" readonly="1" force_save="1"/>
+                                <field name="visible" widget="boolean_toggle"/>
+                            </list>
+                        </field>
+                    </page>
+                </notebook>
+                <field name="other_additive" invisible="1"/>
+                <footer>
+                    <button name="action_apply" type="object" string="Apply"
+                            class="btn-primary" data-hotkey="q" invisible="not app_id"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"
+                            data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="gec_access_scan_buttons_view_form" model="ir.ui.view">
+        <field name="name">gec.access.scan.buttons.form</field>
+        <field name="model">gec.access.scan.buttons</field>
+        <field name="arch" type="xml">
+            <form string="Scan Views">
+                <field name="state" invisible="1"/>
+                <group invisible="state != 'model'">
+                    <field name="profile_id" readonly="1"/>
+                    <field name="model_id" options="{'no_create': True}"/>
+                    <field name="target" widget="radio"/>
+                    <field name="mode" invisible="target != 'buttons'"/>
+                </group>
+                <div invisible="state != 'select'">
+                    <p class="text-muted">
+                        Tick the buttons you want to limit. The others stay as they are.
+                    </p>
+                    <field name="line_ids" nolabel="1" readonly="0">
+                        <list editable="bottom" create="false" delete="false">
+                            <field name="selected" string="Restrict" widget="boolean_toggle"/>
+                            <field name="button_label" string="Label" readonly="1"
+                                   column_invisible="parent.target != 'buttons'"/>
+                            <field name="view_type" string="View" readonly="1"
+                                   column_invisible="parent.target != 'buttons'"/>
+                            <field name="button_type" string="Type" readonly="1"
+                                   column_invisible="parent.target != 'buttons'"/>
+                            <field name="button_name" string="Method / Action" readonly="1"
+                                   column_invisible="parent.target != 'buttons'"/>
+                            <field name="button_id" string="Button Id" readonly="1" optional="hide"
+                                   column_invisible="parent.target != 'buttons'"/>
+                            <field name="element_label" string="Label" readonly="1"
+                                   column_invisible="parent.target != 'elements'"/>
+                            <field name="element_type" string="Kind" readonly="1"
+                                   column_invisible="parent.target != 'elements'"/>
+                            <field name="element_name" string="Name" readonly="1"
+                                   column_invisible="parent.target != 'elements'"/>
+                        </list>
+                    </field>
+                </div>
+                <footer>
+                    <button name="action_scan" type="object" string="Scan"
+                            class="btn-primary" invisible="state != 'model'" data-hotkey="q"/>
+                    <button name="action_apply" type="object" string="Add the Rules"
+                            class="btn-primary" invisible="state != 'select'" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"
+                            data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="gec_access_copy_restrictions_view_form" model="ir.ui.view">
+        <field name="name">gec.access.copy.restrictions.form</field>
+        <field name="model">gec.access.copy.restrictions</field>
+        <field name="arch" type="xml">
+            <form string="Copy Restrictions">
+                <group>
+                    <field name="profile_id" readonly="1"/>
+                    <field name="source_id" options="{'no_create': True}"/>
+                </group>
+                <group string="What to copy">
+                    <field name="copy_models"/>
+                    <field name="copy_fields"/>
+                    <field name="copy_buttons"/>
+                    <field name="copy_elements"/>
+                    <field name="copy_menus"/>
+                </group>
+                <footer>
+                    <button name="action_copy" type="object" string="Copy"
+                            class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"
+                            data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="gec_access_test_user_view_form" model="ir.ui.view">
+        <field name="name">gec.access.test.user.form</field>
+        <field name="model">gec.access.test.user</field>
+        <field name="arch" type="xml">
+            <form string="Effective Access">
+                <group>
+                    <field name="profile_id" invisible="1"/>
+                    <field name="preview_user_ids" invisible="1"/>
+                    <field name="user_id" options="{'no_create': True}"
+                           domain="profile_id and [('id', 'in', preview_user_ids)] or [('share', '=', False)]"/>
+                    <field name="profile_ids" widget="many2many_tags" readonly="1"
+                           invisible="not profile_ids"/>
+                </group>
+                <div class="text-muted mb-2" invisible="not user_id">
+                    'Open Preview' shows Odoo as this user sees it: their apps, menus, records, fields and buttons. You can only look, not change anything. Use the banner to exit.
+                </div>
+                <field name="report" nolabel="1" readonly="1"/>
+                <footer>
+                    <button name="action_open_preview" type="object" string="Open Preview"
+                            class="btn-primary" icon="visibility" invisible="not user_id"
+                            data-hotkey="q"/>
+                    <button name="action_explain" type="object" string="Why?"
+                            icon="help" invisible="not user_id"/>
+                    <button string="Close" class="btn-secondary" special="cancel"
+                            data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="gec_access_test_user_action" model="ir.actions.act_window">
+        <field name="name">Effective Access</field>
+        <field name="res_model">gec.access.test.user</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+
+    <record id="gec_access_explain_view_form" model="ir.ui.view">
+        <field name="name">gec.access.explain.form</field>
+        <field name="model">gec.access.explain</field>
+        <field name="arch" type="xml">
+            <form string="Why?">
+                <group>
+                    <group>
+                        <field name="user_id" options="{'no_create': True}"/>
+                        <field name="model_id" options="{'no_create': True}"/>
+                    </group>
+                    <group>
+                        <field name="operation"/>
+                        <field name="res_id" invisible="operation == 'create'"/>
+                        <field name="record_name" invisible="not record_name or operation == 'create'"/>
+                    </group>
+                </group>
+                <field name="verdict" invisible="1"/>
+                <div class="text-muted mb-2" invisible="report">
+                    Choose the user, the data and the operation. The answer shows in this window: first Odoo's own, then the access profiles'. To check one record, also enter its record ID.
+                </div>
+                <field name="report" nolabel="1" readonly="1"/>
+                <footer>
+                    <button name="action_preview" type="object" string="Preview as User"
+                            class="btn-primary" icon="visibility" invisible="not user_id" data-hotkey="q"/>
+                    <button string="Close" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="gec_access_explain_action" model="ir.actions.act_window">
+        <field name="name">Why?</field>
+        <field name="res_model">gec.access.explain</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

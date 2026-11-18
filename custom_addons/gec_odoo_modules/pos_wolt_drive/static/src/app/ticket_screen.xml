@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="pos_wolt_drive.TicketScreen" t-inherit="point_of_sale.TicketScreen" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('control-buttons')]" position="inside">
+            <button t-if="_selectedSyncedOrder.canBookWoltCourier"
+                class="control-button wolt-courier-button btn btn-secondary btn-lg lh-lg flex-grow-1 flex-shrink-1"
+                t-on-click="() => this.onClickBookWoltCourier(_selectedSyncedOrder)">
+                <i class="oi me-1" data-icon="two_wheeler"/>Wolt Courier
+            </button>
+            <button t-if="_selectedSyncedOrder.wolt_drive_status === 'requested' and _selectedSyncedOrder.wolt_drive_ref"
+                class="control-button wolt-courier-cancel-button btn btn-secondary btn-lg lh-lg flex-grow-1 flex-shrink-1"
+                t-on-click="() => this.onClickCancelWoltCourier(_selectedSyncedOrder)">
+                <i class="oi me-1" data-icon="close"/>Cancel Courier
+            </button>
+        </xpath>
+        <xpath expr="//div[hasclass('control-buttons')]" position="after">
+            <div t-if="_selectedSyncedOrder.wolt_drive_status" class="wolt-courier-status d-flex gap-2 pb-2 align-items-center">
+                <span class="badge text-bg-info" t-out="_selectedSyncedOrder.woltDriveStatusLabel"/>
+                <a t-if="_selectedSyncedOrder.wolt_drive_tracking_url" t-att-href="_selectedSyncedOrder.wolt_drive_tracking_url" target="_blank">Tracking link</a>
+            </div>
+        </xpath>
+    </t>
+</templates>

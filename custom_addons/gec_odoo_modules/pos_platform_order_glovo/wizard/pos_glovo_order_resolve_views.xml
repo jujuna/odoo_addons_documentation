@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="pos_glovo_order_resolve_view_form" model="ir.ui.view">
+        <field name="name">pos.glovo.order.resolve.form</field>
+        <field name="model">pos.glovo.order.resolve</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="order_ids" widget="many2many_tags"/>
+                    <field name="reason"/>
+                </group>
+                <div class="alert alert-warning" role="alert" invisible="resolution != 'delivered'">
+                    Use only if the courier collected the order. This books the sale and payment.
+                    If the food never left the store, use Glovo: mark cancelled.
+                </div>
+                <div class="alert alert-warning" role="alert" invisible="resolution != 'cancelled'">
+                    Use only if Glovo cancelled the order or confirmed it won't be collected.
+                </div>
+                <footer>
+                    <button string="Confirm" name="action_confirm" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_pos_glovo_order_mark_cancelled" model="ir.actions.act_window">
+        <field name="name">Glovo: mark cancelled</field>
+        <field name="res_model">pos.glovo.order.resolve</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_resolution': 'cancelled'}</field>
+        <field name="group_ids" eval="[(6, 0, [ref('point_of_sale.group_pos_manager')])]"/>
+        <field name="binding_model_id" ref="point_of_sale.model_pos_order"/>
+        <field name="binding_view_types">list,form</field>
+    </record>
+
+    <record id="action_pos_glovo_order_mark_delivered" model="ir.actions.act_window">
+        <field name="name">Glovo: mark picked up</field>
+        <field name="res_model">pos.glovo.order.resolve</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_resolution': 'delivered'}</field>
+        <field name="group_ids" eval="[(6, 0, [ref('point_of_sale.group_pos_manager')])]"/>
+        <field name="binding_model_id" ref="point_of_sale.model_pos_order"/>
+        <field name="binding_view_types">list,form</field>
+    </record>
+</odoo>

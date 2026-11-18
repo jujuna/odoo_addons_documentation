@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_rs_form30_declaration"
+              name="Income Tax Declaration (Form 30)"
+              parent="account.menu_finance_reports"
+              action="action_rs_form30_declaration"
+              sequence="60"/>
+
+    <menuitem id="menu_rs_form30_config"
+              name="rs.ge Form 30 (Advanced)"
+              groups="account.group_account_manager"
+              parent="account.menu_finance_configuration"
+              sequence="90"/>
+    <menuitem id="menu_rs_form30_category" name="Recipient Categories"
+              parent="menu_rs_form30_config" action="action_rs_form30_category" sequence="10"/>
+    <menuitem id="menu_rs_form30_income_type" name="Income Types"
+              parent="menu_rs_form30_config" action="action_rs_form30_income_type" sequence="20"/>
+    <menuitem id="menu_rs_form30_account_rule" name="Account Rules"
+              parent="menu_rs_form30_config" action="action_rs_form30_account_rule" sequence="30"/>
+    <menuitem id="menu_rs_form30_withholding_tax" name="Withholding Taxes"
+              parent="menu_rs_form30_config" action="action_rs_form30_withholding_tax" sequence="35"/>
+    <menuitem id="menu_rs_form30_rate_rule" name="Allowed Rates"
+              parent="menu_rs_form30_config" action="action_rs_form30_rate_rule" sequence="40"/>
+    <menuitem id="menu_rs_form30_car_engine" name="Car Engine Bands"
+              parent="menu_rs_form30_config" action="action_rs_form30_car_engine" sequence="50"/>
+    <menuitem id="menu_rs_form30_service_type" name="Service Types"
+              parent="menu_rs_form30_config" action="action_rs_form30_service_type" sequence="60"/>
+</odoo>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="gosms_menu_root" name="GoSMS" web_icon="gec_gosms,static/description/icon.png" groups="base.group_user" sequence="85"/>
+    <menuitem id="gosms_menu_send" name="Send SMS" parent="gosms_menu_root" action="gosms_send_wizard_action" sequence="10"/>
+    <menuitem id="gosms_menu_messages" name="Messages" parent="gosms_menu_root" action="gosms_message_action" groups="base.group_system" sequence="5"/>
+    <menuitem id="gosms_menu_configuration" name="Configuration" parent="gosms_menu_root" groups="base.group_system" sequence="90"/>
+    <menuitem id="gosms_menu_settings" name="Settings" parent="gosms_menu_configuration" action="base_setup.action_general_configuration"
+              groups="base.group_system" sequence="10"/>
+</odoo>

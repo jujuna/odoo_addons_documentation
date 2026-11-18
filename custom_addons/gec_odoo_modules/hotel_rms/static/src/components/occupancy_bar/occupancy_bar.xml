@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="hotel_rms.OccupancyBar">
+        <div class="o_rms_occupancy_bar" t-att-title="this.title">
+            <div t-att-class="{ o_rms_ob_forecast: true, o_rms_ob_low: this.low }" t-att-style="this.width(this.props.forecast_pct)"/>
+            <div class="o_rms_ob_booked" t-att-style="this.width(this.props.booked_pct)"/>
+        </div>
+    </t>
+
+    <t t-name="hotel_rms.OccupancyField">
+        <div class="o_rms_occupancy_field">
+            <span class="o_rms_of_bar">
+                <OccupancyBar booked_pct="this.booked" forecast_pct="this.forecast" confidence="this.confidence"/>
+            </span>
+            <span class="o_rms_of_value"><t t-out="Math.round(this.forecast)"/>%</span>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="gec_property_tax_report.RsForm15RateField">
+        <span t-if="this.props.readonly" t-out="this.formattedValue"/>
+        <input t-else=""
+               t-on-focusin="this.onFocusIn"
+               t-on-focusout="this.onFocusOut"
+               t-on-input="this.onRateInput"
+               t-att-id="this.props.id"
+               t-ref="this.numpadDecimalRef"
+               type="text"
+               inputmode="decimal"
+               maxlength="5"
+               placeholder="0.xxx"
+               class="o_input"
+               autocomplete="off"/>
+    </t>
+
+</templates>

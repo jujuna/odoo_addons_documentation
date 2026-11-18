@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_basisbank_otp_wizard_form" model="ir.ui.view">
+        <field name="name">basisbank.otp.wizard.form</field>
+        <field name="model">basisbank.otp.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Enter Digipass OTP">
+                <group>
+                    <field name="batch_id" readonly="1" invisible="not batch_id"/>
+                    <field name="payment_id" readonly="1" invisible="not payment_id"/>
+                    <field name="otp"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" type="object" string="Send" class="oe_highlight"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_basisbank_statement_import_wizard_form" model="ir.ui.view">
+        <field name="name">basisbank.statement.import.wizard.form</field>
+        <field name="model">basisbank.statement.import.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Import Basis Bank Statement">
+                <group>
+                    <group>
+                        <field name="journal_id" options="{'no_create': True}"/>
+                        <field name="currency_code"/>
+                    </group>
+                    <group>
+                        <field name="start_date"/>
+                        <field name="end_date"/>
+                    </group>
+                </group>
+                <group invisible="imported_count == 0 and skipped_count == 0 and confirmed_count == 0">
+                    <field name="imported_count" readonly="1"/>
+                    <field name="skipped_count" readonly="1"/>
+                    <field name="confirmed_count" readonly="1"/>
+                </group>
+                <footer>
+                    <button name="action_import" type="object" string="Import" class="oe_highlight"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_basisbank_statement_import" model="ir.actions.act_window">
+        <field name="name">Import Statement</field>
+        <field name="res_model">basisbank.statement.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="view_basisbank_resync_wizard_form" model="ir.ui.view">
+        <field name="name">basisbank.resync.wizard.form</field>
+        <field name="model">basisbank.resync.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Resync from Basis Bank">
+                <group>
+                    <field name="batch_id" readonly="1"/>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                </group>
+                <group invisible="not summary">
+                    <field name="matched_count" readonly="1"/>
+                    <field name="unmatched_count" readonly="1"/>
+                    <field name="summary" readonly="1"/>
+                </group>
+                <footer>
+                    <button name="action_resync" type="object" string="Run Resync" class="oe_highlight"/>
+                    <button special="cancel" string="Close"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_basisbank_change_password_wizard_form" model="ir.ui.view">
+        <field name="name">basisbank.change.password.wizard.form</field>
+        <field name="model">basisbank.change.password.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Change Basis Bank Password">
+                <group>
+                    <field name="connection_id" readonly="1"/>
+                    <field name="new_password" password="True"/>
+                    <field name="confirm_password" password="True"/>
+                    <field name="otp"/>
+                </group>
+                <footer>
+                    <button name="action_change_password" type="object" string="Change Password" class="oe_highlight"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

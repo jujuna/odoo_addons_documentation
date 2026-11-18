@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_bsc_dashboard" model="ir.actions.client">
+        <field name="name">Dashboard</field>
+        <field name="tag">bsc_dashboard</field>
+    </record>
+
+    <menuitem id="menu_bsc_dashboard"
+              name="Dashboard"
+              parent="bsc_strategy.menu_bsc_root"
+              action="action_bsc_dashboard"
+              sequence="5"
+              groups="bsc_strategy.group_bsc_manager"/>
+
+    <menuitem id="menu_bsc_objective_link"
+              name="Cause-Effect Links"
+              parent="bsc_strategy.menu_bsc_strategy"
+              action="action_bsc_objective_link"
+              sequence="35"/>
+
+    <record id="action_bsc_user_guide" model="ir.actions.client">
+        <field name="name">User Guide</field>
+        <field name="tag">bsc_user_guide</field>
+    </record>
+
+    <menuitem id="menu_bsc_user_guide"
+              name="User Guide"
+              parent="bsc_strategy.menu_bsc_root"
+              action="action_bsc_user_guide"
+              sequence="95"/>
+
+    <record id="view_bsc_demo_data_form" model="ir.ui.view">
+        <field name="name">bsc.demo.data.form</field>
+        <field name="model">bsc.demo.data</field>
+        <field name="arch" type="xml">
+            <form string="Demo Data">
+                <field name="demo_count" invisible="1"/>
+                <div class="alert alert-info" role="status" invisible="demo_count">
+                    <p class="mb-1"><strong>Load a worked example.</strong></p>
+                    <p class="mb-1">One scorecard covering a full year: eight objectives in the
+                        four perspectives, eight KPIs with targets, the cause-effect links of the
+                        strategy map, six initiatives, three closed quarters with their figures
+                        and strategy reviews, and the current quarter half filled in.</p>
+                    <p class="mb-0">Names and texts follow your interface language. You are set
+                        as the owner of everything, so every screen has something to show you.</p>
+                </div>
+                <div class="alert alert-warning" role="status" invisible="not demo_count">
+                    <p class="mb-1"><strong>The demo data is loaded.</strong></p>
+                    <p class="mb-0">Removing it deletes the demo scorecard and everything in it -
+                        objectives, KPIs, figures, periods, reviews and initiatives. Your own
+                        scorecards are never touched.</p>
+                </div>
+                <footer>
+                    <button name="action_load" type="object" string="Load Demo Data"
+                            class="btn-primary" invisible="demo_count"/>
+                    <button name="action_remove" type="object" string="Remove Demo Data"
+                            class="btn-danger" invisible="not demo_count"
+                            confirm="Delete the demo scorecard and everything in it?"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bsc_demo_data" model="ir.actions.act_window">
+        <field name="name">Demo Data</field>
+        <field name="res_model">bsc.demo.data</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_bsc_demo_data"
+              name="Demo Data"
+              parent="bsc_strategy.menu_bsc_config"
+              action="action_bsc_demo_data"
+              sequence="90"
+              groups="bsc_strategy.group_bsc_admin"/>
+
+</odoo>

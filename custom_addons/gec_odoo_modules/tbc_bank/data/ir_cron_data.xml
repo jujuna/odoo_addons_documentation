@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="cron_tbc_daily_statement_sync" model="ir.cron">
+            <field name="name">TBC Bank — Daily statement sync</field>
+            <field name="model_id" ref="model_tbc_connection"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_daily_statement_sync()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="cron_tbc_live_statements" model="ir.cron">
+            <field name="name">TBC Bank — Live statement snapshots</field>
+            <field name="model_id" ref="model_tbc_statement"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_fetch_live_statements()</field>
+            <field name="interval_number">2</field>
+            <field name="interval_type">hours</field>
+            <field name="active" eval="False"/>
+        </record>
+
+        <record id="cron_tbc_status_poll" model="ir.cron">
+            <field name="name">TBC Bank — Transfer status poll</field>
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_tbc_status_poll()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>

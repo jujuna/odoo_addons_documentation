@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_bsc_kpi_connect_form" model="ir.ui.view">
+        <field name="name">bsc.kpi.connect.form</field>
+        <field name="model">bsc.kpi.connect</field>
+        <field name="arch" type="xml">
+            <form string="Connect to Odoo data">
+                <field name="kpi_id" invisible="1"/>
+                <field name="model_name" invisible="1"/>
+                <field name="has_source_choice" invisible="1"/>
+                <p class="text-muted">
+                    Pick what Odoo should count for <b><field name="kpi_id" readonly="1" class="oe_inline" options="{'no_open': True}"/></b>.
+                    The figure is then filled for every open period and refreshed every
+                    night; the owner no longer types it in.
+                </p>
+                <group>
+                    <field name="mode" widget="radio" invisible="not has_source_choice"
+                           string="Use"/>
+                    <field name="recipe" invisible="mode != 'recipe'"
+                           required="mode == 'recipe'"
+                           placeholder="e.g. Invoiced revenue, Won opportunities, Deliveries shipped"/>
+                    <field name="source_id" invisible="mode != 'source'"
+                           required="mode == 'source'"
+                           options="{'no_create': True, 'no_open': True}"/>
+                </group>
+                <group invisible="not model_name">
+                    <field name="scale" widget="radio" options="{'horizontal': true}"/>
+                </group>
+                <div invisible="not explanation" class="mb-3">
+                    <field name="explanation" nolabel="1" readonly="1"/>
+                </div>
+                <div invisible="not model_name" class="mb-3">
+                    <label for="extra_domain" class="fw-bold"/>
+                    <span class="text-muted ms-1">(optional - e.g. one sales team or one project)</span>
+                    <field name="extra_domain" nolabel="1" widget="domain"
+                           options="{'model': 'model_name'}"/>
+                </div>
+                <label for="preview" string="What it would report now" class="fw-bold"/>
+                <field name="preview" nolabel="1" readonly="1"/>
+                <p class="text-muted small mt-3 mb-0">
+                    Measures that need judgement - satisfaction, quality of a process,
+                    readiness of a team - are best typed in by their owner; that is the
+                    right answer, not a gap. A measure that is missing here can be built
+                    by an administrator under Configuration &gt; KPI Data Sources.
+                </p>
+                <footer>
+                    <button name="action_connect" type="object" string="Connect"
+                            class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

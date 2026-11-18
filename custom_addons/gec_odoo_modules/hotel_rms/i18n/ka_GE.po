@@ -1,0 +1,4506 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* hotel_rms
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-25 11:09+0000\n"
+"PO-Revision-Date: 2026-10-25 11:09+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: hotel_rms
+#: model:ir.module.module,description:base.module_hotel_rms
+msgid ""
+"\n"
+"Forecasts the occupancy of every night, recommends a price per night and room type\n"
+"within the safety rules of the hotel, and explains each recommendation in plain words.\n"
+"A revenue manager accepts, changes, rejects, undoes or locks each price and exports\n"
+"the approved prices to a CSV file.\n"
+"Full documentation: README.md in the module directory.\n"
+msgstr ""
+"\n"
+"პროგნოზირებს ყოველი ღამის დატვირთვას, გვთავაზობს ფასს თითო ღამისა და ოთახის ტიპისთვის\n"
+"სასტუმროს უსაფრთხოების წესების ფარგლებში და ყოველ რეკომენდაციას მარტივი სიტყვებით განმარტავს.\n"
+"შემოსავლების მენეჯერი ყოველ ფასს იღებს, ცვლის, უარყოფს, აბრუნებს ან ჩაკეტავს და\n"
+"დამტკიცებული ფასების ექსპორტს CSV ფაილში ახორციელებს.\n"
+"სრული დოკუმენტაცია: README.md მოდულის დირექტორიაში.\n"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.js:0
+msgid "%(booked)s of %(rooms)s rooms"
+msgstr "%(rooms)s ოთახიდან %(booked)s"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/accuracy_chart/accuracy_chart.js:0
+msgid "%(days)s days ahead: %(rooms)s rooms off"
+msgstr "%(days)s დღით ადრე: გადახრა %(rooms)s ოთახი"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "%(factor)s: %(pct)s"
+msgstr "%(factor)s: %(pct)s"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+msgid "%(kind)s of %(date)s"
+msgstr "%(kind)s: %(date)s"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "%(level)s: about %(off)s off %(ahead)s"
+msgstr "%(level)s: გადახრა დაახლოებით %(off)s (პროგნოზი %(ahead)s)"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/pickup_heatmap/pickup_heatmap.js:0
+msgid "%(night)s · %(change)s this week · %(booked)s of %(capacity)s booked"
+msgstr ""
+"%(night)s · %(change)s ამ კვირაში · %(capacity)s-დან %(booked)s დაჯავშნილია"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.js:0
+msgid "%(position)s of %(total)s"
+msgstr "%(position)s / %(total)s"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/year_pace_chart/year_pace_chart.js:0
+msgid "%(series)s: %(rooms)s rooms"
+msgstr "%(series)s: %(rooms)s ოთახი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "%s accepted in the latest week"
+msgstr "ბოლო კვირაში მიღებულია %s"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "%s added"
+msgstr "დაემატა %s"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/pace_chart/pace_chart.js:0
+msgid "%s d"
+msgstr "%s დღე"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/accuracy_chart/accuracy_chart.js:0
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "%s days ahead"
+msgstr "%s დღით ადრე"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/pace_chart/pace_chart.js:0
+msgid "%s days before"
+msgstr "%s დღით ადრე"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/utils/pricing_utils.js:0
+msgid "%s days left"
+msgstr "დარჩა %s დღე"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "%s days left."
+msgstr "დარჩა %s დღე."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/utils/pricing_utils.js:0
+msgid "%s decisions undone"
+msgstr "%s გადაწყვეტილება დაბრუნდა"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+msgid "%(name)s %(value)s can be read as two dates: write it as YYYY-MM-DD"
+msgstr "%(name)s %(value)s ორნაირად იკითხება: ჩაწერეთ YYYY-MM-DD ფორმატით"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+msgid "%s is not a date"
+msgstr "%s არ არის თარიღი"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+msgid "%s is not a number"
+msgstr "%s არ არის რიცხვი"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+msgid "%s is required"
+msgstr "%s სავალდებულოა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "%s lost"
+msgstr "დაიკარგა %s"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/utils/pricing_utils.js:0
+msgid "%s prices accepted"
+msgstr "%s ფასი მიღებულია"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_property.py:0
+msgid "%s prices exported"
+msgstr "%s ფასი ექსპორტირებულია"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/utils/pricing_utils.js:0
+msgid "%s prices locked"
+msgstr "%s ფასი ჩაკეტილია"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "%s prices need a decision"
+msgstr "%s ფასი საჭიროებს გადაწყვეტილებას"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/utils/pricing_utils.js:0
+msgid "%s prices rejected"
+msgstr "%s ფასი უარყოფილია"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/utils/pricing_utils.js:0
+msgid "%s prices unlocked"
+msgstr "%s ფასი განბლოკილია"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/utils/pricing_utils.js:0
+msgid "%s prices updated"
+msgstr "%s ფასი განახლებულია"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "%s pts vs 7 days ago"
+msgstr "%s პუნქტი 7 დღის წინანდელთან შედარებით"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/pickup_heatmap/pickup_heatmap.js:0
+msgid "%s room"
+msgstr "%s ოთახი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/pickup_heatmap/pickup_heatmap.js:0
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "%s rooms"
+msgstr "%s ოთახი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "%s vs 7 days ago"
+msgstr "%s 7 დღის წინანდელთან შედარებით"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_room_type.py:0
+msgid "%s vs reference"
+msgstr "%s საბაზისოსთან შედარებით"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "%s%% ahead of last year"
+msgstr "გასულ წელთან შედარებით %s%%-ით მეტი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.js:0
+msgid "%s%% ahead of usual"
+msgstr "ჩვეულებრივზე %s%%-ით მეტი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "%s%% behind last year"
+msgstr "გასულ წელთან შედარებით %s%%-ით ნაკლები"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.js:0
+msgid "%s%% behind usual"
+msgstr "ჩვეულებრივზე %s%%-ით ნაკლები"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "%s%% vs 7 days ago"
+msgstr "%s%% 7 დღის წინანდელთან შედარებით"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__confidence_score
+msgid "0 to 100: how much to trust the forecast."
+msgstr "0-დან 100-მდე: რამდენად შეიძლება პროგნოზის ნდობა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_forecast__confidence_score
+msgid "0 to 100: how much to trust this forecast."
+msgstr "0-დან 100-მდე: რამდენად შეიძლება ამ პროგნოზის ნდობა."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "1 price needs a decision"
+msgstr "1 ფასი საჭიროებს გადაწყვეტილებას"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "1 room"
+msgstr "1 ოთახი"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_forecast_view_search
+msgid "30 days before"
+msgstr "30 დღით ადრე"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_forecast_view_search
+msgid "7 days before"
+msgstr "7 დღით ადრე"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid ""
+"<span class=\"badge text-bg-info\" invisible=\"not is_demo\">Demo hotel "
+"(sample data)</span>"
+msgstr ""
+"<span class=\"badge text-bg-info\" invisible=\"not is_demo\">დემო სასტუმრო "
+"(სანიმუშო მონაცემები)</span>"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_import_view_form
+msgid "<span class=\"o_rms_step_no\">1</span>Choose the hotel and the file"
+msgstr "<span class=\"o_rms_step_no\">1</span>აირჩიეთ სასტუმრო და ფაილი"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_import_view_form
+msgid "<span class=\"o_rms_step_no\">2</span>Check the file"
+msgstr "<span class=\"o_rms_step_no\">2</span>ფაილის შემოწმება"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_import_view_form
+msgid "<span class=\"o_rms_step_no\">3</span>Result"
+msgstr "<span class=\"o_rms_step_no\">3</span>შედეგი"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_import_view_form
+msgid ""
+"<span class=\"text-muted\">A CSV or Excel (.xlsx) file with one row per "
+"line.</span>"
+msgstr ""
+"<span class=\"text-muted\">CSV ან Excel (.xlsx) ფაილი, თითო სტრიქონზე ერთი "
+"ჩანაწერით.</span>"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid ""
+"<span class=\"text-success\" invisible=\"not setup_bookings\"><i class=\"oi\" data-icon=\"check_circle\" title=\"Done\"/></span>\n"
+"                            <span class=\"text-muted\" invisible=\"setup_bookings\"><i class=\"oi\" data-icon=\"radio_button_unchecked\" title=\"To do\"/></span>\n"
+"                            <span>3. Bring in your bookings.</span>"
+msgstr ""
+"<span class=\"text-success\" invisible=\"not setup_bookings\"><i class=\"oi\" data-icon=\"check_circle\" title=\"შესრულდა\"/></span>\n"
+"                            <span class=\"text-muted\" invisible=\"setup_bookings\"><i class=\"oi\" data-icon=\"radio_button_unchecked\" title=\"გასაკეთებელი\"/></span>\n"
+"                            <span>3. შემოიტანეთ თქვენი ჯავშნები.</span>"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid ""
+"<span class=\"text-success\" invisible=\"not setup_rooms\"><i class=\"oi\" data-icon=\"check_circle\" title=\"Done\"/></span>\n"
+"                            <span class=\"text-muted\" invisible=\"setup_rooms\"><i class=\"oi\" data-icon=\"radio_button_unchecked\" title=\"To do\"/></span>\n"
+"                            <span>1. Add your rooms, with one reference room (Rooms tab).</span>"
+msgstr ""
+"<span class=\"text-success\" invisible=\"not setup_rooms\"><i class=\"oi\" data-icon=\"check_circle\" title=\"შესრულდა\"/></span>\n"
+"                            <span class=\"text-muted\" invisible=\"setup_rooms\"><i class=\"oi\" data-icon=\"radio_button_unchecked\" title=\"გასაკეთებელი\"/></span>\n"
+"                            <span>1. დაამატეთ თქვენი ოთახები, ერთი საბაზისო ოთახით (ოთახების ჩანართი).</span>"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid ""
+"<span class=\"text-success\" invisible=\"not setup_run\"><i class=\"oi\" data-icon=\"check_circle\" title=\"Done\"/></span>\n"
+"                            <span class=\"text-muted\" invisible=\"setup_run\"><i class=\"oi\" data-icon=\"radio_button_unchecked\" title=\"To do\"/></span>\n"
+"                            <span>4. Run the engine for the first time.</span>"
+msgstr ""
+"<span class=\"text-success\" invisible=\"not setup_run\"><i class=\"oi\" data-icon=\"check_circle\" title=\"შესრულდა\"/></span>\n"
+"                            <span class=\"text-muted\" invisible=\"setup_run\"><i class=\"oi\" data-icon=\"radio_button_unchecked\" title=\"გასაკეთებელი\"/></span>\n"
+"                            <span>4. პირველად გაუშვით ძრავა.</span>"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid ""
+"<span class=\"text-success\" invisible=\"not setup_season\"><i class=\"oi\" data-icon=\"check_circle\" title=\"Done\"/></span>\n"
+"                            <span class=\"text-muted\" invisible=\"setup_season\"><i class=\"oi\" data-icon=\"radio_button_unchecked\" title=\"To do\"/></span>\n"
+"                            <span>2. Add seasons that cover every night ahead (Seasons tab).</span>"
+msgstr ""
+"<span class=\"text-success\" invisible=\"not setup_season\"><i class=\"oi\" data-icon=\"check_circle\" title=\"შესრულდა\"/></span>\n"
+"                            <span class=\"text-muted\" invisible=\"setup_season\"><i class=\"oi\" data-icon=\"radio_button_unchecked\" title=\"გასაკეთებელი\"/></span>\n"
+"                            <span>2. დაამატეთ სეზონები, რომლებიც ყველა მომავალ ღამეს მოიცავს (სეზონების ჩანართი).</span>"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "<span invisible=\"last_data_at\">No booking data yet</span>"
+msgstr "<span invisible=\"last_data_at\">ჯავშნების მონაცემები ჯერ არ არის</span>"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_import_view_form
+msgid "<span>Created</span>"
+msgstr "<span>შექმნილი</span>"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_import_view_form
+msgid "<span>Errors</span>"
+msgstr "<span>შეცდომები</span>"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_import_view_form
+msgid "<span>Kept, waiting for publish</span>"
+msgstr "<span>დარჩა, გამოქვეყნებას ელოდება</span>"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_import_view_form
+msgid "<span>Updated</span>"
+msgstr "<span>განახლებული</span>"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_import__file
+msgid "A CSV or Excel (.xlsx) file; use the template below."
+msgstr "CSV ან Excel (.xlsx) ფაილი; გამოიყენეთ ქვემოთ მოცემული შაბლონი."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_reservation__status
+msgid ""
+"A cancelled booking counts as booked until its cancellation date; a no-show "
+"counts as booked."
+msgstr ""
+"გაუქმებული ჯავშანი გაუქმების თარიღამდე დაჯავშნილად ითვლება; არ გამოცხადებული"
+" სტუმრის ჯავშანი დაჯავშნილად ითვლება."
+
+#. module: hotel_rms
+#: model_terms:ir.actions.act_window,help:hotel_rms.action_hotel_rms_forecast_accuracy
+msgid ""
+"A forecast is checked when its night has passed: how far was it from the "
+"rooms that were really booked?"
+msgstr ""
+"პროგნოზი მოწმდება მისი ღამის გასვლის შემდეგ: რამდენად ცდებოდა ის რეალურად "
+"დაჯავშნილ ოთახებთან შედარებით?"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_room_type.py:0
+msgid "A hotel has one reference room type only."
+msgstr "სასტუმროს მხოლოდ ერთი საბაზისო ოთახის ტიპი შეიძლება ჰქონდეს."
+
+#. module: hotel_rms
+#: model:ir.model.constraint,message:hotel_rms.constraint_hotel_rms_forecast_night_per_run_unique
+msgid "A night has one forecast per run day."
+msgstr "ღამეს გაშვების დღეზე ერთი პროგნოზი აქვს."
+
+#. module: hotel_rms
+#: model:ir.model.constraint,message:hotel_rms.constraint_hotel_rms_price_night_room_unique
+msgid "A night has one price per room type."
+msgstr "ღამეს ოთახის თითო ტიპზე ერთი ფასი აქვს."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__note
+msgid "A note saved in the history with your decision."
+msgstr "შენიშვნა, რომელიც თქვენს გადაწყვეტილებასთან ერთად ისტორიაში ინახება."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__max_step_pct
+msgid ""
+"A price moves at most this much from the current price (the season range "
+"wins)."
+msgstr ""
+"ფასი მიმდინარე ფასიდან მაქსიმუმ ამდენით იცვლება (სეზონის დიაპაზონს "
+"უპირატესობა აქვს)."
+
+#. module: hotel_rms
+#: model:ir.model.constraint,message:hotel_rms.constraint_hotel_rms_reservation_source_ref_unique
+msgid "A reservation reference can exist only once per hotel."
+msgstr "ჯავშნის მითითება სასტუმროში მხოლოდ ერთხელ შეიძლება არსებობდეს."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__is_demo
+msgid ""
+"A sample hotel made by Configuration > Demo Data. Remove it with the button "
+"on its form."
+msgstr ""
+"სანიმუშო სასტუმრო, შექმნილი ბრძანებით კონფიგურაცია > დემო-მონაცემები. "
+"მოაცილეთ ის მისი ფორმის ღილაკით."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_run__params_hash
+msgid "A short code that changes when the settings change."
+msgstr "მოკლე კოდი, რომელიც პარამეტრების შეცვლისას იცვლება."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_room_type__code
+msgid ""
+"A short code. Imports match room types by this code first, then by name."
+msgstr ""
+"მოკლე კოდი. იმპორტისას ოთახის ტიპები ჯერ ამ კოდით, შემდეგ კი სახელით "
+"ემთხვევა."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "ADR on the books"
+msgstr "საშუალო დღიური ტარიფი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_view_list
+msgid "Accept"
+msgstr "მიღება"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+msgid "Accept & next"
+msgstr "მიღება და შემდეგი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "Accept all"
+msgstr "ყველას მიღება"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "Accept the recommended price of %s nights?"
+msgstr "გსურთ %s ღამის რეკომენდებული ფასის მიღება?"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/decision_doughnut/decision_doughnut.js:0
+#: code:addons/hotel_rms/static/src/components/decision_split/decision_split.js:0
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+#: code:addons/hotel_rms/static/src/utils/pricing_utils.js:0
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_price__state__accepted
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_price_audit__action__accept
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_view_search
+msgid "Accepted"
+msgstr "მიღებული"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__action
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price_audit__action
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_audit_view_search
+msgid "Action"
+msgstr "ქმედება"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__message_needaction
+msgid "Action Needed"
+msgstr "საჭიროა მოქმედება"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_room_type__active
+msgid "Active"
+msgstr "აქტიური"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__actual_rooms
+msgid "Actual Rooms"
+msgstr "რეალურად დაჯავშნილი ოთახები"
+
+#. module: hotel_rms
+#: model_terms:ir.actions.act_window,help:hotel_rms.action_hotel_rms_event
+msgid "Add an event or a holiday"
+msgstr "დაამატეთ ღონისძიება ან უქმე დღე"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "Add seasons that cover every night ahead"
+msgstr "დაამატეთ სეზონები, რომლებიც ყველა მომავალ ღამეს მოიცავს"
+
+#. module: hotel_rms
+#: model_terms:ir.actions.act_window,help:hotel_rms.action_hotel_rms_property
+msgid ""
+"Add the rooms, the seasons with their prices and your bookings. The engine "
+"then recommends a price for every night."
+msgstr ""
+"დაამატეთ ოთახები, სეზონები მათი ფასებით და თქვენი ჯავშნები. ამის შემდეგ "
+"ძრავა ყოველი ღამისთვის ფასს გირჩევთ."
+
+#. module: hotel_rms
+#: model_terms:ir.actions.act_window,help:hotel_rms.action_hotel_rms_property
+msgid "Add your first hotel"
+msgstr "დაამატეთ თქვენი პირველი სასტუმრო"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "Add your rooms, with one reference room"
+msgstr "დაამატეთ თქვენი ოთახები, ერთი საბაზისო ოთახით"
+
+#. module: hotel_rms
+#: model:res.groups,name:hotel_rms.group_hotel_rms_manager
+msgid "Administrator"
+msgstr "ადმინისტრატორი"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_run_view_form
+msgid "Advanced"
+msgstr "გაფართოებული"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "All caught up. No price needs a decision."
+msgstr "ყველაფერი გადაწყვეტილია. არც ერთი ფასი არ საჭიროებს გადაწყვეტილებას."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "All done"
+msgstr "ყველაფერი შესრულდა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "All nights"
+msgstr "ყველა ღამე"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/nights_chart/nights_chart.js:0
+msgid "All rooms"
+msgstr "ყველა ოთახი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__otb_rooms
+msgid "Already Booked"
+msgstr "უკვე დაჯავშნილი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__otb_occ
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__otb_occ
+msgid "Already Booked %"
+msgstr "უკვე დაჯავშნილი %"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/nights_chart/nights_chart.js:0
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+msgid "Already booked"
+msgstr "უკვე დაჯავშნილი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__otb_occ
+msgid "Already booked %"
+msgstr "უკვე დაჯავშნილი %"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/nights_chart/nights_chart.js:0
+msgid "Already booked %(booked)s of %(capacity)s rooms"
+msgstr "უკვე დაჯავშნილია %(capacity)s ოთახიდან %(booked)s"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__otb_rooms
+msgid "Already booked rooms"
+msgstr "უკვე დაჯავშნილი ოთახები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_room_type__derive_value
+msgid "Amount / %"
+msgstr "თანხა / %"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_property.py:0
+msgid "Another run of this hotel is in progress."
+msgstr "ამ სასტუმროს სხვა გაშვება უკვე მიმდინარეობს."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_event__note
+msgid "Any detail you want to remember about this event."
+msgstr "ნებისმიერი დეტალი, რომლის დამახსოვრებაც გსურთ ამ ღონისძიების შესახებ."
+
+#. module: hotel_rms
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_price_audit__action__apply
+msgid "Applied"
+msgstr "გამოყენებული"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+msgid "Approved prices appear here after you export them."
+msgstr "დამტკიცებული ფასები აქ მათი ექსპორტის შემდეგ გამოჩნდება."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_room_type__active
+msgid "Archive a room type you no longer sell; its prices and bookings stay."
+msgstr ""
+"დააარქივეთ ოთახის ტიპი, რომელსაც აღარ ყიდით; მისი ფასები და ჯავშნები "
+"შენარჩუნდება."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_reservation__arrival
+msgid "Arrival"
+msgstr "ჩამოსვლა"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_reservation_view_search
+msgid "Arrival month"
+msgstr "ჩამოსვლის თვე"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid ""
+"Arrow keys move, Enter opens, A accepts, R rejects, L locks or unlocks, J "
+"and K go to the next or previous price in review, Esc closes"
+msgstr ""
+"ისრები გადაადგილებს, Enter ხსნის, A იღებს, R უარყოფს, L ჩაკეტავს ან "
+"განბლოკავს, J და K განხილვისას გადადის შემდეგ ან წინა ფასზე, Esc ხურავს"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.js:0
+msgid "As usual"
+msgstr "ჩვეულებრივად"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__message_attachment_count
+msgid "Attachment Count"
+msgstr "დანართების რაოდენობა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "Bar: booked, then forecast (hatched: low confidence)"
+msgstr "ზოლი: ჯერ დაჯავშნილი, შემდეგ პროგნოზი (დაშტრიხული: დაბალი სანდოობა)"
+
+#. module: hotel_rms
+#. odoo-javascript
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+#: code:addons/hotel_rms/static/src/components/waterfall/waterfall.js:0
+msgid "Base"
+msgstr "საბაზისო ფასი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_season__base_rate
+msgid "Base Price"
+msgstr "საბაზისო ფასი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/pace_chart/pace_chart.js:0
+msgid "Booked"
+msgstr "დაჯავშნილი"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Booked %"
+msgstr "დაჯავშნილი %"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_reservation__booking_date
+msgid "Booked On"
+msgstr "დაჯავშნის თარიღი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__otb_revenue
+msgid "Booked Revenue"
+msgstr "დაჯავშნილი შემოსავალი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "Booked in the last 7 days"
+msgstr "ბოლო 7 დღეში დაჯავშნილი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/year_pace_chart/year_pace_chart.js:0
+msgid "Booked now"
+msgstr "ახლა დაჯავშნილი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "Booked occupancy · 30 nights"
+msgstr "დაჯავშნილი დატვირთვა · 30 ღამე"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+msgid "Booked on"
+msgstr "დაჯავშნის თარიღი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__pace
+msgid "Booked rooms divided by usually booked rooms."
+msgstr "დაჯავშნილი ოთახები გაყოფილი ჩვეულებრივ დაჯავშნილ ოთახებზე."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_forecast__pace
+msgid "Booked rooms divided by usually booked rooms; 0 when unknown."
+msgstr ""
+"დაჯავშნილი ოთახები გაყოფილი ჩვეულებრივ დაჯავშნილ ოთახებზე; უცნობის "
+"შემთხვევაში 0."
+
+#. module: hotel_rms
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_curve_point__kind__booking
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_reservation_view_form
+msgid "Booking"
+msgstr "ჯავშანი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__booking_point_ids
+msgid "Booking Curve"
+msgstr "ჯავშნების მრუდი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__pace
+msgid "Booking Pace"
+msgstr "ჯავშნების ტემპი"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Booking curve"
+msgstr "ჯავშნების მრუდი"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Booking data updated"
+msgstr "ჯავშნების მონაცემები განახლდა"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__pace
+msgid "Booking pace"
+msgstr "ჯავშნების ტემპი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+#: model:ir.actions.act_window,name:hotel_rms.action_hotel_rms_reservation
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_import__kind__reservations
+#: model:ir.ui.menu,name:hotel_rms.menu_hotel_rms_reservation
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Bookings"
+msgstr "ჯავშნები"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "Bookings are %s%% ahead of usual."
+msgstr "ჯავშნები ჩვეულებრივზე %s%%-ით მეტია."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "Bookings are %s%% behind usual."
+msgstr "ჯავშნები ჩვეულებრივზე %s%%-ით ნაკლებია."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "Bookings are ahead of usual: %s"
+msgstr "ჯავშნები ჩვეულებრივზე მეტია: %s"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "Bookings are behind usual: %s"
+msgstr "ჯავშნები ჩვეულებრივზე ნაკლებია: %s"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_reservation_view_pivot
+msgid "Bookings by month"
+msgstr "ჯავშნები თვეების მიხედვით"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+msgid "Bookings gained this week"
+msgstr "ამ კვირის ახალი ჯავშნები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__pace_threshold_pct
+msgid ""
+"Bookings must be this far ahead or behind usual before the price reacts."
+msgstr ""
+"ფასის რეაგირებისთვის ჯავშნები ჩვეულებრივზე ამდენით მეტი ან ნაკლები უნდა "
+"იყოს."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+msgid "Bookings vs last year"
+msgstr "ჯავშნები გასულ წელთან შედარებით"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+msgid "Bookings vs usual"
+msgstr "ჯავშნები ჩვეულებრივთან შედარებით"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_import__kind
+msgid ""
+"Bookings: your reservations. Current prices: the prices that are live now."
+msgstr ""
+"ჯავშნები: თქვენი ჯავშნები. მიმდინარე ფასები: ფასები, რომლებიც ახლა "
+"მოქმედებს."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "Bring in your bookings"
+msgstr "შემოიტანეთ თქვენი ჯავშნები"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_property_demo.py:0
+msgid "Business Conference"
+msgstr "ბიზნეს კონფერენცია"
+
+#. module: hotel_rms
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_property__last_run_state__busy
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_run__state__busy
+msgid "Busy"
+msgstr "დაკავებულია"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "Calendar"
+msgstr "კალენდარი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__can_undo
+msgid "Can Undo"
+msgstr "დაბრუნება შეიძლება"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "Cancellations, last 7 days"
+msgstr "გაუქმებები, ბოლო 7 დღე"
+
+#. module: hotel_rms
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_reservation__status__cancelled
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_reservation_view_search
+msgid "Cancelled"
+msgstr "გაუქმებული"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_reservation__cancel_date
+msgid "Cancelled On"
+msgstr "გაუქმების თარიღი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "Cancelled in the last 7 days"
+msgstr "ბოლო 7 დღეში გაუქმებული"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_event__category
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_event_view_search
+msgid "Category"
+msgstr "კატეგორია"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_run_view_list
+msgid "Changed"
+msgstr "შეცვლილი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "Changes"
+msgstr "ცვლილებები"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_reservation__channel
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_reservation_view_search
+msgid "Channel"
+msgstr "არხი"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_import_view_form
+msgid "Check file"
+msgstr "ფაილის შემოწმება"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_property_demo.py:0
+msgid "City Festival"
+msgstr "ქალაქის ფესტივალი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "Clear"
+msgstr "გასუფთავება"
+
+#. module: hotel_rms
+#: model_terms:ir.actions.act_window,help:hotel_rms.action_hotel_rms_event
+msgid ""
+"Click a day or drag over several days. Events and holidays raise or lower "
+"the price of their nights."
+msgstr ""
+"დააწკაპუნეთ დღეზე ან გადაატარეთ მაუსი რამდენიმე დღეზე. ღონისძიებები და უქმე "
+"დღეები მათი ღამეების ფასს ზრდის ან ამცირებს."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+msgid ""
+"Click a night, or drag across several nights, to open the calendar there."
+msgstr ""
+"დააწკაპუნეთ ღამეზე ან გადაატარეთ მაუსი რამდენიმე ღამეზე, რომ კალენდარი იქ "
+"გაიხსნას."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/list_dialog/list_dialog.xml:0
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "Close"
+msgstr "დახურვა"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__protect_occ_pct
+msgid "Close to the night and nearly full: never lower the current price."
+msgstr "ღამესთან ახლოს და თითქმის სავსე: მიმდინარე ფასი არასდროს მცირდება."
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_room_type__code
+msgid "Code"
+msgstr "კოდი"
+
+#. module: hotel_rms
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_forecast__method__coldstart_v1
+msgid "Cold start"
+msgstr "ცივი დაწყება"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_curve_point__company_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_event__company_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__company_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_import__company_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__company_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price_audit__company_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__company_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_reservation__company_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_room_type__company_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_run__company_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_season__company_id
+msgid "Company"
+msgstr "კომპანია"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__refs
+msgid "Comparable Nights"
+msgstr "შესადარი ღამეები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__recent_weeks
+msgid "Comparable Recent Weeks"
+msgstr "შესადარი ბოლო კვირები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__ref_window_days
+msgid "Comparable Window Days"
+msgstr "შესადარი პერიოდის დღეები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__ref_years
+msgid "Comparable Years"
+msgstr "შესადარი წლები"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__confidence_level
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__confidence_score
+msgid "Confidence"
+msgstr "სანდოობა"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__confidence_score
+msgid "Confidence Score"
+msgstr "სანდოობის ქულა"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__confidence_level
+msgid "Confidence level"
+msgstr "სანდოობის დონე"
+
+#. module: hotel_rms
+#: model:ir.ui.menu,name:hotel_rms.menu_hotel_rms_config
+msgid "Configuration"
+msgstr "კონფიგურაცია"
+
+#. module: hotel_rms
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_reservation__status__confirmed
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_reservation_view_search
+msgid "Confirmed"
+msgstr "დადასტურებული"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Copy to next year"
+msgstr "შემდეგ წელზე კოპირება"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "Counts only nights inside the period; the list shows whole bookings"
+msgstr "ითვლება მხოლოდ პერიოდში მოხვედრილი ღამეები; სიაში ნაჩვენებია სრული ჯავშნები"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "Create hotel"
+msgstr "სასტუმროს შექმნა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "Create your hotel to get a price recommendation for every night."
+msgstr ""
+"შექმენით თქვენი სასტუმრო, რომ ყოველი ღამისთვის ფასის რეკომენდაცია მიიღოთ."
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_import__created
+msgid "Created"
+msgstr "შექმნილი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_curve_point__create_uid
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_event__create_uid
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__create_uid
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_import__create_uid
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__create_uid
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price_audit__create_uid
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__create_uid
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_reservation__create_uid
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_room_type__create_uid
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_run__create_uid
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_season__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_curve_point__create_date
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_event__create_date
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__create_date
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_import__create_date
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__create_date
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price_audit__create_date
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__create_date
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_reservation__create_date
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_room_type__create_date
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_run__create_date
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_season__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__currency_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__currency_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price_audit__currency_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__currency_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_reservation__currency_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_season__currency_id
+msgid "Currency"
+msgstr "ვალუტა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+#: code:addons/hotel_rms/static/src/components/price_position/price_position.js:0
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__is_current
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_view_list
+msgid "Current"
+msgstr "მიმდინარე"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_forecast_view_search
+msgid "Current forecast"
+msgstr "მიმდინარე პროგნოზი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__published_rate
+msgid "Current price"
+msgstr "მიმდინარე ფასი"
+
+#. module: hotel_rms
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_import__kind__rates
+msgid "Current prices"
+msgstr "მიმდინარე ფასები"
+
+#. module: hotel_rms
+#: model:ir.model,name:hotel_rms.model_hotel_rms_curve_point
+msgid "Curve Point"
+msgstr "მრუდის წერტილი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "Data %s days old · prices frozen"
+msgstr "მონაცემები %s დღის წინანდელია · ფასები გაყინულია"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__data_age_days
+msgid "Data Age Days"
+msgstr "მონაცემების ასაკი (დღე)"
+
+#. module: hotel_rms
+#: model:ir.model,name:hotel_rms.model_hotel_rms_import
+msgid "Data Import"
+msgstr "მონაცემთა იმპორტი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__stale_after_days
+msgid "Data Stale After Days"
+msgstr "მონაცემების მოძველების ვადა (დღე)"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__last_data_at
+msgid "Data Updated"
+msgstr "მონაცემების განახლების თარიღი"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_kanban
+msgid "Data is old"
+msgstr "მონაცემები მოძველებულია"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_kanban
+msgid "Data is up to date"
+msgstr "მონაცემები განახლებულია"
+
+#. module: hotel_rms
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_property__last_run_state__stale
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_run__state__stale
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_run_view_search
+msgid "Data too old"
+msgstr "მონაცემები მოძველებულია"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_import__date
+msgid "Date"
+msgstr "თარიღი"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_run_view_search
+msgid "Day"
+msgstr "დღე"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__horizon_days
+msgid "Days Ahead"
+msgstr "პროგნოზის ჰორიზონტი (დღე)"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__lead_days
+msgid "Days Before"
+msgstr "ღამემდე დარჩენილი დღეები"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Days left"
+msgstr "დარჩენილი დღეები"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "Decided"
+msgstr "გადაწყვეტილია"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__decided_by
+msgid "Decided By"
+msgstr "გადაწყვეტილების მიმღები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__decided_at
+msgid "Decided On"
+msgstr "გადაწყვეტილების თარიღი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__decision_split
+msgid "Decision Split"
+msgstr "გადაწყვეტილებების განაწილება"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/decision_split/decision_split_field.js:0
+msgid "Decision split"
+msgstr "გადაწყვეტილებების განაწილება"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/utils/pricing_utils.js:0
+msgid "Decision undone"
+msgstr "გადაწყვეტილება დაბრუნდა"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_audit_view_pivot
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_audit_view_search
+msgid "Decisions"
+msgstr "გადაწყვეტილებები"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_kanban
+msgid "Decisions this month"
+msgstr "ამ თვის გადაწყვეტილებები"
+
+#. module: hotel_rms
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_curve_point__source__default
+msgid "Default"
+msgstr "ნაგულისხმევი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__tz
+msgid "Defines 'today' and the nights of this hotel."
+msgstr "განსაზღვრავს ამ სასტუმროს 'დღეს' და ღამეებს."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_property_demo.py:0
+msgid "Deluxe"
+msgstr "დელუქსი"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_curve_point__kind__demand
+msgid "Demand"
+msgstr "მოთხოვნა"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__demand_point_ids
+msgid "Demand Curve"
+msgstr "მოთხოვნის მრუდი"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Demand curve"
+msgstr "მოთხოვნის მრუდი"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "Demand is high: %s"
+msgstr "მოთხოვნა მაღალია: %s"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "Demand is low: %s"
+msgstr "მოთხოვნა დაბალია: %s"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Demand signals"
+msgstr "მოთხოვნის სიგნალები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_curve_point__kind
+msgid "Demand: price change by occupancy. Booking: share booked by days left."
+msgstr ""
+"მოთხოვნა: ფასის ცვლილება დატვირთვის მიხედვით. ჯავშანი: დაჯავშნილი წილი "
+"დარჩენილი დღეების მიხედვით."
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_kanban
+msgid "Demo"
+msgstr "დემო"
+
+#. module: hotel_rms
+#: model:ir.actions.server,name:hotel_rms.action_hotel_rms_demo
+#: model:ir.ui.menu,name:hotel_rms.menu_hotel_rms_demo
+msgid "Demo Data"
+msgstr "დემო-მონაცემები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__is_demo
+msgid "Demo Hotel"
+msgstr "დემო სასტუმრო"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_property_demo.py:0
+msgid "Demo Hotel (sample data)"
+msgstr "დემო სასტუმრო (სანიმუშო)"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_reservation__departure
+msgid "Departure"
+msgstr "წასვლა"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_property_demo.py:0
+msgid "Direct"
+msgstr "პირდაპირი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "Dismiss"
+msgstr "დახურვა"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_curve_point__display_name
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_event__display_name
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__display_name
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_import__display_name
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__display_name
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price_audit__display_name
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__display_name
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_reservation__display_name
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_room_type__display_name
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_run__display_name
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_season__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_import__state__done
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_property__last_run_state__done
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_run__state__done
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_import_view_search
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_run_view_search
+msgid "Done"
+msgstr "შესრულდა"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_run__state
+msgid ""
+"Done: forecasts and prices are fresh. Data too old: nothing changed, import "
+"new bookings. Busy: running now, or another run was already running. Failed:"
+" see the message."
+msgstr ""
+"შესრულდა: პროგნოზები და ფასები განახლებულია. მონაცემები მოძველებულია: "
+"არაფერი შეცვლილა, გააკეთეთ ახალი ჯავშნების იმპორტი. დაკავებულია: გაშვება "
+"ახლა მიმდინარეობს ან სხვა გაშვება უკვე მიმდინარეობდა. ვერ შესრულდა: იხილეთ "
+"შეტყობინება."
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_import_view_form
+msgid "Download sample data"
+msgstr "სანიმუშო მონაცემების ჩამოტვირთვა"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_import_view_form
+msgid "Download template"
+msgstr "შაბლონის ჩამოტვირთვა"
+
+#. module: hotel_rms
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_import__state__draft
+msgid "Draft"
+msgstr "მონახაზი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_import__state
+msgid ""
+"Draft: not imported yet. Done: imported. Failed: nothing was imported, see "
+"the errors."
+msgstr ""
+"მონახაზი: ჯერ არ არის იმპორტირებული. შესრულდა: იმპორტირებულია. ვერ შესრულდა:"
+" არაფერი იმპორტირებულა, იხილეთ შეცდომები."
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_run__duration
+msgid "Duration (s)"
+msgstr "ხანგრძლივობა (წმ)"
+
+#. module: hotel_rms
+#: model:ir.model,name:hotel_rms.model_hotel_rms_run
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__run_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__run_id
+msgid "Engine Run"
+msgstr "ძრავის გაშვება"
+
+#. module: hotel_rms
+#: model:ir.actions.act_window,name:hotel_rms.action_hotel_rms_run
+#: model:ir.ui.menu,name:hotel_rms.menu_hotel_rms_run
+msgid "Engine Runs"
+msgstr "ძრავის გაშვებები"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Engine runs ·"
+msgstr "ძრავის გაშვებები ·"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__error_pts
+msgid "Error (points)"
+msgstr "ცდომილება (პუნქტი)"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_import__errors
+msgid "Error Details"
+msgstr "შეცდომის დეტალები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_import__error_count
+msgid "Errors"
+msgstr "შეცდომები"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "Estimated RevPAR"
+msgstr "სავარაუდო შემოსავალი ერთ ხელმისაწვდომ ოთახზე"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+#: model:ir.model,name:hotel_rms.model_hotel_rms_event
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_event__category__event
+msgid "Event"
+msgstr "ღონისძიება"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "Event: %(name)s (%(pct)s%%)."
+msgstr "ღონისძიება: %(name)s (%(pct)s%%)."
+
+#. module: hotel_rms
+#: model:ir.actions.act_window,name:hotel_rms.action_hotel_rms_event
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__event_ids
+#: model:ir.ui.menu,name:hotel_rms.menu_hotel_rms_event
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_event_view_calendar
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_event_view_search
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Events"
+msgstr "ღონისძიებები"
+
+#. module: hotel_rms
+#: model_terms:ir.actions.act_window,help:hotel_rms.action_hotel_rms_price_audit
+msgid ""
+"Every decision on a price is kept here: who accepted, changed, rejected or "
+"published it, and when."
+msgstr ""
+"ფასის შესახებ ყოველი გადაწყვეტილება აქ ინახება: ვინ მიიღო, შეცვალა, უარყო ან"
+" გამოაქვეყნა და როდის."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_import__errors
+msgid "Every problem found in the file, with its row number."
+msgstr "ფაილში აღმოჩენილი ყველა პრობლემა სტრიქონის ნომრით."
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_season__expected_occ_pct
+msgid "Expected Occupancy %"
+msgstr "მოსალოდნელი დატვირთვა %"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/nights_chart/nights_chart.js:0
+msgid "Expected to book"
+msgstr "მოსალოდნელი ჯავშნები"
+
+#. module: hotel_rms
+#: model:ir.module.module,summary:base.module_hotel_rms
+msgid ""
+"Explainable occupancy forecast and nightly price recommendations for hotels"
+msgstr ""
+"სასტუმროებისთვის განმარტებადი დატვირთვის პროგნოზი და ღამის ფასების "
+"რეკომენდაციები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__explanation_html
+msgid "Explanation Html"
+msgstr "ახსნა (HTML)"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_property.py:0
+msgid "Export approved"
+msgstr "დამტკიცებული ფასების ექსპორტი"
+
+#. module: hotel_rms
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_price_audit__action__export
+msgid "Exported"
+msgstr "ექსპორტირებული"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__exported_rate
+msgid "Exported price"
+msgstr "ექსპორტირებული ფასი"
+
+#. module: hotel_rms
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_import__state__failed
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_property__last_run_state__failed
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_run__state__failed
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_import_view_search
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_run_view_search
+msgid "Failed"
+msgstr "ვერ შესრულდა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "Fair"
+msgstr "დამაკმაყოფილებელი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__curve_min_nights
+msgid "Fewest past nights needed before the booking curve can be learned."
+msgstr ""
+"წარსული ღამეების მინიმალური რაოდენობა, რომელიც ჯავშნების მრუდის შესასწავლად "
+"არის საჭირო."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__min_refs
+msgid "Fewest similar past nights needed to forecast from history."
+msgstr ""
+"მსგავსი წარსული ღამეების მინიმალური რაოდენობა, რომელიც ისტორიიდან "
+"პროგნოზირებისთვის არის საჭირო."
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_import__file
+msgid "File"
+msgstr "ფაილი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_import__filename
+msgid "Filename"
+msgstr "ფაილის სახელი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "Finish these steps to see price recommendations."
+msgstr "ფასების რეკომენდაციების სანახავად შეასრულეთ ეს ნაბიჯები."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "Fit"
+msgstr "მორგება"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_import_view_form
+msgid "Fix the file and choose it again."
+msgstr "შეასწორეთ ფაილი და ხელახლა აირჩიეთ."
+
+#. module: hotel_rms
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_room_type__derivation__amount
+msgid "Fixed amount above reference"
+msgstr "საბაზისო ოთახზე ფიქსირებული თანხით მეტი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__message_follower_ids
+msgid "Followers"
+msgstr "გამომწერები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "გამომწერები (პარტნიორები)"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+#: model:ir.actions.act_window,name:hotel_rms.action_hotel_rms_forecast
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__forecast_id
+#: model:ir.ui.menu,name:hotel_rms.menu_hotel_rms_forecast
+msgid "Forecast"
+msgstr "პროგნოზი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/occupancy_bar/occupancy_bar.js:0
+msgid "Forecast %(forecast)s%, booked %(booked)s%"
+msgstr "პროგნოზი %(forecast)s%, დაჯავშნილი %(booked)s%"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/nights_chart/nights_chart.js:0
+msgid "Forecast %(rooms)s rooms, %(share)s"
+msgstr "პროგნოზი %(rooms)s ოთახი, %(share)s"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__run_date
+msgid "Forecast Made On"
+msgstr "პროგნოზის შედგენის თარიღი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__forecast_occ
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__forecast_occ
+msgid "Forecast Occupancy %"
+msgstr "პროგნოზირებული დატვირთვა %"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__forecast_rooms
+msgid "Forecast Rooms"
+msgstr "პროგნოზირებული ოთახები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__forecast_series
+msgid "Forecast Series"
+msgstr "პროგნოზის სერია"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_run__forecast_version
+msgid "Forecast Version"
+msgstr "პროგნოზის ვერსია"
+
+#. module: hotel_rms
+#: model:ir.actions.act_window,name:hotel_rms.action_hotel_rms_forecast_accuracy
+#: model:ir.ui.menu,name:hotel_rms.menu_hotel_rms_forecast_accuracy
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_forecast_view_pivot
+msgid "Forecast accuracy"
+msgstr "პროგნოზის სიზუსტე"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Forecast from history"
+msgstr "პროგნოზი ისტორიიდან"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_forecast_view_graph
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_forecast_view_list
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_view_list
+msgid "Forecast occupancy"
+msgstr "პროგნოზირებული დატვირთვა"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__forecast_occ
+msgid "Forecast occupancy %"
+msgstr "პროგნოზირებული დატვირთვა %"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_curve_point__x
+msgid "Forecast occupancy % (demand curve) or days left (booking curve)."
+msgstr ""
+"პროგნოზირებული დატვირთვა % (მოთხოვნის მრუდი) ან დარჩენილი დღეები (ჯავშნების "
+"მრუდი)."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "Forecast occupancy %s%%"
+msgstr "პროგნოზირებული დატვირთვა %s%%"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__forecast_series
+msgid "Forecast occupancy of each of the next 30 nights."
+msgstr "მომდევნო 30 ღამიდან თითოეულის პროგნოზირებული დატვირთვა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__forecast_occ
+msgid "Forecast occupancy of the next 30 nights."
+msgstr "მომდევნო 30 ღამის პროგნოზირებული დატვირთვა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__forecast_occ
+msgid "Forecast occupancy of this night."
+msgstr "ამ ღამის პროგნოზირებული დატვირთვა."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "Forecast occupancy · 30 nights"
+msgstr "პროგნოზირებული დატვირთვა · 30 ღამე"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "Forecast occupancy, next %s nights"
+msgstr "პროგნოზირებული დატვირთვა, მომდევნო %s ღამე"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_kanban
+msgid "Forecast occupancy, next 30 nights"
+msgstr "პროგნოზირებული დატვირთვა, მომდევნო 30 ღამე"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+msgid "Forecast quality"
+msgstr "პროგნოზის ხარისხი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_forecast__forecast_occ
+msgid "Forecast rooms as a share of the rooms available."
+msgstr "პროგნოზირებული ოთახები ხელმისაწვდომი ოთახების წილის სახით."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid ""
+"Forecast uses your season settings until enough booking history exists."
+msgstr ""
+"პროგნოზი თქვენი სეზონის პარამეტრებს იყენებს, სანამ ჯავშნების საკმარისი "
+"ისტორია დაგროვდება."
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_list
+msgid "Forecast, next 30 nights"
+msgstr "პროგნოზი, მომდევნო 30 ღამე"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__dow_fri
+msgid "Friday %"
+msgstr "პარასკევი %"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_curve_point__x
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_event__date_from
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_season__date_from
+msgid "From"
+msgstr "დასაწყისი"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "From occupancy %"
+msgstr "დატვირთვიდან %"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid ""
+"From which forecast occupancy (%) the price changes by how many percent."
+msgstr ""
+"პროგნოზირებული დატვირთვის რომელი დონიდან (%) იცვლება ფასი რამდენი პროცენტით."
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_reservation_view_search
+msgid "Future"
+msgstr "მომავალი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "Good"
+msgstr "კარგი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__has_message
+msgid "Has Message"
+msgstr "აქვს შეტყობინება"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "Hide details"
+msgstr "დეტალების დამალვა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.js:0
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_forecast__confidence_level__high
+msgid "High"
+msgstr "მაღალი"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_property_demo.py:0
+msgid "High season"
+msgstr "მაღალი სეზონი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__audit_ids
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_forecast__method__forecast_v1
+msgid "History"
+msgstr "ისტორია"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_forecast__method
+msgid ""
+"History: from similar past nights. Cold start: from the expected occupancy "
+"of the season, while there is no history."
+msgstr ""
+"ისტორია: მსგავსი წარსული ღამეებიდან. ცივი დაწყება: სეზონის მოსალოდნელი "
+"დატვირთვიდან, სანამ ისტორია არ არსებობს."
+
+#. module: hotel_rms
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_event__category__holiday
+msgid "Holiday"
+msgstr "უქმე დღე"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_event_view_search
+msgid "Holidays"
+msgstr "უქმე დღეები"
+
+#. module: hotel_rms
+#: model:ir.model,name:hotel_rms.model_hotel_rms_property
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_curve_point__property_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_event__property_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__property_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_import__property_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__property_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price_audit__property_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_reservation__property_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_room_type__property_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_run__property_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_season__property_id
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_event_view_search
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_forecast_view_search
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_import_view_search
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_audit_view_search
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_view_search
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_reservation_view_search
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_run_view_search
+msgid "Hotel"
+msgstr "სასტუმრო"
+
+#. module: hotel_rms
+#: model:res.groups.privilege,name:hotel_rms.res_groups_privilege_hotel_rms
+msgid "Hotel Revenue"
+msgstr "სასტუმროს შემოსავლები"
+
+#. module: hotel_rms
+#: model:ir.module.module,shortdesc:base.module_hotel_rms
+msgid "Hotel Revenue Management"
+msgstr "სასტუმროს შემოსავლების მართვა"
+
+#. module: hotel_rms
+#: model:ir.actions.server,name:hotel_rms.ir_cron_hotel_rms_run_engine_ir_actions_server
+msgid "Hotel Revenue: Run Engine"
+msgstr "სასტუმროს შემოსავლები: ძრავის გაშვება"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Hotel name"
+msgstr "სასტუმროს სახელი"
+
+#. module: hotel_rms
+#: model:ir.actions.act_window,name:hotel_rms.action_hotel_rms_property
+#: model:ir.ui.menu,name:hotel_rms.menu_hotel_rms_property
+msgid "Hotels"
+msgstr "სასტუმროები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_forecast__error_pts
+msgid ""
+"How far the forecast was from the real bookings, in points of occupancy."
+msgstr "რეალურ ჯავშნებთან შედარებით პროგნოზის გადახრა დატვირთვის პუნქტებში."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+msgid "How far the forecast was from the rooms really booked, by week."
+msgstr ""
+"რეალურად დაჯავშნილ ოთახებთან შედარებით პროგნოზის გადახრა, კვირების მიხედვით."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price_audit__vs_recommended
+msgid "How far the new price is from the recommendation."
+msgstr "რამდენად განსხვავდება ახალი ფასი რეკომენდაციისგან."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__ref_window_days
+msgid "How many days around the same date last year count as similar nights."
+msgstr ""
+"გასული წლის იმავე თარიღის გარშემო რამდენი დღე ითვლება მსგავს ღამეებად."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_forecast__lead_days
+msgid "How many days before the night the forecast was made."
+msgstr "ღამემდე რამდენი დღით ადრე შედგა პროგნოზი."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__horizon_days
+msgid "How many nights ahead the engine forecasts and prices."
+msgstr "რამდენ მომავალ ღამეს პროგნოზირებს და აფასებს ძრავა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__ref_years
+msgid "How many past years are searched for similar nights."
+msgstr "რამდენ წარსულ წელში ეძებება მსგავსი ღამეები."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__recent_weeks
+msgid "How many recent weeks are searched for similar nights."
+msgstr "რამდენ ბოლო კვირაში ეძებება მსგავსი ღამეები."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_reservation__rooms
+msgid "How many rooms of this type were booked."
+msgstr "ამ ტიპის რამდენი ოთახი დაჯავშნეს."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_run__duration
+msgid "How many seconds the run took."
+msgstr "რამდენ წამს გაგრძელდა გაშვება."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_room_type__derive_value
+msgid ""
+"How much above the reference room: an amount, or a percent of its price."
+msgstr "რამდენით მეტია საბაზისო ოთახზე: თანხით ან მისი ფასის პროცენტით."
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid ""
+"How much of the final occupancy is usually booked when this many days are left.\n"
+"                                Used while there is no booking history."
+msgstr ""
+"საბოლოო დატვირთვის რა ნაწილია ჩვეულებრივ დაჯავშნილი, როცა დარჩენილია ამდენი დღე.\n"
+"                                გამოიყენება, სანამ ჯავშნების ისტორია არ არსებობს."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__confidence_level
+msgid "How much to trust the forecast."
+msgstr "რამდენად შეიძლება პროგნოზის ნდობა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_forecast__confidence_level
+msgid "How much to trust this forecast."
+msgstr "რამდენად შეიძლება ამ პროგნოზის ნდობა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__action
+msgid "How the recommendation compares with the current price."
+msgstr "რეკომენდაციის შედარება მიმდინარე ფასთან."
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_curve_point__id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_event__id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_import__id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price_audit__id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_reservation__id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_room_type__id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_run__id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_season__id
+msgid "ID"
+msgstr "ID"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "თუ მონიშნულია, ახალი შეტყობინებები საჭიროებს თქვენს ყურადღებას."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__message_has_error
+msgid "If checked, some messages have a delivery error."
+msgstr "თუ მონიშნულია, ზოგიერთ შეტყობინებას აქვს მიწოდების შეცდომა."
+
+#. module: hotel_rms
+#: model:ir.actions.act_window,name:hotel_rms.action_hotel_rms_import_new
+#: model:ir.ui.menu,name:hotel_rms.menu_hotel_rms_import
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_import_view_form
+msgid "Import"
+msgstr "იმპორტი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__import_count
+msgid "Import Count"
+msgstr "იმპორტების რაოდენობა"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_import_view_form
+msgid "Import another"
+msgstr "კიდევ ერთის იმპორტი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Import bookings"
+msgstr "ჯავშნების იმპორტი"
+
+#. module: hotel_rms
+#: model_terms:ir.actions.act_window,help:hotel_rms.action_hotel_rms_forecast
+msgid ""
+"Import your bookings and press Run now on the hotel: the engine forecasts "
+"the occupancy of every night."
+msgstr ""
+"გააკეთეთ ჯავშნების იმპორტი და სასტუმროზე დააჭირეთ ახლავე გაშვებას: ძრავა "
+"ყოველი ღამის დატვირთვას პროგნოზირებს."
+
+#. module: hotel_rms
+#: model_terms:ir.actions.act_window,help:hotel_rms.action_hotel_rms_import
+#: model_terms:ir.actions.act_window,help:hotel_rms.action_hotel_rms_reservation
+msgid ""
+"Import your bookings from a CSV or Excel file: the engine learns from them "
+"how your nights fill up."
+msgstr ""
+"შემოიტანეთ თქვენი ჯავშნები CSV ან Excel ფაილიდან: ძრავა მათგან სწავლობს, "
+"როგორ ივსება თქვენი ღამეები."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+msgid "Import your bookings to see which nights are filling up."
+msgstr "შემოიტანეთ თქვენი ჯავშნები, რომ ნახოთ, რომელი ღამეები ივსება."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+msgid "Import your bookings, then run the engine."
+msgstr "გააკეთეთ ჯავშნების იმპორტი, შემდეგ გაუშვით ძრავა."
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_import_view_form
+msgid "Import your data"
+msgstr "თქვენი მონაცემების იმპორტი"
+
+#. module: hotel_rms
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_price_audit__action__import
+msgid "Imported"
+msgstr "იმპორტირებული"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_import__user_id
+msgid "Imported By"
+msgstr "იმპორტი შეასრულა"
+
+#. module: hotel_rms
+#: model:ir.actions.act_window,name:hotel_rms.action_hotel_rms_import
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Imports"
+msgstr "იმპორტები"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "Info"
+msgstr "ინფორმაცია"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "Insights"
+msgstr "ანალიტიკა"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__message_is_follower
+msgid "Is Follower"
+msgstr "არის გამომწერი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__is_stale
+msgid "Is Stale"
+msgstr "მოძველებულია"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_price__action__hold
+msgid "Keep"
+msgstr "დატოვება"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "Keep current price"
+msgstr "მიმდინარე ფასის დატოვება"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_import__kept
+msgid "Kept"
+msgstr "დარჩენილი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "Keyboard"
+msgstr "კლავიატურა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "Keyboard shortcuts"
+msgstr "კლავიატურის მალსახმობები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_curve_point__kind
+msgid "Kind"
+msgstr "სახეობა"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__lastmin_pct
+msgid "Last Minute %"
+msgstr "ბოლო წუთის %"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__lastmin_occ_pct
+msgid "Last Minute Below Occupancy %"
+msgstr "ბოლო წუთის: დატვირთვის ზღვარი %"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__lastmin_days
+msgid "Last Minute Within Days"
+msgstr "ბოლო წუთის: დღეები ღამემდე"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__last_run_state
+msgid "Last Run State"
+msgstr "ბოლო გაშვების სტატუსი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_curve_point__write_uid
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_event__write_uid
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__write_uid
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_import__write_uid
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__write_uid
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price_audit__write_uid
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__write_uid
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_reservation__write_uid
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_room_type__write_uid
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_run__write_uid
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_season__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_curve_point__write_date
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_event__write_date
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__write_date
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_import__write_date
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__write_date
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price_audit__write_date
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__write_date
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_reservation__write_date
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_room_type__write_date
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_run__write_date
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_season__write_date
+msgid "Last Updated on"
+msgstr "ბოლოს განახლდა"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "Last minute"
+msgstr "ბოლო წუთის"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+msgid "Latest price changes"
+msgstr "ფასების ბოლო ცვლილებები"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Learn booking curve"
+msgstr "ჯავშნების მრუდის შესწავლა"
+
+#. module: hotel_rms
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_curve_point__source__learned
+msgid "Learned"
+msgstr "შესწავლილი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_curve_point__source
+msgid "Learned points were computed from your past bookings."
+msgstr "შესწავლილი წერტილები გამოითვალა თქვენი წარსული ჯავშნებიდან."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "Limited by your season maximum."
+msgstr "შეზღუდულია თქვენი სეზონის მაქსიმუმით."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "Limited by your season minimum."
+msgstr "შეზღუდულია თქვენი სეზონის მინიმუმით."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_view_list
+msgid "Lock"
+msgstr "ჩაკეტვა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/lock_icon/lock_icon_field.js:0
+msgid "Lock icon"
+msgstr "ჩაკეტვის ხატულა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__locked
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_price_audit__action__lock
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_view_search
+msgid "Locked"
+msgstr "ჩაკეტილი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/lock_icon/lock_icon_field.xml:0
+msgid "Locked: the engine does not change this price"
+msgstr "ჩაკეტილია: ძრავა ამ ფასს არ ცვლის"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.js:0
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_forecast__confidence_level__low
+msgid "Low"
+msgstr "დაბალი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/occupancy_bar/occupancy_bar.js:0
+msgid "Low confidence: there is little booking history for a night like this"
+msgstr "დაბალი სანდოობა: ასეთი ღამისთვის ჯავშნების ისტორია მცირეა"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_property_demo.py:0
+msgid "Low season"
+msgstr "დაბალი სეზონი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_price__action__down
+msgid "Lower"
+msgstr "შემცირება"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__max_step_pct
+msgid "Maximum Change %"
+msgstr "მაქსიმალური ცვლილება %"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_season__max_rate
+msgid "Maximum Price"
+msgstr "მაქსიმალური ფასი"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "Maximum change"
+msgstr "მაქსიმალური ცვლილება"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.js:0
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_forecast__confidence_level__medium
+msgid "Medium"
+msgstr "საშუალო"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_run__message
+msgid "Message"
+msgstr "შეტყობინება"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__message_has_error
+msgid "Message Delivery error"
+msgstr "შეტყობინების მიწოდების შეცდომა"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__message_ids
+msgid "Messages"
+msgstr "შეტყობინებები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__method
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_forecast_view_search
+msgid "Method"
+msgstr "მეთოდი"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_property_demo.py:0
+msgid "Mid season"
+msgstr "საშუალო სეზონი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__min_change_pct
+msgid "Minimum Change %"
+msgstr "მინიმალური ცვლილება %"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__min_refs
+msgid "Minimum Comparable Nights"
+msgstr "შესადარი ღამეების მინიმუმი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_season__min_rate
+msgid "Minimum Price"
+msgstr "მინიმალური ფასი"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+msgid "Missing column: %s"
+msgstr "სვეტი აკლია: %s"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_position/price_position.js:0
+msgid "Model target"
+msgstr "მოდელის სამიზნე ფასი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__raw_target_rate
+msgid "Model target, before safety rules"
+msgstr "მოდელის სამიზნე ფასი უსაფრთხოების წესებამდე"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__dow_mon
+msgid "Monday %"
+msgstr "ორშაბათი %"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_audit_view_search
+msgid "Month"
+msgstr "თვე"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "More"
+msgstr "მეტი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__decided_rate
+msgid "My price"
+msgstr "ჩემი ფასი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_event__name
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__name
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_room_type__name
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_season__name
+msgid "Name"
+msgstr "სახელი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+msgid "Needs 2 weeks of history"
+msgstr "საჭიროა 2 კვირის ისტორია"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+#: code:addons/hotel_rms/static/src/utils/pricing_utils.js:0
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_price__state__pending
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_view_search
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_list
+msgid "Needs decision"
+msgstr "საჭიროებს გადაწყვეტილებას"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "Needs decision (%s)"
+msgstr "საჭიროებს გადაწყვეტილებას (%s)"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__state
+msgid ""
+"Needs decision: waiting for you. Accepted: you took the recommendation. Own "
+"price: you set another price. Rejected: you kept the current price."
+msgstr ""
+"საჭიროებს გადაწყვეტილებას: თქვენს გადაწყვეტილებას ელოდება. მიღებული: თქვენ "
+"მიიღეთ რეკომენდაცია. საკუთარი ფასი: თქვენ დააწესეთ სხვა ფასი. უარყოფილი: "
+"თქვენ დატოვეთ მიმდინარე ფასი."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_change/price_change.js:0
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_price__action__new
+msgid "New"
+msgstr "ახალი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price_audit__new_rate
+msgid "New Price"
+msgstr "ახალი ფასი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "New bookings, last 7 days"
+msgstr "ახალი ჯავშნები, ბოლო 7 დღე"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_audit_view_list
+msgid "New price"
+msgstr "ახალი ფასი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "Next"
+msgstr "შემდეგი"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_view_search
+msgid "Next 30 nights"
+msgstr "შემდეგი 30 ღამე"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__stay_date
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__stay_date
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price_audit__stay_date
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_forecast_view_search
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_view_search
+msgid "Night"
+msgstr "ღამე"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__has_actual
+msgid "Night Passed"
+msgstr "ღამე გავიდა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/night_cell/night_cell_field.js:0
+msgid "Night and room"
+msgstr "ღამე და ოთახი"
+
+#. module: hotel_rms
+#: model:ir.model,name:hotel_rms.model_hotel_rms_price
+msgid "Nightly Price"
+msgstr "ღამის ფასი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_reservation__nights
+msgid "Nights"
+msgstr "ღამეები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_run__nights
+msgid "Nights Forecast"
+msgstr "პროგნოზირებული ღამეები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__curve_min_nights
+msgid "Nights Needed To Learn Curve"
+msgstr "მრუდის შესასწავლად საჭირო ღამეები"
+
+#. module: hotel_rms
+#: model:res.groups.privilege,placeholder:hotel_rms.res_groups_privilege_hotel_rms
+msgid "No"
+msgstr "არა"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_kanban
+msgid "No booking data yet"
+msgstr "ჯავშნების მონაცემები ჯერ არ არის"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "No booking data · prices frozen"
+msgstr "ჯავშნების მონაცემები არ არის · ფასები გაყინულია"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+msgid "No bookings and no forecast for these nights yet"
+msgstr "ამ ღამეებზე ჯავშნები და პროგნოზი ჯერ არ არის"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+msgid "No bookings in the next"
+msgstr "მომდევნო"
+
+#. module: hotel_rms
+#: model_terms:ir.actions.act_window,help:hotel_rms.action_hotel_rms_reservation
+msgid "No bookings yet"
+msgstr "ჯავშნები ჯერ არ არის"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/pickup_heatmap/pickup_heatmap.js:0
+#: code:addons/hotel_rms/static/src/components/price_change/price_change.js:0
+msgid "No change"
+msgstr "ცვლილება არ არის"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/utils/pricing_utils.js:0
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_price__state__hold
+msgid "No change suggested"
+msgstr "ცვლილება არ არის შემოთავაზებული"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "No change vs 7 days ago"
+msgstr "7 დღის წინანდელთან შედარებით ცვლილება არ არის"
+
+#. module: hotel_rms
+#: model_terms:ir.actions.act_window,help:hotel_rms.action_hotel_rms_forecast_accuracy
+msgid "No forecast can be checked yet"
+msgstr "პროგნოზი ჯერ ვერ შემოწმდება"
+
+#. module: hotel_rms
+#: model_terms:ir.actions.act_window,help:hotel_rms.action_hotel_rms_forecast
+msgid "No forecast yet"
+msgstr "პროგნოზი ჯერ არ არის"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "No forecast yet: run the engine."
+msgstr "პროგნოზი ჯერ არ არის: გაუშვით ძრავა."
+
+#. module: hotel_rms
+#: model_terms:ir.actions.act_window,help:hotel_rms.action_hotel_rms_price
+msgid "No price needs a decision"
+msgstr "არც ერთი ფასი არ საჭიროებს გადაწყვეტილებას"
+
+#. module: hotel_rms
+#: model_terms:ir.actions.act_window,help:hotel_rms.action_hotel_rms_price_audit
+msgid "No price was changed yet"
+msgstr "ფასი ჯერ არ შეცვლილა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+msgid "No price was decided this month"
+msgstr "ამ თვეში ფასზე გადაწყვეტილება არ მიღებულა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+msgid "No price was exported or applied yet"
+msgstr "ფასი ჯერ არ ექსპორტირებულა და არ გამოყენებულა"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_import_view_form
+msgid "No problem found: the file is ready to import."
+msgstr "პრობლემა ვერ მოიძებნა: ფაილი იმპორტისთვის მზადაა."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "No recommendation for this night: it has no season or no forecast."
+msgstr "ამ ღამისთვის რეკომენდაცია არ არის: მას სეზონი ან პროგნოზი არ აქვს."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/nights_chart/nights_chart.xml:0
+msgid ""
+"No recommended prices for these nights yet. Run the engine to get them."
+msgstr ""
+"ამ ღამეებისთვის რეკომენდებული ფასები ჯერ არ არის. მისაღებად გაუშვით ძრავა."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_property.py:0
+msgid "No reference room type: forecasts only, no prices."
+msgstr "საბაზისო ოთახის ტიპი არ არის: მხოლოდ პროგნოზები, ფასების გარეშე."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "No season"
+msgstr "სეზონი არ არის"
+
+#. module: hotel_rms
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_reservation__status__no_show
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_reservation_view_search
+msgid "No-show"
+msgstr "არ გამოცხადდა"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_property.py:0
+msgid "Not enough history: %s nights with bookings are needed."
+msgstr "ისტორია საკმარისი არ არის: საჭიროა ჯავშნების მქონე %s ღამე."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "Not for sale"
+msgstr "არ იყიდება"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_event__note
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__note
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price_audit__note
+msgid "Note"
+msgstr "შენიშვნა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+msgid "Note for the history"
+msgstr "შენიშვნა ისტორიისთვის"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+msgid "Note for the history (optional)"
+msgstr "შენიშვნა ისტორიისთვის (არასავალდებულო)"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+msgid "Nothing to compare with yet"
+msgstr "შესადარებელი ჯერ არაფერია"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_kanban
+msgid "Nothing to decide"
+msgstr "გადასაწყვეტი არაფერია"
+
+#. module: hotel_rms
+#: model_terms:ir.actions.act_window,help:hotel_rms.action_hotel_rms_import
+msgid "Nothing was imported yet"
+msgstr "ჯერ არაფერი იმპორტირებულა"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__message_needaction_counter
+msgid "Number of Actions"
+msgstr "ქმედებების რაოდენობა"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__message_has_error_counter
+msgid "Number of errors"
+msgstr "შეცდომების რაოდენობა"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "ქმედების მომთხოვნი შეტყობინებების რაოდენობა"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "მიწოდების შეცდომის მქონე შეტყობინებების რაოდენობა"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_reservation__nights
+msgid "Number of nights of the stay."
+msgstr "ყოფნის ღამეების რაოდენობა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_run__nights
+msgid "Number of nights that got a forecast."
+msgstr "იმ ღამეების რაოდენობა, რომლებსაც პროგნოზი მიეცა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_run__prices_changed
+msgid "Number of prices that are new or different."
+msgstr "ახალი ან შეცვლილი ფასების რაოდენობა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_room_type__rooms
+msgid "Number of rooms of this type: the capacity of the hotel."
+msgstr "ამ ტიპის ოთახების რაოდენობა: სასტუმროს ტევადობა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_forecast__refs
+msgid "Number of similar past nights used for this forecast."
+msgstr "ამ პროგნოზისთვის გამოყენებული მსგავსი წარსული ღამეების რაოდენობა."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "Occupancy"
+msgstr "დატვირთვა"
+
+#. module: hotel_rms
+#: model:ir.model,name:hotel_rms.model_hotel_rms_forecast
+msgid "Occupancy Forecast"
+msgstr "დატვირთვის პროგნოზი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/occupancy_bar/occupancy_field.js:0
+msgid "Occupancy bar"
+msgstr "დატვირთვის ზოლი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price_audit__old_rate
+msgid "Old Price"
+msgstr "ძველი ფასი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "On par with last year"
+msgstr "გასული წლის დონეზე"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_event__category
+msgid "Only changes the colour in the calendar."
+msgstr "მხოლოდ კალენდარში ფერს ცვლის."
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_import_view_form
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_kanban
+msgid "Open calendar"
+msgstr "კალენდრის გახსნა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/list_dialog/list_dialog.xml:0
+msgid "Open full list"
+msgstr "სრული სიის გახსნა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+msgid "Open full record"
+msgstr "სრული ჩანაწერის გახსნა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "Open hotel"
+msgstr "სასტუმროს გახსნა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/decision_doughnut/decision_doughnut.js:0
+#: code:addons/hotel_rms/static/src/components/decision_split/decision_split.js:0
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+#: code:addons/hotel_rms/static/src/utils/pricing_utils.js:0
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_price__state__edited
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_price_audit__action__edit
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_view_search
+msgid "Own price"
+msgstr "საკუთარი ფასი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "Own prices vs recommended"
+msgstr "საკუთარი ფასები რეკომენდებულთან შედარებით"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__pace_adj_pct
+msgid "Pace Adjustment %"
+msgstr "ტემპის კორექტირება %"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__pace_threshold_pct
+msgid "Pace Threshold %"
+msgstr "ტემპის ზღვარი %"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_reservation_view_search
+msgid "Past"
+msgstr "წარსული"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_forecast_view_search
+msgid "Past nights"
+msgstr "წარსული ღამეები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__pending_count
+msgid "Pending Count"
+msgstr "გადასაწყვეტი ფასების რაოდენობა"
+
+#. module: hotel_rms
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_room_type__derivation__percent
+msgid "Percent above reference"
+msgstr "საბაზისო ოთახზე პროცენტით მეტი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__dow_fri
+msgid "Percent added to Friday prices (negative lowers them)."
+msgstr ""
+"პარასკევის ფასებს დამატებული პროცენტი (უარყოფითი მნიშვნელობა მათ ამცირებს)."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__dow_mon
+msgid "Percent added to Monday prices (negative lowers them)."
+msgstr ""
+"ორშაბათის ფასებს დამატებული პროცენტი (უარყოფითი მნიშვნელობა მათ ამცირებს)."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__dow_sat
+msgid "Percent added to Saturday prices (negative lowers them)."
+msgstr ""
+"შაბათის ფასებს დამატებული პროცენტი (უარყოფითი მნიშვნელობა მათ ამცირებს)."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__dow_sun
+msgid "Percent added to Sunday prices (negative lowers them)."
+msgstr ""
+"კვირის ფასებს დამატებული პროცენტი (უარყოფითი მნიშვნელობა მათ ამცირებს)."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__dow_thu
+msgid "Percent added to Thursday prices (negative lowers them)."
+msgstr ""
+"ხუთშაბათის ფასებს დამატებული პროცენტი (უარყოფითი მნიშვნელობა მათ ამცირებს)."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__dow_tue
+msgid "Percent added to Tuesday prices (negative lowers them)."
+msgstr ""
+"სამშაბათის ფასებს დამატებული პროცენტი (უარყოფითი მნიშვნელობა მათ ამცირებს)."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__dow_wed
+msgid "Percent added to Wednesday prices (negative lowers them)."
+msgstr ""
+"ოთხშაბათის ფასებს დამატებული პროცენტი (უარყოფითი მნიშვნელობა მათ ამცირებს)."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__lastmin_pct
+msgid ""
+"Percent added to the price of a last-minute night (negative lowers it)."
+msgstr ""
+"ბოლო წუთის ღამის ფასს დამატებული პროცენტი (უარყოფითი მნიშვნელობა მას "
+"ამცირებს)."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_event__impact_pct
+msgid ""
+"Percent added to the price of these nights. The strongest event of a night "
+"sets its price."
+msgstr ""
+"ამ ღამეების ფასს დამატებული პროცენტი. ღამის ფასს ყველაზე ძლიერი ღონისძიება "
+"განსაზღვრავს."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__pace_adj_pct
+msgid "Percent the price moves when bookings are ahead of or behind usual."
+msgstr ""
+"რამდენი პროცენტით იცვლება ფასი, როცა ჯავშნები ჩვეულებრივზე მეტია ან ნაკლები."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_property_demo.py:0
+msgid "Phone"
+msgstr "ტელეფონი"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Planning"
+msgstr "დაგეგმვა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "Poor"
+msgstr "სუსტი"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_import_view_form
+msgid ""
+"Press Check file to see the first rows as they will be imported and every "
+"problem, before anything is saved."
+msgstr ""
+"დააჭირეთ ფაილის შემოწმებას, რომ ნახოთ პირველი სტრიქონები ისე, როგორც "
+"იმპორტირდება, და ყველა პრობლემა, სანამ რამე შეინახება."
+
+#. module: hotel_rms
+#: model_terms:ir.actions.act_window,help:hotel_rms.action_hotel_rms_run
+msgid "Press Run now on a hotel. The engine also runs by itself every day."
+msgstr "სასტუმროზე დააჭირეთ ახლავე გაშვებას. ძრავა ყოველდღე თავისით ეშვება."
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_import__preview_html
+msgid "Preview"
+msgstr "გადახედვა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "Previous"
+msgstr "წინა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price_audit__price_id
+msgid "Price"
+msgstr "ფასი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+#: model:ir.actions.act_window,name:hotel_rms.action_hotel_rms_price_audit
+#: model:ir.model,name:hotel_rms.model_hotel_rms_price_audit
+#: model:ir.ui.menu,name:hotel_rms.menu_hotel_rms_price_audit
+msgid "Price History"
+msgstr "ფასების ისტორია"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_event__impact_pct
+msgid "Price Impact %"
+msgstr "ფასზე გავლენა %"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__price_step
+msgid "Price Step"
+msgstr "ფასის ბიჯი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_run__price_version
+msgid "Price Version"
+msgstr "ფასების ვერსია"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/utils/pricing_utils.js:0
+msgid "Price accepted"
+msgstr "ფასი მიღებულია"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_change/price_change_field.js:0
+msgid "Price change"
+msgstr "ფასის ცვლილება"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Price change %"
+msgstr "ფასის ცვლილება %"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_curve_point__value
+msgid "Price change % (demand curve) or % already booked (booking curve)."
+msgstr ""
+"ფასის ცვლილება % (მოთხოვნის მრუდი) ან უკვე დაჯავშნილი % (ჯავშნების მრუდი)."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+msgid "Price details"
+msgstr "ფასის დეტალები"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "Price level"
+msgstr "ფასის დონე"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/utils/pricing_utils.js:0
+msgid "Price locked"
+msgstr "ფასი ჩაკეტილია"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/utils/pricing_utils.js:0
+msgid "Price rejected"
+msgstr "ფასი უარყოფილია"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/utils/pricing_utils.js:0
+msgid "Price unlocked"
+msgstr "ფასი განბლოკილია"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_room_type__derivation
+msgid "Priced as"
+msgstr "ფასის განსაზღვრის წესი"
+
+#. module: hotel_rms
+#: model:ir.actions.act_window,name:hotel_rms.action_hotel_rms_price
+#: model:ir.ui.menu,name:hotel_rms.menu_hotel_rms_price
+msgid "Prices"
+msgstr "ფასები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_run__prices_changed
+msgid "Prices Changed"
+msgstr "შეცვლილი ფასები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__decision_split
+msgid "Prices accepted, set by you and rejected this month."
+msgstr "ამ თვეში მიღებული, თქვენ მიერ დაწესებული და უარყოფილი ფასები."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__price_step
+msgid "Prices are rounded to a multiple of this value."
+msgstr "ფასები მრგვალდება ამ მნიშვნელობის ჯერადამდე."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "Prices in"
+msgstr "ფასების ვალუტა:"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_import__kept
+msgid "Prices left as they are because they are waiting to be published."
+msgstr "ფასები, რომლებიც უცვლელი დარჩა, რადგან გამოქვეყნებას ელოდება."
+
+#. module: hotel_rms
+#: model:ir.actions.client,name:hotel_rms.action_pricing_calendar
+#: model:ir.ui.menu,name:hotel_rms.menu_hotel_rms_calendar
+msgid "Pricing Calendar"
+msgstr "ფასების კალენდარი"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Pricing rules"
+msgstr "ფასების წესები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__protect_occ_pct
+msgid "Protect From Occupancy %"
+msgstr "დაცვა დატვირთვიდან %"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__protect_days
+msgid "Protect Within Days"
+msgstr "დაცვა ღამემდე დღეებში"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "Protect current price"
+msgstr "მიმდინარე ფასის დაცვა"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_property_demo.py:0
+msgid "Public Holiday"
+msgstr "სახელმწიფო უქმე დღე"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_audit_view_search
+msgid "Published"
+msgstr "გამოქვეყნებული"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_price__action__up
+msgid "Raise"
+msgstr "გაზრდა"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__reason_json
+msgid "Reasons"
+msgstr "მიზეზები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__stale_after_days
+msgid "Recommendations are frozen when the booking data is older than this."
+msgstr "როცა ჯავშნების მონაცემები ამაზე ძველია, რეკომენდაციები იყინება."
+
+#. module: hotel_rms
+#. odoo-javascript
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+#: code:addons/hotel_rms/static/src/components/price_position/price_position.js:0
+#: code:addons/hotel_rms/static/src/components/waterfall/waterfall.js:0
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_view_list
+msgid "Recommended"
+msgstr "რეკომენდებული"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price_audit__recommended_rate
+msgid "Recommended Price"
+msgstr "რეკომენდებული ფასი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/nights_chart/nights_chart.js:0
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__recommended_rate
+msgid "Recommended price"
+msgstr "რეკომენდებული ფასი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/nights_chart/nights_chart.js:0
+msgid "Recommended price %s"
+msgstr "რეკომენდებული ფასი %s"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/nights_chart/nights_chart.xml:0
+msgid "Recommended price, reference room"
+msgstr "რეკომენდებული ფასი, საბაზისო ოთახი"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_reservation__source_ref
+msgid "Reference"
+msgstr "მითითება"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_room_type.py:0
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_room_type__derivation__reference
+msgid "Reference room"
+msgstr "საბაზისო ოთახი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "Reject"
+msgstr "უარყოფა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/decision_doughnut/decision_doughnut.js:0
+#: code:addons/hotel_rms/static/src/components/decision_split/decision_split.js:0
+#: code:addons/hotel_rms/static/src/utils/pricing_utils.js:0
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_price__state__rejected
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_price_audit__action__reject
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_view_search
+msgid "Rejected"
+msgstr "უარყოფილი"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Remove demo hotel"
+msgstr "დემო სასტუმროს მოცილება"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid ""
+"Replace the booking curve with the one learned from your past bookings."
+msgstr "ჯავშნების მრუდი ჩაანაცვლეთ თქვენი წარსული ჯავშნებიდან შესწავლილით."
+
+#. module: hotel_rms
+#: model:ir.ui.menu,name:hotel_rms.menu_hotel_rms_reports
+msgid "Reports"
+msgstr "ანგარიშგება"
+
+#. module: hotel_rms
+#: model:ir.model,name:hotel_rms.model_hotel_rms_reservation
+msgid "Reservation"
+msgstr "ჯავშანი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__reservation_count
+msgid "Reservation Count"
+msgstr "ჯავშნების რაოდენობა"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_reservation__revenue
+#: model:ir.ui.menu,name:hotel_rms.menu_hotel_rms_root
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_reservation_view_list
+msgid "Revenue"
+msgstr "შემოსავალი"
+
+#. module: hotel_rms
+#: model:res.groups,name:hotel_rms.group_hotel_rms_revenue_manager
+msgid "Revenue Manager"
+msgstr "შემოსავლების მენეჯერი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "Revenue on the books, next %s nights"
+msgstr "ჯავშნებით დაფიქსირებული შემოსავალი, მომდევნო %s ღამე"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_kanban
+msgid "Review"
+msgstr "განხილვა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "Review %s prices"
+msgstr "%s ფასის განხილვა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "Review 1 price"
+msgstr "1 ფასის განხილვა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "Review finished"
+msgstr "განხილვა დასრულდა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+msgid "Review the prices that need a decision in the calendar."
+msgstr "კალენდარში განიხილეთ ფასები, რომლებიც გადაწყვეტილებას საჭიროებს."
+
+#. module: hotel_rms
+#: model:ir.model,name:hotel_rms.model_hotel_rms_room_type
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__room_type_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price_audit__room_type_id
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_reservation__room_type_id
+msgid "Room Type"
+msgstr "ოთახის ტიპი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__room_type_ids
+msgid "Room Types"
+msgstr "ოთახის ტიპები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_forecast__otb_revenue
+msgid "Room revenue of the booked rooms for this night."
+msgstr "ამ ღამისთვის დაჯავშნილი ოთახების შემოსავალი."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_reservation__revenue
+msgid ""
+"Room revenue of the whole stay, on the same basis as your prices (with or "
+"without tax)."
+msgstr ""
+"მთელი ყოფნის შემოსავალი ოთახებიდან, თქვენი ფასების იმავე საფუძველზე "
+"(გადასახადით ან გადასახადის გარეშე)."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_view_search
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_reservation_view_search
+msgid "Room type"
+msgstr "ოთახის ტიპი"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "Room type difference"
+msgstr "ოთახის ტიპების სხვაობა"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_room_type__sequence
+msgid "Room types are listed in this order."
+msgstr "ოთახის ტიპები ამ მიმდევრობით ჩამოითვლება."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_reservation__rooms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_room_type__rooms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_reservation_view_list
+msgid "Rooms"
+msgstr "ოთახები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__capacity
+msgid "Rooms Available"
+msgstr "ხელმისაწვდომი ოთახები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__otb_rooms
+msgid "Rooms already booked for this night."
+msgstr "ამ ღამისთვის უკვე დაჯავშნილი ოთახები."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+msgid "Rooms booked for the next"
+msgstr "დაჯავშნილი ოთახები მომდევნო"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_forecast__otb_rooms
+msgid "Rooms booked for the night when the forecast was made."
+msgstr "პროგნოზის შედგენისას ღამისთვის დაჯავშნილი ოთახები."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_forecast__forecast_rooms
+msgid "Rooms expected to be booked on the night."
+msgstr "ღამისთვის მოსალოდნელად დაჯავშნილი ოთახები."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/pickup_heatmap/pickup_heatmap.xml:0
+msgid "Rooms gained in the last 7 days"
+msgstr "ბოლო 7 დღეში მიღებული ოთახები"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+msgid ""
+"Rooms gained per night in the last 7 days, cancellations taken off. Click a "
+"night to open it."
+msgstr ""
+"ბოლო 7 დღეში თითო ღამეზე მიღებული ოთახები, გაუქმებების გამოკლებით. ღამის "
+"გასახსნელად დააწკაპუნეთ მასზე."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_forecast__capacity
+msgid "Rooms of the hotel that night."
+msgstr "სასტუმროს ოთახები იმ ღამეს."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_forecast__actual_rooms
+msgid "Rooms really booked on the night."
+msgstr "ღამისთვის რეალურად დაჯავშნილი ოთახები."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_forecast__expected_otb
+msgid ""
+"Rooms usually booked by now for a night like this, from similar past nights."
+msgstr ""
+"ოთახები, რომლებიც ასეთი ღამისთვის ახლა ჩვეულებრივ უკვე დაჯავშნილია, მსგავსი "
+"წარსული ღამეების მიხედვით."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__expected_otb
+msgid "Rooms usually booked by now for a night like this."
+msgstr "ოთახები, რომლებიც ასეთი ღამისთვის ახლა ჩვეულებრივ უკვე დაჯავშნილია."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "Rounding"
+msgstr "დამრგვალება"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Rounding and limits"
+msgstr "დამრგვალება და ლიმიტები"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+msgid "Row %(number)s: %(error)s"
+msgstr "სტრიქონი %(number)s: %(error)s"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_import__created
+msgid "Rows added."
+msgstr "დამატებული სტრიქონები."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_import__error_count
+msgid "Rows of the file with a problem."
+msgstr "ფაილის სტრიქონები, რომლებშიც პრობლემაა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_import__updated
+msgid "Rows that existed and were changed."
+msgstr "არსებული სტრიქონები, რომლებიც შეიცვალა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__run_count
+msgid "Run Count"
+msgstr "გაშვებების რაოდენობა"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_run__run_date
+msgid "Run Day"
+msgstr "გაშვების დღე"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Run now"
+msgstr "ახლავე გაშვება"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "Run the engine for the first time"
+msgstr "პირველად გაუშვით ძრავა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/year_pace_chart/year_pace_chart.js:0
+msgid "Same nights last year"
+msgstr "გასული წლის იგივე ღამეები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__dow_sat
+msgid "Saturday %"
+msgstr "შაბათი %"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+msgid "Save the file as UTF-8 CSV."
+msgstr "შეინახეთ ფაილი UTF-8 CSV ფორმატით."
+
+#. module: hotel_rms
+#: model:ir.model,name:hotel_rms.model_hotel_rms_season
+msgid "Season"
+msgstr "სეზონი"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "Season limit"
+msgstr "სეზონის ლიმიტი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__season_ids
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Seasons"
+msgstr "სეზონები"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_season.py:0
+msgid "Seasons of the same hotel cannot overlap."
+msgstr "ერთი სასტუმროს სეზონები ერთმანეთს ვერ გადაფარავს."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "Select a price to see why it is recommended."
+msgstr "აირჩიეთ ფასი, რომ ნახოთ, რატომ არის ის რეკომენდებული."
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_room_type__sequence
+msgid "Sequence"
+msgstr "მიმდევრობა"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_forecast__is_current
+msgid "Set on the rows of the last finished run."
+msgstr "მითითებულია ბოლო დასრულებული გაშვების ჩანაწერებზე."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Set up your hotel"
+msgstr "თქვენი სასტუმროს დაყენება"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_run__params_hash
+msgid "Settings Hash"
+msgstr "პარამეტრების ჰეში"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_run__params
+msgid "Settings Used"
+msgstr "გამოყენებული პარამეტრები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__setup_bookings
+msgid "Setup Bookings"
+msgstr "დაყენება: ჯავშნები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__setup_done
+msgid "Setup Done"
+msgstr "დაყენება დასრულებულია"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__setup_rooms
+msgid "Setup Rooms"
+msgstr "დაყენება: ოთახები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__setup_run
+msgid "Setup Run"
+msgstr "დაყენება: გაშვება"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__setup_season
+msgid "Setup Season"
+msgstr "დაყენება: სეზონი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__otb_occ
+msgid "Share of the rooms already booked for the next 30 nights."
+msgstr "მომდევნო 30 ღამისთვის უკვე დაჯავშნილი ოთახების წილი."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__otb_occ
+msgid "Share of the rooms already booked for this night."
+msgstr "ამ ღამისთვის უკვე დაჯავშნილი ოთახების წილი."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_forecast__otb_occ
+msgid "Share of the rooms already booked."
+msgstr "უკვე დაჯავშნილი ოთახების წილი."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "Show details"
+msgstr "დეტალების ჩვენება"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+msgid "Skip"
+msgstr "გამოტოვება"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__min_change_pct
+msgid "Smaller changes keep the current price."
+msgstr "უფრო მცირე ცვლილების შემთხვევაში მიმდინარე ფასი რჩება."
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_curve_point__source
+msgid "Source"
+msgstr "წყარო"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/sparkline/sparkline_field.js:0
+msgid "Sparkline"
+msgstr "მინი-გრაფიკი"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_property_demo.py:0
+msgid "Standard"
+msgstr "სტანდარტი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_run__started_at
+msgid "Started"
+msgstr "დაიწყო"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_import__state
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__state
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_run__state
+msgid "State"
+msgstr "მდგომარეობა"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_reservation__status
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_view_search
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_reservation_view_search
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_run_view_search
+msgid "Status"
+msgstr "სტატუსი"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_reservation_view_form
+msgid "Stay"
+msgstr "ყოფნა"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_property_demo.py:0
+msgid "Suite"
+msgstr "ლუქსი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__dow_sun
+msgid "Sunday %"
+msgstr "კვირა %"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "Swipe right to accept, left to reject."
+msgstr "მისაღებად გადაასრიალეთ მარჯვნივ, უარსაყოფად — მარცხნივ."
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_view_form
+msgid "Technical details"
+msgstr "ტექნიკური დეტალები"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+msgid "The CSV file could not be read: %s"
+msgstr "CSV ფაილის წაკითხვა ვერ მოხერხდა: %s"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+msgid "The acceptance trend shows after two weeks of decisions."
+msgstr "მიღების ტენდენცია ორი კვირის გადაწყვეტილებების შემდეგ გამოჩნდება."
+
+#. module: hotel_rms
+#: model:ir.model.constraint,message:hotel_rms.constraint_hotel_rms_season_rates_in_order
+msgid "The base price must be between the minimum and the maximum price."
+msgstr "საბაზისო ფასი მინიმალურ და მაქსიმალურ ფასს შორის უნდა იყოს."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_property.py:0
+msgid "The booking data is older than %s days. Import new reservations."
+msgstr ""
+"ჯავშნების მონაცემები %s დღეზე ძველია. გააკეთეთ ახალი ჯავშნების იმპორტი."
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid ""
+"The booking data is out of date. Import new reservations or run the data connection,\n"
+"                        then press Run now."
+msgstr ""
+"ჯავშნების მონაცემები მოძველებულია. გააკეთეთ ახალი ჯავშნების იმპორტი ან გაუშვით მონაცემთა კავშირი,\n"
+"                        შემდეგ დააჭირეთ ახლავე გაშვებას."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_reservation__source_ref
+msgid ""
+"The booking number in your reservation system. A booking is updated by its "
+"reference."
+msgstr ""
+"ჯავშნის ნომერი თქვენს ჯავშნების სისტემაში. ჯავშანი მისი მითითებით "
+"განახლდება."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "The change is limited to the maximum change from the current price."
+msgstr "ცვლილება შეზღუდულია მიმდინარე ფასიდან მაქსიმალური ცვლილებით."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "The change is too small, so the current price stays."
+msgstr "ცვლილება ძალიან მცირეა, ამიტომ მიმდინარე ფასი რჩება."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_curve_point__company_id
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_event__company_id
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_forecast__company_id
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_import__company_id
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__company_id
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price_audit__company_id
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__company_id
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_reservation__company_id
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_room_type__company_id
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_run__company_id
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_season__company_id
+msgid "The company that owns this hotel and its prices."
+msgstr "კომპანია, რომელსაც ეს სასტუმრო და მისი ფასები ეკუთვნის."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__to_export
+msgid "The current price changed and was not published yet."
+msgstr "მიმდინარე ფასი შეიცვალა და ჯერ არ გამოქვეყნებულა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_reservation__cancel_date
+msgid "The day the booking was cancelled."
+msgstr "დღე, როცა ჯავშანი გაუქმდა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_forecast__run_date
+msgid "The day the forecast was made."
+msgstr "დღე, როცა პროგნოზი შედგა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_reservation__booking_date
+msgid "The day the guest booked."
+msgstr "დღე, როცა სტუმარმა დაჯავშნა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_reservation__departure
+msgid "The day the guest leaves: the last night is the day before."
+msgstr "დღე, როცა სტუმარი მიდის: ბოლო ღამე წინა დღეა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__lastmin_occ_pct
+msgid "The discount applies only while the forecast occupancy is below this."
+msgstr ""
+"ფასდაკლება მოქმედებს მხოლოდ მაშინ, როცა პროგნოზირებული დატვირთვა ამაზე "
+"ნაკლებია."
+
+#. module: hotel_rms
+#: model_terms:ir.actions.act_window,help:hotel_rms.action_hotel_rms_run
+msgid "The engine did not run yet"
+msgstr "ძრავა ჯერ არ გაშვებულა"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__locked
+msgid "The engine does not change a locked price."
+msgstr "ძრავა ჩაკეტილ ფასს არ ცვლის."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_season__min_rate
+msgid "The engine never recommends less than this."
+msgstr "ძრავა არასდროს გირჩევთ ამაზე ნაკლებს."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_season__max_rate
+msgid "The engine never recommends more than this."
+msgstr "ძრავა არასდროს გირჩევთ ამაზე მეტს."
+
+#. module: hotel_rms
+#: model_terms:ir.actions.act_window,help:hotel_rms.action_hotel_rms_price
+msgid ""
+"The engine recommends a price for every night each time it runs. Remove the "
+"filters to see all prices."
+msgstr ""
+"ძრავა ყოველ გაშვებაზე ყოველი ღამისთვის გირჩევთ ფასს. ყველა ფასის სანახავად "
+"მოხსენით ფილტრები."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_forecast__run_id
+msgid "The engine run that made this forecast."
+msgstr "ძრავის გაშვება, რომელმაც ეს პროგნოზი შექმნა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__run_id
+msgid "The engine run that made this recommendation."
+msgstr "ძრავის გაშვება, რომელმაც ეს რეკომენდაცია შექმნა."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_property.py:0
+msgid "The engine stopped: %s. See server log."
+msgstr "ძრავა გაჩერდა: %s. იხილეთ სერვერის ჟურნალი."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+msgid "The file has no rows to import."
+msgstr "ფაილში იმპორტისთვის სტრიქონები არ არის."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+msgid "The file must be a CSV or XLSX file (save it as CSV or Excel .xlsx)."
+msgstr ""
+"ფაილი უნდა იყოს CSV ან XLSX ფორმატის (შეინახეთ CSV-ად ან Excel .xlsx-ად)."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+msgid "The first %(shown)s of %(total)s rows:"
+msgstr "პირველი %(shown)s სტრიქონი %(total)s-დან:"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_event__date_from
+msgid "The first night affected."
+msgstr "პირველი ღამე, რომელზეც გავლენას ახდენს."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_season__date_from
+msgid "The first night of the season."
+msgstr "სეზონის პირველი ღამე."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_reservation__arrival
+msgid "The first night of the stay."
+msgstr "ყოფნის პირველი ღამე."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_import__preview_html
+msgid "The first rows of the file as they will be imported."
+msgstr "ფაილის პირველი სტრიქონები ისე, როგორც იმპორტირდება."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+msgid ""
+"The forecast is checked against the real bookings once its nights have "
+"passed."
+msgstr "პროგნოზი რეალურ ჯავშნებს მაშინ ედარება, როცა მისი ღამეები გავა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__forecast_id
+msgid "The forecast this recommendation is based on."
+msgstr "პროგნოზი, რომელსაც ეს რეკომენდაცია ეფუძნება."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_property.py:0
+msgid "The hotel has no rooms."
+msgstr "სასტუმროს ოთახები არ აქვს."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_reservation__property_id
+msgid "The hotel of this booking."
+msgstr "ამ ჯავშნის სასტუმრო."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__property_id
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price_audit__property_id
+msgid "The hotel of this price."
+msgstr "ამ ფასის სასტუმრო."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_run__params
+msgid "The hotel settings, seasons and curves used by this run."
+msgstr ""
+"ამ გაშვების მიერ გამოყენებული სასტუმროს პარამეტრები, სეზონები და მრუდები."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_import__property_id
+msgid "The hotel the file is for."
+msgstr "სასტუმრო, რომლისთვისაც ფაილია განკუთვნილი."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_curve_point__property_id
+msgid "The hotel this curve belongs to."
+msgstr "სასტუმრო, რომელსაც ეს მრუდი ეკუთვნის."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_event__property_id
+msgid "The hotel this event affects."
+msgstr "სასტუმრო, რომელზეც ეს ღონისძიება მოქმედებს."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_forecast__property_id
+msgid "The hotel this forecast is for."
+msgstr "სასტუმრო, რომლისთვისაც ეს პროგნოზია."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_room_type__property_id
+msgid "The hotel this room type belongs to."
+msgstr "სასტუმრო, რომელსაც ეს ოთახის ტიპი ეკუთვნის."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_run__property_id
+msgid "The hotel this run was for."
+msgstr "სასტუმრო, რომლისთვისაც ეს გაშვება შესრულდა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_season__property_id
+msgid "The hotel this season belongs to."
+msgstr "სასტუმრო, რომელსაც ეს სეზონი ეკუთვნის."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_event__date_to
+msgid "The last night affected."
+msgstr "ბოლო ღამე, რომელზეც გავლენას ახდენს."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_season__date_to
+msgid "The last night of the season."
+msgstr "სეზონის ბოლო ღამე."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__exported_rate
+msgid "The last price that was sent out of this app."
+msgstr "ბოლო ფასი, რომელიც ამ აპლიკაციიდან გაიგზავნა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_event__name
+msgid "The name of the event or holiday."
+msgstr "ღონისძიების ან უქმე დღის სახელი."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__name
+msgid "The name of the hotel."
+msgstr "სასტუმროს სახელი."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_room_type__name
+msgid "The name of the room type, for example Double."
+msgstr "ოთახის ტიპის სახელი, მაგალითად, ორადგილიანი."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_season__name
+msgid "The name of the season, for example High season."
+msgstr "სეზონის სახელი, მაგალითად, მაღალი სეზონი."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_import__filename
+msgid "The name of the uploaded file."
+msgstr "ატვირთული ფაილის სახელი."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_forecast__has_actual
+msgid "The night has passed and its real bookings are known."
+msgstr "ღამე გავიდა და მისი რეალური ჯავშნები ცნობილია."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "The night is almost full, so the current price is not lowered."
+msgstr "ღამე თითქმის სავსეა, ამიტომ მიმდინარე ფასი არ მცირდება."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "The night is today."
+msgstr "ღამე დღესაა."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "The night is tomorrow."
+msgstr "ღამე ხვალაა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_forecast__stay_date
+msgid "The night this forecast is for."
+msgstr "ღამე, რომლისთვისაც ეს პროგნოზია."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__stay_date
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price_audit__stay_date
+msgid "The night this price is for."
+msgstr "ღამე, რომლისთვისაც ეს ფასია."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price_audit__price_id
+msgid "The nightly price this entry is about."
+msgstr "ღამის ფასი, რომელსაც ეს ჩანაწერი ეხება."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price_audit__note
+msgid "The note written with the decision."
+msgstr "გადაწყვეტილებასთან ერთად დაწერილი შენიშვნა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price_audit__new_rate
+msgid "The price after this action."
+msgstr "ფასი ამ ქმედების შემდეგ."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price_audit__old_rate
+msgid "The price before this action."
+msgstr "ფასი ამ ქმედებამდე."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "The price is rounded to the price step."
+msgstr "ფასი მრგვალდება ფასის ბიჯამდე."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_season__base_rate
+msgid ""
+"The price of the reference room before any change for the weekday, events or"
+" demand."
+msgstr ""
+"საბაზისო ოთახის ფასი კვირის დღის, ღონისძიებების ან მოთხოვნის გამო ნებისმიერ "
+"ცვლილებამდე."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__published_rate
+msgid "The price that is live now."
+msgstr "ფასი, რომელიც ახლა მოქმედებს."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__recommended_rate
+msgid "The price the engine recommends for this night."
+msgstr "ფასი, რომელსაც ძრავა ამ ღამისთვის გირჩევთ."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__raw_target_rate
+msgid ""
+"The price the model wanted, before the season limits and the other safety "
+"rules."
+msgstr ""
+"ფასი, რომელიც მოდელს სურდა, სეზონის ლიმიტებამდე და სხვა უსაფრთხოების "
+"წესებამდე."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__decided_rate
+msgid "The price you want instead of the recommendation."
+msgstr "ფასი, რომელიც რეკომენდაციის ნაცვლად გსურთ."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_room_type__derivation
+msgid ""
+"The reference room is priced by the engine; the other rooms follow it by an "
+"amount or a percent."
+msgstr ""
+"საბაზისო ოთახს ძრავა აფასებს; დანარჩენი ოთახები მას თანხით ან პროცენტით "
+"მისდევს."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_reservation__room_type_id
+msgid "The room type that was booked."
+msgstr "ოთახის ტიპი, რომელიც დაჯავშნეს."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__room_type_id
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price_audit__room_type_id
+msgid "The room type this price is for."
+msgstr "ოთახის ტიპი, რომლისთვისაც ეს ფასია."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "The run is finished."
+msgstr "გაშვება დასრულდა."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+msgid "There are no bookings from the same nights last year."
+msgstr "გასული წლის იმავე ღამეებზე ჯავშნები არ არის."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid ""
+"There is no booking history yet: the forecast uses the expected occupancy of"
+" the season."
+msgstr ""
+"ჯავშნების ისტორია ჯერ არ არის: პროგნოზი სეზონის მოსალოდნელ დატვირთვას "
+"იყენებს."
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "This deletes the demo hotel and everything in it. Continue?"
+msgstr ""
+"ეს წაშლის დემო სასტუმროს და მასში არსებულ ყველაფერს. გსურთ გაგრძელება?"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_audit_view_search
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_reservation_view_search
+msgid "This month"
+msgstr "მიმდინარე თვე"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_view_search
+msgid "This week"
+msgstr "მიმდინარე კვირა"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__dow_thu
+msgid "Thursday %"
+msgstr "ხუთშაბათი %"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__tz
+msgid "Time Zone"
+msgstr "დროის სარტყელი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_event__date_to
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_season__date_to
+msgid "To"
+msgstr "დასასრული"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__to_export
+msgid "To Publish"
+msgstr "გამოსაქვეყნებელი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "To decide (%s)"
+msgstr "გადასაწყვეტი (%s)"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "To do"
+msgstr "გასაკეთებელი"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_view_search
+msgid "To publish"
+msgstr "გამოსაქვეყნებელი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+#: code:addons/hotel_rms/static/src/utils/pricing_utils.js:0
+msgid "Today"
+msgstr "დღეს"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_run__run_date
+msgid "Today in the time zone of the hotel when the run started."
+msgstr "დღევანდელი დღე სასტუმროს დროის სარტყელში გაშვების დაწყებისას."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/utils/pricing_utils.js:0
+msgid "Tomorrow"
+msgstr "ხვალ"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__dow_tue
+msgid "Tuesday %"
+msgstr "სამშაბათი %"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_import__kind
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_import_view_search
+msgid "Type"
+msgstr "ტიპი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel_widget.js:0
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "Undo"
+msgstr "დაბრუნება"
+
+#. module: hotel_rms
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_price_audit__action__undo
+msgid "Undone"
+msgstr "დაბრუნებული"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+msgid "Unlock"
+msgstr "განბლოკვა"
+
+#. module: hotel_rms
+#: model:ir.model.fields.selection,name:hotel_rms.selection__hotel_rms_price_audit__action__unlock
+msgid "Unlocked"
+msgstr "განბლოკილი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_import__updated
+msgid "Updated"
+msgstr "განახლებული"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "Updated %s"
+msgstr "განახლდა %s"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+msgid "Use a dot for decimals, without thousands separators: %s"
+msgstr "ათწილადებისთვის გამოიყენეთ წერტილი, ათასების გამყოფის გარეშე: %s"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+msgid "Use my price"
+msgstr "ჩემი ფასის გამოყენება"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_season__expected_occ_pct
+msgid "Used for the forecast while there is no booking history."
+msgstr "გამოიყენება პროგნოზისთვის, სანამ ჯავშნების ისტორია არ არსებობს."
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price_audit__user_id
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_audit_view_search
+msgid "User"
+msgstr "მომხმარებელი"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/pace_chart/pace_chart.js:0
+msgid "Usual"
+msgstr "ჩვეულებრივი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_forecast__expected_otb
+msgid "Usually Booked"
+msgstr "ჩვეულებრივ დაჯავშნილი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price__expected_otb
+msgid "Usually booked rooms"
+msgstr "ჩვეულებრივ დაჯავშნილი ოთახები"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_curve_point__value
+msgid "Value"
+msgstr "მნიშვნელობა"
+
+#. module: hotel_rms
+#: model:res.groups,name:hotel_rms.group_hotel_rms_user
+msgid "Viewer"
+msgstr "მნახველი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_price_audit__vs_recommended
+msgid "Vs Recommended"
+msgstr "რეკომენდებულთან შედარებით"
+
+#. module: hotel_rms
+#: model:ir.model.fields,field_description:hotel_rms.field_hotel_rms_property__dow_wed
+msgid "Wednesday %"
+msgstr "ოთხშაბათი %"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_view_search
+msgid "Week"
+msgstr "კვირა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/accuracy_chart/accuracy_chart.js:0
+msgid "Week of %s"
+msgstr "კვირა: %s"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_price.py:0
+msgid "Weekday"
+msgstr "კვირის დღე"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "Weekday price change"
+msgstr "ფასის ცვლილება კვირის დღის მიხედვით"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price_audit__recommended_rate
+msgid "What the engine recommended at that time."
+msgstr "რას გირჩევდათ ძრავა იმ დროს."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_run__message
+msgid ""
+"What to know about this run, for example why it did not change anything."
+msgstr "რა უნდა იცოდეთ ამ გაშვების შესახებ, მაგალითად, რატომ არაფერი შეცვალა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price_audit__action
+msgid "What was done to the price."
+msgstr "რა გაკეთდა ფასზე."
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_price_audit_view_list
+msgid "When"
+msgstr "როდის"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__last_data_at
+msgid "When bookings were last imported or read."
+msgstr "როდის გაკეთდა ჯავშნების ბოლო იმპორტი ან წაკითხვა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_import__date
+msgid "When the import was made."
+msgstr "როდის შესრულდა იმპორტი."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__decided_at
+msgid "When the last decision was made."
+msgstr "როდის მიიღეს ბოლო გადაწყვეტილება."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_run__started_at
+msgid "When the run started."
+msgstr "როდის დაიწყო გაშვება."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_reservation__channel
+msgid "Where the booking came from, for example Booking.com or Direct."
+msgstr "საიდან მოვიდა ჯავშანი, მაგალითად, Booking.com ან პირდაპირ."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_run__forecast_version
+msgid "Which forecast rules were used."
+msgstr "რომელი პროგნოზის წესები გამოიყენეს."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_run__price_version
+msgid "Which pricing rules were used."
+msgstr "რომელი ფასების წესები გამოიყენეს."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price_audit__user_id
+msgid "Who did it."
+msgstr "ვინ გააკეთა."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_price__decided_by
+msgid "Who made the last decision."
+msgstr "ვინ მიიღო ბოლო გადაწყვეტილება."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_import__user_id
+msgid "Who made this import."
+msgstr "ვინ შეასრულა ეს იმპორტი."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+msgid "Why this price"
+msgstr "რატომ ეს ფასი"
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__protect_days
+msgid ""
+"Within this many days before the night, a nearly full night is protected."
+msgstr "ღამემდე ამდენი დღის განმავლობაში თითქმის სავსე ღამე დაცულია."
+
+#. module: hotel_rms
+#: model:ir.model.fields,help:hotel_rms.field_hotel_rms_property__lastmin_days
+msgid ""
+"Within this many days before the night, the last-minute discount can apply."
+msgstr ""
+"ღამემდე ამდენი დღის განმავლობაში ბოლო წუთის ფასდაკლება შეიძლება მოქმედებდეს."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/utils/pricing_utils.js:0
+msgid "Your price is published"
+msgstr "თქვენი ფასი გამოქვეყნებულია"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "a week ahead"
+msgstr "კვირით ადრე"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_form
+msgid "days ago)"
+msgstr "დღის წინ)"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+msgid "departure must be after arrival"
+msgstr "departure უნდა იყოს arrival-ის შემდეგ"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "forecast occupancy"
+msgstr "პროგნოზირებული დატვირთვა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "less than 1 room"
+msgstr "1 ოთახზე ნაკლები"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "nights"
+msgstr "ღამე"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+msgid "nights yet"
+msgstr "ღამეზე ჯავშნები ჯერ არ არის"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.xml:0
+msgid "nights, against the same nights a year ago on the same day."
+msgstr "ღამისთვის, გასული წლის იმავე ღამეებთან შედარებით იმავე დღეს."
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.js:0
+msgid "of the season range: 0% season minimum, 100% season maximum"
+msgstr "სეზონის დიაპაზონიდან: 0% სეზონის მინიმუმია, 100% — სეზონის მაქსიმუმი"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_property_view_kanban
+msgid "prices need a decision"
+msgstr "ფასი საჭიროებს გადაწყვეტილებას"
+
+#. module: hotel_rms
+#: model_terms:ir.ui.view,arch_db:hotel_rms.hotel_rms_import_view_form
+msgid "problems found. Nothing was imported."
+msgstr "პრობლემა აღმოჩნდა. არაფერი იმპორტირებულა."
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+msgid "reference is required"
+msgstr "reference სავალდებულოა"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/insights/insights.js:0
+msgid "room nights in the next %s nights"
+msgstr "ოთახ-ღამე მომდევნო %s ღამეში"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+msgid "room_type %s is unknown"
+msgstr "room_type %s უცნობია"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/pricing_calendar/pricing_calendar.xml:0
+msgid "selected"
+msgstr "არჩეული"
+
+#. module: hotel_rms
+#. odoo-python
+#: code:addons/hotel_rms/models/hotel_rms_import.py:0
+msgid "status %s is unknown"
+msgstr "status %s უცნობია"
+
+#. module: hotel_rms
+#. odoo-javascript
+#: code:addons/hotel_rms/static/src/components/price_panel/price_panel.xml:0
+msgid "to"
+msgstr "შეიცვალა"

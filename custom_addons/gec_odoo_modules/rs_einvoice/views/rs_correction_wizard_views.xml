@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_move_reversal_rs" model="ir.ui.view">
+        <field name="name">account.move.reversal.form.rs</field>
+        <field name="model">account.move.reversal</field>
+        <field name="inherit_id" ref="account.view_account_move_reversal"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date']" position="after">
+                <field name="rs_einv_needs_k_type" invisible="1"/>
+                <field name="rs_einv_flow"
+                       string="RS Treatment"
+                       invisible="not rs_einv_needs_k_type"
+                       required="rs_einv_needs_k_type"
+                       widget="radio"/>
+                <field name="rs_einv_k_type"
+                       string="Reason for RS correction"
+                       invisible="not rs_einv_needs_k_type or rs_einv_flow != 'correct_reissue'"
+                       required="rs_einv_needs_k_type and rs_einv_flow == 'correct_reissue'"
+                       help="Pick the business reason for the rs.ge correction. 'Goods Returned to Seller' must always be picked deliberately. The reason is sent to rs.ge as k_type and does not restrict which lines you may edit."/>
+                <field name="rs_einv_skip_reason_choice"
+                       string="Skip Reason"
+                       invisible="not rs_einv_needs_k_type or rs_einv_flow != 'skip'"
+                       required="rs_einv_needs_k_type and rs_einv_flow == 'skip'"/>
+                <field name="rs_einv_flow_preview"
+                       readonly="1"
+                       invisible="not rs_einv_needs_k_type"/>
+            </xpath>
+            <xpath expr="//field[@name='reason']" position="attributes">
+                <attribute name="invisible" add="rs_einv_needs_k_type and rs_einv_flow in ('replace', 'correct_reissue')" separator="or"/>
+            </xpath>
+            <xpath expr="//field[@name='journal_id']" position="attributes">
+                <attribute name="invisible">rs_einv_needs_k_type and rs_einv_flow in ('replace', 'correct_reissue')</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date']" position="attributes">
+                <attribute name="invisible">rs_einv_needs_k_type and rs_einv_flow in ('replace', 'correct_reissue')</attribute>
+            </xpath>
+            <xpath expr="//button[@name='refund_moves']" position="attributes">
+                <attribute name="invisible">rs_einv_needs_k_type and rs_einv_flow in ('replace', 'correct_reissue')</attribute>
+            </xpath>
+            <xpath expr="//button[@name='modify_moves']" position="attributes">
+                <attribute name="invisible" add="rs_einv_needs_k_type and rs_einv_flow not in ('replace', 'correct_reissue')" separator="or"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_rs_orphan_resolve_wizard_form" model="ir.ui.view">
+        <field name="name">rs.einvoice.orphan.resolve.wizard.form</field>
+        <field name="model">rs.einvoice.orphan.resolve.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Resolve Orphan rs.ge Record">
+                <sheet>
+                    <div class="alert alert-warning" role="alert">
+                        <strong>A previous rs.ge action did not complete cleanly.</strong>
+                        It may have created a draft on rs.ge that Odoo did not capture the ID of (typically caused by a SOAP timeout).
+                        Open rs.ge in the browser, find the orphan in your recent drafts list, and paste its ID below — Odoo will verify the party / direction and link it.
+                    </div>
+                    <group>
+                        <field name="move_id" invisible="1"/>
+                        <field name="candidate_id" placeholder="e.g. 12345678"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Verify and Link"
+                            name="action_confirm"
+                            type="object"
+                            class="btn-primary"
+                            confirm="Link this rs.ge ID to this Odoo document? Cannot be undone without contacting support."/>
+                    <button string="Cancel"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_rs_reject_wizard_form" model="ir.ui.view">
+        <field name="name">rs.einvoice.reject.wizard.form</field>
+        <field name="model">rs.einvoice.reject.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reject Vendor Invoice">
+                <sheet>
+                    <div class="alert alert-warning" role="alert">
+                        Rejection sends a notification back to the supplier on rs.ge with
+                        your reason. They will need to delete or correct the invoice and
+                        resubmit. Be specific so they can fix it on the first try.
+                    </div>
+                    <group>
+                        <field name="move_id" invisible="1"/>
+                        <field name="reason" placeholder="Quantity, price, VAT rate, recipient TIN, etc."/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Reject on rs.ge"
+                            name="action_confirm"
+                            type="object"
+                            class="btn-danger"
+                            confirm="Send rejection to the supplier on rs.ge? They will see your reason."/>
+                    <button string="Cancel"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

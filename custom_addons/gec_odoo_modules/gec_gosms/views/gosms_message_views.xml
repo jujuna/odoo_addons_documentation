@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="gosms_message_view_list" model="ir.ui.view">
+        <field name="name">gosms.message.list</field>
+        <field name="model">gosms.message</field>
+        <field name="arch" type="xml">
+            <list string="Messages" create="0">
+                <field name="create_date"/>
+                <field name="kind"/>
+                <field name="direction"/>
+                <field name="number"/>
+                <field name="partner_id"/>
+                <field name="body"/>
+                <field name="state" widget="badge" decoration-info="state in ('sent', 'received')" decoration-success="state == 'delivered'"
+                       decoration-warning="state == 'expired'" decoration-danger="state in ('undelivered', 'error')"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="gosms_message_view_form" model="ir.ui.view">
+        <field name="name">gosms.message.form</field>
+        <field name="model">gosms.message</field>
+        <field name="arch" type="xml">
+            <form string="Message" create="0" edit="0">
+                <header>
+                    <field name="gosms_id" invisible="1"/>
+                    <button name="action_check_status" type="object" string="Check Status" invisible="direction != 'outgoing' or not gosms_id"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="kind"/>
+                            <field name="direction"/>
+                            <field name="number"/>
+                            <field name="partner_id"/>
+                        </group>
+                        <group>
+                            <field name="state"/>
+                            <field name="failure_reason" invisible="not failure_reason"/>
+                            <field name="segments" invisible="not segments"/>
+                            <field name="encoding" invisible="not encoding"/>
+                            <field name="create_date"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <field name="body"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="gosms_message_view_search" model="ir.ui.view">
+        <field name="name">gosms.message.search</field>
+        <field name="model">gosms.message</field>
+        <field name="arch" type="xml">
+            <search string="Search Messages">
+                <field name="number"/>
+                <field name="partner_id"/>
+                <filter name="outgoing" string="Outgoing" domain="[('direction', '=', 'outgoing')]"/>
+                <filter name="incoming" string="Incoming" domain="[('direction', '=', 'inbound')]"/>
+                <filter name="codes" string="Confirmation Codes" domain="[('kind', '=', 'code')]"/>
+                <filter name="failed" string="Failed" domain="[('state', 'in', ('error', 'undelivered', 'expired'))]"/>
+                <group>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="gosms_message_action" model="ir.actions.act_window">
+        <field name="name">Messages</field>
+        <field name="res_model">gosms.message</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

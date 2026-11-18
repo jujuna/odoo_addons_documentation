@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="business_process_publish_view_form" model="ir.ui.view">
+        <field name="name">business.process.publish.form</field>
+        <field name="model">business.process.publish</field>
+        <field name="arch" type="xml">
+            <form string="Publish">
+                <field name="process_id" invisible="1"/>
+                <field name="has_previous" invisible="1"/>
+                <field name="ack_required" invisible="1"/>
+                <div class="alert alert-info mb-3" role="status" invisible="has_previous">
+                    <b>First publication.</b> Employees will see this process in the Process Map.
+                </div>
+                <p class="mb-3" invisible="not has_previous">
+                    The version valid now is <b><field name="previous_version" class="d-inline"/></b>. It becomes <b>Deprecated</b> (kept as history) when you publish. What kind of change is this?
+                </p>
+                <field name="change_note" nolabel="1" class="mb-3"
+                       placeholder="What changed and why (optional, kept in the history)..."/>
+                <div class="row g-3 mb-2" invisible="not has_previous">
+                    <div class="col-md-6">
+                        <div class="card h-100 o_bpmn_change_card">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title mb-1">Small change</h5>
+                                <div class="text-muted small mb-2">New number: <b><field name="small_version" class="d-inline"/></b></div>
+                                <ul class="small ps-3 mb-3">
+                                    <li>For example: wording, a link, a clearer instruction, a typo, a renamed department.</li>
+                                    <li>Employees keep working as before.</li>
+                                    <li invisible="not ack_required">Read confirmations are kept: whoever confirmed the previous version does not need to confirm again.</li>
+                                </ul>
+                                <button name="action_publish_minor" type="object" class="btn btn-secondary mt-auto">
+                                    Publish as a small change
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100 o_bpmn_change_card">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title mb-1">Major change</h5>
+                                <div class="text-muted small mb-2">New number: <b><field name="major_version" class="d-inline"/></b></div>
+                                <ul class="small ps-3 mb-3">
+                                    <li>For example: new or removed steps, another role does the work, a new control or approval, a different order.</li>
+                                    <li>Employees have to change how they work.</li>
+                                    <li invisible="not ack_required">Everyone is asked again to confirm they have read it.</li>
+                                </ul>
+                                <button name="action_publish_major" type="object" class="btn btn-secondary mt-auto">
+                                    Publish as a major change
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-muted small" invisible="not has_previous">
+                    Not sure? If someone who knows the old version would do something wrong with the new one, it is a major change.
+                    <a href="/bpmn_process_management/guide#versions" target="_blank">How versions work</a>
+                </div>
+                <footer>
+                    <button name="action_publish" type="object" string="Publish" class="btn-primary"
+                            invisible="has_previous"/>
+                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

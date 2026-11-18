@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Board of every project created from an initiative. Own stages, not shared ones, so the
+             Done / Cancelled rule does not leak into other projects. noupdate keeps renamed columns. -->
+    <data noupdate="1">
+        <record id="task_stage_todo" model="project.task.type">
+            <field name="name">To Do</field>
+            <field name="sequence">10</field>
+            <field name="user_id" eval="False"/>
+        </record>
+        <record id="task_stage_in_progress" model="project.task.type">
+            <field name="name">In Progress</field>
+            <field name="sequence">20</field>
+            <field name="user_id" eval="False"/>
+        </record>
+        <record id="task_stage_done" model="project.task.type">
+            <field name="name">Done</field>
+            <field name="sequence">30</field>
+            <field name="user_id" eval="False"/>
+            <field name="fold" eval="True"/>
+        </record>
+        <record id="task_stage_cancelled" model="project.task.type">
+            <field name="name">Cancelled</field>
+            <field name="sequence">40</field>
+            <field name="user_id" eval="False"/>
+            <field name="fold" eval="True"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Income-tax exemption categories (Tax Code art. 82), seeded once; HR may edit them. -->
+    <data noupdate="1">
+
+        <record id="tax_exemption_disability" model="hr.payroll.tax.exemption">
+            <field name="name">ბავშვობიდან შშმ პირი, ასევე მკვეთრად/მნიშვნელოვნად გამოხატული შშმ პირი</field>
+            <field name="yearly_limit">6000</field>
+        </record>
+        <record id="tax_exemption_peacekeeping" model="hr.payroll.tax.exemption">
+            <field name="name">სამშვიდობო ოპერაციაში მძიმედ დაზიანებული პირი</field>
+            <field name="yearly_limit">6000</field>
+        </record>
+        <record id="tax_exemption_highland" model="hr.payroll.tax.exemption">
+            <field name="name">მაღალმთიან დასახლებაში მუდმივად მცხოვრები პირის სტატუსის მქონე (საბიუჯეტო ორგანიზაციიდან ხელფასის გარდა)</field>
+            <field name="yearly_limit">6000</field>
+        </record>
+        <record id="tax_exemption_war_veteran" model="hr.payroll.tax.exemption">
+            <field name="name">მეორე მსოფლიო ომის/საქართველოს ტერიტორიული მთლიანობისთვის ბრძოლის მონაწილე</field>
+            <field name="yearly_limit">3000</field>
+        </record>
+        <record id="tax_exemption_single_mother" model="hr.payroll.tax.exemption">
+            <field name="name">მარტოხელა დედა</field>
+            <field name="yearly_limit">3000</field>
+        </record>
+        <record id="tax_exemption_adopter" model="hr.payroll.tax.exemption">
+            <field name="name">შვილად ამყვანი პირი (შვილად აყვანიდან 1 წლის განმავლობაში)</field>
+            <field name="yearly_limit">3000</field>
+        </record>
+        <record id="tax_exemption_foster_parent" model="hr.payroll.tax.exemption">
+            <field name="name">მინდობით აღმზრდელი</field>
+            <field name="yearly_limit">3000</field>
+        </record>
+        <record id="tax_exemption_georgian_mother" model="hr.payroll.tax.exemption">
+            <field name="name">„ქართველი დედის" საპატიო წოდების მქონე პირი</field>
+            <field name="yearly_limit">3000</field>
+        </record>
+
+    </data>
+</odoo>

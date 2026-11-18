@@ -1,0 +1,27 @@
+id,name,model_id,group_id/id,operation,domain
+access_rs_waybill_read,rs.waybill read,rs.waybill,base.group_user,r,
+access_rs_waybill,rs.waybill,rs.waybill,rs_waybill.group_waybill_user,crud,
+rs_waybill_comp_rule,rs.waybill multi-company,rs.waybill,,crud,"[('company_id', 'in', company_ids)]"
+access_rs_waybill_line_read,rs.waybill.line read,rs.waybill.line,base.group_user,r,
+access_rs_waybill_line,rs.waybill.line,rs.waybill.line,rs_waybill.group_waybill_user,crud,
+rs_waybill_line_comp_rule,rs.waybill.line multi-company,rs.waybill.line,,crud,"[('rs_waybill_id.company_id', 'in', company_ids)]"
+access_rs_waybill_template_save_wizard,access.rs.waybill.template.save.wizard,rs.waybill.template.save.wizard,rs_waybill.group_waybill_user,crud,
+access_rs_waybill_template_picker_wizard,access.rs.waybill.template.picker.wizard,rs.waybill.template.picker.wizard,rs_waybill.group_waybill_user,crud,
+access_rs_product_external_ref_read,rs.product.external.ref read,rs.product.external.ref,base.group_user,r,
+access_rs_product_external_ref,rs.product.external.ref,rs.product.external.ref,rs_waybill.group_waybill_user,cru,
+access_rs_product_external_ref_manager,rs.product.external.ref manager,rs.product.external.ref,rs_waybill.group_waybill_manager,crud,
+rs_product_external_ref_comp_rule,rs.product.external.ref multi-company,rs.product.external.ref,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+access_rs_mapping_wizard,rs.waybill.mapping.wizard,rs.waybill.mapping.wizard,rs_waybill.group_waybill_user,crud,
+access_rs_mapping_wizard_line,rs.waybill.mapping.wizard.line,rs.waybill.mapping.wizard.line,rs_waybill.group_waybill_user,crud,
+access_rs_waybill_operation,rs.waybill.operation,rs.waybill.operation,rs_waybill.group_waybill_user,cru,
+access_rs_waybill_adjustment_wizard,rs.waybill.adjustment.wizard,rs.waybill.adjustment.wizard,rs_waybill.group_waybill_user,crud,
+access_rs_waybill_adjustment_line,rs.waybill.adjustment.line,rs.waybill.adjustment.line,rs_waybill.group_waybill_user,crud,
+access_rs_waybill_adjustment_snapshot,rs.waybill.adjustment.snapshot,rs.waybill.adjustment.snapshot,rs_waybill.group_waybill_user,crud,
+access_rs_waybill_adjustment_snapshot_line,rs.waybill.adjustment.snapshot.line,rs.waybill.adjustment.snapshot.line,rs_waybill.group_waybill_user,crud,
+access_rs_waybill_return_decision_wizard,access.rs.waybill.return.decision.wizard,rs.waybill.return.decision.wizard,rs_waybill.group_waybill_user,crud,
+access_rs_waybill_return_decision_line,access.rs.waybill.return.decision.line,rs.waybill.return.decision.line,rs_waybill.group_waybill_user,crud,
+access_rs_waybill_live,rs.waybill.live,rs.waybill.live,rs_waybill.group_waybill_user,crud,
+access_rs_waybill_live_line,rs.waybill.live.line,rs.waybill.live.line,rs_waybill.group_waybill_user,crud,
+access_rs_excise_code,rs.excise.code,rs.excise.code,rs_waybill.group_waybill_user,r,
+access_rs_excise_code_manager,rs.excise.code manager,rs.excise.code,rs_waybill.group_waybill_manager,crud,
+access_fleet_vehicle_waybill_user,fleet.vehicle waybill user,fleet.vehicle,rs_waybill.group_waybill_user,r,

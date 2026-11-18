@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_gec_vat_rc_declaration_list" model="ir.ui.view">
+        <field name="name">gec.vat.rc.declaration.list</field>
+        <field name="model">gec.vat.rc.declaration</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="date_from"/>
+                <field name="decl_type"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="vat_accrued"/>
+                <field name="vat_reduced"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'filed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_gec_vat_rc_declaration_form" model="ir.ui.view">
+        <field name="name">gec.vat.rc.declaration.form</field>
+        <field name="model">gec.vat.rc.declaration</field>
+        <field name="arch" type="xml">
+            <form class="o_gec_vat_declaration_form">
+                <header>
+                    <button name="action_generate" type="object" string="Generate" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_mark_filed" type="object" string="Mark as Filed" invisible="state != 'draft'"
+                        confirm="Marking as filed locks the tax month for the company and all its branches; Reset to Draft does not unlock it. Continue?"/>
+                    <button name="action_draft" type="object" string="Reset to Draft" invisible="state != 'filed'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-warning" role="alert" invisible="not generation_warnings">
+                        <field name="generation_warnings" nolabel="1"/>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group name="period">
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft' or id"/>
+                            <field name="date_from" readonly="state != 'draft'"/>
+                            <field name="decl_type" readonly="state != 'draft'"/>
+                            <field name="portal_number"/>
+                        </group>
+                        <group name="result">
+                            <field name="vat_accrued"/>
+                            <field name="vat_reduced"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="services" string="I-II · Services">
+                            <field name="services_amount_total" invisible="1"/>
+                            <field name="services_line_ids" nolabel="1" widget="gec_vat_rows" options="{'grid': 'rc_services'}"
+                                   context="{'default_part': 'services'}" readonly="state != 'draft'">
+                                <list editable="bottom" limit="500">
+                                    <field name="part" column_invisible="1"/>
+                                    <field name="move_id"/>
+                                    <field name="partner_name" readonly="move_id"/>
+                                    <field name="description" readonly="move_id"/>
+                                    <field name="date" readonly="move_id"/>
+                                    <field name="amount" readonly="move_id"/>
+                                    <field name="vat" readonly="1"/>
+                                </list>
+                            </field>
+                            <div class="o_gec_vat_grid mt-3">
+                                <div class="o_gvg_title">II ნაწილი</div>
+                                <div class="o_gvg_table_wrap">
+                                    <table class="o_gvg_table">
+                                        <tbody>
+                                            <tr>
+                                                <td class="o_gvg_label">ჯამი:</td>
+                                                <td class="o_gvg_no">3</td>
+                                                <td class="o_gvg_cell o_gvg_locked"><div class="o_gvg_value"><i class="oi o_gvg_padlock" data-icon="lock" title="I ნაწილის დღგ-ის სვეტის ჯამი" aria-hidden="true"/><field name="services_vat_total" nolabel="1"/></div></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="o_gvg_label">დღგ კორექტირებამდე</td>
+                                                <td class="o_gvg_no">4</td>
+                                                <td class="o_gvg_cell"><div class="o_gvg_value"><field name="services_vat_before" nolabel="1" readonly="state != 'draft'"/><button name="action_gec_open_before" type="object" icon="search" class="btn btn-link p-0 o_gvg_audit" title="Lines of the corrected bills"/></div></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="o_gvg_label">დღგ კორექტირების შემდეგ</td>
+                                                <td class="o_gvg_no">5</td>
+                                                <td class="o_gvg_cell"><div class="o_gvg_value"><field name="services_vat_after" nolabel="1" readonly="state != 'draft'"/><button name="action_gec_open_after" type="object" icon="search" class="btn btn-link p-0 o_gvg_audit" title="Lines of the replacement bills"/></div></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="o_gvg_label">კორექტირების შედეგად დამატებით გადასახდელი დღგ (სტ.5-სტ.4, როცა სტ.5> სტ.4)</td>
+                                                <td class="o_gvg_no">6</td>
+                                                <td class="o_gvg_cell o_gvg_locked"><div class="o_gvg_value"><i class="oi o_gvg_padlock" data-icon="lock" title="სტ.5 - სტ.4, როცა სტ.5 > სტ.4" aria-hidden="true"/><field name="services_vat_increase" nolabel="1"/></div></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="o_gvg_label">კორექტირების შედეგად შესამცირებელი დღგ (სტ.4 - სტ.5, როცა სტ.4 > სტ.5)</td>
+                                                <td class="o_gvg_no">7</td>
+                                                <td class="o_gvg_cell o_gvg_locked"><div class="o_gvg_value"><i class="oi o_gvg_padlock" data-icon="lock" title="სტ.4 - სტ.5, როცა სტ.4 > სტ.5" aria-hidden="true"/><field name="services_vat_decrease" nolabel="1"/></div></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="o_gvg_label">ბიუჯეტში შესატანი დღგ (სტ.3 + სტ.6) ან (სტ.3 - სტ.7, როცა სტ.3 > სტ.7)</td>
+                                                <td class="o_gvg_no">8</td>
+                                                <td class="o_gvg_cell o_gvg_locked"><div class="o_gvg_value"><i class="oi o_gvg_padlock" data-icon="lock" title="სტ.3 + სტ.6 - სტ.7, ან 0, როცა სტ.7 > სტ.3" aria-hidden="true"/><field name="services_vat_payable" nolabel="1"/></div></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="o_gvg_label">ბიუჯეტიდან დასაბრუნებელი დღგ (სტ.7 – სტ.3, როცა სტ.7 > სტ.3)</td>
+                                                <td class="o_gvg_no">9</td>
+                                                <td class="o_gvg_cell o_gvg_locked"><div class="o_gvg_value"><i class="oi o_gvg_padlock" data-icon="lock" title="სტ.7 - სტ.3, როცა სტ.7 > სტ.3" aria-hidden="true"/><field name="services_vat_refund" nolabel="1"/></div></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </page>
+                        <page name="goods" string="III-IV · Goods">
+                            <field name="goods_amount_total" invisible="1"/>
+                            <field name="goods_line_ids" nolabel="1" widget="gec_vat_rows" options="{'grid': 'rc_goods'}"
+                                   context="{'default_part': 'goods'}" readonly="state != 'draft'">
+                                <list editable="bottom" limit="500">
+                                    <field name="part" column_invisible="1"/>
+                                    <field name="description"/>
+                                    <field name="date"/>
+                                    <field name="amount"/>
+                                    <field name="vat" readonly="1"/>
+                                </list>
+                            </field>
+                            <div class="o_gec_vat_grid mt-3">
+                                <div class="o_gvg_title">IV ნაწილი</div>
+                                <div class="o_gvg_table_wrap">
+                                    <table class="o_gvg_table">
+                                        <tbody>
+                                            <tr>
+                                                <td class="o_gvg_label">ჯამი:</td>
+                                                <td class="o_gvg_no">3</td>
+                                                <td class="o_gvg_cell o_gvg_locked"><div class="o_gvg_value"><i class="oi o_gvg_padlock" data-icon="lock" title="III ნაწილის დღგ-ის სვეტის ჯამი" aria-hidden="true"/><field name="goods_vat_total" nolabel="1"/></div></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="o_gvg_label">დღგ კორექტირებამდე</td>
+                                                <td class="o_gvg_no">4</td>
+                                                <td class="o_gvg_cell"><div class="o_gvg_value"><field name="goods_vat_before" nolabel="1" readonly="state != 'draft'"/></div></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="o_gvg_label">დღგ კორექტირების შემდეგ</td>
+                                                <td class="o_gvg_no">5</td>
+                                                <td class="o_gvg_cell"><div class="o_gvg_value"><field name="goods_vat_after" nolabel="1" readonly="state != 'draft'"/></div></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="o_gvg_label">კორექტირების შედეგად დამატებით გადასახდელი დღგ (სტ.5-სტ.4, როცა სტ.5> სტ.4)</td>
+                                                <td class="o_gvg_no">6</td>
+                                                <td class="o_gvg_cell o_gvg_locked"><div class="o_gvg_value"><i class="oi o_gvg_padlock" data-icon="lock" title="სტ.5 - სტ.4, როცა სტ.5 > სტ.4" aria-hidden="true"/><field name="goods_vat_increase" nolabel="1"/></div></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="o_gvg_label">კორექტირების შედეგად შესამცირებელი დღგ (სტ.4 - სტ.5, როცა სტ.4 > სტ.5)</td>
+                                                <td class="o_gvg_no">7</td>
+                                                <td class="o_gvg_cell o_gvg_locked"><div class="o_gvg_value"><i class="oi o_gvg_padlock" data-icon="lock" title="სტ.4 - სტ.5, როცა სტ.4 > სტ.5" aria-hidden="true"/><field name="goods_vat_decrease" nolabel="1"/></div></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="o_gvg_label">ბიუჯეტში შესატანი დღგ (სტ.3 + სტ.6) ან (სტ.3 - სტ.7, როცა სტ.3 > სტ.7)</td>
+                                                <td class="o_gvg_no">8</td>
+                                                <td class="o_gvg_cell o_gvg_locked"><div class="o_gvg_value"><i class="oi o_gvg_padlock" data-icon="lock" title="სტ.3 + სტ.6 - სტ.7, ან 0, როცა სტ.7 > სტ.3" aria-hidden="true"/><field name="goods_vat_payable" nolabel="1"/></div></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="o_gvg_label">ბიუჯეტიდან დასაბრუნებელი დღგ (სტ.7 – სტ.3, როცა სტ.7 > სტ.3)</td>
+                                                <td class="o_gvg_no">9</td>
+                                                <td class="o_gvg_cell o_gvg_locked"><div class="o_gvg_value"><i class="oi o_gvg_padlock" data-icon="lock" title="სტ.7 - სტ.3, როცა სტ.7 > სტ.3" aria-hidden="true"/><field name="goods_vat_refund" nolabel="1"/></div></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_gec_vat_rc_declaration_search" model="ir.ui.view">
+        <field name="name">gec.vat.rc.declaration.search</field>
+        <field name="model">gec.vat.rc.declaration</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="filed" string="Filed" domain="[('state', '=', 'filed')]"/>
+                <group name="group_by">
+                    <filter name="group_company" string="Company" context="{'group_by': 'company_id'}"/>
+                    <filter name="group_month" string="Month" context="{'group_by': 'date_from:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_gec_vat_rc_declaration" model="ir.actions.act_window">
+        <field name="name">Reverse-charge VAT (rs.ge)</field>
+        <field name="res_model">gec.vat.rc.declaration</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create the reverse-charge VAT calculation of a month</p>
+            <p>For companies not registered for VAT. Generate lists the foreign service bills of the month; type the goods rows and the corrections by hand, then type the result into the rs.ge portal.</p>
+        </field>
+    </record>
+</odoo>

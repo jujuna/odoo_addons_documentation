@@ -1,0 +1,3930 @@
+# Georgian translation of the Odoo addon purchase, kept in gec_i18n_supply_chain.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-18 17:38+0000\n"
+"PO-Revision-Date: 2026-09-30 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian (ka_GE)\n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#. module: purchase
+#: model:ir.actions.report,print_report_name:purchase.action_report_purchase_order
+msgid ""
+"\n"
+"                (object.state in ('draft', 'sent') and 'Request for Quotation - %s' % (object.name) or\n"
+"                'Purchase Order - %s' % (object.name))"
+msgstr ""
+"\n"
+"                (object.state in ('draft', 'sent') and 'შეთავაზების მოთხოვნა - %s' % (object.name) or\n"
+"                'შესყიდვის შეკვეთა - %s' % (object.name))"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__partner_bill_count
+msgid "# Vendor Bills"
+msgstr "# მომწოდებლის ანგარიშ-ფაქტურები"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_report__nbr_lines
+msgid "# of Lines"
+msgstr "ხაზების რაოდენობა"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/account_invoice.py:0
+msgid "%(added_lines_count)s PO lines added to the bill."
+msgstr "ანგარიშ-ფაქტურას დაემატა შესყიდვის ორდერის %(added_lines_count)s ხაზი."
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/account_invoice.py:0
+msgid "%(matched_lines_count)s bill lines matched, %(unmatched_lines_count)s unmatched remaining."
+msgstr "ანგარიშ-ფაქტურის %(matched_lines_count)s ხაზი დაემთხვა, %(unmatched_lines_count)s დაუმთხვეველი დარჩა."
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/wizard/accrued_orders.py:0
+msgid "%(order)s - %(order_line)s; %(qty_billed)s billed, %(qty_received)s received at %(unit_price)s"
+msgstr "%(order)s - %(order_line)s; %(qty_billed)s დაფაქტურებული, %(qty_received)s მიღებული, ფასით %(unit_price)s"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/wizard/accrued_orders.py:0
+msgid "%(order)s - %(order_line)s; %(quantity_billed)s Billed, %(quantity_received)s Received at %(unit_price)s each"
+msgstr "%(order)s - %(order_line)s; %(quantity_billed)s დაფაქტურებული, %(quantity_received)s მიღებული, თითო %(unit_price)s"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/wizard/accrued_orders.py:0
+msgid "%(order)s - %(order_line)s; price difference for %(product)s"
+msgstr "%(order)s - %(order_line)s; ფასის სხვაობა %(product)s-ისთვის"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "%(product)s from %(original_receipt_date)s to %(new_receipt_date)s"
+msgstr "%(product)s — %(original_receipt_date)s-დან %(new_receipt_date)s-მდე"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "%s modified receipt dates for the following products:"
+msgstr "%s-მა შეცვალა მიღების თარიღები შემდეგი პროდუქტებისთვის:"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_orders model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_rfqs
+msgid "&amp;nbsp;"
+msgstr "&amp;nbsp;"
+
+#. module: purchase
+#: model:ir.actions.report,print_report_name:purchase.report_purchase_quotation
+msgid "'Request for Quotation - %s' % (object.name)"
+msgstr "'შეთავაზების მოთხოვნა - %s' % (object.name)"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_order
+msgid ", it's 100% free! You'll save time creating beautiful quotations and track sales."
+msgstr ", ის 100% უფასოა! დაზოგავთ დროს ლამაზი შეთავაზებების შექმნასა და გაყიდვებისთვის თვალის დევნებაზე."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.track_po_line_qty_received_template model_terms:ir.ui.view,arch_db:purchase.track_po_line_template
+msgid "-&gt;"
+msgstr "-&gt;"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/account_invoice.py:0
+msgid "0 bill lines matched with this PO."
+msgstr "ამ შესყიდვის ორდერს ანგარიშ-ფაქტურის 0 ხაზი დაემთხვა."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.res_config_settings_view_form_purchase
+msgid "3-way matching"
+msgstr "სამმხრივი შედარება"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_res_config_settings__module_account_3way_match
+msgid "3-way matching: purchases, receptions and bills"
+msgstr "სამმხრივი შედარება: შესყიდვები, მიღებები და ანგარიშ-ფაქტურები"
+
+#. module: purchase
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"        Dear <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>\n"
+"        <t t-if=\"object.partner_id.parent_id\">\n"
+"            (<t t-out=\"object.partner_id.parent_id.name or ''\">Azure Interior</t>)\n"
+"        </t>\n"
+"        <br/><br/>\n"
+"        Here is in attachment a purchase order <span style=\"font-weight:bold;\" t-out=\"object.name or ''\">P00015</span>\n"
+"        <t t-if=\"object.partner_ref\">\n"
+"            with reference: <t t-out=\"object.partner_ref or ''\">REF_XXX</t>\n"
+"        </t>\n"
+"        amounting in <span style=\"font-weight:bold;\" t-out=\"format_amount(object.amount_total, object.currency_id) or ''\">$ 10.00</span>\n"
+"        from <t t-out=\"object.company_id.name or ''\">YourCompany</t>. \n"
+"        <br/><br/>\n"
+"        <t t-if=\"object.date_planned\">\n"
+"            The receipt is expected for <span style=\"font-weight:bold;\" t-out=\"format_date(object.date_planned) or ''\">05/05/2021</span>.\n"
+"            <br/><br/>\n"
+"            Could you please acknowledge the receipt of this order?\n"
+"            <br/><br/>\n"
+"            <a t-att-href=\"object.get_acknowledge_url()\" target=\"_blank\" style=\"padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius: 3px\">\n"
+"                Acknowledge</a>\n"
+"        </t>\n"
+"        <t t-if=\"not is_html_empty(object.user_id.signature)\">\n"
+"            <br/><br/>\n"
+"            <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-out=\"object.user_id.signature or ''\">Mitchell Admin</t></div>\n"
+"        </t>\n"
+"        <br/><br/>\n"
+"    </p>\n"
+"</div>"
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"        ძვირფასო <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>\n"
+"        <t t-if=\"object.partner_id.parent_id\">\n"
+"            (<t t-out=\"object.partner_id.parent_id.name or ''\">Azure Interior</t>)\n"
+"        </t>\n"
+"        <br/><br/>\n"
+"        დანართში იხილეთ შესყიდვის ორდერი <span style=\"font-weight:bold;\" t-out=\"object.name or ''\">P00015</span>\n"
+"        <t t-if=\"object.partner_ref\">\n"
+"            ნომრით: <t t-out=\"object.partner_ref or ''\">REF_XXX</t>\n"
+"        </t>\n"
+"        თანხით <span style=\"font-weight:bold;\" t-out=\"format_amount(object.amount_total, object.currency_id) or ''\">$ 10.00</span>\n"
+"        კომპანიისგან <t t-out=\"object.company_id.name or ''\">YourCompany</t>.\n"
+"        <br/><br/>\n"
+"        <t t-if=\"object.date_planned\">\n"
+"            მიღება მოსალოდნელია <span style=\"font-weight:bold;\" t-out=\"format_date(object.date_planned) or ''\">05/05/2021</span>.\n"
+"            <br/><br/>\n"
+"            გთხოვთ, დაადასტუროთ ამ ორდერის მიღება.\n"
+"            <br/><br/>\n"
+"            <a t-att-href=\"object.get_acknowledge_url()\" target=\"_blank\" style=\"padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius: 3px\">\n"
+"                დადასტურება</a>\n"
+"        </t>\n"
+"        <t t-if=\"not is_html_empty(object.user_id.signature)\">\n"
+"            <br/><br/>\n"
+"            <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-out=\"object.user_id.signature or ''\">Mitchell Admin</t></div>\n"
+"        </t>\n"
+"        <br/><br/>\n"
+"    </p>\n"
+"</div>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_order
+msgid "<i class=\"oi me-1\" data-icon=\"print\"/>Download / Print"
+msgstr "<i class=\"oi me-1\" data-icon=\"print\"/>ჩამოტვირთვა / ბეჭდვა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_orders
+msgid "<i class=\"oi oi-fw oi-filled\" data-icon=\"article\" role=\"img\" aria-label=\"Waiting for Bill\" title=\"Waiting for Bill\"/><span class=\"d-none d-md-inline\"> Waiting for Bill</span>"
+msgstr "<i class=\"oi oi-fw oi-filled\" data-icon=\"article\" role=\"img\" aria-label=\"ანგარიშ-ფაქტურის მოლოდინში\" title=\"ანგარიშ-ფაქტურის მოლოდინში\"/><span class=\"d-none d-md-inline\"> ანგარიშ-ფაქტურის მოლოდინში</span>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"check\"/>Paid"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"check\"/>გადახდილი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"check\"/>Reversed"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"check\"/>დაბრუნებული"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_orders
+msgid "<i class=\"oi oi-fw\" data-icon=\"close\" role=\"img\" aria-label=\"Cancelled\" title=\"Cancelled\"/><span class=\"d-none d-md-inline\"> Cancelled</span>"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"close\" role=\"img\" aria-label=\"გაუქმებული\" title=\"გაუქმებული\"/><span class=\"d-none d-md-inline\"> გაუქმებული</span>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content
+msgid "<i class=\"oi oi-fw\" data-icon=\"schedule\"/>Waiting Payment"
+msgstr "<i class=\"oi oi-fw\" data-icon=\"schedule\"/>გადახდის მოლოდინში"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid ""
+"<i class=\"oi\" data-icon=\"lock\"/>\n"
+"                        Locked"
+msgstr ""
+"<i class=\"oi\" data-icon=\"lock\"/>\n"
+"                        ჩაკეტილი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_orders
+msgid ""
+"<span class=\"d-none d-md-inline\">Confirmation Date</span>\n"
+"                          <span class=\"d-block d-md-none\">Confirmation</span>"
+msgstr ""
+"<span class=\"d-none d-md-inline\">დადასტურების თარიღი</span>\n"
+"                          <span class=\"d-block d-md-none\">დადასტურება</span>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_orders
+msgid ""
+"<span class=\"d-none d-md-inline\">Purchase Order #</span>\n"
+"                          <span class=\"d-block d-md-none\">Ref.</span>"
+msgstr ""
+"<span class=\"d-none d-md-inline\">შესყიდვის შეკვეთა #</span>\n"
+"                          <span class=\"d-block d-md-none\">ნომ.</span>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_rfqs
+msgid ""
+"<span class=\"d-none d-md-inline\">Request for Quotation #</span>\n"
+"                        <span class=\"d-block d-md-none\">Ref.</span>"
+msgstr ""
+"<span class=\"d-none d-md-inline\">შეთავაზების მოთხოვნა #</span>\n"
+"                        <span class=\"d-block d-md-none\">ნომ.</span>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid ""
+"<span class=\"o_form_label\" invisible=\"state not in ('draft', 'sent')\">Request for Quotation</span>\n"
+"                        <span class=\"o_form_label\" invisible=\"state in ('draft', 'sent')\">Purchase Order</span>"
+msgstr ""
+"<span class=\"o_form_label\" invisible=\"state not in ('draft', 'sent')\">შეთავაზების მოთხოვნა</span>\n"
+"                        <span class=\"o_form_label\" invisible=\"state in ('draft', 'sent')\">შესყიდვის ორდერი</span>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "<span class=\"o_stat_text\">Price Comparison</span>"
+msgstr "<span class=\"o_stat_text\">ფასების შედარება</span>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.product_normal_form_view_inherit_purchase model_terms:ir.ui.view,arch_db:purchase.view_product_template_purchase_buttons_from
+msgid "<span class=\"o_stat_text\">Purchased</span>"
+msgstr "<span class=\"o_stat_text\">შესყიდული</span>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.product_normal_form_view_inherit_purchase model_terms:ir.ui.view,arch_db:purchase.view_product_template_purchase_buttons_from
+msgid ""
+"<span class=\"o_stat_value text-muted\">\n"
+"                                    Incoming\n"
+"                                </span>"
+msgstr ""
+"<span class=\"o_stat_value text-muted\">\n"
+"                                    შემომავალი\n"
+"                                </span>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "<span invisible=\"not receipt_reminder_email\">day(s) before</span>"
+msgstr "<span invisible=\"not receipt_reminder_email\">დღით ადრე</span>"
+
+#. module: purchase
+#: model_terms:web_tour.tour,rainbow_man_message:purchase.purchase_tour
+msgid "<span><b>Good job!</b> You went through all steps of this tour.</span>"
+msgstr "<span><b>კარგი საქმეა!</b> თქვენ გაიარეთ ამ ტურის ყველა საფეხური.</span>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content
+msgid "<span>Amount</span>"
+msgstr "<span>თანხა</span>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content
+msgid "<span>Taxes</span>"
+msgstr "<span>გადასახადები</span>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "<span>Warning: this order might be a duplicate of</span>"
+msgstr "<span>გაფრთხილება: ეს შეკვეთა შეიძლება იყოს დუბლიკატი</span>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content
+msgid "<strong class=\"d-block mb-1\">From:</strong>"
+msgstr "<strong class=\"d-block mb-1\">ვისგან:</strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content
+msgid "<strong class=\"d-block mb-1\">Invoices</strong>"
+msgstr "<strong class=\"d-block mb-1\">ინვოისები</strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content
+msgid "<strong class=\"d-block mb-1\">Shipping address:</strong>"
+msgstr "<strong class=\"d-block mb-1\">გადაზიდვის მისამართი:</strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.report_purchaseorder_document model_terms:ir.ui.view,arch_db:purchase.report_purchasequotation_document
+msgid "<strong class=\"d-block mt-3\">Shipping address</strong>"
+msgstr "<strong class=\"d-block mt-3\">მიწოდების მისამართი</strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.report_purchaseorder_document
+msgid "<strong>Amount</strong>"
+msgstr "<strong>თანხა</strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.report_purchaseorder_document
+msgid "<strong>Buyer</strong>"
+msgstr "<strong>მყიდველი</strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content
+msgid "<strong>Confirmation Date:</strong>"
+msgstr "<strong>დადასტურების თარიღი:</strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.report_purchaseorder_document model_terms:ir.ui.view,arch_db:purchase.report_purchasequotation_document
+msgid "<strong>Description</strong>"
+msgstr "<strong>აღწერა</strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.report_purchaseorder_document
+msgid "<strong>Disc.</strong>"
+msgstr "<strong>ფასდ.</strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.report_purchaseorder_document
+msgid "<strong>Expected Arrival:</strong>"
+msgstr "<strong>მოსალოდნელი ჩამოსვლა:</strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.report_purchasequotation_document
+msgid "<strong>Expected Date</strong>"
+msgstr "<strong>მოსალოდნელი თარიღი</strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.report_purchaseorder_document model_terms:ir.ui.view,arch_db:purchase.report_purchasequotation_document
+msgid "<strong>Incoterm:</strong>"
+msgstr "<strong>ინკოტერმსი:</strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content model_terms:ir.ui.view,arch_db:purchase.report_purchaseorder_document
+msgid "<strong>Order Date:</strong>"
+msgstr "<strong>შეკვეთის თარიღი:</strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.report_purchaseorder_document
+msgid "<strong>Order Deadline:</strong>"
+msgstr "<strong>შეკვეთის ბოლო ვადა:</strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.report_purchaseorder_document
+msgid "<strong>Payment Terms: </strong>"
+msgstr "<strong>გადახდის პირობები: </strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.report_purchaseorder_document model_terms:ir.ui.view,arch_db:purchase.report_purchasequotation_document
+msgid "<strong>Qty</strong>"
+msgstr "<strong>რაოდ.</strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content
+msgid "<strong>Receipt Date:</strong>"
+msgstr "<strong>მიღების თარიღი:</strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content
+msgid "<strong>Request For Quotation Date:</strong>"
+msgstr "<strong>შეთავაზების მოთხოვნის თარიღი:</strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.report_purchasequotation_document
+msgid "<strong>Requested Ship Date:</strong>"
+msgstr "<strong>მოთხოვნილი გაგზავნის თარიღი:</strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.report_purchaseorder_document
+msgid "<strong>Taxes</strong>"
+msgstr "<strong>გადასახადები</strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.track_po_line_qty_received_template
+msgid "<strong>The received quantity has been updated.</strong>"
+msgstr "<strong>მიღებული რაოდენობა განახლდა.</strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.report_purchaseorder_document
+msgid "<strong>Unit Price</strong>"
+msgstr "<strong>ერთეულის ფასი</strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.report_purchaseorder_document
+msgid "<strong>Your Order Reference</strong>"
+msgstr "<strong>თქვენი შეკვეთის ნომერი</strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.res_config_settings_view_form_purchase
+msgid "A blanket purchase order is a purchase agreement between a buyer and a supplier to deliver goods or services to the buyer at a preset price for a period of time."
+msgstr "ჩარჩოშეკვეთა არის შესყიდვის ხელშეკრულება მყიდველსა და მომწოდებელს შორის, რომლითაც საქონელი ან მომსახურება მყიდველს წინასწარ განსაზღვრულ ფასად მიეწოდება გარკვეული პერიოდის განმავლობაში."
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "A sample email has been sent to %s."
+msgstr "ნიმუშ-ელფოსტა გაიგზავნა მისამართზე %s."
+
+#. module: purchase
+#: model:res.groups,name:purchase.group_warning_purchase
+msgid "A warning can be set on a product or a customer (Purchase)"
+msgstr "გაფრთხილება შეიძლება დაყენდეს პროდუქტზე ან კლიენტზე (შესყიდვა)"
+
+#. module: purchase
+#: model:ir.model,name:purchase.model_res_groups
+msgid "Access Groups"
+msgstr "წვდომის ჯგუფები"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__access_warning
+msgid "Access warning"
+msgstr "წვდომის გაფრთხილება"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order_line__qty_received_method
+msgid ""
+"According to product configuration, the received quantity can be automatically computed by mechanism:\n"
+"  - Manual: the quantity is set manually on the line\n"
+"  - Stock Moves: the quantity comes from confirmed pickings\n"
+msgstr ""
+"პროდუქტის კონფიგურაციის მიხედვით, მიღებული რაოდენობა შეიძლება ავტომატურად გამოითვალოს მექანიზმით:\n"
+"  - ხელით: რაოდენობა ხელით ეთითება ხაზზე\n"
+"  - მარაგის მოძრაობები: რაოდენობა დადასტურებული აღებებიდან მოდის\n"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__account_move_id
+msgid "Account Move"
+msgstr "ბუღალტრული გატარება"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_product_category__property_account_billed_not_received_id
+msgid "Account holding the accrued value of the goods billed but not received yet. With perpetual valuation, it counterbalances the stock valuation account at closing."
+msgstr "ანგარიში, რომელიც ინახავს იმ საქონლის დარიცხულ ღირებულებას, რომელზეც ანგარიშ-ფაქტურა გამოწერილია, მაგრამ ჯერ არ არის მიღებული. უწყვეტი შეფასებისას ის დახურვისას აწონასწორებს მარაგის შეფასების ანგარიშს."
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_product_category__property_account_bills_to_receive_id
+msgid "Account holding the accrued value of the goods received but not billed yet. With perpetual valuation, it counterbalances the stock valuation account at closing."
+msgstr "ანგარიში, რომელიც ინახავს იმ საქონლის დარიცხულ ღირებულებას, რომელიც მიღებულია, მაგრამ მასზე ანგარიშ-ფაქტურა ჯერ არ არის გამოწერილი. უწყვეტი შეფასებისას ის დახურვისას აწონასწორებს მარაგის შეფასების ანგარიშს."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__accrual_move_ids
+msgid "Accrual Entries"
+msgstr "დარიცხვის ჩანაწერები"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order_line__accrual_move_ids
+msgid "Accrual entries generated for this line, so it isn't accrued again while one is still standing (posted, not yet reversed or cancelled)."
+msgstr "ამ ხაზისთვის დაგენერირებული დარიცხვის ჩანაწერები, რომ ხაზზე დარიცხვა ხელახლა არ მოხდეს, სანამ რომელიმე მათგანი ჯერ კიდევ მოქმედებს (გატარებულია, ჯერ არ არის დაბრუნებული ან გაუქმებული)."
+
+#. module: purchase
+#: model:ir.actions.server,name:purchase.action_accrued_expense_entry_purchase_order_line
+msgid "Accrued Expense Entry"
+msgstr "დარიცხული ხარჯის გატარება"
+
+#. module: purchase
+#: model:ir.model,name:purchase.model_account_accrued_orders_wizard
+msgid "Accrued Orders Wizard"
+msgstr "დარიცხული შეკვეთების ოსტატი"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/wizard/accrued_orders.py:0
+msgid "Accrued total"
+msgstr "დარიცხული ჯამი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Acknowledge"
+msgstr "დადასტურება"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__acknowledged
+msgid "Acknowledged"
+msgstr "დადასტურებული"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__message_needaction
+msgid "Action Needed"
+msgstr "საჭიროა მოქმედება"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__activity_ids
+msgid "Activities"
+msgstr "აქტივობები"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_search
+msgid "Activities of"
+msgstr "აქტივობები:"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "აქტივობის გამონაკლისის გაფორმება"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__activity_plans_ids
+msgid "Activity Plans"
+msgstr "აქტივობის გეგმები"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__activity_state
+msgid "Activity State"
+msgstr "აქტივობის მდგომარეობა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "აქტივობის ტიპის ხატულა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_search
+msgid "Activity type"
+msgstr "აქტივობის ტიპი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.bill_to_po_wizard_form
+msgid "Add Down Payment"
+msgstr "ავანსის დამატება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.bill_to_po_wizard_form
+msgid "Add Products"
+msgstr "პროდუქტების დამატება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Add a note"
+msgstr "შენიშვნის დამატება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Add a product"
+msgstr "პროდუქტის დამატება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Add a section"
+msgstr "სექციის დამატება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Add note"
+msgstr "შენიშვნის დამატება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Add product"
+msgstr "პროდუქტის დამატება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Add section"
+msgstr "სექციის დამატება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.res_config_settings_view_form_purchase
+msgid "Add several variants to the purchase order from a grid"
+msgstr "შესყიდვის ორდერში რამდენიმე ვარიანტის დამატება ცხრილიდან"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/js/tours/purchase.js:0
+msgid "Add some products or services to your quotation."
+msgstr "დაამატეთ პროდუქტები ან მომსახურებები თქვენს შეთავაზებას."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.bill_to_po_wizard_form model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_tree
+msgid "Add to PO"
+msgstr "ორდერში დამატება"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_bill_line_match.py:0
+msgid "Add to Purchase Order"
+msgstr "შესყიდვის ორდერში დამატება"
+
+#. module: purchase
+#: model:ir.actions.act_window,name:purchase.mail_followers_edit_action_from_purchase
+msgid "Add/Remove Followers"
+msgstr "გამომწერების დამატება/წაშლა"
+
+#. module: purchase
+#: model:res.groups,name:purchase.group_purchase_manager
+msgid "Administrator"
+msgstr "ადმინისტრატორი"
+
+#. module: purchase
+#. odoo-javascript
+#. odoo-python
+#: code:addons/purchase/controllers/portal.py:0 code:addons/purchase/static/src/views/purchase_dashboard.xml:0
+msgid "All"
+msgstr "ყველა"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/views/purchase_dashboard.xml:0
+msgid "All Days to Order"
+msgstr "შესაკვეთი დღეები — ყველა"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/views/purchase_dashboard.xml:0
+msgid "All Draft RFQs"
+msgstr "ყველა მონახაზი შეთავაზების მოთხოვნა"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/views/purchase_dashboard.xml:0
+msgid "All Late RFQs"
+msgstr "ყველა დაგვიანებული შეთავაზების მოთხოვნა"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/views/purchase_dashboard.xml:0
+msgid "All Late Receipt POs"
+msgstr "ყველა დაგვიანებული მიღების ორდერი"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/views/purchase_dashboard.xml:0
+msgid "All Not Acknowledged POs"
+msgstr "ყველა დაუდასტურებელი ორდერი"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/views/purchase_dashboard.xml:0
+msgid "All Sent RFQs"
+msgstr "ყველა გაგზავნილი შეთავაზების მოთხოვნა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.product_supplierinfo_tree_view2
+msgid "All variants"
+msgstr "ყველა ვარიანტი"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_res_config_settings__group_send_reminder
+msgid "Allow automatically send email to remind your vendor the receipt date"
+msgstr "საშუალებას იძლევა, ავტომატურად გაიგზავნოს ელფოსტა მომწოდებლისთვის მიღების თარიღის შესახსენებლად"
+
+#. module: purchase
+#: model:ir.model.fields.selection,name:purchase.selection__res_company__po_lock__edit
+msgid "Allow to edit purchase orders"
+msgstr "შესყიდვის ორდერების რედაქტირების დაშვება"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__allowed_uom_ids
+msgid "Allowed Uom"
+msgstr "დაშვებული ზომის ერთეული"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__aml_id
+msgid "Aml"
+msgstr "Aml"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_union__amount model:ir.model.fields,field_description:purchase.field_purchase_order_line__amount_to_invoice_at_date model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Amount"
+msgstr "თანხა"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_report__delay_pass
+msgid "Amount of time between date planned and order by date for each purchase order line."
+msgstr "დროის ოდენობა დაგეგმილ თარიღსა და შესაკვეთ თარიღს შორის თითოეული შესყიდვის ორდერის ხაზისთვის."
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_report__delay
+msgid "Amount of time between purchase approval and order by date."
+msgstr "დროის ოდენობა შესყიდვის დამტკიცებასა და შესაკვეთ თარიღს შორის."
+
+#. module: purchase
+#: model:ir.model,name:purchase.model_account_analytic_account
+msgid "Analytic Account"
+msgstr "ანალიტიკური ანგარიში"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__analytic_distribution
+msgid "Analytic Distribution"
+msgstr "ანალიტიკური განაწილება"
+
+#. module: purchase
+#: model:ir.model,name:purchase.model_account_analytic_applicability
+msgid "Analytic Plan's Applicabilities"
+msgstr "ანალიტიკური გეგმის გამოყენებადობა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__analytic_precision
+msgid "Analytic Precision"
+msgstr "ანალიტიკური სიზუსტე"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Approve Order"
+msgstr "ორდერის დამტკიცება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_kpis_tree model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_tree
+msgid "Are you sure you want to cancel the selected RFQs/Orders?"
+msgstr "დარწმუნებული ხართ, რომ გსურთ არჩეული შეთავაზების მოთხოვნების/ორდერების გაუქმება?"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Arrival Confirmation"
+msgstr "ჩამოსვლის დადასტურება"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/product.py:0
+msgid "As other units of measure (ex : %(problem_uom)s) than %(uom)s have already been used for this product, the change of unit of measure can not be done.If you want to change it, please archive the product and create a new one."
+msgstr "რადგან ამ პროდუქტისთვის %(uom)s-ის გარდა სხვა საზომი ერთეულებიც (მაგ.: %(problem_uom)s) უკვე გამოყენებულია, საზომი ერთეულის შეცვლა შეუძლებელია. თუ გსურთ შეცვლა, გთხოვთ, დაარქივოთ პროდუქტი და შექმნათ ახალი."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__message_attachment_count
+msgid "Attachment Count"
+msgstr "დანართების რაოდენობა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__product_template_attribute_value_ids
+msgid "Attribute Values"
+msgstr "ატრიბუტის მნიშვნელობები"
+
+#. module: purchase
+#: model:ir.ui.menu,name:purchase.menu_product_attribute_action model_terms:ir.ui.view,arch_db:purchase.res_config_settings_view_form_purchase
+msgid "Attributes"
+msgstr "ატრიბუტები"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.view_move_form_inherit_purchase
+msgid "Auto-Complete"
+msgstr "ავტო-შევსება"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_account_bank_statement_line__purchase_id model:ir.model.fields,help:purchase.field_account_move__purchase_id
+msgid "Auto-complete from a past purchase order."
+msgstr "ავტომატური შევსება წარსული შესყიდვის ორდერიდან."
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_account_bank_statement_line__purchase_vendor_bill_id model:ir.model.fields,help:purchase.field_account_move__purchase_vendor_bill_id
+msgid "Auto-complete from a previous bill, refund, or purchase order."
+msgstr "ავტომატური შევსება წინა ანგარიშ-ფაქტურიდან, დაბრუნებიდან ან შესყიდვის ორდერიდან."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.res_config_settings_view_form_purchase
+msgid "Automatically lock confirmed orders to prevent editing"
+msgstr "დადასტურებული ორდერების ავტომატური ჩაკეტვა რედაქტირების ასაცილებლად"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.res_config_settings_view_form_purchase
+msgid "Automatically remind the receipt date to your vendors"
+msgstr "მიღების თარიღის ავტომატური შეხსენება თქვენს მომწოდებლებს"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_res_partner__receipt_reminder_email model:ir.model.fields,help:purchase.field_res_users__receipt_reminder_email model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Automatically send a confirmation email to the vendor X days before the expected receipt date, asking him to confirm the exact date."
+msgstr "ავტომატურად გაუგზავნეთ მომწოდებელს დადასტურების წერილი მოსალოდნელი მიღების თარიღამდე X დღით ადრე და სთხოვეთ ზუსტი თარიღის დადასტურება."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_report__price_average
+msgid "Average Cost"
+msgstr "საშუალო თვითღირებულება"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__invoice_count
+msgid "Bill Count"
+msgstr "ანგარიშ-ფაქტურების რაოდენობა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__invoice_lines
+msgid "Bill Lines"
+msgstr "ანგარიშ-ფაქტურის ხაზები"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__bill_matched_ratio
+msgid "Bill Matched Ratio"
+msgstr "ანგარიშ-ფაქტურის შედარების კოეფიციენტი"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0 model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Bill Matching"
+msgstr "ანგარიშ-ფაქტურის შედარება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_tree
+msgid "Bill Qty"
+msgstr "ანგარიშ-ფაქტურის რაოდ."
+
+#. module: purchase
+#: model:ir.model,name:purchase.model_bill_to_po_wizard
+msgid "Bill to Purchase Order"
+msgstr "ანგარიშ-ფაქტურა შესყიდვის ორდერზე"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__bill_to_receive
+msgid "Bill to Receive"
+msgstr "მისაღები ანგარიშ-ფაქტურა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__qty_invoiced_at_date model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_tree model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Billed"
+msgstr "გამოწერილი ანგარიშ-ფაქტურა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__billed_amount_untaxed
+msgid "Billed Amount Untaxed"
+msgstr "დაინვოისებული დაუბეგრავი თანხა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_product_category__property_account_billed_not_received_id model:ir.model.fields,field_description:purchase.field_res_company__account_billed_not_received_id
+msgid "Billed Not Received Account"
+msgstr "„ანგარიშ-ფაქტურა გამოწერილი, მიუღებელი“ ანგარიში"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_product_category__property_account_billed_not_received_active
+msgid "Billed Not Received Account Active"
+msgstr "„ანგარიშ-ფაქტურა გამოწერილი, მიუღებელი“ ანგარიში აქტიურია"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__qty_invoiced
+msgid "Billed Qty"
+msgstr "დაინვოისებული რაოდ."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Billed Quantity"
+msgstr "დაინვოისებული რაოდენობა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.track_po_line_template
+msgid "Billed Quantity:"
+msgstr "დაინვოისებული რაოდენობა:"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__invoice_status
+msgid "Billing Status"
+msgstr "ბილინგის სტატუსი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__invoice_ids model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_search
+msgid "Bills"
+msgstr "ანგარიშ-ფაქტურები"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_search
+msgid "Bills Received"
+msgstr "მიღებული ანგარიშ-ფაქტურები"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_product_category__property_account_bills_to_receive_id model:ir.model.fields,field_description:purchase.field_res_company__account_bills_to_receive_id
+msgid "Bills to Receive Account"
+msgstr "მისაღები ანგარიშ-ფაქტურების ანგარიში"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_product_category__property_account_bills_to_receive_active
+msgid "Bills to Receive Account Active"
+msgstr "მისაღები ანგარიშ-ფაქტურების ანგარიში აქტიურია"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__user_id model:ir.model.fields,field_description:purchase.field_purchase_report__user_id model:ir.model.fields,field_description:purchase.field_res_partner__buyer_id model:ir.model.fields,field_description:purchase.field_res_users__buyer_id model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_order model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_search model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_filter model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_search
+msgid "Buyer"
+msgstr "მყიდველი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_calendar
+msgid "Calendar View"
+msgstr "კალენდრის ხედი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form model_terms:ir.ui.view,arch_db:purchase.purchase_order_kpis_tree model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_tree
+msgid "Cancel"
+msgstr "გაუქმება"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/controllers/portal.py:0 model:ir.model.fields.selection,name:purchase.selection__purchase_order__state__cancel model:ir.model.fields.selection,name:purchase.selection__purchase_report__state__cancel
+msgid "Cancelled"
+msgstr "გაუქმებული"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.report_purchaseorder_document
+msgid "Cancelled Purchase Order #"
+msgstr "გაუქმებული შესყიდვის ორდერი #"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order_line.py:0
+msgid "Cannot delete a purchase order line which is in state “%s”."
+msgstr "ვერ წაშლით შესყიდვის ორდერის ხაზს, რომელიც მდგომარეობაშია „%s“."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Catalog"
+msgstr "კატალოგი"
+
+#. module: purchase
+#: model:ir.ui.menu,name:purchase.menu_product_category_config_purchase
+msgid "Categories"
+msgstr "კატეგორიები"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_order
+msgid "Close"
+msgstr "დახურვა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_report__commercial_partner_id
+msgid "Commercial Entity"
+msgstr "კომერციული სუბიექტი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__company_id model:ir.model.fields,field_description:purchase.field_purchase_bill_union__company_id model:ir.model.fields,field_description:purchase.field_purchase_order__company_id model:ir.model.fields,field_description:purchase.field_purchase_order_line__company_id model:ir.model.fields,field_description:purchase.field_purchase_report__company_id model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_search
+msgid "Company"
+msgstr "კომპანია"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__company_currency_id model:ir.model.fields,field_description:purchase.field_res_config_settings__company_currency_id
+msgid "Company Currency"
+msgstr "კომპანიის ვალუტა"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "Compose Email"
+msgstr "ელფოსტის შედგენა"
+
+#. module: purchase
+#: model:ir.model,name:purchase.model_res_config_settings
+msgid "Config Settings"
+msgstr "კონფიგურაციის პარამეტრები"
+
+#. module: purchase
+#: model:ir.ui.menu,name:purchase.menu_purchase_config
+msgid "Configuration"
+msgstr "კონფიგურაცია"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Confirm Order"
+msgstr "ორდერის დადასტურება"
+
+#. module: purchase
+#: model:ir.actions.server,name:purchase.action_confirm_rfqs
+msgid "Confirm RFQ"
+msgstr "შეთავაზების მოთხოვნის დადასტურება"
+
+#. module: purchase
+#: model:ir.model.fields.selection,name:purchase.selection__res_company__po_double_validation__one_step
+msgid "Confirm purchase orders in one step"
+msgstr "შესყიდვის ორდერების დადასტურება ერთ ნაბიჯში"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/js/tours/purchase.js:0
+msgid "Confirm the price."
+msgstr "დაადასტურეთ ფასი."
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/js/tours/purchase.js:0
+msgid "Confirm your purchase."
+msgstr "დაადასტურეთ თქვენი შესყიდვა."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__date_approve model:ir.model.fields,field_description:purchase.field_purchase_report__date_approve model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_search
+msgid "Confirmation Date"
+msgstr "დადასტურების თარიღი"
+
+#. module: purchase
+#: model:ir.model.fields.selection,name:purchase.selection__res_company__po_lock__lock
+msgid "Confirmed purchase orders are not editable"
+msgstr "დადასტურებული შესყიდვის ორდერები არ ექვემდებარება რედაქტირებას"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_order
+msgid "Connect with your software!"
+msgstr "დაუკავშირდით თქვენს პროგრამას!"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.report_purchaseorder_document model_terms:ir.ui.view,arch_db:purchase.report_purchasequotation_document
+msgid "Connect your software"
+msgstr "დააკავშირეთ თქვენი პროგრამა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__consolidation_currency_id
+msgid "Consolidation Currency"
+msgstr "კონსოლიდაციის ვალუტა"
+
+#. module: purchase
+#: model:ir.model,name:purchase.model_res_partner
+msgid "Contact"
+msgstr "კონტაქტი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_product_product__purchase_method model:ir.model.fields,field_description:purchase.field_product_template__purchase_method
+msgid "Control Policy"
+msgstr "კონტროლის პოლიტიკა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_order
+msgid "Copy"
+msgstr "კოპირება"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__country_code
+msgid "Country code"
+msgstr "ქვეყნის კოდი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_tree
+msgid "Create Bills"
+msgstr "ანგარიშ-ფაქტურების შექმნა"
+
+#. module: purchase
+#: model:ir.model,website_form_label:purchase.model_res_partner
+msgid "Create a Customer"
+msgstr "შექმენით მომხმარებელი"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/product_catalog/kanban_renderer.xml:0
+msgid "Create a product"
+msgstr "პროდუქტის შექმნა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_bill_to_po_wizard__create_uid model:ir.model.fields,field_description:purchase.field_purchase_order__create_uid model:ir.model.fields,field_description:purchase.field_purchase_order_line__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_bill_to_po_wizard__create_date model:ir.model.fields,field_description:purchase.field_purchase_order__create_date model:ir.model.fields,field_description:purchase.field_purchase_order_line__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__currency_id model:ir.model.fields,field_description:purchase.field_purchase_bill_union__currency_id model:ir.model.fields,field_description:purchase.field_purchase_order__currency_id model:ir.model.fields,field_description:purchase.field_purchase_order_line__currency_id model:ir.model.fields,field_description:purchase.field_purchase_report__currency_id
+msgid "Currency"
+msgstr "ვალუტა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__currency_rate
+msgid "Currency Rate"
+msgstr "ვალუტის კურსი"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order__access_url
+msgid "Customer Portal URL"
+msgstr "კლიენტის პორტალის URL"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__date model:ir.model.fields,field_description:purchase.field_purchase_bill_union__date model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_search model_terms:ir.ui.view,arch_db:purchase.purchase_order_line_list_invoice
+msgid "Date"
+msgstr "თარიღი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__date_calendar_start
+msgid "Date Calendar Start"
+msgstr "კალენდრის დაწყების თარიღი"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "Date Updated"
+msgstr "განახლების თარიღი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content
+msgid "Date:"
+msgstr "თარიღი:"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__reminder_date_before_receipt model:ir.model.fields,field_description:purchase.field_res_partner__reminder_date_before_receipt model:ir.model.fields,field_description:purchase.field_res_users__reminder_date_before_receipt
+msgid "Days Before Receipt"
+msgstr "დღეები მიღებამდე"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_report__delay
+msgid "Days to Confirm"
+msgstr "დღეები დადასტურებამდე"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/views/purchase_dashboard.xml:0
+msgid "Days to Order"
+msgstr "დღეები შეკვეთამდე"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_report__delay_pass
+msgid "Days to Receive"
+msgstr "დღეები მიღებამდე"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__company_price_include
+msgid "Default Sales Price Include"
+msgstr "ნაგულისხმევი გასაყიდი ფასი მოიცავს"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order__company_price_include
+msgid "Default on whether the sales price used on the product and invoices with this Company includes its taxes."
+msgstr "ნაგულისხმევი მნიშვნელობა იმისა, მოიცავს თუ არა გადასახადებს ამ კომპანიის პროდუქტსა და ანგარიშ-ფაქტურებზე გამოყენებული გასაყიდი ფასი."
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_bill_line_match__product_uom_id
+msgid "Default unit of measure used for all stock operations."
+msgstr "ნაგულისხმევი საზომი ერთეული, გამოყენებული მარაგის ყველა ოპერაციისთვის."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Define your terms and conditions ..."
+msgstr "განსაზღვრეთ თქვენი წესები და პირობები ..."
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order_line__date_planned
+msgid "Delivery date expected from vendor. This date respectively defaults to vendor pricelist lead time then today's date."
+msgstr "მომწოდებლისგან მოსალოდნელი მიწოდების თარიღი. ეს თარიღი ნაგულისხმევად მომწოდებლის ფასების სიის მოლოდინის დროს, შემდეგ კი დღევანდელ თარიღს იღებს."
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order__date_order model:ir.model.fields,help:purchase.field_purchase_order_line__date_order
+msgid "Depicts the date within which the Quotation should be confirmed and converted into a purchase order."
+msgstr "აღნიშნავს თარიღს, რომლის ფარგლებშიც შეთავაზება უნდა დადასტურდეს და შესყიდვის ორდერად გარდაიქმნას."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__description model:ir.model.fields,field_description:purchase.field_purchase_order_line__name model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_search model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_tree model_terms:ir.ui.view,arch_db:purchase.purchase_order_line_search
+msgid "Description"
+msgstr "აღწერა"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_bill_line_match__qty_to_invoice_raw
+msgid "Difference between demand and quantity but not affected by invoice policy"
+msgstr "სხვაობა მოთხოვნასა და რაოდენობას შორის, ფაქტურირების პოლიტიკის გავლენის გარეშე"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_history_tree model_terms:ir.ui.view,arch_db:purchase.purchase_order_form model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content
+msgid "Disc.%"
+msgstr "ფასდ.%"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__discount
+msgid "Discount (%)"
+msgstr "ფასდაკლება (%)"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Discount:"
+msgstr "ფასდაკლება:"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_account_bank_statement_line__display_auto_complete_field model:ir.model.fields,field_description:purchase.field_account_move__display_auto_complete_field
+msgid "Display Auto Complete Field"
+msgstr "ავტომატური შევსების ველის ჩვენება"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__display_matching_tag
+msgid "Display Matching Tag"
+msgstr "დამთხვევის ტეგის ჩვენება"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_account_analytic_account__display_name model:ir.model.fields,field_description:purchase.field_account_analytic_applicability__display_name model:ir.model.fields,field_description:purchase.field_account_move__display_name model:ir.model.fields,field_description:purchase.field_account_move_line__display_name model:ir.model.fields,field_description:purchase.field_account_tax__display_name model:ir.model.fields,field_description:purchase.field_bill_to_po_wizard__display_name model:ir.model.fields,field_description:purchase.field_product_category__display_name model:ir.model.fields,field_description:purchase.field_product_product__display_name model:ir.model.fields,field_description:purchase.field_product_supplierinfo__display_name model:ir.model.fields,field_description:purchase.field_product_template__display_name model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__display_name model:ir.model.fields,field_description:purchase.field_purchase_bill_union__display_name model:ir.model.fields,field_description:purchase.field_purchase_order__display_name model:ir.model.fields,field_description:purchase.field_purchase_order_line__display_name model:ir.model.fields,field_description:purchase.field_purchase_report__display_name model:ir.model.fields,field_description:purchase.field_res_company__display_name model:ir.model.fields,field_description:purchase.field_res_config_settings__display_name model:ir.model.fields,field_description:purchase.field_res_groups__display_name model:ir.model.fields,field_description:purchase.field_res_partner__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__display_type
+msgid "Display Type"
+msgstr "ჩვენების ტიპი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__distribution_analytic_account_ids
+msgid "Distribution Analytic Account"
+msgstr "განაწილების ანალიტიკური ანგარიში"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__document_tax_mode model:ir.model.fields,field_description:purchase.field_purchase_order_line__document_tax_mode
+msgid "Document Tax Mode"
+msgstr "დოკუმენტის საგადასახადო რეჟიმი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_account_analytic_applicability__business_domain
+msgid "Domain"
+msgstr "დომენი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_res_company__po_double_validation_amount
+msgid "Double validation amount"
+msgstr "ორმაგი დამტკიცების თანხა"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/wizard/bill_to_po_wizard.py:0
+msgid "Down Payment (ref: %(ref)s)"
+msgstr "ავანსი (მითითება: %(ref)s)"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "Down Payments"
+msgstr "ავანსები"
+
+#. module: purchase
+#: model:ir.model.fields.selection,name:purchase.selection__purchase_report__state__draft
+msgid "Draft RFQ"
+msgstr "მონახაზი შეთავაზების მოთხოვნა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_order
+msgid "Drag and drop the request for quotation PDF file into your list of quotations in Odoo. Enjoy the automation!"
+msgstr "გადაათრიეთ შეთავაზების მოთხოვნის PDF ფაილი Odoo-ში თქვენი შეთავაზებების სიაში. ისიამოვნეთ ავტომატიზაციით!"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__dest_address_id
+msgid "Dropship Address"
+msgstr "პირდაპირი მიწოდების მისამართი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Duplicated Documents"
+msgstr "დუბლირებული დოკუმენტები"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__duplicated_order_ids
+msgid "Duplicated Order"
+msgstr "დუბლირებული შეკვეთა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Enter a Description..."
+msgstr "შეიყვანეთ აღწერა..."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__date_planned model:ir.model.fields,field_description:purchase.field_purchase_order_line__date_planned
+msgid "Expected Arrival"
+msgstr "მოსალოდნელი ჩამოსვლა"
+
+#. module: purchase
+msgid "Expected delivery date of goods by the vendor based on the latest information"
+msgstr "მომწოდებლის მიერ საქონლის მოსალოდნელი მიწოდების თარიღი, უახლესი ინფორმაციის საფუძველზე"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order_line.py:0
+msgid "Extra line with %s "
+msgstr "დამატებითი ხაზი %s-ით "
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__fiscal_position_id model:ir.model.fields,field_description:purchase.field_purchase_report__fiscal_position_id
+msgid "Fiscal Position"
+msgstr "ფისკალური პოზიცია"
+
+#. module: purchase
+#: model:portal.entry,description:purchase.portal_purchase_orders
+msgid "Follow orders you have to fulfill"
+msgstr "თვალი ადევნეთ ორდერებს, რომლებიც უნდა შეასრულოთ"
+
+#. module: purchase
+#: model:portal.entry,description:purchase.portal_rfq
+msgid "Follow your Requests for Quotation"
+msgstr "თვალი ადევნეთ თქვენს შეთავაზების მოთხოვნებს"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__message_follower_ids
+msgid "Followers"
+msgstr "გამომწერები"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "გამომწერები (პარტნიორები)"
+
+#. module: purchase
+#: model:ir.model.constraint,message:purchase.constraint_purchase_order_line_non_accountable_null_fields
+msgid "Forbidden values on non-accountable purchase order line"
+msgstr "დაუშვებელი მნიშვნელობები არააღრიცხვად შესყიდვის ორდერის ხაზზე"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.product_product_purchase_tree_view model_terms:ir.ui.view,arch_db:purchase.product_template_purchase_tree_view
+msgid "Forecasted"
+msgstr "პროგნოზირებული"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/account_invoice.py:0
+msgid "From %s"
+msgstr "%s-დან"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/account_invoice.py:0
+msgid "From Electronic Document"
+msgstr "ელექტრონული დოკუმენტიდან"
+
+#. module: purchase
+#: model:ir.model.fields.selection,name:purchase.selection__purchase_order__invoice_status__invoiced
+msgid "Fully Billed"
+msgstr "სრულად დაინვოისებული"
+
+#. module: purchase
+#: model:ir.model.fields.selection,name:purchase.selection__purchase_order__receipt_status__full
+msgid "Fully Received"
+msgstr "სრულად მიღებული"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_search model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_filter
+msgid "Future Activities"
+msgstr "მომავალი აქტივობები"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "Generated Orders"
+msgstr "გენერირებული შეკვეთები"
+
+#. module: purchase
+#: model:ir.model.fields.selection,name:purchase.selection__res_company__po_double_validation__two_step
+msgid "Get 2 levels of approvals to confirm a purchase order"
+msgstr "მიიღეთ დამტკიცების 2 დონე შესყიდვის ორდერის დასადასტურებლად"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.res_config_settings_view_form_purchase
+msgid "Get warnings in orders for products or vendors"
+msgstr "მიიღეთ გაფრთხილებები ორდერებში პროდუქტებზე ან მომწოდებლებზე"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/wizard/accrued_orders.py:0
+msgid "Goods Billed not Received (perpetual valuation)"
+msgstr "დაფაქტურებული, მაგრამ მიუღებელი საქონელი (მუდმივი შეფასება)"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/wizard/accrued_orders.py:0
+msgid "Goods Received not Billed (perpetual valuation)"
+msgstr "მიღებული, მაგრამ დაუფაქტურებელი საქონელი (მუდმივი შეფასება)"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order_line__product_type
+msgid ""
+"Goods are tangible materials and merchandise you provide.\n"
+"A service is a non-material product you provide."
+msgstr ""
+"საქონელი არის ხელშესახები მატერიალები და ნაწარმი, რომელსაც აწვდით.\n"
+"მომსახურება არის არამატერიალური პროდუქტი, რომელსაც აწვდით."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_report__weight
+msgid "Gross Weight"
+msgstr "მთლიანი წონა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__has_message
+msgid "Has Message"
+msgstr "აქვს შეტყობინება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_line_search
+msgid "Hide cancelled lines"
+msgstr "გაუქმებული ხაზების დამალვა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_account_accrued_orders_wizard__id model:ir.model.fields,field_description:purchase.field_account_analytic_account__id model:ir.model.fields,field_description:purchase.field_account_analytic_applicability__id model:ir.model.fields,field_description:purchase.field_account_move__id model:ir.model.fields,field_description:purchase.field_account_move_line__id model:ir.model.fields,field_description:purchase.field_account_tax__id model:ir.model.fields,field_description:purchase.field_bill_to_po_wizard__id model:ir.model.fields,field_description:purchase.field_ir_actions_report__id model:ir.model.fields,field_description:purchase.field_product_category__id model:ir.model.fields,field_description:purchase.field_product_product__id model:ir.model.fields,field_description:purchase.field_product_supplierinfo__id model:ir.model.fields,field_description:purchase.field_product_template__id model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__id model:ir.model.fields,field_description:purchase.field_purchase_bill_union__id model:ir.model.fields,field_description:purchase.field_purchase_order__id model:ir.model.fields,field_description:purchase.field_purchase_order_line__id model:ir.model.fields,field_description:purchase.field_purchase_report__id model:ir.model.fields,field_description:purchase.field_res_company__id model:ir.model.fields,field_description:purchase.field_res_config_settings__id model:ir.model.fields,field_description:purchase.field_res_groups__id model:ir.model.fields,field_description:purchase.field_res_partner__id
+msgid "ID"
+msgstr "ID"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__activity_exception_icon
+msgid "Icon"
+msgstr "ხატულა"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "ხატულა გამონაკლისი აქტივობის აღსანიშნავად."
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "თუ მონიშნულია, ახალი შეტყობინებები თქვენს ყურადღებას საჭიროებს."
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order__message_has_error model:ir.model.fields,help:purchase.field_purchase_order__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "თუ მონიშნულია, ზოგიერთ შეტყობინებას მიწოდების შეცდომა აქვს."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.res_config_settings_view_form_purchase
+msgid "If enabled, activates 3-way matching on vendor bills : the items must be received in order to pay the invoice."
+msgstr "თუ ჩართულია, ააქტიურებს სამმხრივ შედარებას მომწოდებლის ანგარიშ-ფაქტურებზე: ინვოისის გადასახდელად ერთეულები უნდა იყოს მიღებული."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.res_config_settings_view_form_purchase
+msgid "If installed, the product variants will be added to purchase orders through a grid entry."
+msgstr "თუ დაინსტალირებულია, პროდუქტის ვარიანტები შესყიდვის ორდერებს ცხრილის ჩანაწერის საშუალებით დაემატება."
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "In order to delete a purchase order, you must cancel it first."
+msgstr "შესყიდვის ორდერის წასაშლელად ჯერ უნდა გააუქმოთ ის."
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid ""
+"In selected purchase order to merge these details must be same\n"
+"Vendor, currency, destination, dropship address and agreement"
+msgstr ""
+"გასაერთიანებელ არჩეულ შესყიდვის შეკვეთებში ეს დეტალები უნდა იყოს ერთნაირი:\n"
+"მომწოდებელი, ვალუტა, დანიშნულება, დროპშიპინგის მისამართი და ხელშეკრულება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.product_view_search_catalog
+msgid "In the Order"
+msgstr "შეკვეთაში"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__incoterm_id model_terms:ir.ui.view,arch_db:purchase.view_partner_property_form
+msgid "Incoterm"
+msgstr "ინკოტერმსი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__incoterm_location model_terms:ir.ui.view,arch_db:purchase.view_partner_property_form
+msgid "Incoterm Location"
+msgstr "Incoterm-ის ადგილმდებარეობა"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/js/tours/purchase.js:0
+msgid "Indicate the product quantity you want to order."
+msgstr "მიუთითეთ პროდუქტის რაოდენობა, რომლის შეკვეთაც გსურთ."
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_account_bank_statement_line__purchase_warning_text model:ir.model.fields,help:purchase.field_account_move__purchase_warning_text model:ir.model.fields,help:purchase.field_purchase_order__purchase_warning_text
+msgid "Internal warning for the partner or the products as set by the user."
+msgstr "შიდა გაფრთხილება პარტნიორის ან პროდუქტებისთვის, მომხმარებლის მიერ დაყენებული."
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order__incoterm_id model:ir.model.fields,help:purchase.field_res_partner__purchase_incoterm_id model:ir.model.fields,help:purchase.field_res_users__purchase_incoterm_id
+msgid "International Commercial Terms are a series of predefined commercial terms used in international transactions."
+msgstr "საერთაშორისო კომერციული პირობები (Incoterms) წინასწარ განსაზღვრული კომერციული პირობების ერთობლიობაა, რომელიც გამოიყენება საერთაშორისო ტრანზაქციებში."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Invoices and Incoming Shipments"
+msgstr "ინვოისები და შემომავალი გზავნილები"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.res_config_settings_view_form_purchase
+msgid "Invoicing"
+msgstr "ფაქტურირება"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_account_move_line__is_downpayment model:ir.model.fields,field_description:purchase.field_purchase_order_line__is_downpayment
+msgid "Is Downpayment"
+msgstr "არის ავანსი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__message_is_follower
+msgid "Is Follower"
+msgstr "არის გამომწერი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__is_late
+msgid "Is Late"
+msgstr "დაგვიანებულია"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_account_bank_statement_line__is_purchase_matched model:ir.model.fields,field_description:purchase.field_account_move__is_purchase_matched
+msgid "Is Purchase Matched"
+msgstr "შესყიდვა შედარებულია"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order__acknowledged
+msgid "It indicates that the vendor has acknowledged the receipt of the purchase order."
+msgstr "აღნიშნავს, რომ მომწოდებელმა დაადასტურა შესყიდვის ორდერის მიღება."
+
+#. module: purchase
+#: model:ir.model,name:purchase.model_account_move
+msgid "Journal Entry"
+msgstr "ჟურნალის ჩანაწერი"
+
+#. module: purchase
+msgid "Journal Item"
+msgstr "ჟურნალის ერთეული"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__label
+msgid "Label"
+msgstr "წარწერა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_bill_to_po_wizard__write_uid model:ir.model.fields,field_description:purchase.field_purchase_order__write_uid model:ir.model.fields,field_description:purchase.field_purchase_order_line__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_bill_to_po_wizard__write_date model:ir.model.fields,field_description:purchase.field_purchase_order__write_date model:ir.model.fields,field_description:purchase.field_purchase_order_line__write_date
+msgid "Last Updated on"
+msgstr "ბოლო განახლების თარიღი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_filter
+msgid "Late"
+msgstr "ვადაგადაცილებული"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_search model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_filter
+msgid "Late Activities"
+msgstr "დაგვიანებული აქტივობები"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/views/purchase_dashboard.xml:0
+msgid "Late RFQ"
+msgstr "დაგვიანებული შეთავაზების მოთხოვნა"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/views/purchase_dashboard.xml:0
+msgid "Late Receipt"
+msgstr "დაგვიანებული მიღება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_filter
+msgid "Late Receipts"
+msgstr "დაგვიანებული მიღებები"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/js/tours/purchase.js:0
+msgid "Let's create your first request for quotation."
+msgstr "შევქმნათ თქვენი პირველი შეთავაზების მოთხოვნა."
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/js/tours/purchase.js:0
+msgid "Let's try the Purchase app to manage the flow from purchase to reception and invoice control."
+msgstr "მოდით, ვცადოთ შესყიდვის აპლიკაცია, რომ ვმართოთ ნაკადი შესყიდვიდან მიღებამდე და ინვოისის კონტროლამდე."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_res_company__po_double_validation
+msgid "Levels of Approvals"
+msgstr "დამტკიცების დონეები"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_res_config_settings__po_double_validation
+msgid "Levels of Approvals *"
+msgstr "დამტკიცების დონეები *"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__line_amount_untaxed
+msgid "Line Amount Untaxed"
+msgstr "ხაზის დაუბეგრავი თანხა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__line_qty
+msgid "Line Qty"
+msgstr "ხაზის რაოდ."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__line_uom_id
+msgid "Line Uom"
+msgstr "ხაზის ზ.ე."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.res_config_settings_view_form_purchase
+msgid "Link RFQs together and compare them."
+msgstr "დააკავშირეთ შეთავაზების მოთხოვნები ერთმანეთთან და შეადარეთ ისინი."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Lock"
+msgstr "ჩაკეტვა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_res_config_settings__lock_confirmed_po
+msgid "Lock Confirmed Orders"
+msgstr "დადასტურებული ორდერების ჩაკეტვა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__locked
+msgid "Locked"
+msgstr "ჩაკეტილი"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order__locked
+msgid "Locked Purchase Orders cannot be modified."
+msgstr "ჩაკეტილი შესყიდვის ორდერები ვერ შეიცვლება."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.res_config_settings_view_form_purchase
+msgid "Make sure you only pay bills for which you received the goods you ordered"
+msgstr "დარწმუნდით, რომ იხდით მხოლოდ იმ ანგარიშ-ფაქტურებს, რომლებისთვისაც მიიღეთ შეკვეთილი საქონელი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.res_config_settings_view_form_purchase
+msgid "Manage blanket orders and purchase templates"
+msgstr "მართეთ ჩარჩო-ორდერები და შესყიდვის შაბლონები"
+
+#. module: purchase
+#: model:ir.model.fields.selection,name:purchase.selection__purchase_order_line__qty_received_method__manual
+msgid "Manual"
+msgstr "ხელით"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_line_form2
+msgid "Manual Invoices"
+msgstr "ხელით შედგენილი ინვოისები"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__qty_received_manual
+msgid "Manual Received Qty"
+msgstr "ხელით მიღებული რაოდ."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_tree
+msgid "Match"
+msgstr "შედარება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_search
+msgid "Matched"
+msgstr "დამთხვეული"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__matched_invoice_count
+msgid "Matched Invoices Count"
+msgstr "დამთხვეული ანგარიშ-ფაქტურების რაოდენობა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__matching_id model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_search model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_tree
+msgid "Matching"
+msgstr "დამთხვევა"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order_line.py:0
+msgid "Matching Invoices"
+msgstr "ანგარიშ-ფაქტურების დამთხვევა"
+
+#. module: purchase
+msgid "Material Symbols icon e.g. checklist"
+msgstr "Material Symbols-ის ხატულა, მაგ. checklist"
+
+#. module: purchase
+#: model:ir.actions.server,name:purchase.action_merger
+msgid "Merge RFQs"
+msgstr "შეთავაზების მოთხოვნების გაერთიანება"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "Merged RFQs"
+msgstr "გაერთიანებული შეთავაზების მოთხოვნები"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__message_has_error
+msgid "Message Delivery error"
+msgstr "შეტყობინების მიწოდების შეცდომა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_res_partner__purchase_warn_msg model:ir.model.fields,field_description:purchase.field_res_users__purchase_warn_msg
+msgid "Message for Purchase Order"
+msgstr "შეტყობინება შესყიდვის ორდერისთვის"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_product_product__purchase_line_warn_msg model:ir.model.fields,field_description:purchase.field_product_template__purchase_line_warn_msg
+msgid "Message for Purchase Order Line"
+msgstr "შეტყობინება შესყიდვის ორდერის ხაზისთვის"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__message_ids
+msgid "Messages"
+msgstr "შეტყობინებები"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_res_config_settings__po_double_validation_amount
+msgid "Minimum Amount"
+msgstr "მინიმალური თანხა"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_res_company__po_double_validation_amount model:ir.model.fields,help:purchase.field_res_config_settings__po_double_validation_amount
+msgid "Minimum amount for which a double validation is required"
+msgstr "მინიმალური თანხა, რომლისთვისაც ორმაგი დამტკიცება საჭიროა"
+
+#. module: purchase
+#: model:ir.model.constraint,message:purchase.constraint_purchase_order_line_accountable_required_fields
+msgid "Missing required fields on accountable purchase order line."
+msgstr "აკლია სავალდებულო ველები აღრიცხვად შესყიდვის ორდერის ხაზზე."
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/views/purchase_dashboard.xml:0
+msgid "My"
+msgstr "ჩემი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_search model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_filter
+msgid "My Activities"
+msgstr "ჩემი აქტივობები"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "ჩემი აქტივობის ბოლო ვადა"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/views/purchase_dashboard.xml:0
+msgid "My Days to Order"
+msgstr "ჩემი დღეები შეკვეთამდე"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/views/purchase_dashboard.xml:0
+msgid "My Draft RFQs"
+msgstr "ჩემი მონახაზი შეთავაზების მოთხოვნები"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/views/purchase_dashboard.xml:0
+msgid "My Late RFQs"
+msgstr "ჩემი დაგვიანებული შეთავაზების მოთხოვნები"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/views/purchase_dashboard.xml:0
+msgid "My Late Receipt POs"
+msgstr "ჩემი დაგვიანებული მიღების ორდერები"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/views/purchase_dashboard.xml:0
+msgid "My Not Acknowledged POs"
+msgstr "ჩემი დაუდასტურებელი ორდერები"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_search
+msgid "My Orders"
+msgstr "ჩემი შეკვეთები"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_filter
+msgid "My Purchases"
+msgstr "ჩემი შესყიდვები"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/views/purchase_dashboard.xml:0
+msgid "My Waiting RFQs"
+msgstr "ჩემი მოლოდინში მყოფი შეთავაზების მოთხოვნები"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/controllers/portal.py:0
+msgid "Name"
+msgstr "სახელი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Name, TIN, Email, or Reference"
+msgstr "სახელი, საიდენტიფიკაციო კოდი, ელფოსტა ან მითითება"
+
+#. module: purchase
+#. odoo-javascript
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0 code:addons/purchase/static/src/views/purchase_dashboard.xml:0 model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_filter
+msgid "New"
+msgstr "ახალი"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/controllers/portal.py:0
+msgid "Newest"
+msgstr "უახლესი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_tree
+msgid "Next Activity"
+msgstr "შემდეგი აქტივობა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__activity_calendar_event_id
+msgid "Next Activity Calendar Event"
+msgstr "შემდეგი აქტივობის კალენდრის მოვლენა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "შემდეგი აქტივობის ვადა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__activity_summary
+msgid "Next Activity Summary"
+msgstr "შემდეგი აქტივობის შინაარსი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__activity_type_id
+msgid "Next Activity Type"
+msgstr "შემდეგი აქტივობის ტიპი"
+
+#. module: purchase
+#: model:res.groups.privilege,placeholder:purchase.res_groups_privilege_purchase
+msgid "No"
+msgstr "არა"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/product_catalog/kanban_renderer.xml:0
+msgid "No Products for the selected Vendor."
+msgstr "არჩეული მომწოდებლისთვის პროდუქტები არ არის."
+
+#. module: purchase
+#: model_terms:ir.actions.act_window,help:purchase.action_purchase_order_report_all
+msgid "No Purchase Analysis"
+msgstr "შესყიდვების ანალიზი არ არის"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "No attachment was provided"
+msgstr "დანართი არ იყო მოწოდებული"
+
+#. module: purchase
+#: model_terms:ir.actions.act_window,help:purchase.product_normal_action_puchased
+msgid "No product found. Let's create one!"
+msgstr "პროდუქტი ვერ მოიძებნა. შევქმნათ ერთი!"
+
+#. module: purchase
+#: model_terms:ir.actions.act_window,help:purchase.purchase_form_action
+msgid "No purchase order found. Let's create one!"
+msgstr "შესყიდვის ორდერი ვერ მოიძებნა. შევქმნათ ერთი!"
+
+#. module: purchase
+#: model_terms:ir.actions.act_window,help:purchase.action_purchase_history
+msgid "No purchase order were made for this product yet!"
+msgstr "ამ პროდუქტისთვის ჯერ შესყიდვის ორდერი არ შედგენილა!"
+
+#. module: purchase
+#: model_terms:ir.actions.act_window,help:purchase.purchase_rfq
+msgid "No request for quotation found. Let's create one!"
+msgstr "შეთავაზების მოთხოვნა ვერ მოიძებნა. შევქმნათ ერთი!"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__non_deductible_tax
+msgid "Non Deductible Tax"
+msgstr "არაგამოქვითვადი გადასახადი"
+
+#. module: purchase
+#: model:ir.model.fields.selection,name:purchase.selection__purchase_order__priority__0
+msgid "Normal"
+msgstr "ჩვეულებრივი"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/views/purchase_dashboard.xml:0 model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_filter
+msgid "Not Acknowledged"
+msgstr "დაუდასტურებელი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__qty_to_invoice_raw
+msgid "Not Invoiced Quantity"
+msgstr "არდაფაქტურებული რაოდენობა"
+
+#. module: purchase
+#: model:ir.model.fields.selection,name:purchase.selection__purchase_order__receipt_status__pending
+msgid "Not Received"
+msgstr "არ არის მიღებული"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_order
+msgid "Not using Odoo?"
+msgstr "არ იყენებთ Odoo-ს?"
+
+#. module: purchase
+#: model:ir.model.fields.selection,name:purchase.selection__purchase_order_line__display_type__line_note model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Note"
+msgstr "შენიშვნა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Notes"
+msgstr "შენიშვნები"
+
+#. module: purchase
+#: model:ir.model.fields.selection,name:purchase.selection__purchase_order__invoice_status__no
+msgid "Nothing to Bill"
+msgstr "დასაინვოისებელი არაფერია"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__message_needaction_counter
+msgid "Number of Actions"
+msgstr "მოქმედებების რაოდენობა"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_res_partner__reminder_date_before_receipt model:ir.model.fields,help:purchase.field_res_users__reminder_date_before_receipt
+msgid "Number of days to send reminder email before the promised receipt date"
+msgstr "დღეების რაოდენობა, რომლითადაც ადრე უნდა გაიგზავნოს შეხსენების ელფოსტა დაპირებულ მიღების თარიღამდე"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__message_has_error_counter
+msgid "Number of errors"
+msgstr "შეცდომების რაოდენობა"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "მოქმედების მომთხოვნი შეტყობინებების რაოდენობა"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "მიწოდების შეცდომის მქონე შეტყობინებების რაოდენობა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_order
+msgid "Odoo"
+msgstr "Odoo"
+
+#. module: purchase
+#: model:ir.model.fields.selection,name:purchase.selection__product_template__purchase_method__purchase
+msgid "On ordered quantities"
+msgstr "შეკვეთილი რაოდენობების მიხედვით"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_product_product__purchase_method model:ir.model.fields,help:purchase.field_product_template__purchase_method
+msgid ""
+"On ordered quantities: Control bills based on ordered quantities.\n"
+"On received quantities: Control bills based on received quantities."
+msgstr ""
+"შეკვეთილი რაოდენობებით: აკონტროლეთ ინვოისები შეკვეთილი რაოდენობების მიხედვით.\n"
+"მიღებული რაოდენობებით: აკონტროლეთ ინვოისები მიღებული რაოდენობების მიხედვით."
+
+#. module: purchase
+#: model:ir.model.fields.selection,name:purchase.selection__product_template__purchase_method__receive
+msgid "On received quantities"
+msgstr "მიღებული რაოდენობების მიხედვით"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/js/tours/purchase.js:0
+msgid "Once you get the price from the vendor, you can complete the purchase order with the right price."
+msgstr "როცა მომწოდებლისგან ფასს მიიღებთ, შესყიდვის ორდერს სწორი ფასით შეავსებთ."
+
+#. module: purchase
+#: model_terms:ir.actions.act_window,help:purchase.purchase_form_action
+msgid "Once you ordered your products to your supplier, confirm your request for quotation and it will turn into a purchase order."
+msgstr "როგორც კი პროდუქტებს მომწოდებელს შეუკვეთავთ, დაადასტურეთ შეთავაზების მოთხოვნა და ის შესყიდვის შეკვეთად გადაიქცევა."
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0 model:ir.model.fields,field_description:purchase.field_purchase_report__order_id model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_search model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_filter
+msgid "Order"
+msgstr "შეკვეთა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__date_approve
+msgid "Order Date"
+msgstr "შეკვეთის თარიღი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_line_search
+msgid "Order DeadLine: Last 365 Days"
+msgstr "ორდერის ბოლო ვადა: ბოლო 365 დღე"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__date_order model:ir.model.fields,field_description:purchase.field_purchase_order_line__date_order model:ir.model.fields,field_description:purchase.field_purchase_report__date_order model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_rfqs
+msgid "Order Deadline"
+msgstr "ორდერის ბოლო ვადა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_search
+msgid "Order Deadline: Last 365 Days"
+msgstr "ორდერის ბოლო ვადა: ბოლო 365 დღე"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__order_line
+msgid "Order Lines"
+msgstr "შეკვეთის ხაზები"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__name model:ir.model.fields,field_description:purchase.field_purchase_order_line__order_id model_terms:ir.ui.view,arch_db:purchase.purchase_order_line_search
+msgid "Order Reference"
+msgstr "შეკვეთის მითითება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.track_po_line_template
+msgid "Ordered Quantity:"
+msgstr "შეკვეთილი რაოდენობა:"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order_line__qty_to_invoice_raw
+msgid "Ordered quantity not invoiced. This may or may not include quantities that won't be invoiced, depending on the product's Control Policy."
+msgstr "შეკვეთილი არდაფაქტურებული რაოდენობა. პროდუქტის კონტროლის პოლიტიკიდან გამომდინარე, ეს შეიძლება მოიცავდეს ან არ მოიცავდეს რაოდენობებს, რომლებიც არ დაფაქტურდება."
+
+#. module: purchase
+#: model:ir.ui.menu,name:purchase.menu_procurement_management model_terms:ir.ui.view,arch_db:purchase.res_config_settings_view_form_purchase model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_search
+msgid "Orders"
+msgstr "ორდერები"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "Order due %(date)s"
+msgstr "ორდერის ვადა %(date)s"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Other Info"
+msgstr "სხვა ინფორმაცია"
+
+#. module: purchase
+#: model:portal.entry,name:purchase.portal_purchase_orders
+msgid "Our Orders"
+msgstr "ჩვენი ორდერები"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.view_move_form_inherit_purchase
+msgid "PO Matching"
+msgstr "ორდერის შედარება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_tree
+msgid "PO Qty"
+msgstr "ორდერის რაოდ."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__parent_id
+msgid "Parent Section Line"
+msgstr "მშობელი სექციის სტრიქონი"
+
+#. module: purchase
+#: model:ir.model.fields.selection,name:purchase.selection__purchase_order__receipt_status__partial
+msgid "Partially Received"
+msgstr "ნაწილობრივ მიღებული"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_bill_to_po_wizard__partner_id model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__partner_id model:ir.model.fields,field_description:purchase.field_purchase_order_line__partner_id
+msgid "Partner"
+msgstr "პარტნიორი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_report__country_id
+msgid "Partner Country"
+msgstr "პარტნიორის ქვეყანა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__payment_term_id
+msgid "Payment Terms"
+msgstr "გადახდის პირობები"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content
+msgid "Payment terms"
+msgstr "გადახდის პირობები"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "Please select at least two purchase orders with state RFQ and RFQ sent to merge."
+msgstr "გასაერთიანებლად აირჩიეთ სულ მცირე ორი შესყიდვის ორდერი მდგომარეობით „შეთავაზების მოთხოვნა“ ან „გაგზავნილი შეთავაზების მოთხოვნა“."
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_bill_line_match.py:0
+msgid "Please select bill lines with the same vendor."
+msgstr "აირჩიეთ ერთი და იმავე მომწოდებლის ანგარიშ-ფაქტურის ხაზები."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__pol_id
+msgid "Pol"
+msgstr "Pol"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__access_url
+msgid "Portal Access URL"
+msgstr "პორტალზე წვდომის URL"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__prepaid_expense
+msgid "Prepaid Expense"
+msgstr "წინასწარ გადახდილი ხარჯი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Preview the reminder email by sending it to yourself."
+msgstr "წინასწარ ნახეთ შეხსენების ელფოსტა საკუთარ თავზე გაგზავნით."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_search
+msgid "Price"
+msgstr "ფასი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content
+msgid "Pricing"
+msgstr "ფასწარმოქმნა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Print"
+msgstr "ბეჭდვა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__priority
+msgid "Priority"
+msgstr "პრიორიტეტი"
+
+#. module: purchase
+#: model:ir.model,name:purchase.model_product_template model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__product_id model:ir.model.fields,field_description:purchase.field_purchase_order__product_id model:ir.model.fields,field_description:purchase.field_purchase_order_line__product_id model:ir.model.fields,field_description:purchase.field_purchase_report__product_id model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_search model_terms:ir.ui.view,arch_db:purchase.purchase_order_line_search model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_search
+msgid "Product"
+msgstr "პროდუქტი"
+
+#. module: purchase
+#: model:ir.model,name:purchase.model_product_category model:ir.model.fields,field_description:purchase.field_purchase_report__category_id model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_search
+msgid "Product Category"
+msgstr "პროდუქტის კატეგორია"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_report__product_tmpl_id
+msgid "Product Template"
+msgstr "პროდუქტის შაბლონი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__product_type
+msgid "Product Type"
+msgstr "პროდუქტის ტიპი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__product_uom_price
+msgid "Product Uom Price"
+msgstr "პროდუქტის ზ.ე. ფასი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__product_uom_qty
+msgid "Product Uom Qty"
+msgstr "პროდუქტის ზ.ე. რაოდენობა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__product_uom_qty_to_invoice
+msgid "Product Uom Qty To Invoice"
+msgstr "პროდუქტის ზ.ე. დასაინვოისებელი რაოდენობა"
+
+#. module: purchase
+#: model:ir.model,name:purchase.model_product_product
+msgid "Product Variant"
+msgstr "პროდუქტის ვარიანტი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__product_no_variant_attribute_value_ids
+msgid "Product attribute values that do not create variants"
+msgstr "პროდუქტის ატრიბუტის მნიშვნელობები, რომლებიც ვარიანტებს არ ქმნიან"
+
+#. module: purchase
+#: model:ir.actions.act_window,name:purchase.product_normal_action_puchased model:ir.ui.menu,name:purchase.menu_procurement_partner_contact_form model:ir.ui.menu,name:purchase.menu_product_in_config_purchase model:ir.ui.menu,name:purchase.menu_purchase_products model_terms:ir.ui.view,arch_db:purchase.purchase_order_form model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content model_terms:ir.ui.view,arch_db:purchase.res_config_settings_view_form_purchase
+msgid "Products"
+msgstr "პროდუქტები"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_res_company__po_double_validation model:ir.model.fields,help:purchase.field_res_config_settings__po_double_validation
+msgid "Provide a double validation mechanism for purchases"
+msgstr "შესყიდვებისთვის ორმაგი დამტკიცების მექანიზმის უზრუნველყოფა"
+
+#. module: purchase
+#: model:ir.module.module,shortdesc:base.module_purchase model:ir.ui.menu,name:purchase.menu_purchase_root model:ir.ui.menu,name:purchase.purchase_report model:res.groups.privilege,name:purchase.res_groups_privilege_purchase model_terms:ir.ui.view,arch_db:purchase.res_config_settings_view_form_purchase
+msgid "Purchase"
+msgstr "შესყიდვა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_res_config_settings__module_purchase_requisition
+msgid "Purchase Agreements"
+msgstr "შესყიდვის ხელშეკრულებები"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_res_config_settings__module_purchase_alternative
+msgid "Purchase Alternative"
+msgstr "შესყიდვის ალტერნატივა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__purchase_amount_untaxed
+msgid "Purchase Amount Untaxed"
+msgstr "შესყიდვის დაუბეგრავი თანხა"
+
+#. module: purchase
+#: model:ir.actions.act_window,name:purchase.action_purchase_order_report_all model_terms:ir.ui.view,arch_db:purchase.purchase_report_view_tree model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_graph model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_pivot
+msgid "Purchase Analysis"
+msgstr "შესყიდვების ანალიზი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_tree
+msgid "Purchase Bill Lines"
+msgstr "შესყიდვის ანგარიშ-ფაქტურის ხაზები"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "Purchase Comparison for %s"
+msgstr "შესყიდვის შედარება — %s"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.view_product_supplier_inherit
+msgid "Purchase Description"
+msgstr "შესყიდვის აღწერა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_res_config_settings__module_purchase_product_matrix
+msgid "Purchase Grid Entry"
+msgstr "შესყიდვის ცხრილის ჩანაწერი"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/product.py:0
+msgid "Purchase History for %s"
+msgstr "შესყიდვის ისტორია — %s"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_account_move_line__purchase_line_warn_msg model:ir.model.fields,field_description:purchase.field_purchase_order_line__purchase_line_warn_msg
+msgid "Purchase Line Warn Msg"
+msgstr "შესყიდვის ხაზის გაფრთხილების ტექსტი"
+
+#. module: purchase
+#: model:ir.model,name:purchase.model_purchase_bill_line_match
+msgid "Purchase Line and Vendor Bill line matching view"
+msgstr "შესყიდვის ხაზისა და მომწოდებლის ანგარიშ-ფაქტურის ხაზის შედარების ხედი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_account_bank_statement_line__purchase_matched_ratio model:ir.model.fields,field_description:purchase.field_account_move__purchase_matched_ratio
+msgid "Purchase Matched Ratio"
+msgstr "შესყიდვის შედარების კოეფიციენტი"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/account_invoice.py:0
+msgid "Purchase Matching"
+msgstr "შესყიდვის შედარება"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_account_move_line__purchase_matching_issue_msg
+msgid "Purchase Matching Issue Msg"
+msgstr "შესყიდვის შედარების პრობლემის ტექსტი"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/controllers/portal.py:0 code:addons/purchase/models/purchase_order.py:0 model:ir.actions.report,name:purchase.action_report_purchase_order model:ir.model,name:purchase.model_purchase_order model:ir.model.fields,field_description:purchase.field_account_bank_statement_line__purchase_id model:ir.model.fields,field_description:purchase.field_account_move__purchase_id model:ir.model.fields,field_description:purchase.field_account_move_line__purchase_order_id model:ir.model.fields,field_description:purchase.field_bill_to_po_wizard__purchase_order_id model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__purchase_order_id model:ir.model.fields,field_description:purchase.field_purchase_bill_union__purchase_order_id model:ir.model.fields.selection,name:purchase.selection__account_analytic_applicability__business_domain__purchase_order model:ir.model.fields.selection,name:purchase.selection__purchase_order__state__purchase model:ir.model.fields.selection,name:purchase.selection__purchase_report__state__purchase model_terms:ir.ui.view,arch_db:purchase.purchase_order_form model_terms:ir.ui.view,arch_db:purchase.purchase_order_graph model_terms:ir.ui.view,arch_db:purchase.purchase_order_kpis_tree model_terms:ir.ui.view,arch_db:purchase.purchase_order_pivot model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content model_terms:ir.ui.view,arch_db:purchase.purchase_order_tree model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_activity model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_tree model_terms:ir.ui.view,arch_db:purchase.view_move_form_inherit_purchase
+msgid "Purchase Order"
+msgstr "შესყიდვის ორდერი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.report_purchaseorder_document
+msgid "Purchase Order #"
+msgstr "შესყიდვის ორდერი #"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_res_config_settings__po_order_approval
+msgid "Purchase Order Approval"
+msgstr "შესყიდვის ორდერის დამტკიცება"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_account_analytic_account__purchase_order_count model:ir.model.fields,field_description:purchase.field_account_bank_statement_line__purchase_order_count model:ir.model.fields,field_description:purchase.field_account_move__purchase_order_count model:ir.model.fields,field_description:purchase.field_res_partner__purchase_order_count model:ir.model.fields,field_description:purchase.field_res_users__purchase_order_count
+msgid "Purchase Order Count"
+msgstr "შესყიდვის ორდერების რაოდენობა"
+
+#. module: purchase
+#: model:ir.actions.act_window,name:purchase.action_purchase_history model:ir.model,name:purchase.model_purchase_order_line model:ir.model.fields,field_description:purchase.field_account_move_line__purchase_line_id model:ir.model.fields,field_description:purchase.field_account_tax__purchase_order_line_ids model_terms:ir.ui.view,arch_db:purchase.purchase_order_form model_terms:ir.ui.view,arch_db:purchase.purchase_order_line_form2 model_terms:ir.ui.view,arch_db:purchase.purchase_order_line_view_form_invoice
+msgid "Purchase Order Line"
+msgstr "შესყიდვის ორდერის სტრიქონი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form model_terms:ir.ui.view,arch_db:purchase.purchase_order_line_list_invoice model_terms:ir.ui.view,arch_db:purchase.purchase_order_line_tree
+msgid "Purchase Order Lines"
+msgstr "შესყიდვის ორდერის ხაზები"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__lock_confirmed_po model:ir.model.fields,field_description:purchase.field_res_company__po_lock
+msgid "Purchase Order Modification"
+msgstr "შესყიდვის ორდერის ცვლილება"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_res_config_settings__po_lock
+msgid "Purchase Order Modification *"
+msgstr "შესყიდვის ორდერის ცვლილება *"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order__lock_confirmed_po model:ir.model.fields,help:purchase.field_res_company__po_lock model:ir.model.fields,help:purchase.field_res_config_settings__po_lock
+msgid "Purchase Order Modification used when you want to purchase order editable after confirm"
+msgstr "შესყიდვის ორდერის ცვლილება გამოიყენება, როცა გსურთ, რომ შესყიდვის ორდერი დადასტურების შემდეგ რედაქტირებადი იყოს"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_account_bank_statement_line__purchase_order_name model:ir.model.fields,field_description:purchase.field_account_move__purchase_order_name
+msgid "Purchase Order Name"
+msgstr "შესყიდვის ორდერის სახელი"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/analytic_account.py:0 model:ir.actions.act_window,name:purchase.purchase_form_action model:ir.ui.menu,name:purchase.menu_purchase_form_action model_terms:ir.ui.view,arch_db:purchase.account_analytic_account_view_form_purchase model_terms:ir.ui.view,arch_db:purchase.portal_my_home_menu_purchase model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_orders model_terms:ir.ui.view,arch_db:purchase.view_purchase_bill_union_filter model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_filter model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_search
+msgid "Purchase Orders"
+msgstr "შესყიდვის ორდერები"
+
+#. module: purchase
+#: model:ir.model,name:purchase.model_purchase_report
+msgid "Purchase Report"
+msgstr "შესყიდვის რეპორტი"
+
+#. module: purchase
+msgid "Purchase Vendor Bill"
+msgstr "შესყიდვის მომწოდებლის ანგარიშ-ფაქტურა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_account_bank_statement_line__purchase_warning_text model:ir.model.fields,field_description:purchase.field_account_move__purchase_warning_text model:ir.model.fields,field_description:purchase.field_purchase_order__purchase_warning_text
+msgid "Purchase Warning"
+msgstr "შესყიდვის გაფრთხილება"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_res_config_settings__group_warning_purchase
+msgid "Purchase Warnings"
+msgstr "შესყიდვის გაფრთხილებები"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_search
+msgid "Purchase orders that have been invoiced."
+msgstr "შესყიდვის ორდერები, რომლებიც დაინვოისებულია."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_search
+msgid "Purchase orders that include lines not invoiced."
+msgstr "შესყიდვის ორდერები, რომლებიც შეიცავს დაუინვოისებელ ხაზებს."
+
+#. module: purchase
+#: model:ir.module.module,summary:base.module_purchase
+msgid "Purchase orders, tenders and agreements"
+msgstr "შესყიდვის ორდერები, ტენდერები და ხელშეკრულებები"
+
+#. module: purchase
+#: model:ir.actions.server,name:purchase.purchase_send_reminder_mail_ir_actions_server
+msgid "Purchase reminder"
+msgstr "შესყიდვის შეხსენება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.res_config_settings_view_form_purchase
+msgid "Purchase variants of a product using attributes (size, color, etc.)"
+msgstr "შეიძინეთ პროდუქტის ვარიანტები ატრიბუტების გამოყენებით (ზომა, ფერი და ა.შ.)"
+
+#. module: purchase
+#: model:mail.template,name:purchase.email_template_edi_purchase_done
+msgid "Purchase: Purchase Order"
+msgstr "შესყიდვა: შესყიდვის ორდერი"
+
+#. module: purchase
+#: model:mail.template,name:purchase.email_template_edi_purchase
+msgid "Purchase: Request For Quotation"
+msgstr "შესყიდვა: შეთავაზების მოთხოვნა"
+
+#. module: purchase
+#: model:mail.template,name:purchase.email_template_edi_purchase_reminder
+msgid "Purchase: Vendor Reminder"
+msgstr "შესყიდვა: მომწოდებლის შეხსენება"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_product_product__purchased_product_qty model:ir.model.fields,field_description:purchase.field_product_template__purchased_product_qty model_terms:ir.ui.view,arch_db:purchase.product_normal_form_view_inherit_purchase model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_tree model_terms:ir.ui.view,arch_db:purchase.view_product_template_purchase_buttons_from
+msgid "Purchased"
+msgstr "შესყიდული"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.product_normal_form_view_inherit_purchase model_terms:ir.ui.view,arch_db:purchase.view_product_template_purchase_buttons_from
+msgid "Purchased in the last 365 days. Incoming represents confirmed purchase orders not received, or partially received"
+msgstr "ბოლო 365 დღის განმავლობაში შესყიდული. „შემომავალი“ აჩვენებს დადასტურებულ შესყიდვის ორდერებს, რომლებიც ჯერ არ მიღებულა ან ნაწილობრივ მიღებულია"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/res_partner.py:0 model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_search model_terms:ir.ui.view,arch_db:purchase.res_partner_view_purchase_buttons model_terms:ir.ui.view,arch_db:purchase.view_move_form_inherit_purchase
+msgid "Purchases"
+msgstr "შესყიდვები"
+
+#. module: purchase
+#: model:ir.model,name:purchase.model_purchase_bill_union
+msgid "Purchases & Bills Union"
+msgstr "შესყიდვებისა და ანგარიშ-ფაქტურების გაერთიანება"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order__dest_address_id
+msgid "Put an address if you want to deliver directly from the vendor to the customer. Otherwise, keep empty to deliver to your own company."
+msgstr "მიუთითეთ მისამართი, თუ გსურთ მიწოდება პირდაპირ მომწოდებლიდან კლიენტთან. წინააღმდეგ შემთხვევაში დატოვეთ ცარიელი, რომ თქვენს კომპანიაში მიეწოდოს."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_report__qty_billed
+msgid "Qty Billed"
+msgstr "დაინვოისებული რაოდ."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__qty_invoiced
+msgid "Qty Invoiced"
+msgstr "დაინვოისებული რაოდ."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_report__qty_ordered
+msgid "Qty Ordered"
+msgstr "შეკვეთილი რაოდ."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_report__qty_received
+msgid "Qty Received"
+msgstr "მიღებული რაოდ."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__qty_to_invoice_raw
+msgid "Qty not invoiced"
+msgstr "არდაფაქტურებული რაოდ."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_line_list_invoice
+msgid "Qty to Invoice"
+msgstr "დასაინვოისებელი რაოდ."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_report__qty_to_be_billed
+msgid "Qty to be Billed"
+msgstr "დასაინვოისებელი რაოდ."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__qty_to_invoice model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_tree
+msgid "Qty to invoice"
+msgstr "დასაინვოისებელი რაოდ."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__product_qty model_terms:ir.ui.view,arch_db:purchase.purchase_history_tree model_terms:ir.ui.view,arch_db:purchase.purchase_order_line_list_invoice model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content
+msgid "Quantity"
+msgstr "რაოდენობა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.view_product_supplier_inherit
+msgid "Quantity on hand minus outgoing quantity from Sales Orders plus incoming quantity from Purchase Orders"
+msgstr "ხელთ არსებულ რაოდენობას გამოკლებული გაყიდვის შეკვეთებიდან გამავალი რაოდენობა და დამატებული შესყიდვის ორდერებიდან შემომავალი რაოდენობა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Quantity:"
+msgstr "რაოდენობა:"
+
+#. module: purchase
+#: model:ir.model.fields.selection,name:purchase.selection__purchase_order__state__draft
+msgid "RFQ"
+msgstr "შეთავაზების მოთხოვნა"
+
+#. module: purchase
+#: model:mail.message.subtype,name:purchase.mt_rfq_approved
+msgid "RFQ Approved"
+msgstr "შეთავაზების მოთხოვნა დამტკიცდა"
+
+#. module: purchase
+#: model:mail.message.subtype,name:purchase.mt_rfq_confirmed
+msgid "RFQ Confirmed"
+msgstr "შეთავაზების მოთხოვნა დადასტურდა"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/views/purchase_dashboard.xml:0 model:ir.model.fields.selection,name:purchase.selection__purchase_order__state__sent model:ir.model.fields.selection,name:purchase.selection__purchase_report__state__sent model:mail.message.subtype,name:purchase.mt_rfq_sent
+msgid "RFQ Sent"
+msgstr "შეთავაზების მოთხოვნა გაგზავნილია"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "RFQ merged with %(oldest_rfq_name)s and %(cancelled_rfq)s"
+msgstr "შეთავაზების მოთხოვნა გაერთიანდა %(oldest_rfq_name)s-თან და %(cancelled_rfq)s-თან"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "RFQ merged with %s"
+msgstr "შეთავაზების მოთხოვნა გაერთიანდა %s-თან"
+
+#. module: purchase
+#: model:ir.actions.act_window,name:purchase.act_res_partner_2_purchase_order
+msgid "RFQs and Purchases"
+msgstr "შეთავაზების მოთხოვნები და შესყიდვები"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__consolidation_rate
+msgid "Rate"
+msgstr "განაკვეთი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__rating_ids
+msgid "Ratings"
+msgstr "შეფასებები"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_order
+msgid "Read the documentation"
+msgstr "წაიკითხეთ დოკუმენტაცია"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_res_config_settings__group_send_reminder model:ir.model.fields,field_description:purchase.field_res_partner__receipt_reminder_email model:ir.model.fields,field_description:purchase.field_res_users__receipt_reminder_email
+msgid "Receipt Reminder"
+msgstr "მიღების შეხსენება"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__receipt_status
+msgid "Receipt Status"
+msgstr "მიღების სტატუსი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_tree
+msgid "Receive"
+msgstr "მიღება"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__qty_received_at_date model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Received"
+msgstr "მიღებული"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__qty_received
+msgid "Received Qty"
+msgstr "მიღებული რაოდ."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__qty_received_method
+msgid "Received Qty Method"
+msgstr "მიღებული რაოდენობის მეთოდი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Received Quantity"
+msgstr "მიღებული რაოდენობა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.track_po_line_qty_received_template
+msgid "Received Quantity:"
+msgstr "მიღებული რაოდენობა:"
+
+#. module: purchase
+#: model_terms:ir.actions.act_window,help:purchase.act_res_partner_2_supplier_invoices
+msgid "Record a new vendor bill"
+msgstr "ახალი მომწოდებლის ანგარიშ-ფაქტურის ჩაწერა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__reference model:ir.model.fields,field_description:purchase.field_purchase_bill_union__name model_terms:ir.ui.view,arch_db:purchase.purchase_order_kpis_tree model_terms:ir.ui.view,arch_db:purchase.purchase_order_tree model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_tree model_terms:ir.ui.view,arch_db:purchase.view_purchase_bill_union_filter
+msgid "Reference"
+msgstr "მითითება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.view_purchase_bill_union_list_invoice model_terms:ir.ui.view,arch_db:purchase.view_purchase_bill_union_tree
+msgid "Reference Document"
+msgstr "საცნობარო დოკუმენტი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_report__uom_id
+msgid "Reference Unit of Measure"
+msgstr "საცნობარო საზომი ერთეული"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order__origin
+msgid "Reference of the document that generated this purchase order request (e.g. a sales order)"
+msgstr "იმ დოკუმენტის მითითება, რომელმაც ეს შესყიდვის ორდერის მოთხოვნა წარმოქმნა (მაგ. გაყიდვის შეკვეთა)"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order__partner_ref
+msgid "Reference of the sales order or bid sent by the vendor. It's used to do the matching when you receive the products as this reference is usually written on the delivery order sent by your vendor."
+msgstr "მომწოდებლის მიერ გამოგზავნილი გაყიდვის შეკვეთის ან შეთავაზების ნომერი. გამოიყენება პროდუქტების მიღებისას შესადარებლად, რადგან ეს ნომერი ჩვეულებრივ მომწოდებლის მიწოდების დოკუმენტზეა მითითებული."
+
+#. module: purchase
+#: model:ir.model,name:purchase.model_ir_actions_report
+msgid "Report Action"
+msgstr "ანგარიშის ქმედება"
+
+#. module: purchase
+#: model:ir.ui.menu,name:purchase.purchase_report_main
+msgid "Reporting"
+msgstr "ანგარიშგება"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0 model:ir.actions.report,name:purchase.report_purchase_quotation model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content model_terms:ir.ui.view,arch_db:purchase.report_purchasequotation_document
+msgid "Request for Quotation"
+msgstr "შეთავაზების მოთხოვნა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.report_purchaseorder_document
+msgid "Request for Quotation #"
+msgstr "შეთავაზების მოთხოვნა #"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.res_config_settings_view_form_purchase
+msgid "Request managers to approve orders above a minimum amount"
+msgstr "მოსთხოვეთ მენეჯერებს მინიმალურ თანხაზე მეტი ორდერების დამტკიცება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_rfqs
+msgid "Requests For Quotation"
+msgstr "შეთავაზების მოთხოვნები"
+
+#. module: purchase
+#: model:ir.actions.act_window,name:purchase.action_rfq_form model:ir.actions.act_window,name:purchase.purchase_rfq model:ir.ui.menu,name:purchase.menu_purchase_rfq model:portal.entry,name:purchase.portal_rfq model_terms:ir.ui.view,arch_db:purchase.portal_my_home_menu_purchase model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_search
+msgid "Requests for Quotation"
+msgstr "შეთავაზების მოთხოვნები"
+
+#. module: purchase
+#: model_terms:ir.actions.act_window,help:purchase.purchase_rfq
+msgid ""
+"Requests for quotation are documents that will be sent to your suppliers to request prices for different products you consider buying.\n"
+"                Once an agreement has been found with the supplier, they will be confirmed and turned into purchase orders."
+msgstr ""
+"შეთავაზების მოთხოვნები არის დოკუმენტები, რომლებიც მომწოდებლებს გაეგზავნება სხვადასხვა პროდუქტის ფასების მოთხოვნით.\n"
+"                მომწოდებელთან შეთანხმების მიღწევის შემდეგ ისინი დადასტურდება და შესყიდვის შეკვეთებად გადაიქცევა."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Reset to today's date to recompute expected arrival based on available lead time                                     and previous information from the RFQ."
+msgstr "დააბრუნეთ დღევანდელ თარიღზე, რომ მოსალოდნელი ჩამოსვლა ხელახლა გამოითვალოს ხელმისაწვდომი მოლოდინის დროისა და შეთავაზების მოთხოვნის წინა ინფორმაციის საფუძველზე."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__activity_user_id
+msgid "Responsible User"
+msgstr "პასუხისმგებელი მომხმარებელი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "SMS მიწოდების შეცდომა"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/js/tours/purchase.js:0
+msgid "Save the line."
+msgstr "შეინახეთ ხაზი."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content
+msgid "Scheduled Date"
+msgstr "დაგეგმილი თარიღი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_line_search model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_search model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_filter
+msgid "Search Purchase Order"
+msgstr "შესყიდვის ორდერის ძებნა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.view_purchase_bill_union_filter
+msgid "Search Reference Document"
+msgstr "საცნობარო დოკუმენტის ძებნა"
+
+#. module: purchase
+#: model:ir.model.fields.selection,name:purchase.selection__purchase_order_line__display_type__line_section
+msgid "Section"
+msgstr "სექცია"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Section Name (eg. Products, Services)"
+msgstr "სექციის სახელი (მაგ. პროდუქტები, მომსახურებები)"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__access_token
+msgid "Security Token"
+msgstr "უსაფრთხოების ტოკენი"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_bill_line_match.py:0
+msgid "Select Vendor Bill lines to add to a Purchase Order"
+msgstr "აირჩიეთ მომწოდებლის ანგარიშ-ფაქტურის ხაზები შესყიდვის ორდერში დასამატებლად"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Select a Product"
+msgstr "აირჩიეთ პროდუქტი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.view_move_form_inherit_purchase
+msgid "Select a purchase document"
+msgstr "აირჩიეთ შესყიდვის დოკუმენტი"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/js/tours/purchase.js:0
+msgid "Select price"
+msgstr "აირჩიეთ ფასი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__selected_seller_id
+msgid "Selected Seller"
+msgstr "არჩეული გამყიდველი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.res_config_settings_view_form_purchase
+msgid "Sell and purchase products in different units of measure or packagings"
+msgstr "პროდუქტების გაყიდვა და შესყიდვა სხვადასხვა საზომ ერთეულში ან შეფუთვაში"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Send PO"
+msgstr "ორდერის გაგზავნა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Send RFQ"
+msgstr "შეთავაზების მოთხოვნის გაგზავნა"
+
+#. module: purchase
+#: model:ir.actions.server,name:purchase.action_purchase_send_reminder
+msgid "Send Reminder"
+msgstr "შეხსენების გაგზავნა"
+
+#. module: purchase
+#: model:res.groups,name:purchase.group_send_reminder
+msgid "Send an automatic reminder email to confirm delivery"
+msgstr "მიწოდების დასადასტურებლად ავტომატური შეხსენების ელფოსტის გაგზავნა"
+
+#. module: purchase
+#: model:ir.actions.act_window,name:purchase.action_purchase_order_mass_mail
+msgid "Send by mail"
+msgstr "ელფოსტით გაგზავნა"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/js/tours/purchase.js:0
+msgid "Send the request for quotation to your vendor."
+msgstr "გააგზავნეთ შეთავაზების მოთხოვნა თქვენს მომწოდებელთან."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_filter
+msgid "Sent"
+msgstr "გაგზავნილი"
+
+#. module: purchase
+#: model:mail.template,description:purchase.email_template_edi_purchase
+msgid "Sent manually to vendor to request a quotation"
+msgstr "ხელით ეგზავნება მომწოდებელს შეთავაზების მოსათხოვნად"
+
+#. module: purchase
+#: model:mail.template,description:purchase.email_template_edi_purchase_done
+msgid "Sent to vendor with the purchase order in attachment"
+msgstr "ეგზავნება მომწოდებელს შესყიდვის ორდერის დანართით"
+
+#. module: purchase
+#: model:mail.template,description:purchase.email_template_edi_purchase_reminder
+msgid "Sent to vendors before expected arrival, based on the purchase order setting"
+msgstr "ეგზავნება მომწოდებლებს მოსალოდნელ ჩამოსვლამდე, შესყიდვის ორდერის პარამეტრის მიხედვით"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__sequence
+msgid "Sequence"
+msgstr "მიმდევრობა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Set to Draft"
+msgstr "მონახაზად მონიშვნა"
+
+#. module: purchase
+#: model:ir.actions.act_window,name:purchase.action_purchase_configuration model:ir.ui.menu,name:purchase.menu_purchase_general_settings
+msgid "Settings"
+msgstr "პარამეტრები"
+
+#. module: purchase
+#: model:ir.actions.server,name:purchase.model_purchase_order_action_share
+msgid "Share"
+msgstr "გაზიარება"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__show_comparison
+msgid "Show Comparison"
+msgstr "შედარების ჩვენება"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__show_receive_button
+msgid "Show Receive Button"
+msgstr "მიღების ღილაკის ჩვენება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_search model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_filter
+msgid "Show all records whose next activity date is past"
+msgstr "აჩვენე ყველა ჩანაწერი, რომლის შემდეგი აქტივობის თარიღი გასულია"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "Some order lines are missing a product, you need to correct them before going further."
+msgstr "ზოგიერთ შეკვეთის ხაზს პროდუქტი აკლია — გასაგრძელებლად ჯერ უნდა გაასწოროთ ისინი."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_union__reference model:ir.model.fields,field_description:purchase.field_purchase_order__origin
+msgid "Source"
+msgstr "წყარო"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_search model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_filter
+msgid "Starred"
+msgstr "ვარსკვლავიანი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_order
+msgid "Start on Odoo"
+msgstr "დაიწყეთ Odoo-ზე"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__state
+msgid "State"
+msgstr "შტატი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__state model:ir.model.fields,field_description:purchase.field_purchase_order_line__state model:ir.model.fields,field_description:purchase.field_purchase_report__state model_terms:ir.ui.view,arch_db:purchase.purchase_order_line_search model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_search
+msgid "Status"
+msgstr "სტატუსი"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+"სტატუსი აქტივობების მიხედვით\n"
+"ვადაგადაცილებული: ვადა უკვე გასულია\n"
+"დღეს: აქტივობის თარიღი დღეს არის\n"
+"დაგეგმილი: მომავალი აქტივობები."
+
+#. module: purchase
+#: model:ir.model.fields.selection,name:purchase.selection__purchase_order_line__display_type__line_subsection
+msgid "Subsection"
+msgstr "ქვესექცია"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Subsection Name"
+msgstr "ქვესექციის სახელი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__price_subtotal
+msgid "Subtotal"
+msgstr "ქვეჯამი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_report_view_tree
+msgid "Sum of Qty Billed"
+msgstr "დაინვოისებული რაოდენობის ჯამი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_report_view_tree
+msgid "Sum of Qty Ordered"
+msgstr "შეკვეთილი რაოდენობის ჯამი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_report_view_tree
+msgid "Sum of Qty Received"
+msgstr "მიღებული რაოდენობის ჯამი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_report_view_tree
+msgid "Sum of Total"
+msgstr "ჯამის ჯამი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_report_view_tree
+msgid "Sum of Untaxed Total"
+msgstr "დაუბეგრავი ჯამის ჯამი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_res_partner__property_purchase_currency_id model:ir.model.fields,field_description:purchase.field_res_users__property_purchase_currency_id
+msgid "Supplier Currency"
+msgstr "მომწოდებლის ვალუტა"
+
+#. module: purchase
+#: model:ir.model,name:purchase.model_product_supplierinfo
+msgid "Supplier Pricelist"
+msgstr "მომწოდებლის ფასების სია"
+
+#. module: purchase
+#: model:ir.model,name:purchase.model_account_tax model:ir.model.fields,field_description:purchase.field_purchase_order_line__price_tax
+msgid "Tax"
+msgstr "გადასახადი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__tax_country_id
+msgid "Tax Country"
+msgstr "გადასახადის ქვეყანა"
+
+#. module: purchase
+#: model:ir.model.fields.selection,name:purchase.selection__purchase_order__document_tax_mode__tax_excluded
+msgid "Tax Excl."
+msgstr "გადასახადის გარეშე"
+
+#. module: purchase
+#: model:ir.model.fields.selection,name:purchase.selection__purchase_order__document_tax_mode__tax_included
+msgid "Tax Incl."
+msgstr "გადასახადის ჩათვლით"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__tax_totals
+msgid "Tax Totals"
+msgstr "გადასახადის ჯამები"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__tax_calculation_rounding_method model:ir.model.fields,field_description:purchase.field_purchase_order_line__tax_calculation_rounding_method
+msgid "Tax calculation rounding method"
+msgstr "გადასახადის გამოთვლის დამრგვალების მეთოდი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Tax excl.:"
+msgstr "გადასახადის გარეშე:"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Tax incl.:"
+msgstr "გადასახადის ჩათვლით:"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__amount_tax model:ir.model.fields,field_description:purchase.field_purchase_order_line__tax_ids
+msgid "Taxes"
+msgstr "გადასახადები"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__technical_price_unit
+msgid "Technical Price Unit"
+msgstr "ტექნიკური ფასის ერთეული"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order_line__display_type
+msgid "Technical field for UX purpose."
+msgstr "ტექნიკური ველი UX მიზნებისთვის."
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order_line__technical_price_unit
+msgid "Technical field for price computation"
+msgstr "ტექნიკური ველი ფასის გამოსათვლელად"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order__tax_country_id
+msgid "Technical field to filter the available taxes depending on the fiscal country and fiscal position."
+msgstr "ტექნიკური ველი ხელმისაწვდომი გადასახადების გასაფილტრად ფისკალური ქვეყნისა და ფისკალური პოზიციის მიხედვით."
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order_line__selected_seller_id
+msgid "Technical field to get the vendor pricelist used to generate this line"
+msgstr "ტექნიკური ველი ამ ხაზის გენერირებისთვის გამოყენებული მომწოდებლის ფასების სიის მისაღებად"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/product.py:0
+msgid "Template for Products"
+msgstr "შაბლონი პროდუქტებისთვის"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "Template for Requests for Quotation"
+msgstr "შეთავაზების მოთხოვნების შაბლონი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content
+msgid "Terms &amp; Conditions"
+msgstr "წესები &amp; პირობები"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__note
+msgid "Terms and Conditions"
+msgstr "წესები და პირობები"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order__country_code
+msgid ""
+"The ISO country code in two chars. \n"
+"You can use this field for quick search."
+msgstr ""
+"ISO ქვეყნის კოდი ორი სიმბოლოთი. \n"
+"ამ ველს შეგიძლიათ გამოიყენოთ სწრაფი ძებნისთვის."
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order_line__price_unit_product_uom
+msgid "The Price of one unit of the product's Unit of Measure"
+msgstr "პროდუქტის საზომი ერთეულის ერთი ერთეულის ფასი"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "The following purchase orders %(invalid_orders)s can't be received. Cancelled all receptions."
+msgstr "შემდეგი შესყიდვის ორდერების %(invalid_orders)s მიღება შეუძლებელია. ყველა მიღება გაუქმდა."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.track_po_line_template
+msgid "The ordered quantity and unit price have been updated."
+msgstr "შეკვეთილი რაოდენობა და ერთეულის ფასი განახლდა."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.track_po_line_template
+msgid "The ordered quantity has been updated."
+msgstr "შეკვეთილი რაოდენობა განახლდა."
+
+#. module: purchase
+#: model_terms:ir.actions.act_window,help:purchase.act_res_partner_2_purchase_order
+msgid ""
+"The request for quotation is the first step of the purchases flow. Once\n"
+"                    converted into a purchase order, you will be able to control the receipt\n"
+"                    of the products and the vendor bill."
+msgstr ""
+"შეთავაზების მოთხოვნა შესყიდვების პროცესის პირველი ნაბიჯია. შესყიდვის\n"
+"                    შეკვეთად გარდაქმნის შემდეგ შეგეძლებათ პროდუქტების მიღებისა და\n"
+"                    მომწოდებლის ინვოისის კონტროლი."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.track_po_line_template
+msgid "The unit price has been updated."
+msgstr "ერთეულის ფასი განახლდა."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_orders
+msgid "There are currently no purchase orders for your account."
+msgstr "ამჟამად თქვენს ანგარიშზე შესყიდვის ორდერები არ არის."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_rfqs
+msgid "There are currently no requests for quotation for your account."
+msgstr "ამჟამად თქვენს ანგარიშზე შეთავაზების მოთხოვნები არ არის."
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/wizard/bill_to_po_wizard.py:0
+msgid "There are no products to add to the Purchase Order. Are these Down Payments?"
+msgstr "შესყიდვის ორდერში დასამატებელი პროდუქტები არ არის. ეს ავანსებია?"
+
+#. module: purchase
+#: model_terms:ir.actions.act_window,help:purchase.action_purchase_order_report_all
+msgid ""
+"This analysis allows you to easily check and analyse your company purchase history and performance.\n"
+"                You can track your negotiation performance, the delivery performance of your vendors, etc"
+msgstr ""
+"ეს ანალიზი საშუალებას გაძლევთ, მარტივად შეამოწმოთ და გააანალიზოთ თქვენი კომპანიის შესყიდვების ისტორია და მაჩვენებლები.\n"
+"                შეგიძლიათ თვალი ადევნოთ მოლაპარაკებების ეფექტიანობას, მომწოდებლების მიწოდების მაჩვენებლებს და სხვას"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_res_partner__property_purchase_currency_id model:ir.model.fields,help:purchase.field_res_users__property_purchase_currency_id
+msgid "This currency will be used for purchases from the current partner"
+msgstr "ეს ვალუტა გამოყენებული იქნება მიმდინარე პარტნიორისგან შესყიდვებისთვის"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.view_product_supplier_inherit
+msgid "This note is added to purchase orders."
+msgstr "ეს შენიშვნა ემატება შესყიდვის ორდერებს."
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/account_invoice.py:0
+msgid "This vendor bill has been created from: "
+msgstr "ეს მომწოდებლის ანგარიშ-ფაქტურა შეიქმნა შემდეგიდან: "
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/account_invoice.py:0
+msgid "This vendor bill has been modified from: "
+msgstr "ეს მომწოდებლის ანგარიშ-ფაქტურა შეიცვალა შემდეგიდან: "
+
+#. module: purchase
+#: model_terms:ir.actions.act_window,help:purchase.act_res_partner_2_purchase_order
+msgid "This vendor has no purchase order. Create a new RfQ"
+msgstr "ამ მომწოდებელს შესყიდვის ორდერი არ აქვს. შექმენით ახალი შეთავაზების მოთხოვნა"
+
+#. module: purchase
+#: model:digest.tip,name:purchase.digest_tip_purchase_0 model_terms:digest.tip,tip_description:purchase.digest_tip_purchase_0
+msgid "Tip: How to keep late receipts under control?"
+msgstr "რჩევა: როგორ ვაკონტროლოთ დაგვიანებული მიღებები?"
+
+#. module: purchase
+#: model:digest.tip,name:purchase.digest_tip_purchase_1 model_terms:digest.tip,tip_description:purchase.digest_tip_purchase_1
+msgid "Tip: Never miss a purchase order"
+msgstr "რჩევა: არასოდეს გამოტოვოთ შესყიდვის ორდერი"
+
+#. module: purchase
+#: model:ir.model.fields.selection,name:purchase.selection__purchase_order__state__to_approve model:ir.model.fields.selection,name:purchase.selection__purchase_report__state__to_approve model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_filter
+msgid "To Approve"
+msgstr "დასამტკიცებელი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__price_subtotal_to_invoice model_terms:ir.ui.view,arch_db:purchase.purchase_order_line_list_invoice
+msgid "To Invoice"
+msgstr "დასაინვოისებელი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__qty_to_invoice
+msgid "To Invoice Quantity"
+msgstr "დასაინვოისებელი რაოდენობა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_search model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_filter
+msgid "Today Activities"
+msgstr "დღევანდელი აქტივობები"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/controllers/portal.py:0 model:ir.model.fields,field_description:purchase.field_purchase_order__amount_total model:ir.model.fields,field_description:purchase.field_purchase_order_line__price_total model:ir.model.fields,field_description:purchase.field_purchase_report__price_total model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_orders
+msgid "Total"
+msgstr "ჯამი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_tree
+msgid "Total Billed"
+msgstr "სულ დაინვოისებული"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.product_product_purchase_tree_view model_terms:ir.ui.view,arch_db:purchase.product_template_purchase_tree_view
+msgid "Total Forecasted"
+msgstr "სულ პროგნოზირებული"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_tree
+msgid "Total Purchased"
+msgstr "სულ შესყიდული"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_history_pivot
+msgid "Total Qty purchased"
+msgstr "სულ შესყიდული რაოდენობა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__product_uom_qty
+msgid "Total Quantity"
+msgstr "ჯამური რაოდენობა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_history_tree model_terms:ir.ui.view,arch_db:purchase.purchase_order_line_list_invoice
+msgid "Total Untaxed"
+msgstr "სულ დაუბეგრავი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_kpis_tree model_terms:ir.ui.view,arch_db:purchase.purchase_order_tree model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_tree
+msgid "Total Untaxed amount"
+msgstr "სულ დაუბეგრავი თანხა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_kpis_tree model_terms:ir.ui.view,arch_db:purchase.purchase_order_tree model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_tree
+msgid "Total amount"
+msgstr "ჯამური თანხა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__amount_total_cc
+msgid "Total in currency"
+msgstr "ჯამი ვალუტაში"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_history_pivot
+msgid "Total purchased amount"
+msgstr "სულ შესყიდული თანხა"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/product_catalog/kanban_renderer.xml:0
+msgid "Try removing the top filter to broaden your search"
+msgstr "სცადეთ ზედა ფილტრის მოხსნა ძებნის გასაფართოებლად"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "ჩანაწერზე გამონაკლისი აქტივობის ტიპი."
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "Unable to cancel purchase order(s): %s. You must first cancel their related vendor bills."
+msgstr "შესყიდვის ორდერ(ებ)ის გაუქმება ვერ ხერხდება: %s. ჯერ უნდა გააუქმოთ მათთან დაკავშირებული მომწოდებლის ანგარიშ-ფაქტურები."
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "Unable to cancel purchase order(s): %s. You must first unlock them."
+msgstr "შესყიდვის ორდერ(ებ)ის გაუქმება ვერ ხერხდება: %s. ჯერ უნდა განბლოკოთ ისინი."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_line_match__product_uom_id model:ir.model.fields,field_description:purchase.field_purchase_order_line__uom_id
+msgid "Unit"
+msgstr "ერთეული"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__price_unit model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_tree model_terms:ir.ui.view,arch_db:purchase.purchase_history_tree model_terms:ir.ui.view,arch_db:purchase.purchase_order_line_list_invoice model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content
+msgid "Unit Price"
+msgstr "ერთეულის ფასი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__price_unit_discounted
+msgid "Unit Price (Discounted)"
+msgstr "ერთეულის ფასი (ფასდაკლებული)"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order_line__price_unit_product_uom
+msgid "Unit Price Product UoM"
+msgstr "ერთეულის ფასი — პროდუქტის ზ.ე."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form model_terms:ir.ui.view,arch_db:purchase.track_po_line_template
+msgid "Unit Price:"
+msgstr "ერთეულის ფასი:"
+
+#. module: purchase
+#: model:ir.ui.menu,name:purchase.menu_purchase_uom_form_action model_terms:ir.ui.view,arch_db:purchase.res_config_settings_view_form_purchase
+msgid "Units & Packagings"
+msgstr "ერთეულები და შეფუთვები"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Unlock"
+msgstr "განბლოკვა"
+
+#. module: purchase
+#: model:ir.actions.server,name:purchase.action_unmatch_lines
+msgid "Unmatch"
+msgstr "დამთხვევის გაუქმება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_search
+msgid "Unmatched"
+msgstr "დაუმთხვეველი"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "Unsupported operator"
+msgstr "მხარდაუჭერელი ოპერატორი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_kpis_tree model_terms:ir.ui.view,arch_db:purchase.purchase_order_tree model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_tree
+msgid "Untaxed"
+msgstr "დაუბეგრავი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__amount_untaxed
+msgid "Untaxed Amount"
+msgstr "დაუბეგრავი თანხა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_report__untaxed_total
+msgid "Untaxed Total"
+msgstr "დაუბეგრავი ჯამი"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/account_invoice.py:0
+msgid "Update"
+msgstr "განახლება"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/components/purchase_file_uploader/purchase_file_uploader.xml:0
+msgid "Upload Bill"
+msgstr "ანგარიშ-ფაქტურის ატვირთვა"
+
+#. module: purchase
+#: model:ir.model.fields.selection,name:purchase.selection__purchase_order__priority__1
+msgid "Urgent"
+msgstr "სასწრაფო"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_order
+msgid "Use the above REST URL to get structured data of the purchase order in UBL format."
+msgstr "გამოიყენეთ ზემოთ მოცემული REST URL, რომ მიიღოთ შესყიდვის შეკვეთის სტრუქტურირებული მონაცემები UBL ფორმატში."
+
+#. module: purchase
+#: model:res.groups,name:purchase.group_purchase_user
+msgid "User"
+msgstr "მომხმარებელი"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/components/purchase_file_uploader/purchase_file_uploader.js:0
+msgid "Validation Error"
+msgstr "შემოწმების შეცდომა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.res_config_settings_view_form_purchase
+msgid "Variant Grid Entry"
+msgstr "ვარიანტების ცხრილის ჩანაწერი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_product_product__sold_by_vendor_id model:ir.model.fields,field_description:purchase.field_purchase_bill_union__partner_id model:ir.model.fields,field_description:purchase.field_purchase_order__partner_id model:ir.model.fields,field_description:purchase.field_purchase_report__partner_id model_terms:ir.ui.view,arch_db:purchase.product_template_search_view_purchase model_terms:ir.ui.view,arch_db:purchase.product_view_search_catalog_inherit model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_search model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_tree model_terms:ir.ui.view,arch_db:purchase.purchase_history_tree model_terms:ir.ui.view,arch_db:purchase.purchase_order_line_list_invoice model_terms:ir.ui.view,arch_db:purchase.purchase_order_line_search model_terms:ir.ui.view,arch_db:purchase.purchase_order_line_tree model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_search model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_filter model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_search
+msgid "Vendor"
+msgstr "მომწოდებელი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_bill_union__vendor_bill_id
+msgid "Vendor Bill"
+msgstr "მომწოდებლის ანგარიშ-ფაქტურა"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_bill_line_match.py:0
+msgid "Vendor Bill lines can only be added to one Purchase Order."
+msgstr "მომწოდებლის ანგარიშ-ფაქტურის ხაზები მხოლოდ ერთ შესყიდვის ორდერს შეიძლება დაემატოს."
+
+#. module: purchase
+#: model:ir.actions.act_window,name:purchase.act_res_partner_2_supplier_invoices model_terms:ir.ui.view,arch_db:purchase.purchase_order_form model_terms:ir.ui.view,arch_db:purchase.purchase_order_line_view_form_invoice model_terms:ir.ui.view,arch_db:purchase.view_purchase_bill_union_filter
+msgid "Vendor Bills"
+msgstr "მომწოდებლის ანგარიშ-ფაქტურები"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_search
+msgid "Vendor Country"
+msgstr "მომწოდებლის ქვეყანა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_res_partner__purchase_incoterm_id model:ir.model.fields,field_description:purchase.field_res_users__purchase_incoterm_id
+msgid "Vendor Incoterm"
+msgstr "მომწოდებლის ინკოტერმსი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_res_partner__purchase_incoterm_location model:ir.model.fields,field_description:purchase.field_res_users__purchase_incoterm_location
+msgid "Vendor Incoterm Location"
+msgstr "მომწოდებლის Incoterm-ის ადგილმდებარეობა"
+
+#. module: purchase
+#: model:ir.ui.menu,name:purchase.menu_product_pricelist_action2_purchase
+msgid "Vendor Pricelists"
+msgstr "მომწოდებლის ფასების სიები"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__partner_ref model_terms:ir.ui.view,arch_db:purchase.view_purchase_bill_union_list_invoice
+msgid "Vendor Reference"
+msgstr "მომწოდებლის მითითება"
+
+#. module: purchase
+#: model:ir.ui.menu,name:purchase.menu_procurement_management_supplier_name
+msgid "Vendors"
+msgstr "მომწოდებლები"
+
+#. module: purchase
+#: model_terms:ir.actions.act_window,help:purchase.act_res_partner_2_supplier_invoices
+msgid ""
+"Vendors bills can be pre-generated based on purchase\n"
+"                    orders or receipts. This allows you to control bills\n"
+"                    you receive from your vendor according to the draft\n"
+"                    document in Odoo."
+msgstr ""
+"მომწოდებლების ინვოისები შესყიდვის შეკვეთების ან მიღებების\n"
+"                    საფუძველზე წინასწარ შეიძლება დაგენერირდეს. ეს საშუალებას გაძლევთ,\n"
+"                    აკონტროლოთ მომწოდებლისგან მიღებული ინვოისები Odoo-ში\n"
+"                    არსებული პროექტის მიხედვით."
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "View"
+msgstr "ნახვა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_order
+msgid "View Details"
+msgstr "დეტალების ნახვა"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "View Order"
+msgstr "ორდერის ნახვა"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "View Quotation"
+msgstr "შეთავაზების ნახვა"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_report__volume
+msgid "Volume"
+msgstr "მოცულობა"
+
+#. module: purchase
+#: model:ir.model.fields.selection,name:purchase.selection__purchase_order__invoice_status__to_invoice model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_search
+msgid "Waiting Bills"
+msgstr "მოლოდინში მყოფი ანგარიშ-ფაქტურები"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_order
+msgid "Want to import this document in Odoo?"
+msgstr "გსურთ ამ დოკუმენტის იმპორტი Odoo-ში?"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.view_product_supplier_inherit
+msgid "Warning on Purchase Orders"
+msgstr "გაფრთხილება შესყიდვის ორდერებზე"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.res_partner_view_purchase_buttons
+msgid "Warning on Purchase Orders and Bills"
+msgstr "გაფრთხილება შესყიდვის ორდერებსა და ანგარიშ-ფაქტურებზე"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_view_search model_terms:ir.ui.view,arch_db:purchase.res_config_settings_view_form_purchase model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_filter
+msgid "Warnings"
+msgstr "გაფრთხილებები"
+
+#. module: purchase
+#: model_terms:digest.tip,tip_description:purchase.digest_tip_purchase_0
+msgid "When creating a purchase order, have a look at the vendor's <i>On Time Delivery</i> rate: the percentage of products shipped on time. If it is too low, activate the <i>automated reminders</i>. A few days before the due shipment, Odoo will send the vendor an email to ask confirmation of shipment dates and keep you informed in case of any delays. To get the vendor's performance statistics, click on the OTD rate."
+msgstr "შესყიდვის შეკვეთის შექმნისას შეხედეთ მომწოდებლის <i>დროული მიწოდების</i> მაჩვენებელს: დროულად გაგზავნილი პროდუქტების პროცენტს. თუ ის ძალიან დაბალია, გაააქტიურეთ <i>ავტომატური შეხსენებები</i>. გაგზავნის ვადამდე რამდენიმე დღით ადრე Odoo მომწოდებელს გაუგზავნის წერილს გაგზავნის თარიღების დადასტურების მოთხოვნით და დაყოვნების შემთხვევაში შეგატყობინებთ. მომწოდებლის მაჩვენებლების სტატისტიკისთვის დააწკაპუნეთ დროული მიწოდების მაჩვენებელზე."
+
+#. module: purchase
+#: model_terms:digest.tip,tip_description:purchase.digest_tip_purchase_1
+msgid "When sending a purchase order by email, Odoo asks the vendor to acknowledge the reception of the order. When the vendor acknowledges the order by clicking on a button in the email, the information is added on the purchase order. Use filters to track orders that have not been acknowledged."
+msgstr "შესყიდვის შეკვეთის ელფოსტით გაგზავნისას Odoo მომწოდებელს სთხოვს შეკვეთის მიღების დადასტურებას. როცა მომწოდებელი წერილში ღილაკზე დაწკაპუნებით დაადასტურებს შეკვეთას, ინფორმაცია შესყიდვის შეკვეთაზე დაემატება. გამოიყენეთ ფილტრები დაუდასტურებელი შეკვეთებისთვის თვალის დევნებისას."
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order__partner_id model:ir.model.fields,help:purchase.field_purchase_order_line__partner_id
+msgid "You can find a vendor by its Name, TIN, Email or Internal Reference."
+msgstr "მომწოდებელი შეგიძლიათ იპოვოთ სახელით, საიდენტიფიკაციო კოდით, ელფოსტით ან შიდა მითითებით."
+
+#. module: purchase
+#. odoo-javascript
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0 code:addons/purchase/static/src/components/purchase_file_uploader/purchase_file_uploader.js:0
+msgid "You can only upload a bill for a single vendor at a time."
+msgstr "ერთდროულად მხოლოდ ერთი მომწოდებლის ანგარიშ-ფაქტურის ატვირთვა შეგიძლიათ."
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order_line.py:0
+msgid "You cannot change the type of a purchase order line. Instead you should delete the current line and create a new line of the proper type."
+msgstr "შესყიდვის შეკვეთის ხაზის ტიპს ვერ შეცვლით. სამაგიეროდ უნდა წაშალოთ მიმდინარე ხაზი და შექმნათ ახალი ხაზი სათანადო ტიპით."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_order
+msgid "You don't use a good CRM software?"
+msgstr "არ იყენებთ კარგ CRM პროგრამას?"
+
+#. module: purchase
+#: model_terms:ir.actions.act_window,help:purchase.product_normal_action_puchased
+msgid ""
+"You must define a product for everything you sell or purchase,\n"
+"            whether it's a storable product, a consumable or a service."
+msgstr ""
+"უნდა განსაზღვროთ პროდუქტი ყველაფრისთვის, რასაც ყიდით ან შეისყიდით,\n"
+"            იქნება ეს შესანახი პროდუქტი, სახარჯი მატერიალი თუ მომსახურება."
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_bill_line_match.py:0
+msgid "You must select at least one Purchase Order line to match or create bill."
+msgstr "შესადარებლად ან ანგარიშ-ფაქტურის შესაქმნელად აირჩიეთ სულ მცირე ერთი შესყიდვის ორდერის ხაზი."
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid ""
+"Your RFQ contains products from company %(product_company)s whereas your RFQ belongs to company %(quote_company)s. \n"
+" Please change the company of your RFQ or remove the products from other companies (%(bad_products)s)."
+msgstr ""
+"თქვენი შეთავაზების მოთხოვნა შეიცავს კომპანიის %(product_company)s პროდუქტებს, ხოლო თავად შეთავაზების მოთხოვნა ეკუთვნის კომპანიას %(quote_company)s.\n"
+" გთხოვთ, შეცვალოთ შეთავაზების მოთხოვნის კომპანია ან წაშალოთ სხვა კომპანიების პროდუქტები (%(bad_products)s)."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "billing"
+msgstr "ფაქტურირება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.view_product_supplier_inherit
+msgid "e.g. There is a newer version of this product."
+msgstr "მაგ. ამ პროდუქტის უფრო ახალი ვერსია არსებობს."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.res_partner_view_purchase_buttons
+msgid "e.g. This vendor is on vacation until the end of August."
+msgstr "მაგ. ეს მომწოდებელი შვებულებაშია აგვისტოს ბოლომდე."
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order_line.py:0
+msgid "id"
+msgstr "id"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.bill_to_po_wizard_form
+msgid "or create new"
+msgstr "ან შექმენით ახალი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "purchase"
+msgstr "შესყიდვა"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "res_id"
+msgstr "res_id"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "res_model_id"
+msgstr "res_model_id"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/controllers/portal.py:0
+msgid "state"
+msgstr "state"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.report_purchaseorder_document model_terms:ir.ui.view,arch_db:purchase.report_purchasequotation_document
+msgid "to create quotes automatically."
+msgstr "შეთავაზებების ავტომატურად შესაქმნელად."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_order
+msgid "to learn all the ways to connect your software with"
+msgstr "რომ გაიგოთ თქვენი პროგრამის დაკავშირების ყველა გზა შემდეგთან"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "tracking"
+msgstr "მიდევნება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.report_purchaseorder_document model_terms:ir.ui.view,arch_db:purchase.report_purchasequotation_document
+msgid "with"
+msgstr "შემდეგთან:"
+
+#. module: purchase
+#: model:mail.template,subject:purchase.email_template_edi_purchase_done model:mail.template,subject:purchase.email_template_edi_purchase_reminder
+msgid "{{ object.company_id.name }} Order (Ref {{ object.name or 'n/a' }})"
+msgstr "{{ object.company_id.name }} ორდერი (მითითება {{ object.name or 'n/a' }})"
+
+#. module: purchase
+#: model:mail.template,body_html:purchase.email_template_edi_purchase_reminder
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"        Dear <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>\n"
+"        <t t-if=\"object.partner_id.parent_id\">\n"
+"            (<t t-out=\"object.partner_id.parent_id.name or ''\">Azure Interior</t>)\n"
+"        </t>\n"
+"        <br/><br/>\n"
+"        Here is a reminder that the delivery of the purchase order <span style=\"font-weight:bold;\" t-out=\"object.name or ''\">P00015</span>\n"
+"        <t t-if=\"object.partner_ref\">\n"
+"            <span style=\"font-weight:bold;\">(<t t-out=\"object.partner_ref or ''\">REF_XXX</t>)</span>\n"
+"        </t>\n"
+"        is expected for \n"
+"        <t t-if=\"object.date_planned\">\n"
+"            <span style=\"font-weight:bold;\" t-out=\"format_date(object.date_planned) or ''\">05/05/2021</span>.\n"
+"        </t>\n"
+"         <t t-else=\"\">\n"
+"            <span style=\"font-weight:bold;\">undefined</span>.\n"
+"        </t>\n"
+"        Could you please confirm it will be delivered on time?\n"
+"        <br/><br/>\n"
+"        <a t-att-href=\"object.get_acknowledge_url()\" target=\"_blank\" style=\"padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius: 3px\">\n"
+"            Acknowledge</a>\n"
+"        <br/><br/>\n"
+"        <t t-if=\"not is_html_empty(object.user_id.signature)\" data-o-mail-quote-container=\"1\">\n"
+"            <br/><br/>\n"
+"            <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-out=\"object.user_id.signature or ''\" data-o-mail-quote=\"1\">Mitchell Admin</t></div>\n"
+"        </t>\n"
+"        <br/><br/>\n"
+"    </p>\n"
+"</div>"
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"        ძვირფასო <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>\n"
+"        <t t-if=\"object.partner_id.parent_id\">\n"
+"            (<t t-out=\"object.partner_id.parent_id.name or ''\">Azure Interior</t>)\n"
+"        </t>\n"
+"        <br/><br/>\n"
+"        შეგახსენებთ, რომ შესყიდვის შეკვეთის მიწოდება <span style=\"font-weight:bold;\" t-out=\"object.name or ''\">P00015</span>\n"
+"        <t t-if=\"object.partner_ref\">\n"
+"            <span style=\"font-weight:bold;\">(<t t-out=\"object.partner_ref or ''\">REF_XXX</t>)</span>\n"
+"        </t>\n"
+"        მოსალოდნელია \n"
+"        <t t-if=\"object.date_planned\">\n"
+"            <span style=\"font-weight:bold;\" t-out=\"format_date(object.date_planned) or ''\">05/05/2021</span>.\n"
+"        </t>\n"
+"         <t t-else=\"\">\n"
+"            <span style=\"font-weight:bold;\">განუსაზღვრელი</span>.\n"
+"        </t>\n"
+"        გთხოვთ, დაადასტუროთ, რომ დროულად მოგვეწოდება.\n"
+"        <br/><br/>\n"
+"        <a t-att-href=\"object.get_acknowledge_url()\" target=\"_blank\" style=\"padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius: 3px\">\n"
+"            დადასტურება</a>\n"
+"        <br/><br/>\n"
+"        <t t-if=\"not is_html_empty(object.user_id.signature)\" data-o-mail-quote-container=\"1\">\n"
+"            <br/><br/>\n"
+"            <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-out=\"object.user_id.signature or ''\" data-o-mail-quote=\"1\">Mitchell Admin</t></div>\n"
+"        </t>\n"
+"        <br/><br/>\n"
+"    </p>\n"
+"</div>"
+
+#. module: purchase
+#: model:mail.template,body_html:purchase.email_template_edi_purchase_done
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"        Dear <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>\n"
+"        <t t-if=\"object.partner_id.parent_id\">\n"
+"            (<t t-out=\"object.partner_id.parent_id.name or ''\">Azure Interior</t>)\n"
+"        </t>\n"
+"        <br/><br/>\n"
+"        Here is in attachment a purchase order <span style=\"font-weight:bold;\" t-out=\"object.name or ''\">P00015</span>\n"
+"        <t t-if=\"object.partner_ref\">\n"
+"            with reference: <t t-out=\"object.partner_ref or ''\">REF_XXX</t>\n"
+"        </t>\n"
+"        amounting in <span style=\"font-weight:bold;\" t-out=\"format_amount(object.amount_total, object.currency_id) or ''\">$ 10.00</span>\n"
+"        from <t t-out=\"object.company_id.name or ''\">YourCompany</t>. \n"
+"        <br/><br/>\n"
+"        <t t-if=\"object.date_planned\">\n"
+"            The receipt is expected for <span style=\"font-weight:bold;\" t-out=\"format_date(object.date_planned) or ''\">05/05/2021</span>.\n"
+"            <br/><br/>\n"
+"            Could you please acknowledge the receipt of this order?\n"
+"            <br/><br/>\n"
+"            <a t-att-href=\"object.get_acknowledge_url()\" target=\"_blank\" style=\"padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius: 3px\">\n"
+"                Acknowledge</a>\n"
+"        </t>\n"
+"        <t t-if=\"not is_html_empty(object.user_id.signature)\" data-o-mail-quote-container=\"1\">\n"
+"            <br/><br/>\n"
+"            <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-out=\"object.user_id.signature or ''\" data-o-mail-quote=\"1\">Mitchell Admin</t></div>\n"
+"        </t>\n"
+"        <br/><br/>\n"
+"    </p>\n"
+"</div>"
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"        ძვირფასო <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>\n"
+"        <t t-if=\"object.partner_id.parent_id\">\n"
+"            (<t t-out=\"object.partner_id.parent_id.name or ''\">Azure Interior</t>)\n"
+"        </t>\n"
+"        <br/><br/>\n"
+"        დანართში იხილეთ შესყიდვის შეკვეთა <span style=\"font-weight:bold;\" t-out=\"object.name or ''\">P00015</span>\n"
+"        <t t-if=\"object.partner_ref\">\n"
+"            ნომრით: <t t-out=\"object.partner_ref or ''\">REF_XXX</t>\n"
+"        </t>\n"
+"        თანხით <span style=\"font-weight:bold;\" t-out=\"format_amount(object.amount_total, object.currency_id) or ''\">$ 10.00</span>\n"
+"        from <t t-out=\"object.company_id.name or ''\">YourCompany</t>. \n"
+"        <br/><br/>\n"
+"        <t t-if=\"object.date_planned\">\n"
+"            The receipt მოსალოდნელია <span style=\"font-weight:bold;\" t-out=\"format_date(object.date_planned) or ''\">05/05/2021</span>.\n"
+"            <br/><br/>\n"
+"            გთხოვთ, დაადასტუროთ ამ შეკვეთის მიღება.\n"
+"            <br/><br/>\n"
+"            <a t-att-href=\"object.get_acknowledge_url()\" target=\"_blank\" style=\"padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius: 3px\">\n"
+"                დადასტურება</a>\n"
+"        </t>\n"
+"        <t t-if=\"not is_html_empty(object.user_id.signature)\" data-o-mail-quote-container=\"1\">\n"
+"            <br/><br/>\n"
+"            <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-out=\"object.user_id.signature or ''\" data-o-mail-quote=\"1\">Mitchell Admin</t></div>\n"
+"        </t>\n"
+"        <br/><br/>\n"
+"    </p>\n"
+"</div>"
+
+#. module: purchase
+#: model:mail.template,body_html:purchase.email_template_edi_purchase
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"        Dear <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>\n"
+"        <t t-if=\"object.partner_id.parent_id\">\n"
+"            (<t t-out=\"object.partner_id.parent_id.name or ''\">Azure Interior</t>)\n"
+"        </t>\n"
+"        <br/><br/>\n"
+"        Here is in attachment a request for quotation <span style=\"font-weight:bold;\" t-out=\"object.name or ''\">P00015</span>\n"
+"        <t t-if=\"object.partner_ref\">\n"
+"            with reference: <t t-out=\"object.partner_ref or ''\">REF_XXX</t>\n"
+"        </t>\n"
+"        from <t t-out=\"object.company_id.name or ''\">YourCompany</t>.\n"
+"        <br/><br/>\n"
+"        If you have any questions, please do not hesitate to contact us.\n"
+"        <br/><br/>\n"
+"        Best regards,\n"
+"        <t t-if=\"not is_html_empty(object.user_id.signature)\" data-o-mail-quote-container=\"1\">\n"
+"            <br/><br/>\n"
+"            <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-out=\"object.user_id.signature or ''\" data-o-mail-quote=\"1\">Mitchell Admin</t></div>\n"
+"        </t>\n"
+"    </p>\n"
+"</div>"
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"        ძვირფასო <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>\n"
+"        <t t-if=\"object.partner_id.parent_id\">\n"
+"            (<t t-out=\"object.partner_id.parent_id.name or ''\">Azure Interior</t>)\n"
+"        </t>\n"
+"        <br/><br/>\n"
+"        დანართში იხილეთ შეთავაზების მოთხოვნა <span style=\"font-weight:bold;\" t-out=\"object.name or ''\">P00015</span>\n"
+"        <t t-if=\"object.partner_ref\">\n"
+"            ნომრით: <t t-out=\"object.partner_ref or ''\">REF_XXX</t>\n"
+"        </t>\n"
+"        from <t t-out=\"object.company_id.name or ''\">YourCompany</t>.\n"
+"        <br/><br/>\n"
+"        თუ შეკითხვები გაქვთ, ნუ მოგერიდებათ დაგვიკავშირდეთ.\n"
+"        <br/><br/>\n"
+"        პატივისცემით,\n"
+"        <t t-if=\"not is_html_empty(object.user_id.signature)\" data-o-mail-quote-container=\"1\">\n"
+"            <br/><br/>\n"
+"            <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-out=\"object.user_id.signature or ''\" data-o-mail-quote=\"1\">Mitchell Admin</t></div>\n"
+"        </t>\n"
+"    </p>\n"
+"</div>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content
+msgid "<i class=\"fa fa-fw fa-check\"/>Paid"
+msgstr "<i class=\"fa fa-fw fa-check\"/>გადახდილი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content
+msgid "<i class=\"fa fa-fw fa-check\"/>Reversed"
+msgstr "<i class=\"fa fa-fw fa-check\"/>გაუქმებული"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content
+msgid "<i class=\"fa fa-fw fa-clock-o\"/>Waiting Payment"
+msgstr "<i class=\"fa fa-fw fa-clock-o\"/>გადახდის მოლოდინში"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_orders
+msgid "<i class=\"fa fa-fw fa-file-text\" role=\"img\" aria-label=\"Waiting for Bill\" title=\"Waiting for Bill\"/><span class=\"d-none d-md-inline\"> Waiting for Bill</span>"
+msgstr "<i class=\"fa fa-fw fa-file-text\" role=\"img\" aria-label=\"ინვოისის მოლოდინში\" title=\"ინვოისის მოლოდინში\"/><span class=\"d-none d-md-inline\"> ინვოისის მოლოდინში</span>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_orders
+msgid "<i class=\"fa fa-fw fa-remove\" role=\"img\" aria-label=\"Cancelled\" title=\"Cancelled\"/><span class=\"d-none d-md-inline\"> Cancelled</span>"
+msgstr "<i class=\"fa fa-fw fa-remove\" role=\"img\" aria-label=\"გაუქმებული\" title=\"გაუქმებული\"/><span class=\"d-none d-md-inline\"> გაუქმებული</span>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid ""
+"<i class=\"fa fa-lock\"/>\n"
+"                        Locked"
+msgstr ""
+"<i class=\"fa fa-lock\"/>\n"
+"                        ჩაკეტილი"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_order
+msgid "<i class=\"fa fa-print me-1\"/>Download / Print"
+msgstr "<i class=\"fa fa-print me-1\"/>ჩამოტვირთვა / ბეჭდვა"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid ""
+"<span class=\"o_form_label\" invisible=\"state not in ('draft', 'sent')\">Request for Quotation </span>\n"
+"                        <span class=\"o_form_label\" invisible=\"state in ('draft', 'sent')\">Purchase Order </span>"
+msgstr ""
+"<span class=\"o_form_label\" invisible=\"state not in ('draft', 'sent')\">შეთავაზების მოთხოვნა </span>\n"
+"                        <span class=\"o_form_label\" invisible=\"state in ('draft', 'sent')\">შესყიდვის შეკვეთა </span>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "<span class=\"o_stat_text\">Bill Matching</span>"
+msgstr "<span class=\"o_stat_text\">ინვოისების შედარება</span>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.view_move_form_inherit_purchase
+msgid "<span class=\"o_stat_text\">Purchase Matching</span>"
+msgstr "<span class=\"o_stat_text\">შესყიდვების შედარება</span>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.view_partner_property_form
+msgid "<span> day(s) before</span>"
+msgstr "<span> დღით ადრე</span>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "<span>Ask confirmation</span>"
+msgstr "<span>დადასტურების მოთხოვნა</span>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_portal_content model_terms:ir.ui.view,arch_db:purchase.report_purchaseorder_document
+msgid "<strong class=\"mr16\">Subtotal</strong>"
+msgstr "<strong class=\"mr16\">ქვეჯამი</strong>"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.track_po_line_template
+msgid "<strong>The ordered quantity has been updated.</strong>"
+msgstr "<strong>შეკვეთილი რაოდენობა განახლდა.</strong>"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_account_bank_statement_line__purchase_vendor_bill_id model:ir.model.fields,field_description:purchase.field_account_move__purchase_vendor_bill_id
+msgid "Auto-complete"
+msgstr "ავტომატური შევსება"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.portal_my_purchase_order
+msgid "Communication history"
+msgstr "კომუნიკაციის ისტორია"
+
+#. module: purchase
+msgid "Companies"
+msgstr "კომპანიები"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.view_purchase_order_search
+msgid "Confirmation Date Last Year"
+msgstr "დადასტურების თარიღი — გასულ წელს"
+
+#. module: purchase
+#: model_terms:ir.actions.act_window,help:purchase.product_product_action
+msgid "Create a new product variant"
+msgstr "ახალი პროდუქტის ვარიანტის შექმნა"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order__date_planned
+msgid "Delivery date promised by vendor. This date is used to determine expected arrival of products."
+msgstr "მომწოდებლის მიერ დაპირებული მიწოდების თარიღი. ეს თარიღი გამოიყენება პროდუქტების მოსალოდნელი ჩამოსვლის დასადგენად."
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr "Font Awesome ხატულა, მაგ. fa-tasks"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/product.py:0
+msgid "Import Template for Products"
+msgstr "პროდუქტების იმპორტის შაბლონი"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid "Import Template for Requests for Quotation"
+msgstr "შეთავაზების მოთხოვნების იმპორტის შაბლონი"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_product_product__is_in_purchase_order
+msgid "Is In Purchase Order"
+msgstr "არის შესყიდვის ორდერში"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_line_search
+msgid "Order Date: Last 365 Days"
+msgstr "შეკვეთის თარიღი: ბოლო 365 დღე"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Other Information"
+msgstr "სხვა ინფორმაცია"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_bill_line_match_tree
+msgid "Product Description"
+msgstr "პროდუქტის აღწერა"
+
+#. module: purchase
+#: model:ir.actions.act_window,name:purchase.product_product_action model:ir.ui.menu,name:purchase.product_product_menu
+msgid "Product Variants"
+msgstr "პროდუქტის ვარიანტები"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.product_normal_form_view_inherit_purchase model_terms:ir.ui.view,arch_db:purchase.view_product_template_purchase_buttons_from
+msgid "Purchased in the last 365 days"
+msgstr "შესყიდული ბოლო 365 დღეში"
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__receipt_reminder_email
+msgid "Receipt Reminder Email"
+msgstr "მიღების შეხსენების ელფოსტა"
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/js/tours/purchase.js:0
+msgid "Search a vendor name, or create one on the fly."
+msgstr "მოძებნეთ მომწოდებლის სახელი, ან შექმენით ახალი ადგილზევე."
+
+#. module: purchase
+#. odoo-javascript
+#: code:addons/purchase/static/src/js/tours/purchase.js:0
+msgid "Select a product, or create a new one on the fly."
+msgstr "აირჩიეთ პროდუქტი, ან შექმენით ახალი ადგილზევე."
+
+#. module: purchase
+#: model:ir.model.fields,field_description:purchase.field_purchase_order__website_message_ids
+msgid "Website Messages"
+msgstr "ვებსაიტის შეტყობინებები"
+
+#. module: purchase
+#: model:ir.model.fields,help:purchase.field_purchase_order__website_message_ids
+msgid "Website communication history"
+msgstr "ვებსაიტის კომუნიკაციის ისტორია"
+
+#. module: purchase
+#: model_terms:ir.actions.act_window,help:purchase.product_product_action
+msgid ""
+"You must define a product for everything you sell or purchase,\n"
+"                whether it's a storable product, a consumable or a service."
+msgstr ""
+"უნდა განსაზღვროთ პროდუქტი ყველაფრისთვის, რასაც ყიდით ან შეისყიდით,\n"
+"                იქნება ეს შესანახი პროდუქტი, სახარჯი მატერიალი თუ მომსახურება."
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/purchase_order.py:0
+msgid ""
+"Your quotation contains products from company %(product_company)s whereas your quotation belongs to company %(quote_company)s. \n"
+" Please change the company of your quotation or remove the products from other companies (%(bad_products)s)."
+msgstr ""
+"თქვენი შეთავაზება შეიცავს კომპანიის %(product_company)s პროდუქტებს, ხოლო თავად შეთავაზება ეკუთვნის კომპანიას %(quote_company)s. \n"
+" გთხოვთ, შეცვალოთ შეთავაზების კომპანია ან წაშალოთ სხვა კომპანიების პროდუქტები (%(bad_products)s)."
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "day(s) before"
+msgstr "დღით ადრე"
+
+#. module: purchase
+#. odoo-python
+#: code:addons/purchase/models/account_invoice.py:0 code:addons/purchase/models/purchase_order.py:0
+msgid "partner_id"
+msgstr "partner_id"

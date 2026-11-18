@@ -1,0 +1,29 @@
+id,name,model_id,group_id/id,operation,domain
+access_gec_vat_cell_user,gec.vat.cell user,gec.vat.cell,base.group_user,r,
+access_gec_vat_declaration_readonly,gec.vat.declaration readonly,gec.vat.declaration,account.group_account_readonly,r,
+access_gec_vat_declaration_user,gec.vat.declaration user,gec.vat.declaration,account.group_account_user,crud,
+rule_gec_vat_declaration_company,VAT Declaration: multi-company,gec.vat.declaration,,crud,"[('company_id', 'in', company_ids)]"
+access_gec_vat_declaration_line_readonly,gec.vat.declaration.line readonly,gec.vat.declaration.line,account.group_account_readonly,r,
+access_gec_vat_declaration_line_user,gec.vat.declaration.line user,gec.vat.declaration.line,account.group_account_user,crud,
+rule_gec_vat_declaration_line_company,VAT Declaration Line: multi-company,gec.vat.declaration.line,,crud,"[('company_id', 'in', company_ids)]"
+access_gec_vat_invoice_line_readonly,gec.vat.invoice.line readonly,gec.vat.invoice.line,account.group_account_readonly,r,
+access_gec_vat_invoice_line_user,gec.vat.invoice.line user,gec.vat.invoice.line,account.group_account_user,crud,
+rule_gec_vat_invoice_line_company,VAT Declaration B I / B II Row: multi-company,gec.vat.invoice.line,,crud,"[('company_id', 'in', company_ids)]"
+access_gec_vat_stock_line_readonly,gec.vat.stock.line readonly,gec.vat.stock.line,account.group_account_readonly,r,
+access_gec_vat_stock_line_user,gec.vat.stock.line user,gec.vat.stock.line,account.group_account_user,crud,
+rule_gec_vat_stock_line_company,VAT Declaration Tab 15 Row: multi-company,gec.vat.stock.line,,crud,"[('company_id', 'in', company_ids)]"
+access_gec_vat_advance_line_readonly,gec.vat.advance.line readonly,gec.vat.advance.line,account.group_account_readonly,r,
+access_gec_vat_advance_line_user,gec.vat.advance.line user,gec.vat.advance.line,account.group_account_user,crud,
+rule_gec_vat_advance_line_company,VAT Declaration B I / B II Advance Offset: multi-company,gec.vat.advance.line,,crud,"[('company_id', 'in', company_ids)]"
+access_gec_vat_customs_line_readonly,gec.vat.customs.line readonly,gec.vat.customs.line,account.group_account_readonly,r,
+access_gec_vat_customs_line_user,gec.vat.customs.line user,gec.vat.customs.line,account.group_account_user,crud,
+rule_gec_vat_customs_line_company,VAT Declaration B III Row: multi-company,gec.vat.customs.line,,crud,"[('company_id', 'in', company_ids)]"
+access_gec_vat_ref_line_readonly,gec.vat.ref.line readonly,gec.vat.ref.line,account.group_account_readonly,r,
+access_gec_vat_ref_line_user,gec.vat.ref.line user,gec.vat.ref.line,account.group_account_user,crud,
+rule_gec_vat_ref_line_company,VAT Declaration B IV / B V / B VIII / B IX Row: multi-company,gec.vat.ref.line,,crud,"[('company_id', 'in', company_ids)]"
+access_gec_vat_rc_declaration_readonly,gec.vat.rc.declaration readonly,gec.vat.rc.declaration,account.group_account_readonly,r,
+access_gec_vat_rc_declaration_user,gec.vat.rc.declaration user,gec.vat.rc.declaration,account.group_account_user,crud,
+rule_gec_vat_rc_declaration_company,Reverse-charge VAT Calculation: multi-company,gec.vat.rc.declaration,,crud,"[('company_id', 'in', company_ids)]"
+access_gec_vat_rc_line_readonly,gec.vat.rc.line readonly,gec.vat.rc.line,account.group_account_readonly,r,
+access_gec_vat_rc_line_user,gec.vat.rc.line user,gec.vat.rc.line,account.group_account_user,crud,
+rule_gec_vat_rc_line_company,Reverse-charge VAT Calculation Row: multi-company,gec.vat.rc.line,,crud,"[('company_id', 'in', company_ids)]"

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_rs_einvoice_waybill" model="ir.ui.view">
+        <field name="name">account.move.form.rs.einvoice.waybill</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="rs_einvoice.view_move_form_rs_einvoice"/>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_open_rs_waybill_links"
+                        class="oe_stat_button"
+                        icon="local_shipping"
+                        type="object"
+                        invisible="not rs_einv_waybill_has_links">
+                    <field name="rs_einv_waybill_count" widget="statinfo" string="Waybills"/>
+                </button>
+            </xpath>
+
+            <xpath expr="//page[@name='rs_einvoice_tab']" position="after">
+                <page string="RS Waybills" name="rs_einvoice_waybills_tab"
+                      invisible="move_type not in ('out_invoice', 'in_invoice')">
+                    <div class="alert alert-warning mb-2" role="alert"
+                         invisible="move_type != 'out_invoice' or rs_einv_waybill_sync_state not in ('draft', 'error')">
+                        Waybill links are not synced to rs.ge yet. Click <em>Send to RS</em>
+                        or <em>Update on RS</em> before <em>Send to buyer</em>.
+                    </div>
+                    <div class="mb-2" invisible="move_type != 'in_invoice'">
+                        <button name="action_rs_sync_buyer_waybills"
+                                type="object" string="Sync Waybills"
+                                class="btn-primary"
+                                invisible="not rs_einv_id"/>
+                    </div>
+                    <field name="rs_einv_waybill_link_ids"
+                           readonly="move_type == 'in_invoice'">
+                        <list editable="bottom">
+                            <field name="waybill_id"
+                                   readonly="sync_state == 'synced'"/>
+                            <field name="waybill_number" optional="show"/>
+                            <field name="waybill_status" optional="hide"/>
+                            <field name="waybill_date" optional="show"/>
+                            <field name="waybill_amount" optional="show"/>
+                            <field name="source" optional="hide"/>
+                            <field name="sync_state" widget="badge"
+                                   decoration-success="sync_state == 'synced'"
+                                   decoration-warning="sync_state == 'draft'"
+                                   decoration-danger="sync_state == 'error'"/>
+                            <field name="sync_message" optional="hide"/>
+                            <field name="synced_at" optional="hide"/>
+                            <field name="rs_remote_id" optional="hide"/>
+                        </list>
+                        <form>
+                            <sheet>
+                                <group>
+                                    <group>
+                                        <field name="waybill_id"/>
+                                        <field name="waybill_number"/>
+                                        <field name="waybill_date"/>
+                                        <field name="waybill_amount"/>
+                                    </group>
+                                    <group>
+                                        <field name="sync_state" widget="badge"/>
+                                        <field name="rs_remote_id"/>
+                                        <field name="synced_at"/>
+                                        <field name="source"/>
+                                    </group>
+                                </group>
+                                <field name="sync_message" readonly="1"/>
+                            </sheet>
+                        </form>
+                    </field>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

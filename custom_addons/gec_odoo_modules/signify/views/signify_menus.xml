@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_signify_root"
+              name="Signify"
+              sequence="90"
+              web_icon="signify,static/description/icon.png"
+              groups="signify.group_signify_user"/>
+
+    <menuitem id="menu_signify_documents"
+              name="Documents"
+              parent="menu_signify_root"
+              action="action_signify_document"
+              sequence="10"/>
+
+    <menuitem id="menu_signify_configuration"
+              name="Configuration"
+              parent="menu_signify_root"
+              sequence="90"/>
+
+    <menuitem id="menu_signify_connections"
+              name="Signify Accounts"
+              parent="menu_signify_configuration"
+              action="action_signify_connection"
+              sequence="10"/>
+</odoo>

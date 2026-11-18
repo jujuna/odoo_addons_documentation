@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_bsc_period_form_source" model="ir.ui.view">
+        <field name="name">bsc.period.form.source</field>
+        <field name="model">bsc.period</field>
+        <field name="inherit_id" ref="bsc_strategy.view_bsc_period_form"/>
+        <field name="arch" type="xml">
+            <button name="action_notify_owners" position="after">
+                <button name="action_refresh_automated" type="object"
+                        string="Refresh Automated Figures"
+                        invisible="state == 'closed' or automated_count == 0" groups="bsc_strategy.group_bsc_manager"/>
+            </button>
+            <field name="completion_rate" position="after">
+                <field name="automated_count" string="Automated KPIs"/>
+                <field name="attention_count" string="Need attention"
+                       invisible="attention_count == 0"/>
+            </field>
+            <xpath expr="//notebook" position="before">
+                <div class="alert alert-warning" role="alert"
+                     invisible="attention_count == 0">
+                    <strong>Some automated figures were not published.</strong>
+                    Held back as too far from last period, matched no records, or the
+                    source failed. Deal with these before closing the period.
+                    <button name="action_open_attention" type="object"
+                            string="Review them" class="btn-link"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_bsc_period_list_source" model="ir.ui.view">
+        <field name="name">bsc.period.list.source</field>
+        <field name="model">bsc.period</field>
+        <field name="inherit_id" ref="bsc_strategy.view_bsc_period_list"/>
+        <field name="arch" type="xml">
+            <field name="completion_rate" position="after">
+                <field name="attention_count" string="Attention" optional="show"/>
+            </field>
+            <button name="action_notify_owners" position="after">
+                <button name="action_refresh_automated" type="object"
+                        string="Refresh automated" icon="download"
+                        invisible="state == 'closed' or automated_count == 0" groups="bsc_strategy.group_bsc_manager"/>
+                <field name="automated_count" column_invisible="1"/>
+            </button>
+        </field>
+    </record>
+
+</odoo>

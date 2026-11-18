@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="gec_income_tax_report.RsForm30SummaryGrid">
+        <section class="o_rs_form30_grid o_rsf30_summary" t-att-class="this.className">
+            <header class="o_rsf30_toolbar">
+                <div class="o_rsf30_title">
+                    <span class="o_rsf30_mark">RS</span>
+                    <span>
+                        <strong>Form No. 30 — Main part</strong>
+                        <small>Cells 16–69</small>
+                    </span>
+                </div>
+                <div class="o_rsf30_toolbar_stats">
+                    <span class="o_rsf30_stat">
+                        <i class="oi" data-icon="lock" aria-hidden="true"/>
+                        Locked cells are calculated by the portal
+                    </span>
+                    <span class="o_rsf30_stat">
+                        <i class="oi" data-icon="wand_stars" aria-hidden="true"/>
+                        Wand cells are proposed by Odoo and can be overwritten
+                    </span>
+                </div>
+            </header>
+
+            <div class="o_rsf30_table_wrap">
+                <table class="o_rsf30_table o_rsf30_summary_table">
+                    <tbody>
+                        <t t-foreach="this.records" t-as="record" t-key="record.id">
+                            <tr t-if="record.data.is_section" class="o_rsf30_summary_section">
+                                <td colspan="4" t-out="record.data.name"/>
+                            </tr>
+                            <tr t-else=""
+                                t-att-class="{ 'o_rsf30_summary_locked': record.data.computed,
+                                               'o_rsf30_summary_proposed': record.data.proposed and !record.data.computed,
+                                               'o_rsf30_edited_row': record.isInEdition }"
+                                t-on-click="() => this.onRowClick(record)">
+                                <td class="o_rsf30_summary_label" t-out="record.data.name"/>
+                                <td class="o_rsf30_summary_note" t-out="record.data.note or ''"/>
+                                <td class="o_rsf30_summary_code" t-out="record.data.code"/>
+                                <td class="o_rsf30_summary_value">
+                                    <div class="o_rsf30_summary_value_content">
+                                        <i t-if="record.data.computed" class="oi o_rsf30_summary_padlock" data-icon="lock"
+                                           title="Calculated by the portal" aria-hidden="true"/>
+                                        <i t-elif="record.data.proposed" class="oi o_rsf30_summary_wand" data-icon="wand_stars"
+                                           t-att-title="this.wandTitle(record)"
+                                           aria-hidden="true"/>
+                                        <Field t-if="record.data.is_boolean" name="'value_bool'"
+                                               record="record" readonly="!this.isEditable(record)"/>
+                                        <Field t-else="" name="'value'"
+                                               record="record" readonly="!this.isEditable(record)"/>
+                                        <button t-if="this.canExplain" type="button" class="o_rsf30_summary_explain"
+                                                title="How was this cell calculated?"
+                                                t-on-click.stop="() => this.explain(record)">
+                                            <i class="oi" data-icon="help" aria-hidden="true"/>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+            <footer class="o_rsf30_hint">
+                <i class="oi" data-icon="info" aria-hidden="true"/>
+                Locked cells follow the annex rows and the portal recalculates them on import; Odoo refreshes
+                them at Generate Lines and at Export. Wand cells are proposed from Odoo's ledger and rows and keep
+                following them until you type your own value, which then stays. The remaining cells are yours to fill.
+                The question mark on a row shows the formula and every row or journal item behind that cell.
+            </footer>
+        </section>
+    </t>
+
+</templates>

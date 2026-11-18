@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="gec_income_tax_report.RsForm30ServiceGrid">
+        <section class="o_rs_form30_grid" t-att-class="this.className" t-ref="this.gridRef">
+            <header class="o_rsf30_toolbar">
+                <div class="o_rsf30_title">
+                    <span class="o_rsf30_mark">RS</span>
+                    <span>
+                        <strong>Form No. 30 — Annex E</strong>
+                        <small>Service fees to individuals, not withheld at source</small>
+                    </span>
+                </div>
+                <div class="o_rsf30_toolbar_stats">
+                    <span class="o_rsf30_stat">
+                        <i class="oi" data-icon="list_alt" aria-hidden="true"/>
+                        <t t-out="this.list.count"/> rows
+                    </span>
+                    <span t-if="this.leftOutCount" class="o_rsf30_stat">
+                        <i class="oi" data-icon="block" aria-hidden="true"/>
+                        <t t-out="this.leftOutCount"/> left out of the file
+                    </span>
+                </div>
+                <t t-call="gec_income_tax_report.RsForm30Grid.ToolbarActions"/>
+            </header>
+
+            <t t-call="gec_income_tax_report.RsForm30Grid.Pager"/>
+
+            <div class="o_rsf30_table_wrap">
+                <table class="o_rsf30_table" t-att-style="this.tableStyle">
+                    <t t-call="gec_income_tax_report.RsForm30Grid.Colgroup"/>
+                    <thead>
+                        <tr class="o_rsf30_group_headers">
+                            <th rowspan="2" class="o_rsf30_sticky_col">№</th>
+                            <th rowspan="2" t-out="this.columns[0].label"/>
+                            <th colspan="2">Recipient</th>
+                            <t t-foreach="this.columns.slice(3)" t-as="column" t-key="column.field">
+                                <th rowspan="2" t-out="column.label"/>
+                            </t>
+                        </tr>
+                        <tr class="o_rsf30_leaf_headers">
+                            <t t-foreach="this.nameColumns" t-as="column" t-key="column.field">
+                                <th t-out="column.label"/>
+                            </t>
+                        </tr>
+                        <t t-call="gec_income_tax_report.RsForm30Grid.FiltersRow"/>
+                    </thead>
+                    <tbody>
+                        <tr t-if="!this.visibleRecords.length" class="o_rsf30_empty_row">
+                            <td t-att-colspan="this.columns.length + 1">
+                                <span class="o_rsf30_empty_icon"><i class="oi" data-icon="table_chart" aria-hidden="true"/></span>
+                                <strong t-if="this.records.length">No lines match the filters</strong>
+                                <strong t-else="">No lines yet</strong>
+                            </td>
+                        </tr>
+                        <t t-foreach="this.visibleRecords" t-as="record" t-key="record.id">
+                            <tr t-att-class="{
+                                    'o_rsf30_warning_row': this.issueLevel(record) === 'warning',
+                                    'o_rsf30_blocker_row': this.issueLevel(record) === 'blocker',
+                                }">
+                                <td class="o_rsf30_row_actions o_rsf30_sticky_col">
+                                    <span class="o_rsf30_row_number" t-out="record_index + 1 + this.list.offset"/>
+                                    <t t-call="gec_income_tax_report.RsForm30Grid.SourceLink"/>
+                                    <i t-if="this.issueLevel(record)" t-att-class="'oi o_rsf30_warning_icon ' + this.issueClass(record)"
+                                       t-att-data-icon="this.issueIcon(record)" t-att-data-level="this.issueLevel(record)"
+                                       t-att-title="record.data.warning_display || record.data.warning" aria-hidden="true"/>
+                                </td>
+                                <t t-call="gec_income_tax_report.RsForm30Grid.Cells"/>
+                            </tr>
+                        </t>
+                    </tbody>
+                    <t t-call="gec_income_tax_report.RsForm30Grid.Totals"/>
+                </table>
+            </div>
+            <footer class="o_rsf30_hint">
+                <i class="oi" data-icon="info" aria-hidden="true"/>
+                Annex E lists service fees paid to individuals that were not taxed at source.
+                Rows cannot be edited in this table. Filters and footer totals apply to this page.
+            </footer>
+        </section>
+    </t>
+
+</templates>

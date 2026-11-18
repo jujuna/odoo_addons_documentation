@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <record id="view_account_asset_form_gec_margin_scheme" model="ir.ui.view">
+    <field name="name">account.asset.form.gec.margin.scheme</field>
+    <field name="model">account.asset</field>
+    <field name="inherit_id" ref="account_asset.view_account_asset_form"/>
+    <field name="arch" type="xml">
+      <field name="acquisition_date" position="after">
+        <field name="gec_margin_scheme" invisible="country_code != 'GE'"/>
+      </field>
+    </field>
+  </record>
+
+</odoo>

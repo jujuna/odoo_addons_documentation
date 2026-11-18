@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_rs_form30" model="ir.ui.view">
+        <field name="name">res.partner.form.rs.form30</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='sales_purchases']" position="inside">
+                <group name="rs_form30" string="rs.ge Form 30">
+                    <field name="rs_form30_individual_entrepreneur"/>
+                    <field name="rs_form30_small_business"/>
+                    <field name="gec_vat_payer" groups="account.group_account_invoice,account.group_account_readonly"
+                           invisible="not is_company and not rs_form30_individual_entrepreneur and not rs_form30_small_business and not gec_vat_payer"/>
+                    <field name="rs_form30_service_type_id"
+                           invisible="not rs_form30_individual_entrepreneur and not rs_form30_small_business"/>
+                    <field name="rs_form30_current_category_id"/>
+                    <field name="rs_form30_category_id" string="Category Without History" readonly="1"
+                           invisible="rs_form30_category_history_ids or not rs_form30_category_id"/>
+                    <div colspan="2" class="text-muted">
+                        Categories apply by payment date, including both boundary dates. End the old period the day
+                        before the new one starts. Leave Valid From empty for an unknown start and Valid To empty
+                        for an ongoing category. Once history exists, it replaces the category without history for all dates.
+                    </div>
+                    <field name="rs_form30_category_history_ids" nolabel="1" colspan="2">
+                        <list editable="bottom">
+                            <field name="category_id" options="{'no_create': True}"/>
+                            <field name="use_salary"/>
+                            <field name="use_entry"/>
+                            <field name="use_bill"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </list>
+                    </field>
+                    <label for="rs_form30_exempt_limit"/>
+                    <div class="o_row">
+                        <field name="rs_form30_exempt_limit" class="oe_inline"/>
+                        <button name="action_rs_form30_exempt_usage" type="object"
+                                string="Usage" class="btn-link" icon="format_list_bulleted"
+                                invisible="not rs_form30_exempt_limit"/>
+                    </div>
+                    <field name="rs_form30_exempt_used" invisible="not rs_form30_exempt_limit"/>
+                    <field name="rs_form30_exempt_remaining" invisible="not rs_form30_exempt_limit"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_partner_list_rs_form30" model="ir.ui.view">
+        <field name="name">res.partner.list.rs.form30</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <field name="company_id" position="after">
+                <field name="rs_form30_current_category_id" optional="hide"/>
+            </field>
+        </field>
+    </record>
+</odoo>

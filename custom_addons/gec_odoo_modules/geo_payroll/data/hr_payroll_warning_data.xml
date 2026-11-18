@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+    <record id="hr_payroll_warning_geo_unclaimed_work" model="hr.payroll.warning">
+        <field name="name">Work logs or timesheets missing from the payslip</field>
+        <field name="description">Approved work logs or payable timesheets are not in these draft payslips. Compute them again before validating; an edited payslip must be cancelled and replaced.</field>
+        <field name="country_id" ref="base.ge"/>
+        <field name="warning_color_class">danger</field>
+        <field name="warning_type">python</field>
+        <field name="model_id" ref="hr_payroll.model_hr_payslip"/>
+        <field name="display_on_dashboard" eval="True"/>
+        <field name="display_on_model" eval="True"/>
+        <field name="block_payslips" eval="True"/>
+        <field name="evaluation_code">
+payslips = self.env['hr.payslip'].search([
+    ('state', '=', 'draft'),
+    ('company_id', 'in', self.env.companies.ids),
+    ('struct_id.country_id', '=', self.country_id.id),
+] + ([('id', 'in', records.ids)] if records else []))
+warning_records = payslips._gec_unclaimed_slips()
+        </field>
+    </record>
+
+    <record id="hr_payroll_warning_geo_short_fixed_period" model="hr.payroll.warning">
+        <field name="name">Fixed-wage payslip shorter than its period</field>
+        <field name="description">A shortened fixed-wage payslip pays the full monthly wage for part of the period. Use one full-period payslip per contract.</field>
+        <field name="country_id" ref="base.ge"/>
+        <field name="warning_color_class">danger</field>
+        <field name="warning_type">python</field>
+        <field name="model_id" ref="hr_payroll.model_hr_payslip"/>
+        <field name="display_on_dashboard" eval="True"/>
+        <field name="display_on_model" eval="True"/>
+        <field name="block_payslips" eval="True"/>
+        <field name="evaluation_code">
+payslips = self.env['hr.payslip'].search([
+    ('state', '=', 'draft'),
+    ('company_id', 'in', self.env.companies.ids),
+    ('struct_id.country_id', '=', self.country_id.id),
+] + ([('id', 'in', records.ids)] if records else []))
+warning_records = payslips._gec_short_fixed_period_slips()
+        </field>
+    </record>
+
+    <record id="hr_payroll_warning_geo_mixed_pay_route" model="hr.payroll.warning">
+        <field name="name">Pay scheme changed inside the payslip period</field>
+        <field name="description">Start a new contract on the date the pay changes, so each contract is paid on its own payslip.</field>
+        <field name="country_id" ref="base.ge"/>
+        <field name="warning_color_class">danger</field>
+        <field name="warning_type">python</field>
+        <field name="model_id" ref="hr_payroll.model_hr_payslip"/>
+        <field name="display_on_dashboard" eval="True"/>
+        <field name="display_on_model" eval="True"/>
+        <field name="block_payslips" eval="True"/>
+        <field name="evaluation_code">
+payslips = self.env['hr.payslip'].search([
+    ('state', '=', 'draft'),
+    ('company_id', 'in', self.env.companies.ids),
+    ('struct_id.country_id', '=', self.country_id.id),
+] + ([('id', 'in', records.ids)] if records else []))
+warning_records = payslips._gec_mixed_pay_route_slips()
+        </field>
+    </record>
+
+    <record id="hr_payroll_warning_geo_schedule_base" model="hr.payroll.warning">
+        <field name="name">Daily or unit payslip pays the work schedule instead of work logs</field>
+        <field name="description">Compute the payslip again so base pay comes only from approved work logs.</field>
+        <field name="country_id" ref="base.ge"/>
+        <field name="warning_color_class">danger</field>
+        <field name="warning_type">python</field>
+        <field name="model_id" ref="hr_payroll.model_hr_payslip"/>
+        <field name="display_on_dashboard" eval="True"/>
+        <field name="display_on_model" eval="True"/>
+        <field name="block_payslips" eval="True"/>
+        <field name="evaluation_code">
+payslips = self.env['hr.payslip'].search([
+    ('state', '=', 'draft'),
+    ('company_id', 'in', self.env.companies.ids),
+    ('struct_id.country_id', '=', self.country_id.id),
+] + ([('id', 'in', records.ids)] if records else []))
+warning_records = payslips._gec_schedule_base_slips()
+        </field>
+    </record>
+
+    <record id="hr_payroll_warning_geo_timesheet_base" model="hr.payroll.warning">
+        <field name="name">Timesheet-paid payslip was edited or uses another salary structure</field>
+        <field name="description">Use the default salary structure without manual edits and compute the payslip again, so only timesheet hours are paid.</field>
+        <field name="country_id" ref="base.ge"/>
+        <field name="warning_color_class">danger</field>
+        <field name="warning_type">python</field>
+        <field name="model_id" ref="hr_payroll.model_hr_payslip"/>
+        <field name="display_on_dashboard" eval="True"/>
+        <field name="display_on_model" eval="True"/>
+        <field name="block_payslips" eval="True"/>
+        <field name="evaluation_code">
+payslips = self.env['hr.payslip'].search([
+    ('state', '=', 'draft'),
+    ('company_id', 'in', self.env.companies.ids),
+    ('struct_id.country_id', '=', self.country_id.id),
+] + ([('id', 'in', records.ids)] if records else []))
+warning_records = payslips._gec_timesheet_base_slips()
+        </field>
+    </record>
+</odoo>

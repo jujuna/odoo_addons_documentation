@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Template for WHT certificate numbering: _ge_gec_apply_maintenance copies it per company
+     and points that company's WHT taxes to it (withholding_sequence_id). -->
+<odoo>
+  <data noupdate="1">
+    <record id="seq_ge_wht" model="ir.sequence">
+      <field name="name">Georgian Withholding Tax Certificate</field>
+      <field name="code">l10n.ge.wht.certificate</field>
+      <field name="prefix">WHT/%(year)s/</field>
+      <field name="padding">5</field>
+      <field name="company_id" eval="False"/>
+    </record>
+  </data>
+</odoo>

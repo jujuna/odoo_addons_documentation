@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_gec_margin_component_list" model="ir.ui.view">
+        <field name="name">gec.margin.component.list</field>
+        <field name="model">gec.margin.component</field>
+        <field name="arch" type="xml">
+            <list string="Margin Components" editable="bottom" open_form_view="True">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="nature"/>
+                <field name="cost_level" optional="show"/>
+                <field name="allocatable" widget="boolean_toggle"/>
+                <field name="is_function" optional="hide"/>
+                <field name="function_reclassify" optional="hide"/>
+                <field name="level_ids" widget="many2many_tags" optional="show"/>
+                <field name="account_count" string="Accounts"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_gec_margin_component_form" model="ir.ui.view">
+        <field name="name">gec.margin.component.form</field>
+        <field name="model">gec.margin.component</field>
+        <field name="arch" type="xml">
+            <form string="Margin Component">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_accounts" type="object"
+                                class="oe_stat_button" icon="view_list">
+                            <field name="account_count" widget="statinfo" string="Accounts"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Personnel"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="active" invisible="1"/>
+                            <field name="code" placeholder="personnel"/>
+                            <field name="nature"/>
+                            <field name="cost_level"/>
+                            <field name="allocatable"
+                                   readonly="cost_level == 'facility'"/>
+                            <div class="text-muted" colspan="2"
+                                 invisible="cost_level != 'facility'">
+                                Facility level cost is never allocated. It stays
+                                visible below the margin ladder, where it belongs.
+                            </div>
+                        </group>
+                        <group>
+                            <field name="level_ids" widget="many2many_tags"
+                                   options="{'no_create': True}"/>
+                            <field name="is_function" invisible="nature != 'cost'"/>
+                            <field name="function_reclassify"
+                                   invisible="nature != 'cost' or is_function"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Classification Rules" name="rules">
+                            <p class="text-muted">
+                                Accounts matching one of these rules resolve to this
+                                component without being tagged individually. Rules are
+                                tried across all components in sequence order and the
+                                first match wins. A code prefix matches every company's
+                                chart at once.
+                            </p>
+                            <field name="classification_rule_ids">
+                                <list editable="bottom" open_form_view="True">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="code_prefix"/>
+                                    <field name="account_type"/>
+                                    <field name="company_ids" widget="many2many_tags"
+                                           groups="base.group_multi_company"
+                                           options="{'no_create': True}"/>
+                                    <button name="action_apply_now" type="object"
+                                            string="Apply" icon="play_arrow"
+                                            title="Classify every account that has no component set"/>
+                                </list>
+                            </field>
+                            <div class="mt-2">
+                                <button name="action_gec_open_all_rules" type="object"
+                                        string="See all rules in precedence order"
+                                        class="btn-link" icon="format_list_numbered"/>
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_gec_margin_component" model="ir.actions.act_window">
+        <field name="name">Margin Components</field>
+        <field name="res_model">gec.margin.component</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define a margin component</p>
+            <p>
+                A component is a line of your P&amp;L — Revenue, Direct Cost,
+                Personnel, Overhead. It decides which margin levels an account's
+                amounts reach, and whether cost on it can be allocated.
+            </p>
+        </field>
+    </record>
+
+    <record id="view_gec_margin_classification_rule_list" model="ir.ui.view">
+        <field name="name">gec.margin.classification.rule.list</field>
+        <field name="model">gec.margin.classification.rule</field>
+        <field name="arch" type="xml">
+            <list string="Classification Rules" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="code_prefix"/>
+                <field name="account_type"/>
+                <field name="component_id"/>
+                <field name="company_ids" widget="many2many_tags"
+                       groups="base.group_multi_company" optional="hide"/>
+                <button name="action_apply_now" type="object" string="Apply Rules"
+                        icon="play_arrow" title="Classify every account that has no component set"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_gec_margin_classification_rule" model="ir.actions.act_window">
+        <field name="name">Account Classification</field>
+        <field name="res_model">gec.margin.classification.rule</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add a classification rule</p>
+            <p>
+                Rules classify accounts automatically, so individual accounts
+                rarely need tagging. Match on account type, on a code prefix, or
+                both. First match in sequence order wins, and an account with an
+                explicit component always keeps it.
+            </p>
+        </field>
+    </record>
+
+</odoo>

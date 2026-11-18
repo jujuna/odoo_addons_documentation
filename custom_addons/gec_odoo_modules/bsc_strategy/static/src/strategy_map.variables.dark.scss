@@ -1,0 +1,29 @@
+// Dark mode: Odoo inverts its greys but brand colours do not follow, so each brand hue is lifted for a dark ground.
+
+// Dark background: text WHITE, accents ORANGE / YELLOW, sub-accent TEAL_BRIGHT.
+$bsc-name-color:          #FFFFFF;
+$bsc-name-color-critical: #FFFFFF;
+
+$bsc-green-text: lighten(#049978, 22%);
+$bsc-amber-text: #F0B91C;
+// Lifted further than the light theme: on TEAL_DARK, 14% only reaches 2.9:1.
+$bsc-red-text:   lighten(#F05324, 20%);
+$bsc-grey-text:  mix(#153749, #ffffff, 38%);
+
+// Stripes and dots: teal is lifted a little so On Track does not sink into the background.
+$bsc-green: lighten(#049978, 10%);
+$bsc-amber: #F0B91C;
+$bsc-red:   #F05324;
+$bsc-grey:  mix(#153749, #ffffff, 34%);
+
+$bsc-accent:      lighten(#F05324, 8%);
+$bsc-accent-soft: lighten(#049978, 16%);
+
+// Unchanged: the cards are TEAL_DARK in both themes.
+
+// Same roles, lifted; headings use a lightened TEAL_BRIGHT as TEAL_DARK is unreadable here.
+$bsc-panel-heading: lighten(#049978, 20%);
+$bsc-panel-body:    mix(#ffffff, #153749, 88%);
+$bsc-panel-muted:   mix(#ffffff, #153749, 60%);
+$bsc-panel-tint:    rgba(#049978, .16);
+$bsc-panel-rule:    rgba(#ffffff, .18);

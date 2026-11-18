@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_tax_form_ge_withholding" model="ir.ui.view">
+        <field name="name">account.tax.form.ge.withholding</field>
+        <field name="model">account.tax</field>
+        <field name="inherit_id" ref="l10n_account_withholding_tax.view_tax_form"/>
+        <field name="arch" type="xml">
+            <field name="is_withholding_tax" position="attributes">
+                <attribute name="invisible" add="gec_is_withholding" separator=" or "/>
+            </field>
+            <field name="is_withholding_tax" position="after">
+                <field name="gec_is_withholding"/>
+            </field>
+        </field>
+    </record>
+</odoo>

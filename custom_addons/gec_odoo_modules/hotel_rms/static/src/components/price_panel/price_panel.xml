@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="hotel_rms.PricePanel">
+        <aside class="o_rms_panel" t-att-class="{ o_rms_sheet_full: this.state.full }" role="dialog"
+               aria-label="Price details" t-ref="this.root">
+            <t t-set="data" t-value="this.state.data"/>
+            <div t-if="!this.props.embedded" class="o_rms_handle d-md-none" t-on-pointerdown="this.onHandleDown"
+                 t-on-pointermove="this.onHandleMove" t-on-pointerup="this.onHandleUp"/>
+            <header class="o_rms_panel_header">
+                <div class="o_rms_min0">
+                    <div t-if="this.props.review" class="o_rms_progress" t-out="this.progress"/>
+                    <h2 class="o_rms_panel_title" t-out="this.title"/>
+                    <div class="text-muted" t-out="data.property"/>
+                </div>
+                <button t-if="!this.props.embedded" type="button" class="btn-close" aria-label="Close"
+                        t-on-click="this.props.onClose"/>
+            </header>
+
+            <section class="o_rms_panel_section">
+                <div class="o_rms_hero">
+                    <PriceChange recommended="this.shown" current="data.current" currency="this.props.currency"/>
+                    <span t-attf-class="o_rms_badge o_rms_badge_{{ data.state }}" t-out="this.stateLabel"/>
+                </div>
+                <div t-if="data.current" class="text-muted mt-1">Current <t t-out="this.price(data.current)"/></div>
+                <div t-if="data.has_season" class="mt-3">
+                    <PricePosition min="data.season_min" max="data.season_max" current="data.current"
+                                   target="data.target" recommended="data.recommended"
+                                   currency="this.props.currency"/>
+                </div>
+            </section>
+
+            <section t-if="this.props.review" class="o_rms_panel_section d-flex gap-2">
+                <button type="button" class="btn btn-secondary" t-att-disabled="this.props.review.position === 1"
+                        t-on-click="this.props.onPrevious">
+                    <i class="oi me-1" data-icon="skip_previous"/>Previous
+                </button>
+                <button type="button" class="btn btn-secondary" t-on-click="this.props.onSkip">
+                    Skip<i class="oi ms-1" data-icon="skip_next"/>
+                </button>
+            </section>
+
+            <section t-if="this.hasActions" class="o_rms_panel_section o_rms_actions">
+                <div class="d-flex flex-wrap gap-2">
+                    <button t-if="data.actions.accept" type="button" class="btn btn-primary"
+                            t-att-disabled="this.props.busy" t-on-click="() => this.run('action_accept')">
+                        <i t-if="this.props.busy === 'action_accept'" class="oi oi-spin me-1" data-icon="progress_activity"/>
+                        <i t-else="" class="oi me-1" data-icon="check"/>
+                        <t t-if="this.props.review">Accept &amp; next</t>
+                        <t t-else="">Accept</t>
+                    </button>
+                    <button t-if="data.actions.reject" type="button" class="btn btn-secondary"
+                            t-att-disabled="this.props.busy" t-on-click="() => this.run('action_reject')">Reject</button>
+                    <button t-if="data.actions.undo" type="button" class="btn btn-secondary"
+                            t-att-disabled="this.props.busy" t-on-click="() => this.props.onAction('action_undo')">Undo</button>
+                    <button t-if="data.actions.lock" type="button" class="btn btn-secondary"
+                            t-att-disabled="this.props.busy" t-on-click="() => this.run('action_lock')">
+                        <i class="oi me-1" data-icon="lock"/>Lock
+                    </button>
+                    <button t-if="data.actions.unlock" type="button" class="btn btn-secondary"
+                            t-att-disabled="this.props.busy" t-on-click="() => this.props.onAction('action_unlock')">Unlock</button>
+                </div>
+                <div t-if="data.actions.use_my_price and data.recommended" class="d-flex flex-wrap gap-2 mt-3">
+                    <button t-foreach="this.quickPcts" t-as="quick" t-key="quick.pct" type="button"
+                            class="btn btn-secondary flex-fill" t-att-disabled="this.props.busy"
+                            t-on-click="() => this.run('action_quick_price', [quick.pct])"
+                            t-out="quick.label"/>
+                </div>
+                <form t-if="data.actions.use_my_price" class="mt-2" t-on-submit.prevent="this.useMyPrice">
+                    <div class="d-flex gap-2">
+                        <input type="number" inputmode="decimal" step="any" min="0" class="form-control" placeholder="My price"
+                               aria-label="My price" t-model.proxy="this.state.ownRate"/>
+                        <button type="submit" class="btn btn-secondary text-nowrap" t-att-disabled="this.props.busy">Use my price</button>
+                    </div>
+                    <input type="text" class="form-control mt-2" placeholder="Note for the history (optional)"
+                           aria-label="Note for the history" t-model.proxy="this.state.note"/>
+                </form>
+                <button t-if="!this.showDetails" type="button" class="btn btn-link p-0 mt-2"
+                        t-on-click="this.expand">Show details</button>
+            </section>
+
+            <section t-if="this.showDetails" class="o_rms_panel_section o_rms_panel_why">
+                <h3 class="o_rms_panel_heading">Why this price</h3>
+                <ul class="o_rms_sentences">
+                    <li t-foreach="data.sentences" t-as="sentence" t-key="sentence_index" t-out="sentence"/>
+                </ul>
+                <Waterfall t-if="data.steps.length" rows="data.steps" base="data.base" total="data.total"
+                           currency="this.props.currency"/>
+            </section>
+
+            <section t-if="data.forecast and this.showDetails" class="o_rms_panel_section o_rms_panel_forecast">
+                <h3 class="o_rms_panel_heading">Forecast</h3>
+                <dl class="o_rms_facts">
+                    <dt>Already booked</dt>
+                    <dd t-out="this.booked"/>
+                    <dt>Forecast occupancy</dt>
+                    <dd t-out="this.occupancy"/>
+                    <dt>Bookings vs usual</dt>
+                    <dd t-out="this.pace"/>
+                    <dt>Days left</dt>
+                    <dd t-out="this.daysLeft"/>
+                    <dt>Confidence</dt>
+                    <dd t-out="this.confidence"/>
+                </dl>
+                <div class="mt-3">
+                    <PaceChart points="data.pace_points"/>
+                </div>
+            </section>
+
+            <section t-if="data.history.length and this.showDetails" class="o_rms_panel_section">
+                <h3 class="o_rms_panel_heading">History</h3>
+                <ul class="o_rms_history">
+                    <li t-foreach="data.history" t-as="item" t-key="item_index">
+                        <div><span class="fw-semibold" t-out="item.action"/> · <t t-out="item.user"/></div>
+                        <div class="text-muted">
+                            <t t-out="this.historyDate(item.date)"/> · <t t-out="this.price(item.old_rate)"/>
+                            <i class="oi mx-1" data-icon="arrow_forward" title="to"/> <t t-out="this.price(item.new_rate)"/>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
+            <footer t-if="this.showDetails and !this.props.embedded" class="o_rms_panel_section">
+                <button type="button" class="btn btn-link p-0" t-on-click="this.openRecord">Open full record</button>
+            </footer>
+        </aside>
+    </t>
+
+    <t t-name="hotel_rms.PricePanelWidget">
+        <div class="o_rms_price_form_panel">
+            <PricePanel t-if="this.props.record.resId" t-key="this.state.version"
+                        priceId="this.props.record.resId" currency="this.currency" busy="this.state.busy"
+                        embedded="true" onAction="(method, args) => this.act(method, args)"
+                        onSkip="this.noop" onPrevious="this.noop" onClose="this.noop"/>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,2027 @@
+# Georgian translation of the Odoo addon account_peppol, kept in gec_i18n_accounting.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-25 17:37+0000\n"
+"PO-Revision-Date: 2026-09-30 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian (ka_GE)\n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/account_move_send_wizard.py:0
+msgid " (Customer not on Peppol)"
+msgstr " (მომხმარებელი არ არის Peppol-ზე)"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/account_move_send_wizard.py:0
+msgid " (Demo)"
+msgstr " (დემო)"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/account_move_send_wizard.py:0
+msgid " (Test)"
+msgstr " (ტესტი)"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/account_move_send_wizard.py:0
+msgid " (no VAT)"
+msgstr " (დღგ-ის გარეშე)"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_registration.py:0
+msgid " Expected format: %(expected_format)s."
+msgstr " მოსალოდნელი ფორმატი: %(expected_format)s."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/account_move_send_wizard.py:0
+msgid "%(peppol_label)s%(disable_reason)s%(peppol_proxy_mode)s"
+msgstr "%(peppol_label)s%(disable_reason)s%(peppol_proxy_mode)s"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_move_send.py:0
+msgid "%s has requested electronic invoices reception on Peppol."
+msgstr "%s-მა მოითხოვა ელექტრონული ანგარიშ-ფაქტურების მიღება Peppol-ზე."
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.mail_notification_layout_with_responsible_signature_and_peppol
+msgid ""
+"<br/>\n"
+"                                In Belgium, electronic invoicing is <u>mandatory as of January 2026</u> - don't wait to register."
+msgstr ""
+"<br/>\n"
+"                                ბელგიაში ელექტრონული ანგარიშ-ფაქტურირება <u>სავალდებულოა 2026 წლის იანვრიდან</u> — არ დააყოვნოთ რეგისტრაცია."
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.res_config_settings_view_form
+msgid ""
+"<br/>\n"
+"                            But you are receiving your e-invoices via this Access Point:"
+msgstr ""
+"<br/>\n"
+"                            მაგრამ თქვენ იღებთ თქვენს ელექტრონულ ანგარიშ-ფაქტურებს ამ წვდომის წერტილის (Access Point) მეშვეობით:"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.res_config_settings_view_form
+msgid "<span><strong>Disconnected from Peppol!</strong></span>"
+msgstr "<span><strong>Peppol-თან კავშირი გაწყვეტილია!</strong></span>"
+
+#. module: account_peppol
+#: model:mail.template,body_html:account_peppol.mail_template_peppol_registration
+msgid ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;\">\n"
+"    <tr>\n"
+"        <td align=\"center\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"padding: 16px; background-color: white; color: #454748; border-collapse:separate;\">\n"
+"                <!-- HEADER -->\n"
+"                <tr>\n"
+"                    <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                        <table width=\"590\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding: 0px 8px; background-color: white; border-collapse:separate;\">\n"
+"                            <tr>\n"
+"                                <td valign=\"middle\">\n"
+"                                    <span style=\"font-size: 10px;\">Notification</span>\n"
+"                                    <br/>\n"
+"                                    <span style=\"font-size: 20px; font-weight: bold;\">\n"
+"                                        Welcome to Peppol\n"
+"                                    </span>\n"
+"                                    <div style=\"margin-bottom: 5px; margin-top: 18px;\">\n"
+"                                        <a t-attf-href=\"/odoo/accounting/\" target=\"_blank\" t-attf-style=\"padding: 8px 12px; font-size: 12px; color: {{ object.email_primary_color or '#FFFFFF' }}; text-decoration: none !important; font-weight: 400; background-color: {{ object.email_secondary_color or '#875A7B' }}; border-radius:3px\">\n"
+"                                            Send invoices\n"
+"                                        </a>\n"
+"                                    </div>\n"
+"                                </td>\n"
+"                                <td valign=\"middle\" align=\"right\">\n"
+"                                    <t t-if=\"not object.uses_default_logo\">\n"
+"                                        <img t-att-src=\"'/logo.png?company=%s' % object.id\" style=\"height: auto; width: 80px; margin-right: 10px;\" t-att-alt=\"'%s' % object.name\"/>\n"
+"                                    </t>\n"
+"                                </td>\n"
+"                            </tr>\n"
+"                            <tr>\n"
+"                                <td colspan=\"2\" style=\"text-align:center;\">\n"
+"                                    <hr style=\"background-color:#CCCCCC; border:none; height:1px; margin:16px 0;\"/>\n"
+"                                </td>\n"
+"                            </tr>\n"
+"                        </table>\n"
+"                    </td>\n"
+"                </tr>\n"
+"                <!-- BODY -->\n"
+"                <tr>\n"
+"                    <td align=\"center\">\n"
+"                        <table width=\"590\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding: 0px 8px; background-color: white; border-collapse:separate;\">\n"
+"                            <tr>\n"
+"                                <td style=\"font-size: 14px;\">\n"
+"                                    <p>Dear <t t-out=\"object.name or ''\">YourCompany</t>,</p>\n"
+"\n"
+"                                    <p>We have successfully added your company to the <strong>Peppol Network</strong>.</p>\n"
+"\n"
+"                                    <p>You can now <strong>send<t t-if=\"object.account_peppol_proxy_state == 'receiver'\"> and receive</t></strong> electronic invoices via Odoo — completely free of charge.</p>\n"
+"\n"
+"                                    <p>Best regards,</p>\n"
+"\n"
+"                                    <p style=\"margin-bottom: 24px;\">The Odoo Team</p>\n"
+"                                </td>\n"
+"                            </tr>\n"
+"                        </table>\n"
+"                    </td>\n"
+"                </tr>\n"
+"            </table>\n"
+"        </td>\n"
+"    </tr>\n"
+"</table>\n"
+"            "
+msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;\">\n"
+"    <tr>\n"
+"        <td align=\"center\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"padding: 16px; background-color: white; color: #454748; border-collapse:separate;\">\n"
+"                <!-- HEADER -->\n"
+"                <tr>\n"
+"                    <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                        <table width=\"590\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding: 0px 8px; background-color: white; border-collapse:separate;\">\n"
+"                            <tr>\n"
+"                                <td valign=\"middle\">\n"
+"                                    <span style=\"font-size: 10px;\">შეტყობინება</span>\n"
+"                                    <br/>\n"
+"                                    <span style=\"font-size: 20px; font-weight: bold;\">\n"
+"                                        კეთილი იყოს თქვენი მობრძანება Peppol-ში\n"
+"                                    </span>\n"
+"                                    <div style=\"margin-bottom: 5px; margin-top: 18px;\">\n"
+"                                        <a t-attf-href=\"/odoo/accounting/\" target=\"_blank\" t-attf-style=\"padding: 8px 12px; font-size: 12px; color: {{ object.email_primary_color or '#FFFFFF' }}; text-decoration: none !important; font-weight: 400; background-color: {{ object.email_secondary_color or '#875A7B' }}; border-radius:3px\">\n"
+"                                            ანგარიშ-ფაქტურების გაგზავნა\n"
+"                                        </a>\n"
+"                                    </div>\n"
+"                                </td>\n"
+"                                <td valign=\"middle\" align=\"right\">\n"
+"                                    <t t-if=\"not object.uses_default_logo\">\n"
+"                                        <img t-att-src=\"'/logo.png?company=%s' % object.id\" style=\"height: auto; width: 80px; margin-right: 10px;\" t-att-alt=\"'%s' % object.name\"/>\n"
+"                                    </t>\n"
+"                                </td>\n"
+"                            </tr>\n"
+"                            <tr>\n"
+"                                <td colspan=\"2\" style=\"text-align:center;\">\n"
+"                                    <hr style=\"background-color:#CCCCCC; border:none; height:1px; margin:16px 0;\"/>\n"
+"                                </td>\n"
+"                            </tr>\n"
+"                        </table>\n"
+"                    </td>\n"
+"                </tr>\n"
+"                <!-- BODY -->\n"
+"                <tr>\n"
+"                    <td align=\"center\">\n"
+"                        <table width=\"590\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding: 0px 8px; background-color: white; border-collapse:separate;\">\n"
+"                            <tr>\n"
+"                                <td style=\"font-size: 14px;\">\n"
+"                                    <p>ძვირფასო <t t-out=\"object.name or ''\">YourCompany</t>,</p>\n"
+"\n"
+"                                    <p>ჩვენ წარმატებით დავამატეთ თქვენი კომპანია <strong>Peppol-ის ქსელში</strong>.</p>\n"
+"\n"
+"                                    <p>ახლა თქვენ შეგიძლიათ Odoo-ს მეშვეობით <strong>გააგზავნოთ<t t-if=\"object.account_peppol_proxy_state == 'receiver'\"> და მიიღოთ</t></strong> ელექტრონული ანგარიშ-ფაქტურები — სრულიად უფასოდ.</p>\n"
+"\n"
+"                                    <p>პატივისცემით,</p>\n"
+"\n"
+"                                    <p style=\"margin-bottom: 24px;\">Odoo-ს გუნდი</p>\n"
+"                                </td>\n"
+"                            </tr>\n"
+"                        </table>\n"
+"                    </td>\n"
+"                </tr>\n"
+"            </table>\n"
+"        </td>\n"
+"    </tr>\n"
+"</table>\n"
+"            "
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "A Receipt has been received  for a message that was previously sent by the MSH generating this error, but the content does not match the message content (e.g. some part has not been acknowledged, or the digest associated does not match the signature digest, for NRR)."
+msgstr "მიღებულია Receipt იმ შეტყობინებაზე, რომელიც ადრე გაიგზავნა ამ შეცდომის გენერირებული MSH-ის მიერ, მაგრამ შინაარსი არ ემთხვევა შეტყობინების შინაარსს (მაგ., რომელიმე ნაწილი არ დადასტურდა, ან ასოცირებული digest არ ემთხვევა ხელმოწერის digest-ს, NRR-ისთვის)."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "A Receipt has not been received  for a message that was previously sent by the MSH generating this error."
+msgstr "Receipt არ მიღებულა იმ შეტყობინებაზე, რომელიც ადრე გაიგზავნა ამ შეცდომის გენერირებული MSH-ის მიერ."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "A fragment is received but a previously received fragment message had the same values for GroupId and FragmentNum"
+msgstr "მიღებულია ფრაგმენტი, მაგრამ ადრე მიღებულ ფრაგმენტის შეტყობინებას ჰქონდა იგივე მნიშვნელობები GroupId-სა და FragmentNum-ისთვის"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "A fragment is received but more than one fragment message in a group of fragments specifies a value for a compression element."
+msgstr "მიღებულია ფრაგმენტი, მაგრამ ფრაგმენტების ჯგუფში ერთზე მეტი ფრაგმენტის შეტყობინება მიუთითებს მნიშვნელობას შეკუმშვის ელემენტისთვის."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "A fragment is received but more than one fragment message in a group of fragments specifies a value for this element."
+msgstr "მიღებულია ფრაგმენტი, მაგრამ ფრაგმენტების ჯგუფში ერთზე მეტი ფრაგმენტის შეტყობინება მიუთითებს მნიშვნელობას ამ ელემენტისთვის."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "A fragment is received that relates to a group that was previously rejected."
+msgstr "მიღებულია ფრაგმენტი, რომელიც უკავშირდება ჯგუფს, რომელიც ადრე იქნა უარყოფილი."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "A message unit in a bundle was not processed because a related message unit in the bundle caused an error."
+msgstr "შეკვრაში (bundle) შეტყობინების ერთეული არ დამუშავდა, რადგან შეკვრაში დაკავშირებულმა შეტყობინების ერთეულმა გამოიწვია შეცდომა."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/res_company.py:0
+msgid "A participant with these details has already been registered on the network. If you have previously registered to a Peppol service, please deregister."
+msgstr "ამ მონაცემების მქონე მონაწილე უკვე დარეგისტრირებულია ქსელში. თუ ადრე დარეგისტრირდით Peppol-ის სერვისზე, გთხოვთ, მოხსნათ რეგისტრაცია."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/res_company.py:0
+msgid "A purchase journal must be used to receive Peppol documents."
+msgstr "Peppol-ის დოკუმენტების მისაღებად უნდა გამოიყენებოდეს შესყიდვების ჟურნალი."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "A responding MSH indicates that it applies the alternate MEP binding to the response message."
+msgstr "მოპასუხე MSH მიუთითებს, რომ ის იყენებს ალტერნატიულ MEP-ის მიბმას საპასუხო შეტყობინებაზე."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "A value is set for FragmentCount, but a previously received fragment had a greature value."
+msgstr "მითითებულია მნიშვნელობა FragmentCount-ისთვის, მაგრამ ადრე მიღებულ ფრაგმენტს ჰქონდა უფრო დიდი მნიშვნელობა."
+
+#. module: account_peppol
+#: model:ir.model,name:account_peppol.model_account_edi_proxy_client_user
+msgid "Account EDI proxy user"
+msgstr "EDI პროქსის მომხმარებლის ანგარიში"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_res_config_settings__account_peppol_contact_email
+msgid "Account Peppol Contact Email"
+msgstr "Peppol-ის ანგარიშის საკონტაქტო ელფოსტა"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_res_company__account_peppol_edi_user model:ir.model.fields,field_description:account_peppol.field_res_config_settings__account_peppol_edi_user
+msgid "Account Peppol Edi User"
+msgstr "Peppol-ის ანგარიშის EDI მომხმარებელი"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_account_journal__is_peppol_journal
+msgid "Account used for Peppol"
+msgstr "Peppol-ისთვის გამოყენებული ანგარიში"
+
+#. module: account_peppol
+#. odoo-javascript
+#: code:addons/account_peppol/static/src/components/peppol_info/peppol_info.js:0
+msgid "Activate"
+msgstr "გააქტიურება"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_registration.py:0
+msgid "Activate Electronic Invoicing (via Peppol)"
+msgstr "ელექტრონული ანგარიშ-ფაქტურირების გააქტიურება (Peppol-ის მეშვეობით)"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_journal.py:0 model_terms:ir.ui.view,arch_db:account_peppol.peppol_registration_form model_terms:ir.ui.view,arch_db:account_peppol.res_config_settings_view_form
+msgid "Activate Peppol"
+msgstr "Peppol-ის გააქტიურება"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_registration_form
+msgid "Activate Peppol (Demo)"
+msgstr "Peppol-ის გააქტიურება (დემო)"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_registration_form
+msgid "Activate Peppol (Test)"
+msgstr "Peppol-ის გააქტიურება (ტესტი)"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.res_config_settings_view_form
+msgid "Allow sending and receiving invoices through the Peppol network"
+msgstr "ანგარიშ-ფაქტურების გაგზავნისა და მიღების ნების დართვა Peppol-ის ქსელის მეშვეობით"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "Although the message document is well formed and schema valid, some element/attribute contains a value that could not be recognized and therefore could not be used by the MSH."
+msgstr "მიუხედავად იმისა, რომ შეტყობინების დოკუმენტი სწორად არის ფორმირებული და ვალიდურია სქემის მიხედვით, რომელიმე ელემენტი/ატრიბუტი შეიცავს მნიშვნელობას, რომელიც ვერ ამოიცნო და ამიტომ ვერ გამოიყენა MSH-მა."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "Although the message document is well formed and schema valid, some element/attribute value cannot be processed as expected because the related feature is not supported by the MSH."
+msgstr "მიუხედავად იმისა, რომ შეტყობინების დოკუმენტი სწორად არის ფორმირებული და ვალიდურია სქემის მიხედვით, რომელიმე ელემენტის/ატრიბუტის მნიშვნელობა ვერ მუშავდება მოსალოდნელად, რადგან შესაბამის ფუნქციას MSH არ უჭერს მხარს."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "Although the message document is well formed and schema valid, some element/attribute value is inconsistent either with the content of other element/attribute, or with the processing mode of the MSH, or with the normative requirements of the ebMS specification."
+msgstr "მიუხედავად იმისა, რომ შეტყობინების დოკუმენტი სწორად არის ფორმირებული და ვალიდურია სქემის მიხედვით, რომელიმე ელემენტის/ატრიბუტის მნიშვნელობა შეუსაბამოა სხვა ელემენტის/ატრიბუტის შინაარსთან, ან MSH-ის დამუშავების რეჟიმთან, ან ebMS სპეციფიკაციის ნორმატიულ მოთხოვნებთან."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "Although the message document is well formed and schema valid, the presence or absence of some element/ attribute is not consistent with the capability of the MSH, with respect to supported features."
+msgstr "მიუხედავად იმისა, რომ შეტყობინების დოკუმენტი სწორად არის ფორმირებული და ვალიდურია სქემის მიხედვით, რომელიმე ელემენტის/ატრიბუტის არსებობა ან არარსებობა შეუსაბამოა MSH-ის შესაძლებლობებთან მხარდაჭერილი ფუნქციების მიმართ."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "Although the message was sent under Guaranteed delivery requirement, the Reliability module could not get assurance that the message was properly delivered, in spite of resending efforts."
+msgstr "მიუხედავად იმისა, რომ შეტყობინება გაიგზავნა გარანტირებული მიწოდების მოთხოვნით, საიმედოობის (Reliability) მოდულმა ვერ მიიღო რწმუნება, რომ შეტყობინება სათანადოდ მიეწოდა, განმეორებითი გაგზავნის მცდელობების მიუხედავად."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "An Intermediary MSH was unable to route an ebMS message and stopped processing the message."
+msgstr "შუამავალმა MSH-მა ვერ შეძლო ebMS შეტყობინების მარშრუტიზაცია და შეწყვიტა შეტყობინების დამუშავება."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "An MSH has determined that the message is expired and will not attempt to forward or deliver it."
+msgstr "MSH-მა დაადგინა, რომ შეტყობინების ვადა ამოიწურა და არ შეეცდება მის გადაგზავნას ან მიწოდებას."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "An entry in the routing function is matched that assigns the message to an MPC for pulling, but the intermediary MSH is unable to store the message with this MPC"
+msgstr "მარშრუტიზაციის ფუნქციაში ემთხვევა ჩანაწერი, რომელიც შეტყობინებას ანიჭებს MPC-ს გამოსაძახად (pulling), მაგრამ შუამავალ MSH-ს არ შეუძლია შეტყობინების შენახვა ამ MPC-ით"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "An error occurred during the decompression."
+msgstr "შეცდომა მოხდა დეკომპრესიის დროს."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "An error occurred while decompressing the reassembled message."
+msgstr "შეცდომა მოხდა ხელახლა აწყობილი შეტყობინების დეკომპრესიის დროს."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "An incoming message fragment has a a value greater than the known FragmentCount."
+msgstr "შემომავალ შეტყობინების ფრაგმენტს აქვს ცნობილ FragmentCount-ზე დიდი მნიშვნელობა."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "An intermediary MSH has assigned the message to an MPC for pulling and has successfully stored it. However the intermediary set a limit on the time it was prepared to wait for the message to be pulled, and that limit has been reached."
+msgstr "შუამავალმა MSH-მა შეტყობინება მიანიჭა MPC-ს გამოსაძახად (pulling) და წარმატებით შეინახა იგი. თუმცა შუამავალმა დააწესა ლიმიტი იმ დროზე, რომლის მოცდასაც აპირებდა შეტყობინების გამოძახებამდე, და ეს ლიმიტი მიღწეულია."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "An internal error occurred"
+msgstr "მოხდა შიდა შეცდომა"
+
+#. module: account_peppol
+#. odoo-javascript
+#: code:addons/account_peppol/static/src/components/peppol_auth/peppol_auth_service.js:0
+msgid "Authentication failed"
+msgstr "ავთენტიფიკაცია ვერ მოხერხდა"
+
+#. module: account_peppol
+#. odoo-javascript
+#: code:addons/account_peppol/static/src/components/peppol_auth/peppol_auth_service.js:0
+msgid "Authentication successful"
+msgstr "ავთენტიფიკაცია წარმატებულია"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_res_partner__available_peppol_edi_formats model:ir.model.fields,field_description:account_peppol.field_res_users__available_peppol_edi_formats
+msgid "Available Peppol Edi Formats"
+msgstr "ხელმისაწვდომი Peppol EDI ფორმატები"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_res_partner__available_peppol_sending_methods model:ir.model.fields,field_description:account_peppol.field_res_users__available_peppol_sending_methods
+msgid "Available Peppol Sending Methods"
+msgstr "ხელმისაწვდომი Peppol-ის გაგზავნის მეთოდები"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_registration_form
+msgid "By clicking the button below:"
+msgstr "ქვემოთ მოცემულ ღილაკზე დაჭერით:"
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__res_company__account_peppol_proxy_state__receiver
+msgid "Can send and receive"
+msgstr "შეუძლია გაგზავნა და მიღება"
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__res_company__account_peppol_proxy_state__sender
+msgid "Can send but not receive"
+msgstr "შეუძლია გაგზავნა, მაგრამ არა მიღება"
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__res_company__account_peppol_proxy_state__smp_registration
+msgid "Can send, pending registration to receive"
+msgstr "შეუძლია გაგზავნა, მიღების რეგისტრაცია მოლოდინში"
+
+#. module: account_peppol
+#. odoo-javascript
+#: code:addons/account_peppol/static/src/web/account_move_list_controller.js:0
+msgid "Cancel"
+msgstr "გაუქმება"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_edi_proxy_user.py:0 code:addons/account_peppol/wizard/peppol_registration.py:0
+msgid "Cannot register a user with a %s application"
+msgstr "არ შეიძლება მომხმარებლის რეგისტრაცია %s აპლიკაციით"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_move_send.py:0
+msgid "Check Partner(s)"
+msgstr "პარტნიორ(ებ)ის შემოწმება"
+
+#. module: account_peppol
+#: model:ir.model,name:account_peppol.model_account_edi_common
+msgid "Common functions for EDI documents: generate the data, the constraints, etc"
+msgstr "საერთო ფუნქციები EDI დოკუმენტებისთვის: მონაცემების, შეზღუდვების და ა.შ. გენერირება"
+
+#. module: account_peppol
+#: model:ir.model,name:account_peppol.model_res_company model:ir.model.fields,field_description:account_peppol.field_account_peppol_response__company_id model:ir.model.fields,field_description:account_peppol.field_peppol_registration__company_id
+msgid "Company"
+msgstr "კომპანია"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_registration__parent_company_name
+msgid "Company Name"
+msgstr "კომპანიის სახელი"
+
+#. module: account_peppol
+#: model:ir.model,name:account_peppol.model_res_config_settings
+msgid "Config Settings"
+msgstr "კონფიგურაციის პარამეტრები"
+
+#. module: account_peppol
+#: model:ir.model,name:account_peppol.model_res_partner
+msgid "Contact"
+msgstr "კონტაქტი"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_registration.py:0
+msgid "Contact email and phone number are required."
+msgstr "საკონტაქტო ელფოსტა და ტელეფონის ნომერი სავალდებულოა."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_registration.py:0
+msgid "Could not connect to Proxy Server."
+msgstr "პროქსი სერვერთან დაკავშირება ვერ მოხერხდა."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "Could not find an XSD with which to validate the document with identifier \"%s\"."
+msgstr "ვერ მოიძებნა XSD, რომლითაც უნდა დავამოწმოთ დოკუმენტი იდენტიფიკატორით \"%s\"."
+
+#. module: account_peppol
+#: model:ir.model,website_form_label:account_peppol.model_res_partner
+msgid "Create a Customer"
+msgstr "მომხმარებლის შექმნა"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_account_peppol_clarification__create_uid model:ir.model.fields,field_description:account_peppol.field_account_peppol_rejection_wizard__create_uid model:ir.model.fields,field_description:account_peppol.field_account_peppol_response__create_uid model:ir.model.fields,field_description:account_peppol.field_peppol_registration__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_account_peppol_clarification__create_date model:ir.model.fields,field_description:account_peppol.field_account_peppol_rejection_wizard__create_date model:ir.model.fields,field_description:account_peppol.field_account_peppol_response__create_date model:ir.model.fields,field_description:account_peppol.field_peppol_registration__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_move_send.py:0
+msgid "Customer is on Peppol but did not enable receiving documents."
+msgstr "მომხმარებელი Peppol-ზეა, მაგრამ არ ჩაურთავს დოკუმენტების მიღება."
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__peppol_registration__edi_mode__demo
+msgid "Demo"
+msgstr "დემო"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.res_config_settings_view_form
+msgid "Disconnect"
+msgstr "კავშირის გაწყვეტა"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.res_config_settings_view_form
+msgid "Disconnect Peppol"
+msgstr "Peppol-თან კავშირის გაწყვეტა"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.res_config_settings_view_form
+msgid "Disconnect this database"
+msgstr "ამ მონაცემთა ბაზის გათიშვა"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/res_config_settings.py:0
+msgid "Disconnected this branch company peppol configuration from %s."
+msgstr "ამ ფილიალი კომპანიის Peppol-ის კონფიგურაცია გაითიშა %s-ისგან."
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_registration__display_itsme_login
+msgid "Display Itsme Login"
+msgstr "Itsme-ით შესვლის ჩვენება"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_account_edi_common__display_name model:ir.model.fields,field_description:account_peppol.field_account_edi_proxy_client_user__display_name model:ir.model.fields,field_description:account_peppol.field_account_edi_ubl__display_name model:ir.model.fields,field_description:account_peppol.field_account_journal__display_name model:ir.model.fields,field_description:account_peppol.field_account_move__display_name model:ir.model.fields,field_description:account_peppol.field_account_move_send__display_name model:ir.model.fields,field_description:account_peppol.field_account_move_send_batch_wizard__display_name model:ir.model.fields,field_description:account_peppol.field_account_move_send_wizard__display_name model:ir.model.fields,field_description:account_peppol.field_account_peppol_clarification__display_name model:ir.model.fields,field_description:account_peppol.field_account_peppol_rejection_wizard__display_name model:ir.model.fields,field_description:account_peppol.field_account_peppol_response__display_name model:ir.model.fields,field_description:account_peppol.field_peppol_registration__display_name model:ir.model.fields,field_description:account_peppol.field_res_company__display_name model:ir.model.fields,field_description:account_peppol.field_res_config_settings__display_name model:ir.model.fields,field_description:account_peppol.field_res_partner__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_registration__display_no_auth_buttons
+msgid "Display No Auth Buttons"
+msgstr "ავთენტიფიკაციის გარეშე ღილაკების ჩვენება"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_registration__display_use_parent_connection_selection
+msgid "Display Use Parent Connection Selection"
+msgstr "მშობელი კავშირის არჩევის ჩვენება"
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__account_move__peppol_move_state__done model:ir.model.fields.selection,name:account_peppol.selection__account_peppol_response__peppol_state__done
+msgid "Done"
+msgstr "შესრულდა"
+
+#. module: account_peppol
+#. odoo-javascript
+#: code:addons/account_peppol/static/src/components/peppol_info/peppol_info.xml:0
+msgid "E-invoices will soon be mandatory in many countries"
+msgstr "ელექტრონული ანგარიშ-ფაქტურები მალე სავალდებულო გახდება ბევრ ქვეყანაში"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_registration__edi_mode
+msgid "EDI mode"
+msgstr "EDI რეჟიმი"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_res_config_settings__account_peppol_edi_mode
+msgid "EDI operating mode"
+msgstr "EDI-ის ფუნქციონირების რეჟიმი"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_registration__edi_user_id
+msgid "EDI user"
+msgstr "EDI მომხმარებელი"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_res_config_settings__account_peppol_edi_identification
+msgid "Edi Identification"
+msgstr "EDI იდენტიფიკაცია"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_registration_form
+msgid "Email"
+msgstr "ელ-ფოსტა"
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__account_move__peppol_move_state__error model:ir.model.fields.selection,name:account_peppol.selection__account_peppol_response__peppol_state__error
+msgid "Error"
+msgstr "შეცდომა"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_move_send.py:0
+msgid "Errors occurred while creating the EDI document (format: %s):"
+msgstr "EDI დოკუმენტის შექმნისას წარმოიქმნა შეცდომები (ფორმატი: %s):"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/tools/peppol_iap_connector.py:0
+msgid "Failed to connect to Odoo Peppol Proxy."
+msgstr "Odoo Peppol Proxy-თან დაკავშირება ვერ მოხერხდა."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_edi_proxy_user.py:0
+msgid "Failed to connect to Peppol Access Point. This might happen if you restored a database from a backup or copied it without neutralization. To fix this, please go to Settings > Accounting > Peppol Settings and click on 'Reconnect this database'."
+msgstr "Peppol-ის წვდომის წერტილთან (Access Point) დაკავშირება ვერ მოხერხდა. ეს შეიძლება მოხდეს, თუ მონაცემთა ბაზა აღადგინეთ სარეზერვო ასლიდან ან დააკოპირეთ ნეიტრალიზაციის გარეშე. ამის გამოსასწორებლად გთხოვთ, გადახვიდეთ Settings > Accounting > Peppol Settings და დააჭიროთ 'ამ მონაცემთა ბაზის ხელახლა დაკავშირებას'."
+
+#. module: account_peppol
+#. odoo-javascript
+#: code:addons/account_peppol/static/src/components/peppol_info/peppol_info.xml:0
+msgid "Free on Odoo"
+msgstr "უფასოა Odoo-ზე"
+
+#. module: account_peppol
+#. odoo-javascript
+#: code:addons/account_peppol/static/src/components/peppol_info/peppol_info.xml:0
+msgid "Fully automated"
+msgstr "სრულად ავტომატიზებული"
+
+#. module: account_peppol
+#. odoo-javascript
+#: code:addons/account_peppol/static/src/components/peppol_info/peppol_info.js:0
+msgid "Got it !"
+msgstr "გასაგებია!"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_registration_form
+msgid "I accept that Odoo may process my e-invoices,"
+msgstr "ვეთანხმები, რომ Odoo-მ შესაძლოა დაამუშავოს ჩემი ელექტრონული ანგარიშ-ფაქტურები,"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_registration_form
+msgid "I reckon I'm allowed to register this company."
+msgstr "ვფიქრობ, ნებადართული მაქვს ამ კომპანიის რეგისტრაცია."
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_account_edi_common__id model:ir.model.fields,field_description:account_peppol.field_account_edi_proxy_client_user__id model:ir.model.fields,field_description:account_peppol.field_account_edi_ubl__id model:ir.model.fields,field_description:account_peppol.field_account_journal__id model:ir.model.fields,field_description:account_peppol.field_account_move__id model:ir.model.fields,field_description:account_peppol.field_account_move_send__id model:ir.model.fields,field_description:account_peppol.field_account_move_send_batch_wizard__id model:ir.model.fields,field_description:account_peppol.field_account_move_send_wizard__id model:ir.model.fields,field_description:account_peppol.field_account_peppol_clarification__id model:ir.model.fields,field_description:account_peppol.field_account_peppol_rejection_wizard__id model:ir.model.fields,field_description:account_peppol.field_account_peppol_response__id model:ir.model.fields,field_description:account_peppol.field_peppol_registration__id model:ir.model.fields,field_description:account_peppol.field_res_company__id model:ir.model.fields,field_description:account_peppol.field_res_config_settings__id model:ir.model.fields,field_description:account_peppol.field_res_partner__id
+msgid "ID"
+msgstr "ID"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_registration_form
+msgid "If you don't have Itsme, please contact"
+msgstr "თუ Itsme არ გაქვთ, გთხოვთ დაუკავშირდეთ"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/controllers/portal.py:0
+msgid "If you want to be invoiced by Peppol, your configuration must be valid."
+msgstr "თუ გსურთ, რომ Peppol-ის მიერ გამოგეწეროთ ანგარიშ-ფაქტურა, თქვენი კონფიგურაცია უნდა იყოს ვალიდური."
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.res_config_settings_view_form
+msgid "Incoming Accounting Journal"
+msgstr "შემომავალი ბუღალტრული ჟურნალი"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_res_partner__invoice_sending_method model:ir.model.fields,field_description:account_peppol.field_res_users__invoice_sending_method
+msgid "Invoice sending"
+msgstr "ანგარიშ-ფაქტურის გაგზავნა"
+
+#. module: account_peppol
+#: model:ir.model,name:account_peppol.model_account_journal
+msgid "Journal"
+msgstr "ჟურნალი"
+
+#. module: account_peppol
+#: model:ir.model,name:account_peppol.model_account_move
+msgid "Journal Entry"
+msgstr "ბუღალტრული გატარება"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_account_peppol_clarification__write_uid model:ir.model.fields,field_description:account_peppol.field_account_peppol_rejection_wizard__write_uid model:ir.model.fields,field_description:account_peppol.field_account_peppol_response__write_uid model:ir.model.fields,field_description:account_peppol.field_peppol_registration__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_account_peppol_clarification__write_date model:ir.model.fields,field_description:account_peppol.field_account_peppol_rejection_wizard__write_date model:ir.model.fields,field_description:account_peppol.field_account_peppol_response__write_date model:ir.model.fields,field_description:account_peppol.field_peppol_registration__write_date
+msgid "Last Updated on"
+msgstr "ბოლოს განახლდა"
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__peppol_registration__edi_mode__prod
+msgid "Live"
+msgstr "ცოცხალი"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "Message properties were present in the fragment SOAP header that were not specified in %s"
+msgstr "ფრაგმენტის SOAP სათაურში მითითებული იყო შეტყობინების თვისებები, რომლებიც არ იყო განსაზღვრული %s-ში"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_res_company__account_peppol_migration_key model:ir.model.fields,field_description:account_peppol.field_res_config_settings__account_peppol_migration_key
+msgid "Migration Key"
+msgstr "მიგრაციის გასაღები"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_registration__phone_number model:ir.model.fields,field_description:account_peppol.field_res_company__account_peppol_phone_number model:ir.model.fields,field_description:account_peppol.field_res_config_settings__account_peppol_phone_number
+msgid "Mobile number"
+msgstr "მობილურის ნომერი"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "More time than %s has passed since the first fragment was received but not all other fragments are received."
+msgstr "%s-ზე მეტი დრო გავიდა პირველი ფრაგმენტის მიღების შემდეგ, მაგრამ ყველა დანარჩენი ფრაგმენტი არ არის მიღებული."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "No UBL document was provided to the Peppol Outbound Service."
+msgstr "Peppol-ის გამავალ სერვისს UBL დოკუმენტი არ მიეწოდა."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "No valid AS4 participant endpoint were found."
+msgstr "ვალიდური AS4 მონაწილის ბოლოწერტილი ვერ მოიძებნა."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "Not enough disk space available to store all (expected) fragments of the group."
+msgstr "ჯგუფის ყველა (მოსალოდნელი) ფრაგმენტის შესანახად საკმარისი დისკის სივრცე არ არის ხელმისაწვდომი."
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__res_company__account_peppol_proxy_state__not_registered
+msgid "Not registered"
+msgstr "არ არის რეგისტრირებული"
+
+#. module: account_peppol
+#: model:mail.template,description:account_peppol.mail_template_peppol_registration
+msgid "Notification email for peppol registration state update"
+msgstr "შეტყობინების ელფოსტა peppol რეგისტრაციის მდგომარეობის განახლებისთვის"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.mail_notification_layout_with_responsible_signature_and_peppol
+msgid "Odoo"
+msgstr "Odoo"
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__res_partner__routing_scheme__odemo
+msgid "Odoo Demo ID"
+msgstr "Odoo დემო ID"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "Other"
+msgstr "სხვა"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_account_journal__account_peppol_proxy_state model:ir.model.fields,field_description:account_peppol.field_peppol_registration__account_peppol_proxy_state model:ir.model.fields,field_description:account_peppol.field_res_company__account_peppol_proxy_state model:ir.model.fields,field_description:account_peppol.field_res_config_settings__account_peppol_proxy_state
+msgid "PEPPOL status"
+msgstr "PEPPOL სტატუსი"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_registration__parent_company_id
+msgid "Parent Company"
+msgstr "მშობელი კომპანია"
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__res_partner__peppol_verification_state__not_valid_format
+msgid "Partner cannot receive format"
+msgstr "პარტნიორს ფორმატის მიღება არ შეუძლია"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/account_move_send_wizard.py:0
+msgid "Partner doesn't have a valid Peppol configuration."
+msgstr "პარტნიორს არ აქვს ვალიდური Peppol კონფიგურაცია."
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__res_partner__peppol_verification_state__not_valid
+msgid "Partner is not on Peppol"
+msgstr "პარტნიორი არ არის Peppol-ზე"
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__res_partner__peppol_verification_state__valid
+msgid "Partner is on Peppol"
+msgstr "პარტნიორი არის Peppol-ზე"
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__account_move__peppol_move_state__processing model:ir.model.fields.selection,name:account_peppol.selection__account_peppol_response__peppol_state__processing
+msgid "Pending Reception"
+msgstr "მიღების მოლოდინში"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_registration.py:0
+msgid "Peppol Address should be provided."
+msgstr "Peppol მისამართი უნდა იყოს მითითებული."
+
+#. module: account_peppol
+#: model:ir.actions.client,name:account_peppol.action_peppol_auth_callback
+msgid "Peppol Auth Callback action"
+msgstr "Peppol ავტორიზაციის უკუგამოძახების მოქმედება"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_registration__peppol_can_connect_data
+msgid "Peppol Can Connect Data"
+msgstr "Peppol დაკავშირების შესაძლებლობის მონაცემები"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_res_company__peppol_can_send
+msgid "Peppol Can Send"
+msgstr "Peppol გაგზავნა შესაძლებელია"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.res_config_settings_view_form
+msgid "Peppol Contact Email"
+msgstr "Peppol საკონტაქტო ელფოსტა"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_registration__peppol_endpoint model_terms:ir.ui.view,arch_db:account_peppol.portal_my_details
+msgid "Peppol Endpoint"
+msgstr "Peppol წერტილი"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_registration__peppol_external_provider model:ir.model.fields,field_description:account_peppol.field_res_company__peppol_external_provider model:ir.model.fields,field_description:account_peppol.field_res_config_settings__peppol_external_provider
+msgid "Peppol External Provider"
+msgstr "Peppol გარე პროვაიდერი"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_registration_form
+msgid "Peppol ID"
+msgstr "Peppol ID"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_registration.py:0
+msgid "Peppol ID should be different from main company."
+msgstr "Peppol ID უნდა განსხვავდებოდეს მთავარი კომპანიისგან."
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_res_company__peppol_metadata
+msgid "Peppol Metadata"
+msgstr "Peppol მეტამონაცემები"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_res_company__peppol_parent_company_id
+msgid "Peppol Parent Company"
+msgstr "Peppol მშობელი კომპანია"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_res_config_settings__peppol_parent_company_name
+msgid "Peppol Parent Company Name"
+msgstr "Peppol მშობელი კომპანიის სახელი"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_res_config_settings__peppol_participation_role model_terms:ir.ui.view,arch_db:account_peppol.res_config_settings_view_form
+msgid "Peppol Participation Role"
+msgstr "Peppol მონაწილეობის როლი"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_res_company__peppol_purchase_journal_id model:ir.model.fields,field_description:account_peppol.field_res_config_settings__account_peppol_purchase_journal_id
+msgid "Peppol Purchase Journal"
+msgstr "Peppol შესყიდვების ჟურნალი"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.account_peppol_view_account_invoice_filter
+msgid "Peppol Ready"
+msgstr "Peppol მზად არის"
+
+#. module: account_peppol
+#: model:ir.model,name:account_peppol.model_peppol_registration
+msgid "Peppol Registration"
+msgstr "Peppol რეგისტრაცია"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_res_config_settings__peppol_use_parent_company
+msgid "Peppol Use Parent Company"
+msgstr "Peppol მშობელი კომპანიის გამოყენება"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_edi_common.py:0
+msgid "Peppol document UUID: %s"
+msgstr "Peppol დოკუმენტის UUID: %s"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.portal_my_details
+msgid "Peppol e-Address (EAS)"
+msgstr "Peppol ელ-მისამართი (EAS)"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_edi_common.py:0
+msgid "Peppol invoice received"
+msgstr "Peppol ანგარიშ-ფაქტურა მიღებულია"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_res_company__peppol_metadata_updated_at
+msgid "Peppol meta updated at"
+msgstr "Peppol მეტამონაცემები განახლდა"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_account_bank_statement_line__peppol_move_state model:ir.model.fields,field_description:account_peppol.field_account_move__peppol_move_state model:ir.model.fields,field_description:account_peppol.field_account_peppol_response__peppol_state model:ir.model.fields,field_description:account_peppol.field_res_partner__peppol_verification_state model:ir.model.fields,field_description:account_peppol.field_res_users__peppol_verification_state model_terms:ir.ui.view,arch_db:account_peppol.account_peppol_view_account_invoice_filter
+msgid "Peppol status"
+msgstr "Peppol სტატუსი"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_edi_proxy_user.py:0
+msgid "Peppol status update: %s"
+msgstr "Peppol სტატუსის განახლება: %s"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_registration__peppol_warnings
+msgid "Peppol warnings"
+msgstr "Peppol გაფრთხილებები"
+
+#. module: account_peppol
+#: model:mail.template,name:account_peppol.mail_template_peppol_registration
+msgid "Peppol: Registration update"
+msgstr "Peppol: რეგისტრაციის განახლება"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_registration_form
+msgid "Phone"
+msgstr "ტელეფონი"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/res_company.py:0
+msgid "Please install the phonenumbers library."
+msgstr "გთხოვთ დააინსტალიროთ phonenumbers ბიბლიოთეკა."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_registration.py:0
+msgid "Please select a country for your company."
+msgstr "გთხოვთ აირჩიოთ ქვეყანა თქვენი კომპანიისთვის."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_edi_proxy_user.py:0
+msgid "Please set a journal for Peppol invoices on %s before receiving documents."
+msgstr "გთხოვთ დააყენოთ ჟურნალი Peppol ანგარიშ-ფაქტურებისთვის %s-ზე, სანამ დოკუმენტებს მიიღებთ."
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_registration__contact_email model:ir.model.fields,field_description:account_peppol.field_res_company__account_peppol_contact_email
+msgid "Primary contact email"
+msgstr "ძირითადი საკონტაქტო ელფოსტა"
+
+#. module: account_peppol
+#: model:ir.model.fields,help:account_peppol.field_peppol_registration__contact_email model:ir.model.fields,help:account_peppol.field_res_company__account_peppol_contact_email
+msgid ""
+"Primary contact email for Peppol connection related communications and notifications.\n"
+"In particular, this email is used by Odoo to reconnect your Peppol account in case of database change."
+msgstr ""
+"ძირითადი საკონტაქტო ელფოსტა Peppol დაკავშირებასთან დაკავშირებული კომუნიკაციებისა და შეტყობინებებისთვის.\n"
+"კერძოდ, ამ ელფოსტას Odoo იყენებს თქვენი Peppol ანგარიშის ხელახლა დასაკავშირებლად მონაცემთა ბაზის ცვლილების შემთხვევაში."
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_account_edi_proxy_client_user__proxy_type
+msgid "Proxy Type"
+msgstr "პროქსის ტიპი"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "Proxy error, please contact Odoo (missing \"%s\" - please make sure that it was loaded from the configuration panel)"
+msgstr "პროქსის შეცდომა, გთხოვთ დაუკავშირდეთ Odoo-ს (აკლია \"%s\" - გთხოვთ დარწმუნდეთ, რომ ის ჩაიტვირთა კონფიგურაციის პანელიდან)"
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__account_move__peppol_move_state__to_send
+msgid "Queued"
+msgstr "რიგში დაყენებული"
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__account_move__peppol_move_state__ready
+msgid "Ready to send"
+msgstr "გასაგზავნად მზად"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.res_config_settings_view_form
+msgid "Reconnect this database"
+msgstr "ამ მონაცემთა ბაზის ხელახლა დაკავშირება"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_registration__smp_registration
+msgid "Register as a receiver"
+msgstr "მიმღებად რეგისტრაცია"
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__peppol_registration__use_parent_connection_selection__use_self
+msgid "Register this company on peppol"
+msgstr "ამ კომპანიის რეგისტრაცია peppol-ზე"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_registration.py:0
+msgid "Registration rejected."
+msgstr "რეგისტრაცია უარყოფილია."
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__account_move__peppol_move_state__re model:ir.model.fields.selection,name:account_peppol.selection__res_company__account_peppol_proxy_state__rejected
+msgid "Rejected"
+msgstr "უარყოფილი"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_registration__selected_company_id
+msgid "Selected Company"
+msgstr "არჩეული კომპანია"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_registration.py:0
+msgid "Selected authentication method is not available."
+msgstr "არჩეული ავთენტიფიკაციის მეთოდი არ არის ხელმისაწვდომი."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_move_send.py:0
+msgid "Send"
+msgstr "გაგზავნა"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_registration_form
+msgid "Send electronic invoices, and receive bills automatically via Peppol."
+msgstr "გააგზავნეთ ელექტრონული ანგარიშ-ფაქტურები და მიიღეთ ანგარიშ-ფაქტურები ავტომატურად Peppol-ის მეშვეობით."
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__peppol_registration__use_parent_connection_selection__use_parent
+msgid "Send from parent company"
+msgstr "მშობელი კომპანიიდან გაგზავნა"
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__res_config_settings__peppol_participation_role__sending_and_receiving
+msgid "Sending & Receiving"
+msgstr "გაგზავნა და მიღება"
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__res_config_settings__peppol_participation_role__sending_only
+msgid "Sending Only"
+msgstr "მხოლოდ გაგზავნა"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_move_send.py:0
+msgid "Some attachments could not be sent with the XML:"
+msgstr "ზოგიერთი დანართი XML-თან ერთად ვერ გაიგზავნა:"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "Some reliability function as implemented by the Reliability module, is not operational, or the reliability state associated with this message sequence is not valid."
+msgstr "ზოგიერთი სანდოობის ფუნქცია, როგორც ის რეალიზებულია Reliability მოდულის მიერ, არ ფუნქციონირებს, ან ამ შეტყობინების მიმდევრობასთან დაკავშირებული სანდოობის მდგომარეობა არ არის ვალიდური."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "Something went wrong with your request"
+msgstr "თქვენს მოთხოვნასთან დაკავშირებით რაღაც ვერ შესრულდა"
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__peppol_registration__edi_mode__test
+msgid "Test"
+msgstr "ტესტი"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_registration_form
+msgid ""
+"Test mode allows sending e-invoices through the test Peppol network.<br/>\n"
+"                            By clicking the button below I accept that Odoo may process my e-invoices."
+msgstr ""
+"სატესტო რეჟიმი იძლევა ელექტრონული ანგარიშ-ფაქტურების გაგზავნის შესაძლებლობას სატესტო Peppol ქსელის მეშვეობით.<br/>\n"
+"                            ქვემოთ მოცემულ ღილაკზე დაჭერით ვეთანხმები, რომ Odoo-მ შესაძლოა დაამუშაოს ჩემი ელექტრონული ანგარიშ-ფაქტურები."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/controllers/portal.py:0
+msgid "That country is not available for Peppol."
+msgstr "ეს ქვეყანა არ არის ხელმისაწვდომი Peppol-ისთვის."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The MSH is experiencing temporary or permanent failure in trying to open a transport connection with a remote MSH."
+msgstr "MSH განიცდის დროებით ან მუდმივ ჩავარდნას დისტანციურ MSH-თან სატრანსპორტო კავშირის გახსნის მცდელობისას."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The MSH is unable to resolve an external payload reference (i.e. a Part that is not contained within the ebMS Message, as identified by a PartInfo/href URI)."
+msgstr "MSH ვერ ახერხებს გარე დატვირთვის მინიშნების ამოხსნას (ანუ ნაწილის, რომელიც არ არის ჩასმული ebMS შეტყობინებაში, როგორც ეს იდენტიფიცირებულია PartInfo/href URI-ით)."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The Peppol Participant DNS lookup resulted in an URL address that does not belong to this server."
+msgstr "Peppol მონაწილის DNS ძიების შედეგად მიღებულ იქნა URL მისამართი, რომელიც არ ეკუთვნის ამ სერვერს."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The Peppol Participant cannot receive this document type."
+msgstr "Peppol-ის მონაწილეს ამ ტიპის დოკუმენტის მიღება არ შეუძლია."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The Peppol Participant certificate is invalid."
+msgstr "Peppol-ის მონაწილის სერტიფიკატი არასწორია."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The Peppol Participant service group found on his Service Metadata Provider is invalid."
+msgstr "მის სერვისის მეტამონაცემების პროვაიდერზე ნაპოვნი Peppol-ის მონაწილის სერვისების ჯგუფი არასწორია."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/res_company.py:0
+msgid "The Peppol service that is used is %s."
+msgstr "გამოყენებული Peppol-ის სერვისია %s."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The Service Metadata Publisher associated to this participant is not reachable. url: %s"
+msgstr "ამ მონაწილესთან დაკავშირებული სერვისის მეტამონაცემების გამომქვეყნებელი მიუწვდომელია. url: %s"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The UBL document provided to the Peppol Outbound Service is malformed."
+msgstr "Peppol-ის გამავალ სერვისზე მიწოდებული UBL დოკუმენტი დაზიანებულია."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The XML document could not be canonicalized."
+msgstr "XML დოკუმენტის კანონიკალიზაცია ვერ მოხერხდა."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The XML document is not valid according to the XSD Schema."
+msgstr "XML დოკუმენტი XSD სქემის მიხედვით არასწორია."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The XML document is not valid according to the schematron."
+msgstr "XML დოკუმენტი schematron-ის მიხედვით არასწორია."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_registration.py:0
+msgid "The database you are trying to connect to is not suitable for Peppol."
+msgstr "მონაცემთა ბაზა, რომელთან დაკავშირებასაც ცდილობთ, არ არის Peppol-ისთვის ვარგისი."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The document could not be found"
+msgstr "დოკუმენტი ვერ მოიძებნა"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The document could not be sent to the Peppol Participant."
+msgstr "დოკუმენტის გაგზავნა Peppol-ის მონაწილესთან ვერ მოხერხდა."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The document could not be validated."
+msgstr "დოკუმენტის ვალიდაცია ვერ მოხერხდა."
+
+#. module: account_peppol
+#. odoo-javascript
+#: code:addons/account_peppol/static/src/components/peppol_info/peppol_info.xml:0
+msgid "The e-invoicing network"
+msgstr "ელექტრონული ანგარიშ-ფაქტურების ქსელი"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The eb3:Message header copied to the fragment header does not match the eb3:Message header in the reassembled source message."
+msgstr "ფრაგმენტის სათაურში დაკოპირებული eb3:Message სათაური არ ემთხვევა აღდგენილ საწყის შეტყობინებაში არსებულ eb3:Message სათაურს."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The ebMS header is either not well formed as an XML document, or does not conform to the ebMS packaging rules."
+msgstr "ebMS სათაური ან არ არის სწორად ფორმირებული, როგორც XML დოკუმენტი, ან არ შეესაბამება ebMS-ის შეფუთვის წესებს."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The ebMS header or another header (e.g. reliability, security) expected by the MSH is not compatible with the expected content, based on the associated P-Mode."
+msgstr "ebMS სათაური ან სხვა სათაური (მაგ. სანდოობის, უსაფრთხოების), რომელსაც MSH ელოდება, არ არის თავსებადი მოსალოდნელ შინაარსთან, შესაბამისი P-Mode-ის მიხედვით."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The encrypted data reference the Security header intended for the \"ebms\" SOAP actor could not be decrypted by the Security Module."
+msgstr "დაშიფრული მონაცემები, რომლებიც მიუთითებენ \"ebms\" SOAP აქტორისთვის განკუთვნილ უსაფრთხოების სათაურზე, ვერ გაიშიფრა უსაფრთხოების მოდულის მიერ."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_registration.py:0
+msgid "The endpoint number might not be correct. Please check if you entered the right identification number."
+msgstr "ბოლოწერტილის ნომერი შესაძლოა არასწორი იყოს. გთხოვთ, შეამოწმოთ, სწორი საიდენტიფიკაციო ნომერი შეიყვანეთ თუ არა."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The href attribute does not reference a valid MIME data part, MIME parts other than the fragment header and a data part are in the message. are added or the SOAP Body is not empty."
+msgstr "href ატრიბუტი არ მიუთითებს ვალიდურ MIME მონაცემთა ნაწილზე, შეტყობინებაში არის ფრაგმენტის სათაურისა და მონაცემთა ნაწილის გარდა სხვა MIME ნაწილებიც. დამატებულია, ან SOAP Body არ არის ცარიელი."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The incoming message could not be decompressed."
+msgstr "შემომავალი შეტყობინების დეკომპრესია ვერ მოხერხდა."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_move_send.py:0
+msgid "The invoice has been sent to the Peppol Access Point. The following attachments were sent with the XML:"
+msgstr "ანგარიშ-ფაქტურა გაიგზავნა Peppol-ის წვდომის წერტილზე. XML-თან ერთად გაიგზავნა შემდეგი დანართები:"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The message does not comply with the AS4 policy."
+msgstr "შეტყობინება არ შეესაბამება AS4 პოლიტიკას."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The processor determined that the message's security methods, parameters, scope or other security policy-level requirements or agreements were not satisfied."
+msgstr "პროცესორმა დაადგინა, რომ შეტყობინების უსაფრთხოების მეთოდები, პარამეტრები, არეალი ან უსაფრთხოების პოლიტიკის დონის სხვა მოთხოვნები თუ შეთანხმებები არ იყო დაკმაყოფილებული."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The signature in the Security header intended for the \"ebms\" SOAP actor, could not be validated by the Security module."
+msgstr "\"ebms\" SOAP აქტორისთვის განკუთვნილ უსაფრთხოების სათაურში არსებული ხელმოწერის ვალიდაცია ვერ მოხერხდა უსაფრთხოების მოდულის მიერ."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The size of the data part in a fragment message is greater than %s"
+msgstr "ფრაგმენტის შეტყობინებაში მონაცემთა ნაწილის ზომა აღემატება %s-ს"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The structure of a received bundle is not in accordance with the bundling rules."
+msgstr "მიღებული შეკვრის სტრუქტურა არ შეესაბამება შეკვრის წესებს."
+
+#. module: account_peppol
+#: model:ir.model.fields,help:account_peppol.field_res_config_settings__account_peppol_edi_identification
+msgid "The unique id that identifies this user, typically the vat"
+msgstr "უნიკალური id, რომელიც ამ მომხმარებელს იდენტიფიცირებს, ჩვეულებრივ — საიდენტიფიკაციო ნომერი"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "The use of MIME is not consistent with the required usage in this specification."
+msgstr "MIME-ის გამოყენება არ შეესაბამება ამ სპეციფიკაციაში მოთხოვნილ გამოყენებას."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "There is no message available for pulling from this MPC at this moment."
+msgstr "ამ მომენტში ამ MPC-დან გამოსატანი შეტყობინება მიუწვდომელია."
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.account_peppol_view_move_form
+msgid "There was an error while sending this invoice via Peppol."
+msgstr "ამ ანგარიშ-ფაქტურის Peppol-ის მეშვეობით გაგზავნისას მოხდა შეცდომა."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "There was an error with the Peppol Request"
+msgstr "მოხდა შეცდომა Peppol-ის მოთხოვნასთან დაკავშირებით"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "There was an error with the incoming message."
+msgstr "მოხდა შეცდომა შემომავალ შეტყობინებასთან დაკავშირებით."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "There was an issue with the Hermes Migration Token Collection Interface (MTCI)."
+msgstr "მოხდა შეცდომა Hermes-ის მიგრაციის ტოკენების შეგროვების ინტერფეისთან (MTCI) დაკავშირებით."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "There was an issue with the Peppol Participant."
+msgstr "მოხდა შეცდომა Peppol-ის მონაწილესთან დაკავშირებით."
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_registration_form
+msgid "This branch company will use the active Peppol connection found on"
+msgstr "ეს ფილიალი გამოიყენებს აქტიურ Peppol-ის კავშირს, რომელიც ნაპოვნია"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_edi_proxy_user.py:0
+msgid "This connection has been superseded by another database. Register again."
+msgstr "ეს კავშირი ჩაანაცვლა სხვა მონაცემთა ბაზამ. დარეგისტრირდით ხელახლა."
+
+#. module: account_peppol
+#: model:ir.model.fields,help:account_peppol.field_res_config_settings__account_is_token_out_of_sync
+msgid "This field is used to indicate that the edi user token is out of sync with the proxy server. It is set to True when the token needs to be refreshed or updated."
+msgstr "ეს ველი მიუთითებს, რომ EDI მომხმარებლის ტოკენი არ არის სინქრონიზებული პროქსი სერვერთან. იგი მნიშვნელობას True იღებს, როდესაც ტოკენის განახლება ან დარეგულირებაა საჭირო."
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.mail_notification_layout_with_responsible_signature_and_peppol
+msgid "This invoice has also been"
+msgstr "ეს ანგარიშ-ფაქტურა ასევე"
+
+#. module: account_peppol
+#: model:ir.model.fields,help:account_peppol.field_peppol_registration__phone_number model:ir.model.fields,help:account_peppol.field_res_company__account_peppol_phone_number model:ir.model.fields,help:account_peppol.field_res_config_settings__account_peppol_phone_number
+msgid "This number is used for identification purposes only."
+msgstr "ეს ნომერი გამოიყენება მხოლოდ იდენტიფიკაციის მიზნით."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "This user is not registered on our Access Point."
+msgstr "ეს მომხმარებელი ჩვენს წვდომის წერტილზე რეგისტრირებული არ არის."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "This user's is not a Peppol User. The proxy_type associated must be \"peppol\". This is required to create a peppol participant."
+msgstr "ეს მომხმარებელი არ არის Peppol-ის მომხმარებელი. დაკავშირებული proxy_type უნდა იყოს \"peppol\". ეს საჭიროა Peppol-ის მონაწილის შესაქმნელად."
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.res_partner_form_account_peppol
+msgid "To generate complete electronic invoices, also set a country for this partner."
+msgstr "სრული ელექტრონული ანგარიშ-ფაქტურების გენერირებისთვის, ასევე მიუთითეთ ქვეყანა ამ პარტნიორისთვის."
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_res_config_settings__account_is_token_out_of_sync
+msgid "Token Out of Sync"
+msgstr "ტოკენი არ არის სინქრონიზებული"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "Unable to verify the digest value."
+msgstr "დაიჯესტის მნიშვნელობის გადამოწმება ვერ მოხერხდა."
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__res_partner__peppol_verification_state__not_verified
+msgid "Unchecked"
+msgstr "მოუნიშნავი"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "Unexpected end of MIME multipart message."
+msgstr "MIME multipart შეტყობინების მოულოდნელი დასასრული."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "Unknown Peppol Error: %s"
+msgstr "Peppol-ის უცნობი შეცდომა: %s"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_registration__use_parent_connection
+msgid "Use Parent Connection"
+msgstr "მშობელი კავშირის გამოყენება"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_registration__use_parent_connection_selection
+msgid "Use Parent Connection Selection"
+msgstr "მშობელი კავშირის არჩევის გამოყენება"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.res_partner_form_account_peppol
+msgid "Verify"
+msgstr "გადამოწმება"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_move_send.py:0
+msgid "View Partner(s)"
+msgstr "პარტნიორ(ებ)ის ნახვა"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_edi_proxy_user.py:0
+msgid "We could not find a user with this information on our server. Please check your information."
+msgstr "ჩვენს სერვერზე ამ ინფორმაციის მქონე მომხმარებელი ვერ მოვძებნეთ. გთხოვთ, შეამოწმოთ თქვენი ინფორმაცია."
+
+#. module: account_peppol
+#: model:mail.template,subject:account_peppol.mail_template_peppol_registration
+msgid "Welcome to Peppol"
+msgstr "მოგესალმებით Peppol-ში"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_registration.py:0
+msgid "You are about to register with your VAT number. Make sure you register with your Company Registry (BCE/KBO) first to be compliant with the new regulation."
+msgstr "თქვენ აპირებთ თქვენი დღგ-ის ნომრით რეგისტრაციას. დარწმუნდით, რომ ჯერ თქვენი კომპანიის რეესტრში (BCE/KBO) დარეგისტრირდით, რათა შეესაბამებოდეთ ახალ რეგულაციას."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "You are not authorized to change the contact email."
+msgstr "საკონტაქტო ელ-ფოსტის შეცვლის უფლება არ გაქვთ."
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.res_config_settings_view_form
+msgid "You are sending from"
+msgstr "თქვენ აგზავნით"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_registration.py:0
+msgid "You can now send and receive electronic invoices via Peppol"
+msgstr "ახლა შეგიძლიათ გააგზავნოთ და მიიღოთ ელექტრონული ანგარიშ-ფაქტურები Peppol-ის მეშვეობით"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_registration.py:0
+msgid "You can now send electronic invoices via Peppol."
+msgstr "ახლა შეგიძლიათ გააგზავნოთ ელექტრონული ანგარიშ-ფაქტურები Peppol-ის მეშვეობით."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_move_send.py:0
+msgid "You can send this invoice electronically via Peppol."
+msgstr "ამ ანგარიშ-ფაქტურის ელექტრონულად გაგზავნა შეგიძლიათ Peppol-ის მეშვეობით."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "You don't have enough credit"
+msgstr "საკმარისი კრედიტი არ გაქვთ"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "You have reached the limit of documents you can send today. Retry later. Please contact the support if you think you need to increase that limit."
+msgstr "მიაღწიეთ დღეს გასაგზავნი დოკუმენტების ლიმიტს. სცადეთ მოგვიანებით. გთხოვთ, დაუკავშირდეთ მხარდაჭერას, თუ ფიქრობთ, რომ ამ ლიმიტის გაზრდა გჭირდებათ."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_registration.py:0
+msgid "You need to authenticate to continue."
+msgstr "გასაგრძელებლად საჭიროა ავთენტიფიკაცია."
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.res_config_settings_view_form
+msgid ""
+"You registration has been rejected, the reason has been sent to you via email.\n"
+"                            Please contact our support if you need further assistance."
+msgstr ""
+"თქვენი რეგისტრაცია უარყოფილია, მიზეზი გამოგეგზავნათ ელ-ფოსტით.\n"
+"                            გთხოვთ, დაუკავშირდეთ ჩვენს მხარდაჭერას, თუ დამატებითი დახმარება გჭირდებათ."
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.res_config_settings_view_form
+msgid "Your Peppol ID"
+msgstr "თქვენი Peppol ID"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.res_config_settings_view_form
+msgid "Your Peppol identification is:"
+msgstr "თქვენი Peppol იდენტიფიკატორია:"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_registration.py:0
+msgid "Your Peppol registration will be activated soon. You can already send invoices."
+msgstr "თქვენი Peppol-ის რეგისტრაცია მალე გააქტიურდება. უკვე შეგიძლიათ ანგარიშ-ფაქტურების გაგზავნა."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_registration.py:0
+msgid "Your company is already registered on an Access Point (%s) for receiving invoices. We will register you on Odoo as a sender only."
+msgstr "თქვენი კომპანია უკვე რეგისტრირებულია წვდომის წერტილზე (%s) ანგარიშ-ფაქტურების მისაღებად. ჩვენ დაგარეგისტრირებთ Odoo-ზე მხოლოდ როგორც გამგზავნს."
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.res_config_settings_view_form
+msgid ""
+"Your database is not linked to Peppol anymore. This might be due to a database duplication or restoration.\n"
+"                                        Make sure to reconnect the correct database."
+msgstr ""
+"თქვენი მონაცემთა ბაზა აღარ არის დაკავშირებული Peppol-თან. ეს შესაძლოა გამოწვეული იყოს მონაცემთა ბაზის დუბლირებით ან აღდგენით.\n"
+"                                        დარწმუნდით, რომ სწორ მონაცემთა ბაზას ხელახლა დაუკავშირდებით."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "Your identification has not been approved for this action yet"
+msgstr "თქვენი იდენტიფიკაცია ამ მოქმედებისთვის ჯერ არ არის დამტკიცებული"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_registration.py:0
+msgid "Your identifier does not have a valid format.%s"
+msgstr "თქვენს იდენტიფიკატორს ვალიდური ფორმატი არ აქვს.%s"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_registration.py:0
+msgid "Your identifier is invalid."
+msgstr "თქვენი იდენტიფიკატორი არასწორია."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_registration.py:0
+msgid "Your identifier you entered is invalid for Peppol."
+msgstr "თქვენ მიერ შეყვანილი იდენტიფიკატორი Peppol-ისთვის არასწორია."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_registration.py:0
+msgid "Your registration has been rejected. Please contact the support for further assistance."
+msgstr "თქვენი რეგისტრაცია უარყოფილია. გთხოვთ, დაუკავშირდეთ მხარდაჭერას დამატებითი დახმარებისთვის."
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.res_config_settings_view_form
+msgid "Your registration should be activated within a day."
+msgstr "თქვენი რეგისტრაცია ერთ დღეში უნდა გააქტიურდეს."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid "Your request is still being processed."
+msgstr "თქვენი მოთხოვნა ჯერ კიდევ მუშავდება."
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_registration_form
+msgid "and send invoices via Peppol on their behalf."
+msgstr "და მათი სახელით ანგარიშ-ფაქტურების გაგზავნა Peppol-ის მეშვეობით."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/controllers/portal.py:0 model:ir.model.fields.selection,name:account_peppol.selection__res_partner__invoice_sending_method__peppol
+msgid "by Peppol"
+msgstr "Peppol-ის მიერ"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.mail_notification_layout_with_responsible_signature_and_peppol
+msgid "could not be sent via Peppol"
+msgstr "ვერ გაიგზავნა Peppol-ის მეშვეობით"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.mail_notification_layout_with_responsible_signature_and_peppol
+msgid "sent via Peppol"
+msgstr "გაიგზავნა Peppol-ის მეშვეობით"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_registration_form
+msgid "support"
+msgstr "მხარდაჭერა"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.mail_notification_layout_with_responsible_signature_and_peppol
+msgid "to send invoices, but this one"
+msgstr "ანგარიშ-ფაქტურების გასაგზავნად, თუმცა ეს"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.mail_notification_layout_with_responsible_signature_and_peppol
+msgid "uses"
+msgstr "იყენებს"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/account_move_send_wizard.py:0
+msgid " (no access)"
+msgstr " (წვდომის გარეშე)"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_registration_form
+msgid "<b>Authentify with itsme</b>"
+msgstr "<b>ავთენტიფიკაცია itsme-ით</b>"
+
+#. module: account_peppol
+#: model:ir.model,name:account_peppol.model_account_move_send
+msgid "Account Move Send"
+msgstr "ანგარიშის გატარების გაგზავნა"
+
+#. module: account_peppol
+#: model:ir.model,name:account_peppol.model_account_move_send_batch_wizard
+msgid "Account Move Send Batch Wizard"
+msgstr "ანგარიშის გატარების ჯგუფურად გაგზავნის ოსტატი"
+
+#. module: account_peppol
+#: model:ir.model,name:account_peppol.model_account_move_send_wizard
+msgid "Account Move Send Wizard"
+msgstr "ანგარიშის გატარების გაგზავნის ოსტატი"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.res_config_settings_view_form
+msgid "Activate Electronic Invoicing"
+msgstr "ელექტრონული ანგარიშ-ფაქტურირების გააქტიურება"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_config_wizard__peppol_activate_self_billing
+msgid "Activate self-billing"
+msgstr "თვითბილინგის გააქტიურება"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_res_company__peppol_activate_self_billing_sending
+msgid "Activate self-billing sending"
+msgstr "თვითბილინგის გაგზავნის გააქტიურება"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_registration__active_parent_company
+msgid "Active Parent Company"
+msgstr "აქტიური მშობელი კომპანია"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_registration__active_parent_company_name
+msgid "Active Parent Company Name"
+msgstr "აქტიური მშობელი კომპანიის სახელი"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.res_config_settings_view_form
+msgid "Advanced Configuration"
+msgstr "დამატებითი კონფიგურაცია"
+
+#. module: account_peppol
+#: model:ir.model.fields,help:account_peppol.field_peppol_config_wizard__peppol_self_billing_reception_journal_id model:ir.model.fields,help:account_peppol.field_res_company__peppol_self_billing_reception_journal_id
+msgid "Any self-billed invoices / credit notes received via Peppol will be created in draft in this journal. Defaults to the first sale journal."
+msgstr "Peppol-ის მეშვეობით მიღებული ნებისმიერი თვითბილინგის ანგარიშ-ფაქტურა / საკრედიტო ანგარიშ-ფაქტურა შეიქმნება მონახაზად ამ ჟურნალში. ნაგულისხმევად აყენებს პირველ გაყიდვების ჟურნალს."
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_registration__can_use_parent_connection
+msgid "Can Use Parent Connection"
+msgstr "შეუძლია მშობელი კავშირის გამოყენება"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.account_peppol_view_move_form
+msgid "Cancel PEPPOL"
+msgstr "PEPPOL-ის გაუქმება"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_move.py:0
+msgid "Cannot cancel an entry that has already been sent to PEPPOL"
+msgstr "არ შეიძლება იმ ჩანაწერის გაუქმება, რომელიც უკვე გაიგზავნა PEPPOL-ზე"
+
+#. module: account_peppol
+#: model:ir.model.fields,help:account_peppol.field_peppol_registration__peppol_eas model:ir.model.fields,help:account_peppol.field_res_company__peppol_eas model:ir.model.fields,help:account_peppol.field_res_config_settings__account_peppol_eas model:ir.model.fields,help:account_peppol.field_res_partner__peppol_eas model:ir.model.fields,help:account_peppol.field_res_users__peppol_eas
+msgid ""
+"Code used to identify the Endpoint for BIS Billing 3.0 and its derivatives.\n"
+"             List available at https://docs.peppol.eu/poacc/billing/3.0/codelist/eas/"
+msgstr ""
+"BIS Billing 3.0-ისა და მისი წარმოებულების ბოლოწერტილის იდენტიფიცირებისთვის გამოყენებული კოდი.\n"
+"             სია ხელმისაწვდომია მისამართზე https://docs.peppol.eu/poacc/billing/3.0/codelist/eas/"
+
+#. module: account_peppol
+#: model:ir.model,name:account_peppol.model_res_company
+msgid "Companies"
+msgstr "კომპანიები"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_config_wizard_form
+msgid "Company information"
+msgstr "კომპანიის ინფორმაცია"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_config_wizard_form
+msgid "Configure your Peppol Services and allowed formats"
+msgstr "დააკონფიგურირეთ თქვენი Peppol-ის სერვისები და დაშვებული ფორმატები"
+
+#. module: account_peppol
+#. odoo-javascript
+#: code:addons/account_peppol/static/src/components/peppol_info/peppol_info.xml:0
+msgid "Create, send and receive e-invoices for free."
+msgstr "შექმენით, გააგზავნეთ და მიიღეთ ელექტრონული ანგარიშ-ფაქტურები უფასოდ."
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_config_wizard_form
+msgid "Danger zone"
+msgstr "საფრთხის ზონა"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_config_wizard_form
+msgid "Disable the reception."
+msgstr "მიღების გათიშვა."
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_config_wizard_form
+msgid "Discard"
+msgstr "უარყოფა"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_account_peppol_service__document_identifier
+msgid "Document Identifier"
+msgstr "დოკუმენტის იდენტიფიკატორი"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_account_peppol_service__document_name
+msgid "Document Name"
+msgstr "დოკუმენტის სახელი"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_edi_proxy_user.py:0
+msgid "EDI user should be of type Peppol"
+msgstr "EDI მომხმარებელი უნდა იყოს Peppol ტიპის"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_config_wizard_form
+msgid "Enable reception"
+msgstr "მიღების ჩართვა"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_account_peppol_service__enabled
+msgid "Enabled"
+msgstr "ჩართულია"
+
+#. module: account_peppol
+#: model:ir.model.fields,help:account_peppol.field_peppol_config_wizard__peppol_activate_self_billing
+msgid "If activated, you will be able to send and receive self-billed invoices via Peppol.You can still disable reception by disabling the self-billing document types below."
+msgstr "თუ გააქტიურებთ, შეძლებთ თვით-გამოწერილი ანგარიშ-ფაქტურების გაგზავნასა და მიღებას Peppol-ის მეშვეობით. მიღების გათიშვა მაინც შეგიძლიათ ქვემოთ მოცემული თვით-გამოწერის დოკუმენტის ტიპების გათიშვით."
+
+#. module: account_peppol
+#: model:ir.model.fields,help:account_peppol.field_res_company__peppol_activate_self_billing_sending
+msgid "If activated, you will be able to send vendor bills as self-billed invoices via Peppol."
+msgstr "თუ გააქტიურებთ, შეძლებთ მომწოდებლის ანგარიშ-ფაქტურების გაგზავნას თვით-გამოწერილ ანგარიშ-ფაქტურებად Peppol-ის მეშვეობით."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_move_send.py:0
+msgid "Invoice %s is too big to send via peppol (64MB limit)"
+msgstr "ანგარიშ-ფაქტურა %s ზედმეტად დიდია peppol-ის მეშვეობით გასაგზავნად (64MB ლიმიტი)"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_registration__is_branch_company
+msgid "Is Branch Company"
+msgstr "არის ფილიალი კომპანია"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_registration_form
+msgid "Itsme"
+msgstr "Itsme"
+
+#. module: account_peppol
+#: model:ir.model.fields,help:account_peppol.field_peppol_config_wizard__service_json
+msgid "JSON representation of peppol services as retrieved from the peppol server."
+msgstr "peppol სერვისების JSON წარმოდგენა, peppol სერვერიდან მიღებული სახით."
+
+#. module: account_peppol
+#. odoo-javascript
+#: code:addons/account_peppol/static/src/components/peppol_info/peppol_info.xml:0
+msgid "Odoo keeps you up to date with the new regulation."
+msgstr "Odoo გამუდმებით გაცნობებთ ახალი რეგულაციების შესახებ."
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__account_edi_proxy_client_user__proxy_type__peppol
+msgid "PEPPOL"
+msgstr "PEPPOL"
+
+#. module: account_peppol
+#. odoo-javascript
+#: code:addons/account_peppol/static/src/components/peppol_info/peppol_info.xml:0
+msgid "PEPPOL allows for complete automation of sending and receiving e-invoices."
+msgstr "PEPPOL იძლევა ელექტრონული ანგარიშ-ფაქტურების გაგზავნისა და მიღების სრულ ავტომატიზაციას."
+
+#. module: account_peppol
+#. odoo-javascript
+#: code:addons/account_peppol/static/src/components/peppol_info/peppol_info.xml:0
+msgid "PEPPOL is the secure standard for e-invoices used in EU and across the world."
+msgstr "PEPPOL არის ელექტრონული ანგარიშ-ფაქტურების უსაფრთხო სტანდარტი, რომელიც გამოიყენება ევროკავშირსა და მთელ მსოფლიოში."
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_account_bank_statement_line__peppol_message_uuid model:ir.model.fields,field_description:account_peppol.field_account_move__peppol_message_uuid
+msgid "PEPPOL message ID"
+msgstr "PEPPOL შეტყობინების ID"
+
+#. module: account_peppol
+#: model:ir.actions.server,name:account_peppol.ir_cron_peppol_get_new_documents_ir_actions_server
+msgid "PEPPOL: retrieve new documents"
+msgstr "PEPPOL: ახალი დოკუმენტების მოძიება"
+
+#. module: account_peppol
+#: model:ir.actions.server,name:account_peppol.ir_cron_peppol_get_message_status_ir_actions_server
+msgid "PEPPOL: update message status"
+msgstr "PEPPOL: შეტყობინების სტატუსის განახლება"
+
+#. module: account_peppol
+#: model:ir.actions.server,name:account_peppol.ir_cron_peppol_get_participant_status_ir_actions_server
+msgid "PEPPOL: update participant status"
+msgstr "PEPPOL: მონაწილის სტატუსის განახლება"
+
+#. module: account_peppol
+#: model:ir.actions.server,name:account_peppol.ir_cron_peppol_webhook_keepalive_ir_actions_server
+msgid "PEPPOL: webhook keep alive"
+msgstr "PEPPOL: webhook-ის აქტიურად შენარჩუნება"
+
+#. module: account_peppol
+#: model:ir.model,name:account_peppol.model_peppol_config_wizard
+msgid "Peppol Configuration Wizard"
+msgstr "Peppol კონფიგურაციის ოსტატი"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/exceptions.py:0
+msgid ""
+"Peppol Error [code=%(error_code)s]: %(error_subject)s\n"
+"%(error_message)s"
+msgstr ""
+"Peppol შეცდომა [code=%(error_code)s]: %(error_subject)s\n"
+"%(error_message)s"
+
+#. module: account_peppol
+#: model:ir.model,name:account_peppol.model_account_peppol_service
+msgid "Peppol Service"
+msgstr "Peppol სერვისი"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_registration__peppol_eas model:ir.model.fields,field_description:account_peppol.field_res_company__peppol_eas model:ir.model.fields,field_description:account_peppol.field_res_config_settings__account_peppol_eas model:ir.model.fields,field_description:account_peppol.field_res_partner__peppol_eas model:ir.model.fields,field_description:account_peppol.field_res_users__peppol_eas
+msgid "Peppol e-address (EAS)"
+msgstr "Peppol ელ-მისამართი (EAS)"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_edi_proxy_user.py:0
+msgid "Peppol error: %s"
+msgstr "Peppol შეცდომა: %s"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/res_company.py:0
+msgid ""
+"Please enter the mobile number in the correct international format.\n"
+"For example: +32123456789, where +32 is the country code.\n"
+"Currently, only European countries are supported."
+msgstr ""
+"გთხოვთ შეიყვანოთ მობილურის ნომერი სწორ საერთაშორისო ფორმატში.\n"
+"მაგალითად: +32123456789, სადაც +32 არის ქვეყნის კოდი.\n"
+"ამჟამად მხარდაჭერილია მხოლოდ ევროპული ქვეყნები."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_edi_proxy_user.py:0
+msgid "Please fill in the EAS code and the Participant ID code."
+msgstr "გთხოვთ შეავსოთ EAS კოდი და მონაწილის ID კოდი."
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_config_wizard_form
+msgid "Receive your electronic invoices in Odoo"
+msgstr "მიიღეთ თქვენი ელექტრონული ანგარიშ-ფაქტურები Odoo-ში"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.res_config_settings_view_form
+msgid "Register with Odoo"
+msgstr "Odoo-ით რეგისტრაცია"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_config_wizard.py:0
+msgid "Registered to receive documents via Peppol."
+msgstr "რეგისტრირებულია დოკუმენტების მისაღებად Peppol-ის მეშვეობით."
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_config_wizard_form
+msgid "Remove from Peppol"
+msgstr "Peppol-დან წაშლა"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_config_wizard_form
+msgid "Save"
+msgstr "შენახვა"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_config_wizard_form
+msgid "Self Billing"
+msgstr "თვითგამოწერა"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_config_wizard__peppol_self_billing_reception_journal_id model:ir.model.fields,field_description:account_peppol.field_res_company__peppol_self_billing_reception_journal_id
+msgid "Self-Billing reception journal"
+msgstr "თვით-გამოწერის მიღების ჟურნალი"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_config_wizard__service_ids
+msgid "Service"
+msgstr "მომსახურება"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_config_wizard__service_info
+msgid "Service Info"
+msgstr "სერვისის ინფორმაცია"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_peppol_config_wizard__service_json
+msgid "Service Json"
+msgstr "სერვისის Json"
+
+#. module: account_peppol
+#: model:ir.model.fields.selection,name:account_peppol.selection__account_move__peppol_move_state__skipped
+msgid "Skipped"
+msgstr "გამოტოვებული"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_config_wizard_form
+msgid ""
+"Some service support migration keys. If this is your case you can enter your migration key below.\n"
+"                            If not, you should de-register from your current service provider and register with Odoo afterward."
+msgstr ""
+"ზოგიერთი სერვისი მხარს უჭერს მიგრაციის გასაღებებს. თუ ეს თქვენი შემთხვევაა, შეგიძლიათ შეიყვანოთ თქვენი მიგრაციის გასაღები ქვემოთ.\n"
+"                            თუ არა, უნდა გააუქმოთ რეგისტრაცია თქვენი ამჟამინდელი სერვის-პროვაიდერისგან და შემდეგ დარეგისტრირდეთ Odoo-ით."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/res_company.py:0
+msgid "The Peppol endpoint identification number is not correct."
+msgstr "Peppol-ის ბოლოწერტილის საიდენტიფიკაციო ნომერი არასწორია."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_config_wizard.py:0
+msgid "The following services are listed on your participant but cannot be configured here. If you wish to configure them differently, please contact support."
+msgstr "შემდეგი სერვისები მითითებულია თქვენს მონაწილეზე, თუმცა მათი კონფიგურაცია აქ ვერ მოხერხდება. თუ გსურთ მათი განსხვავებულად კონფიგურაცია, გთხოვთ, დაუკავშირდეთ მხარდაჭერას."
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_config_wizard_form
+msgid "This will delete your Peppol registration."
+msgstr "ეს წაშლის თქვენს Peppol-ის რეგისტრაციას."
+
+#. module: account_peppol
+#: model:ir.model,name:account_peppol.model_account_edi_xml_ubl_20
+msgid "UBL 2.0"
+msgstr "UBL 2.0"
+
+#. module: account_peppol
+#: model:ir.model.fields,help:account_peppol.field_peppol_registration__peppol_endpoint model:ir.model.fields,help:account_peppol.field_res_company__peppol_endpoint model:ir.model.fields,help:account_peppol.field_res_config_settings__account_peppol_endpoint
+msgid "Unique identifier used by the BIS Billing 3.0 and its derivatives, also known as 'Endpoint ID'."
+msgstr "BIS Billing 3.0-ისა და მისი წარმოებულების მიერ გამოყენებული უნიკალური იდენტიფიკატორი, ასევე ცნობილი როგორც 'Endpoint ID'."
+
+#. module: account_peppol
+#: model:ir.actions.server,name:account_peppol.partner_action_verify_peppol
+msgid "Verify Peppol"
+msgstr "Peppol-ის გადამოწმება"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.res_partner_form_account_peppol
+msgid "Verify partner's PEPPOL endpoint"
+msgstr "პარტნიორის PEPPOL ბოლოწერტილის გადამოწმება"
+
+#. module: account_peppol
+#. odoo-javascript
+#: code:addons/account_peppol/static/src/components/peppol_info/peppol_info.xml:0
+msgid "What is Peppol and why it's great ?"
+msgstr "რა არის Peppol და რატომ არის ის შესანიშნავი?"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_move_send.py:0
+msgid "Why should I use PEPPOL ?"
+msgstr "რატომ უნდა გამოვიყენო PEPPOL?"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/models/account_move_send.py:0
+msgid "Why should you use it ?"
+msgstr "რატომ უნდა გამოიყენოთ ის?"
+
+#. module: account_peppol
+#: model:ir.model.fields,field_description:account_peppol.field_account_peppol_service__wizard_id
+msgid "Wizard"
+msgstr "ვიზარდი"
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/account_move_send_wizard.py:0
+msgid "You are not allowed to send invoice on behalf of %s."
+msgstr "%s-ის სახელით ანგარიშ-ფაქტურის გაგზავნის უფლება არ გაქვთ."
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_config_wizard_form
+msgid "You are sending and receiving your e-invoices via Odoo with this Peppol ID"
+msgstr "თქვენ აგზავნით და იღებთ თქვენს ელექტრონულ ანგარიშ-ფაქტურებს Odoo-ს მეშვეობით ამ Peppol ID-ით"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_config_wizard_form
+msgid "You are sending your e-invoices via Odoo with this Peppol ID"
+msgstr "თქვენ აგზავნით თქვენს ელექტრონულ ანგარიშ-ფაქტურებს Odoo-ს მეშვეობით ამ Peppol ID-ით"
+
+#. module: account_peppol
+#: model_terms:ir.ui.view,arch_db:account_peppol.peppol_config_wizard_form
+msgid "Your Peppol registration is being processed, it should be active within a day."
+msgstr "თქვენი Peppol-ის რეგისტრაცია მუშავდება, ის ერთ დღეში უნდა გააქტიურდეს."
+
+#. module: account_peppol
+#. odoo-python
+#: code:addons/account_peppol/wizard/peppol_config_wizard.py:0
+msgid "Your registration on Peppol network should be activated within a day. The updated status will be visible in Settings."
+msgstr "თქვენი რეგისტრაცია Peppol-ის ქსელში ერთ დღეში უნდა გააქტიურდეს. განახლებული სტატუსი ხილული იქნება პარამეტრებში."

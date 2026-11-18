@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_rs_waybill_adjustment_wizard_form" model="ir.ui.view">
+        <field name="name">rs.waybill.adjustment.wizard.form</field>
+        <field name="model">rs.waybill.adjustment.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Adjustment History">
+                <group>
+                    <field name="waybill_id" readonly="1"/>
+                </group>
+                <separator string="Historical Versions"/>
+                <field name="line_ids" nolabel="1">
+                    <list create="false" delete="false" edit="false">
+                        <field name="date"/>
+                        <field name="user_name"/>
+                        <field name="archival_id"/>
+                        <button name="action_view_snapshot" type="object"
+                                string="View" class="btn-primary" icon="visibility"/>
+                    </list>
+                </field>
+                <footer>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    
+    <record id="view_rs_waybill_adjustment_snapshot_form" model="ir.ui.view">
+        <field name="name">rs.waybill.adjustment.snapshot.form</field>
+        <field name="model">rs.waybill.adjustment.snapshot</field>
+        <field name="arch" type="xml">
+            <form string="Historical Snapshot" create="false" edit="false" js_class="rs_waybill_live_form">
+                <field name="drift_field_names" invisible="1"/>
+                <sheet>
+                    <div class="rsw-tab">
+
+                        <div class="alert alert-info mb-2" role="alert">
+                            <strong>Read-only Historical Snapshot</strong> ·
+                            Archival ID: <field name="archival_id" readonly="1" class="oe_inline"/> ·
+                            Edited: <field name="date" readonly="1" class="oe_inline"/> ·
+                            By: <field name="user_name" readonly="1" class="oe_inline"/>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="oe_title">
+                                <label for="waybill_number" string="Waybill Number"/>
+                                <h1>
+                                    <field name="waybill_number" readonly="1"/>
+                                </h1>
+                            </div>
+                        </div>
+
+                        <h5 class="rsw-title">Main Information</h5>
+                        <div class="rsw-row">
+                            <div class="rsw-field">
+                                <span class="rsw-label">Waybill Type</span>
+                                <div class="rsw-value">
+                                    <field name="waybill_type" nolabel="1" readonly="1"/>
+                                </div>
+                            </div>
+                            <div class="rsw-field">
+                                <span class="rsw-label">Category</span>
+                                <div class="rsw-value">
+                                    <field name="category" nolabel="1" readonly="1"/>
+                                </div>
+                            </div>
+                            <div class="rsw-field">
+                                <span class="rsw-label">Activation Date</span>
+                                <div class="rsw-value">
+                                    <field name="activation_date" nolabel="1" readonly="1"/>
+                                </div>
+                            </div>
+                            <div class="rsw-field">
+                                <span class="rsw-label">Status</span>
+                                <div class="rsw-value">
+                                    <field name="waybill_status" nolabel="1" readonly="1"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rsw-card rsw-required">
+                            <h5 class="rsw-title">Seller Information</h5>
+                            <div class="rsw-row">
+                                <div class="rsw-field">
+                                    <span class="rsw-label">Identification Number</span>
+                                    <div class="rsw-value">
+                                        <field name="seller_tin" nolabel="1" readonly="1"/>
+                                    </div>
+                                </div>
+                                <div class="rsw-field">
+                                    <span class="rsw-label">Seller Name/Surname</span>
+                                    <div class="rsw-value">
+                                        <field name="seller_name" nolabel="1" readonly="1"/>
+                                    </div>
+                                </div>
+                                <div class="rsw-field">
+                                    <span class="rsw-label">Transport Start Address</span>
+                                    <div class="rsw-value">
+                                        <field name="start_address" nolabel="1" readonly="1"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div invisible="waybill_type == '3'">
+                            <div class="rsw-row">
+                                <div class="rsw-field">
+                                    <span class="rsw-label">Transport Type</span>
+                                    <div class="rsw-value">
+                                        <field name="transport_type" nolabel="1" readonly="1"/>
+                                    </div>
+                                </div>
+                                <div class="rsw-field" invisible="transport_type != '4'">
+                                    <span class="rsw-label">Other Transport</span>
+                                    <div class="rsw-value">
+                                        <field name="other_transport" nolabel="1" readonly="1"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="rsw-card" invisible="transport_type != '7'">
+                                <h5 class="rsw-title">Carrier Information</h5>
+                                <div class="rsw-row">
+                                    <div class="rsw-field">
+                                        <span class="rsw-label">Carrier TIN</span>
+                                        <div class="rsw-value">
+                                            <field name="transporter_tin" nolabel="1" readonly="1"/>
+                                        </div>
+                                    </div>
+                                    <div class="rsw-field">
+                                        <span class="rsw-label">Carrier Name</span>
+                                        <div class="rsw-value">
+                                            <field name="transporter_name" nolabel="1" readonly="1"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rsw-card rsw-required" invisible="transport_type not in ('1', '6', '7', '8')">
+                            <h5 class="rsw-title">Driver Information</h5>
+                            <div class="rsw-row">
+                                <div class="rsw-field">
+                                    <span class="rsw-label">Driver Name/Surname</span>
+                                    <div class="rsw-value">
+                                        <field name="driver_name" nolabel="1" readonly="1"/>
+                                    </div>
+                                </div>
+                                <div class="rsw-field">
+                                    <span class="rsw-label">Driver TIN</span>
+                                    <div class="rsw-value">
+                                        <field name="driver_tin" nolabel="1" readonly="1"/>
+                                    </div>
+                                </div>
+                                <div class="rsw-field">
+                                    <span class="rsw-label">Car Number</span>
+                                    <div class="rsw-value">
+                                        <field name="car_number" nolabel="1" readonly="1"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="rsw-row">
+                                <div class="rsw-field">
+                                    <span class="rsw-label">Driver is Foreigner</span>
+                                    <div class="rsw-value">
+                                        <field name="driver_is_foreigner" nolabel="1" readonly="1" widget="boolean_toggle"/>
+                                    </div>
+                                </div>
+                                <div class="rsw-field">
+                                    <span class="rsw-label">Transport Cost</span>
+                                    <div class="rsw-value">
+                                        <field name="transport_cost" nolabel="1" readonly="1"/>
+                                    </div>
+                                </div>
+                                <div class="rsw-field">
+                                    <span class="rsw-label">Transport Cost Payer</span>
+                                    <div class="rsw-value">
+                                        <field name="transport_cost_payer" nolabel="1" readonly="1"/>
+                                    </div>
+                                </div>
+                                <div class="rsw-field">
+                                    <span class="rsw-label">Transport Start Date</span>
+                                    <div class="rsw-value">
+                                        <field name="transport_start_date" nolabel="1" readonly="1"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rsw-card rsw-required">
+                            <h5 class="rsw-title">Buyer Information</h5>
+                            <div class="rsw-row">
+                                <div class="rsw-field">
+                                    <span class="rsw-label">Identification Number</span>
+                                    <div class="rsw-value">
+                                        <field name="buyer_tin" nolabel="1" readonly="1"/>
+                                    </div>
+                                </div>
+                                <div class="rsw-field">
+                                    <span class="rsw-label">Buyer Name</span>
+                                    <div class="rsw-value">
+                                        <field name="buyer_name" nolabel="1" readonly="1"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="rsw-row">
+                                <div class="rsw-field" invisible="waybill_type == '3'">
+                                    <span class="rsw-label">Delivery Address</span>
+                                    <div class="rsw-value">
+                                        <field name="end_address" nolabel="1" readonly="1"/>
+                                    </div>
+                                </div>
+                                <div class="rsw-field">
+                                    <span class="rsw-label">Buyer is Foreigner</span>
+                                    <div class="rsw-value">
+                                        <field name="citizen" nolabel="1" readonly="1" widget="boolean_toggle"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5 class="rsw-title">Goods</h5>
+                        <field name="line_ids" readonly="1">
+                            <list create="false" delete="false" edit="false"
+                                  decoration-warning="status == 'changed'"
+                                  decoration-danger="status == 'removed'"
+                                  decoration-info="status == 'added'">
+                                <field name="sequence" widget="handle"/>
+                                <field name="bar_code" string="Goods Code"/>
+                                <field name="name"/>
+                                <field name="unit_name"/>
+                                <field name="quantity"/>
+                                <field name="unit_price"/>
+                                <field name="amount"/>
+                                <field name="vat_type"/>
+                                <field name="status" optional="show"/>
+                            </list>
+                        </field>
+
+                        <group class="oe_subtotal_footer">
+                            <field name="full_amount" readonly="1"/>
+                        </group>
+
+                        <h5 class="rsw-title">Additional Info</h5>
+                        <div class="rsw-row">
+                            <div class="rsw-field">
+                                <span class="rsw-label">Delivery Date</span>
+                                <div class="rsw-value">
+                                    <field name="delivery_date" nolabel="1" readonly="1"/>
+                                </div>
+                            </div>
+                            <div class="rsw-field">
+                                <span class="rsw-label">Handed Over By</span>
+                                <div class="rsw-value">
+                                    <field name="reception_info" nolabel="1" readonly="1"/>
+                                </div>
+                            </div>
+                            <div class="rsw-field">
+                                <span class="rsw-label">Received By</span>
+                                <div class="rsw-value">
+                                    <field name="receiver_info" nolabel="1" readonly="1"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rsw-row">
+                            <div class="rsw-field" style="flex: 1 1 100%;">
+                                <span class="rsw-label">Notes</span>
+                                <div class="rsw-value">
+                                    <field name="comment" nolabel="1" readonly="1"/>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </sheet>
+                <footer>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_journal_form_bog" model="ir.ui.view">
+        <field name="name">account.journal.form.bog</field>
+        <field name="model">account.journal</field>
+        <field name="inherit_id" ref="account.view_account_journal_form"/>
+        <field name="arch" type="xml">
+            <sheet position="inside">
+                <field name="is_bog" invisible="1"/>
+                <group string="Bank of Georgia" invisible="not is_bog">
+                    <field name="bog_connection_id" readonly="1"/>
+                </group>
+                <button name="action_bog_import_statement" type="object" groups="bog_bank.group_bog_user"
+                        string="Import BOG Statement" class="btn-secondary"
+                        invisible="not is_bog"/>
+            </sheet>
+        </field>
+    </record>
+</odoo>

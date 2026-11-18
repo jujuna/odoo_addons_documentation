@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="card_vat" model="gec.declaration.card">
+        <field name="name">VAT Declaration</field>
+        <field name="description">Monthly VAT return for rs.ge</field>
+        <field name="sequence">10</field>
+        <field name="color">4</field>
+        <field name="module_name">gec_vat_declaration</field>
+        <field name="model_name">gec.vat.declaration</field>
+        <field name="action_xmlid">gec_vat_declaration.action_gec_vat_declaration</field>
+        <field name="frequency">monthly</field>
+    </record>
+    <record id="card_income" model="gec.declaration.card">
+        <field name="name">Income Tax Declaration (Form 30)</field>
+        <field name="description">Monthly income tax withheld at source</field>
+        <field name="sequence">20</field>
+        <field name="color">10</field>
+        <field name="module_name">gec_income_tax_report</field>
+        <field name="model_name">rs.form30.declaration</field>
+        <field name="action_xmlid">gec_income_tax_report.action_rs_form30_declaration</field>
+        <field name="frequency">monthly</field>
+    </record>
+    <record id="card_profit" model="gec.declaration.card">
+        <field name="name">Profit Tax Declaration (II-086)</field>
+        <field name="description">Monthly profit tax on distributed profit</field>
+        <field name="sequence">30</field>
+        <field name="color">2</field>
+        <field name="module_name">gec_profit_tax_report</field>
+        <field name="model_name">rs.cit.declaration</field>
+        <field name="action_xmlid">gec_profit_tax_report.rs_cit_declaration_action</field>
+        <field name="frequency">monthly</field>
+    </record>
+    <record id="card_property" model="gec.declaration.card">
+        <field name="name">Property Tax Declaration</field>
+        <field name="description">Annual property tax on buildings, equipment and land</field>
+        <field name="sequence">40</field>
+        <field name="color">9</field>
+        <field name="module_name">gec_property_tax_report</field>
+        <field name="model_name">rs.form15.declaration</field>
+        <field name="action_xmlid">gec_property_tax_report.action_rs_form15_declaration</field>
+        <field name="frequency">annual</field>
+    </record>
+</odoo>

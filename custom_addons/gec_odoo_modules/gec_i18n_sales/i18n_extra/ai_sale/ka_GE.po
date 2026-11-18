@@ -1,0 +1,87 @@
+# Georgian translation of the Odoo addon ai_sale, kept in gec_i18n_sales.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-28 17:52+0000\n"
+"PO-Revision-Date: 2026-09-30 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian (ka_GE)\n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#. module: ai_sale
+#: model:ir.module.module,shortdesc:base.module_ai_sale
+msgid "AI Sale"
+msgstr "AI გაყიდვები"
+
+#. module: ai_sale
+#: model:ir.module.module,summary:base.module_ai_sale
+msgid "Augment Sales with AI Agents."
+msgstr "გააძლიერეთ გაყიდვები AI აგენტებით."
+
+#. module: ai_sale
+#: model_terms:ai.prompt.button,prompt:ai_sale.ai_prompt_top_selling_products_chart
+msgid ""
+"Go to the Sales Analysis menu item (model_name: sale.report) and open the graph view of type \"bar chart\". Group by product_variant (field_name: product_id), in descending order. Set the measure as Total (measure_name: price_total) directly without computing the available measures.\n"
+"Don't mention model_name, field_name, measure_name or any record ids in the response."
+msgstr ""
+"გადადი გაყიდვების ანალიზის მენიუს ელემენტზე (model_name: sale.report) და გახსენი გრაფიკის ხედი, ტიპით \"სვეტოვანი დიაგრამა\". დააჯგუფე პროდუქტის ვარიანტის მიხედვით (field_name: product_id), კლებადი თანმიმდევრობით. საზომად პირდაპირ დააყენე ჯამი (measure_name: price_total), ხელმისაწვდომი საზომების გამოთვლის გარეშე.\n"
+"პასუხში არ ახსენო model_name, field_name, measure_name ან ჩანაწერების რაიმე ID."
+
+#. module: ai_sale
+#: model_terms:ai.prompt.button,prompt:ai_sale.ai_prompt_sales_by_category
+msgid ""
+"Go to the Sales Analysis menu item (model_name: sale.report) and open the pivot view. Group by product category (field_name: categ_id). Set the measure to Total (measure_name: price_total) directly without computing the available measures.\n"
+"Don't mention model_name, field_name, measure_name or any record ids in the response."
+msgstr ""
+"გადადი გაყიდვების ანალიზის მენიუს ელემენტზე (model_name: sale.report) და გახსენი პივოტის ხედი. დააჯგუფე პროდუქტის კატეგორიის მიხედვით (field_name: categ_id). საზომად პირდაპირ დააყენე ჯამი (measure_name: price_total), ხელმისაწვდომი საზომების გამოთვლის გარეშე.\n"
+"პასუხში არ ახსენო model_name, field_name, measure_name ან ჩანაწერების რაიმე ID."
+
+#. module: ai_sale
+#: model_terms:ai.prompt.button,prompt:ai_sale.ai_prompt_blog_ideas_catalog
+msgid ""
+"Read the names of all my products (model_name: product.template). Then based on this list, pick five of them at random. For each of those, come up with an idea of a blog post I could write.\n"
+"Example:\n"
+"The products are: Apple Pie, Cheese Burger, Bagel, Black embroidered t-shirt and Burger Menu Combo\n"
+"\n"
+"The final output should be something like:\n"
+"- Apple Pie: 5 Apple pie recipes you haven't tried yet\n"
+"- Cheese Burger: Why the classic Burgers still rule\n"
+"- Bagel: 3 ingredients to try in your bagel\n"
+"- Black embroidered t-shirt: What should we wear with a black t-shirt?\n"
+"- Burger Menu Combo: Try out our new burger menu combo, we swear you won't leave hungry!\n"
+"Don't mention model_name or any record ids in the response."
+msgstr ""
+"წაიკითხე ჩემი ყველა პროდუქტის სახელი (model_name: product.template). შემდეგ, ამ სიის საფუძველზე, შემთხვევით შეარჩიე მათგან ხუთი. თითოეულისთვის მოიფიქრე ბლოგპოსტის იდეა, რომლის დაწერაც შემიძლია.\n"
+"მაგალითი:\n"
+"პროდუქტებია: ვაშლის ღვეზელი, ყველის ბურგერი, ბეიგლი, შავი მაისური ნაქარგით და ბურგერის მენიუს კომბო\n"
+"\n"
+"საბოლოო შედეგი დაახლოებით ასეთი უნდა იყოს:\n"
+"- ვაშლის ღვეზელი: ვაშლის ღვეზელის 5 რეცეპტი, რომელიც ჯერ არ გიცდიათ\n"
+"- ყველის ბურგერი: რატომ რჩებიან კლასიკური ბურგერები ისევ ფავორიტებად\n"
+"- ბეიგლი: 3 ინგრედიენტი, რომელიც ბეიგლში უნდა სცადოთ\n"
+"- შავი მაისური ნაქარგით: რა ჩავიცვათ შავ მაისურთან ერთად?\n"
+"- ბურგერის მენიუს კომბო: სცადეთ ჩვენი ახალი ბურგერის მენიუს კომბო, გპირდებით, მშივრები არ წახვალთ!\n"
+"პასუხში არ ახსენო model_name ან ჩანაწერების რაიმე ID."
+
+#. module: ai_sale
+#: model_terms:ai.prompt.button,prompt:ai_sale.ai_prompt_top_sales_reps
+msgid ""
+"Search all sale order (model_name: sale.order) records, group them by user (field_name: user_id), sum the revenue (field_name: amount_total) from all the records and return\n"
+"the top 5. Don't mention model_name, field_name or any record ids in your response."
+msgstr ""
+"მოძებნე გაყიდვის შეკვეთის (model_name: sale.order) ყველა ჩანაწერი, დააჯგუფე ისინი მომხმარებლის მიხედვით (field_name: user_id), შეაჯამე შემოსავალი (field_name: amount_total) ყველა ჩანაწერიდან და დააბრუნე\n"
+"პირველი 5. პასუხში არ ახსენო model_name, field_name ან ჩანაწერების რაიმე ID."
+
+#. module: ai_sale
+#: model_terms:ai.prompt.button,prompt:ai_sale.ai_prompt_sales_by_country
+msgid ""
+"Show me a graph view, of type \"pie chart\" , using the Sales Analysis (model_name: sale.report) menu item. Group those sale orders by customer country (field_name: country_id).\n"
+"Don't mention model_name, field_name or any record ids in your response."
+msgstr ""
+"მაჩვენე გრაფიკის ხედი, ტიპით \"წრიული დიაგრამა\", გაყიდვების ანალიზის (model_name: sale.report) მენიუს ელემენტის გამოყენებით. დააჯგუფე ეს გაყიდვის შეკვეთები კლიენტის ქვეყნის მიხედვით (field_name: country_id).\n"
+"პასუხში არ ახსენო model_name, field_name ან ჩანაწერების რაიმე ID."

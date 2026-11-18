@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_rs_einvoice" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.rs.einvoice</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='account']" position="inside">
+                <block title="RS E-Invoice (SOAP)" name="rs_einvoice_settings">
+                    <setting string="Credentials"
+                             help="rs.ge credentials are stored per user and per company. Switch to the company, open Settings > Users > Preferences > Revenue Service (rs.ge), fill in the rs.ge Username and Password, then click 'Test RS Credentials' to validate them and store the company's taxpayer id. Tick 'RS Responsible User' on the user whose login runs that company's scheduled actions.">
+                        <div class="text-muted">
+                            Per user and per company: Settings &gt; Users &gt; Preferences &gt; Revenue Service (rs.ge), in each company.
+                        </div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="partner_pension_agency" model="res.partner">
+            <field name="name">საპენსიო სააგენტო</field>
+            <field name="country_id" ref="base.ge"/>
+            <field name="company_id" eval="False"/>
+        </record>
+        <!-- Taxes, income tax included, go to treasury code 101001000; the Pension Agency has bank accounts. -->
+        <record id="partner_state_treasury" model="res.partner">
+            <field name="name">სახელმწიფო ხაზინა</field>
+            <field name="country_id" ref="base.ge"/>
+            <field name="company_id" eval="False"/>
+            <field name="gec_treasury_code">101001000</field>
+        </record>
+    </data>
+</odoo>

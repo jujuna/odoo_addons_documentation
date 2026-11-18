@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <template id="sign_template_mail_completed_geoeid_placeholder"
+              inherit_id="sign.sign_template_mail_completed">
+        <xpath expr="//t[@t-foreach='signers']/t[@t-else='']" position="replace">
+            <t t-else="">
+                <t t-out="signer.get('name')"/>
+                <t t-if="signer.get('email') and not signer.get('email').lower().endswith('@id-card.invalid')">
+                    (<a t-att-href="record._get_mail_link(signer.get('email'), subject)"
+                        style="color:#428BCA; text-decoration:none;"
+                        target="_blank"><t t-out="signer.get('email')"/></a>)</t>
+            </t>
+        </xpath>
+    </template>
+
+    <template id="sign_request_logs_user_geoeid" inherit_id="sign.sign_request_logs_user">
+        <xpath expr="//span[@t-field='sri.partner_id.email']/.." position="replace">
+            <td>
+                <span t-if="not (sri.partner_id.email or '').lower().endswith('@id-card.invalid')"
+                      t-field="sri.partner_id.email">john@example.com</span>
+            </td>
+        </xpath>
+        <xpath expr="//section[hasclass('mb-4')]" position="after">
+            <t t-set="geoeid_items" t-value="o.sudo().request_item_ids.filtered(lambda i: i.geoeid_state == 'signed')"/>
+            <t t-if="geoeid_items">
+                <h5>Georgian ID Card Signatures</h5>
+                <table class="table table-borderless o_main_table small mb-1">
+                    <thead>
+                        <tr>
+                            <th class="text-start">Signatory</th>
+                            <th class="text-start">Certificate</th>
+                            <th class="text-start">Personal Number</th>
+                            <th class="text-start">Serial</th>
+                            <th class="text-start">Valid Until</th>
+                            <th class="text-start">Assurance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="geoeid_items" t-as="gi">
+                            <td><span t-out="gi.geoeid_cert_common_name or gi.partner_id.name">John Smith</span></td>
+                            <td><span t-out="gi.geoeid_cert_subject">CN=...</span></td>
+                            <td><span t-out="gi.geoeid_cert_personal_number">01234567890</span></td>
+                            <td><span t-out="gi.geoeid_cert_serial">a1b2c3</span></td>
+                            <td><span t-out="gi.geoeid_cert_not_after">2027-01-01</span></td>
+                            <td>
+                                <span t-if="gi.geoeid_cert_trusted" class="text-success">Chain verified (revocation not checked)</span>
+                                <span t-else="" class="text-warning">Chain not verified</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <section class="mb-4">
+                    <div class="text-muted">
+                        <small>
+                            Each signature above is cryptographically bound to the document with the
+                            signatory's Georgian ID Card (PAdES) and can be validated in any compliant
+                            PDF reader. "Chain verified" means the signing certificate was issued by a
+                            certificate authority saved as trust anchor; Odoo does not check whether the
+                            certificate was revoked. Rows marked "Chain not verified" were cryptographically
+                            validated, but their issuer was not checked.
+                        </small>
+                    </div>
+                </section>
+            </t>
+        </xpath>
+    </template>
+
+</odoo>

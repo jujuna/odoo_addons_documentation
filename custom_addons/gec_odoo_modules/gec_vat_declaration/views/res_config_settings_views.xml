@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_gec_vat_declaration" model="ir.ui.view">
+        <field name="name">res.config.settings.form.gec.vat.declaration</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='default_taxes_setting_container']" position="after">
+                <block title="VAT Declaration" name="gec_vat_declaration_setting_container"
+                       groups="account.group_account_manager">
+                    <setting id="gec_vat_fixed_asset_accounts" company_dependent="1"
+                             string="Fixed-asset accounts (VAT declaration)"
+                             help="VAT of bill lines on these accounts goes to the fixed-assets column of annex A III">
+                        <field name="gec_vat_fixed_asset_account_ids" widget="many2many_tags"
+                               options="{'no_create': True}"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

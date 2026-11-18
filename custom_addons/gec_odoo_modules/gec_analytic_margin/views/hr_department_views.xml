@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_department_form_gec_function" model="ir.ui.view">
+        <field name="name">hr.department.form.gec.function</field>
+        <field name="model">hr.department</field>
+        <field name="inherit_id" ref="hr.view_department_form"/>
+        <field name="arch" type="xml">
+            <field name="parent_id" position="after">
+                <field name="gec_function_component_id" options="{'no_create': True}"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

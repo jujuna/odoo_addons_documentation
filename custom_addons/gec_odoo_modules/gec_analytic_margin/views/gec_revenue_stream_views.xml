@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_gec_revenue_stream_list" model="ir.ui.view">
+        <field name="name">gec.revenue.stream.list</field>
+        <field name="model">gec.revenue.stream</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="recurring" widget="boolean_toggle"/>
+                <field name="standard_product" widget="boolean_toggle"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_gec_revenue_stream" model="ir.actions.act_window">
+        <field name="name">Revenue Streams</field>
+        <field name="res_model">gec.revenue.stream</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Say what kind of revenue you earn</p>
+            <p>
+                Set a stream on each income account, or on the product-line
+                analytic accounts when one income account carries everything.
+                Mark the streams that renew without a new sale as recurring:
+                the dashboard shows their share of revenue.
+            </p>
+        </field>
+    </record>
+
+</odoo>

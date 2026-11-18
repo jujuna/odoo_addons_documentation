@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_payroll_unit_rate_view_list" model="ir.ui.view">
+        <field name="name">hr.payroll.unit.rate.list</field>
+        <field name="model">hr.payroll.unit.rate</field>
+        <field name="arch" type="xml">
+            <list string="Unit Work Rates">
+                <field name="name"/>
+                <field name="uom_id"/>
+                <field name="price_per_unit"/>
+                <field name="currency_id"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_payroll_unit_rate_view_form" model="ir.ui.view">
+        <field name="name">hr.payroll.unit.rate.form</field>
+        <field name="model">hr.payroll.unit.rate</field>
+        <field name="arch" type="xml">
+            <form string="Unit Work Rate">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="uom_id"/>
+                        </group>
+                        <group>
+                            <field name="price_per_unit"/>
+                            <field name="currency_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_payroll_unit_rate_view_search" model="ir.ui.view">
+        <field name="name">hr.payroll.unit.rate.search</field>
+        <field name="model">hr.payroll.unit.rate</field>
+        <field name="arch" type="xml">
+            <search string="Unit Work Rates">
+                <field name="name"/>
+                <field name="uom_id"/>
+                <separator/>
+                <filter name="filter_archived" string="Archived" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hr_payroll_unit_rate" model="ir.actions.act_window">
+        <field name="name">Unit Work Rates</field>
+        <field name="res_model">hr.payroll.unit.rate</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define a unit work rate</p>
+            <p>Each rate prices one unit of work, e.g. laying 1 square meter of tiles.
+               An approved work log keeps its price; changing a rate only affects work logs approved later.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_hr_payroll_unit_rate" name="Unit Work Rates"
+              parent="hr_payroll.menu_hr_payroll_root"
+              action="action_hr_payroll_unit_rate" sequence="48"
+              groups="hr_payroll.group_hr_payroll_manager"/>
+</odoo>

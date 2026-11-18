@@ -1,0 +1,31 @@
+.o_rms_price_change {
+    // the list view forces the spans of number cells to inline: keep the flex layout
+    display: inline-flex !important;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-variant-numeric: tabular-nums;
+    .o_rms_pc_price { font-size: 0.9375rem; font-weight: 600; }
+    .o_rms_pc_empty { color: var(--rms-muted); font-weight: 400; }
+    &.o_rms_compact {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        .o_rms_delta { background: var(--rms-muted-soft); }
+        .o_rms_delta_up { background: var(--rms-success-soft); }
+        .o_rms_delta_down { background: var(--rms-danger-soft); }
+    }
+    .o_rms_delta {
+        display: inline-flex !important;
+        align-items: center;
+        padding: 0 6px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        gap: 2px;
+        color: var(--rms-muted);
+        .oi { font-size: 0.75rem; }
+    }
+    .o_rms_delta_up { background: var(--rms-success-soft); color: var(--rms-success); }
+    .o_rms_delta_down { background: var(--rms-danger-soft); color: var(--rms-danger); }
+}

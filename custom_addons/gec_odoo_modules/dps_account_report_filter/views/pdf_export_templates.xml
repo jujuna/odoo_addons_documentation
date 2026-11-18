@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="pdf_export_filters_currency"
+              inherit_id="account_reports.pdf_export_filters"
+              name="PDF export filters: presentation currency">
+        <xpath expr="//t[@name='aml_ir_filters']" position="before">
+            <t t-if="options.get('selected_currencies_id') and options['selected_currencies_id'] != env.company.currency_id.id">
+                <div class="row">
+                    <div>Reporting Currency: <span t-out="options.get('selected_currencies')" class="o_text_muted"/></div>
+                </div>
+            </t>
+        </xpath>
+    </template>
+</odoo>

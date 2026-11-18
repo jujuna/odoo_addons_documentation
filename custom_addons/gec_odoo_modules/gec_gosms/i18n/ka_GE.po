@@ -1,0 +1,609 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* gec_gosms
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-16 09:28+0000\n"
+"PO-Revision-Date: 2026-11-16 09:28+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian (ka_GE)\n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#. module: gec_gosms
+#: model:ir.module.module,description:base.module_gec_gosms
+msgid ""
+"\n"
+"Connects Odoo to GoSMS.ge: Odoo's own SMS (chatter, SMS Marketing) go out through it, every message is logged in a GoSMS list,\n"
+"delivery reports and replies come back by webhook, and any module can ask for a one-time SMS code before a button runs.\n"
+msgstr ""
+"\n"
+"Odoo-ს GoSMS.ge-სთან აკავშირებს: Odoo-ს SMS-ები (შეტყობინებების ისტორიიდან და SMS მარკეტინგიდან) მისი მეშვეობით იგზავნება, ყოველი შეტყობინება GoSMS-ის სიაში აისახება,\n"
+"მიწოდების შეტყობინებები და პასუხები webhook-ით ბრუნდება, ხოლო ნებისმიერ მოდულს შეუძლია ღილაკის შესრულებამდე SMS-ით ერთჯერადი კოდი მოითხოვოს.\n"
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/models/gosms_send_wizard.py:0
+msgid "%(sent)s of %(total)s SMS sent."
+msgstr "%(total)s SMS-დან გაიგზავნა %(sent)s."
+
+#. module: gec_gosms
+#: model_terms:ir.ui.view,arch_db:gec_gosms.res_config_settings_view_form
+msgid "API Key"
+msgstr "API გასაღები"
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/models/gosms_confirm_wizard.py:0
+msgid "Add a phone number first: the confirmation code is sent to it by SMS."
+msgstr "ჯერ მიუთითეთ ტელეფონის ნომერი: დამადასტურებელი კოდი მასზე SMS-ით გაიგზავნება."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/models/res_company.py:0
+msgid "Add the GoSMS API key in Settings first."
+msgstr "ჯერ პარამეტრებში მიუთითეთ GoSMS-ის API გასაღები."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/tools/sms_api.py:0
+msgid "Add the GoSMS sender name in Settings first."
+msgstr "ჯერ პარამეტრებში მიუთითეთ GoSMS-ის გამგზავნის სახელი."
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_confirm_wizard__attempts_left
+msgid "Attempts Left"
+msgstr "დარჩენილი მცდელობები"
+
+#. module: gec_gosms
+#: model_terms:ir.ui.view,arch_db:gec_gosms.gosms_confirm_wizard_view_form
+msgid "Attempts left:"
+msgstr "დარჩენილი მცდელობები:"
+
+#. module: gec_gosms
+#: model_terms:ir.ui.view,arch_db:gec_gosms.res_config_settings_view_form
+msgid "Check Connection"
+msgstr "კავშირის შემოწმება"
+
+#. module: gec_gosms
+#: model_terms:ir.ui.view,arch_db:gec_gosms.gosms_message_view_form
+msgid "Check Status"
+msgstr "სტატუსის შემოწმება"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_confirm_wizard__code model_terms:ir.ui.view,arch_db:gec_gosms.gosms_confirm_wizard_view_form
+msgid "Code"
+msgstr "კოდი"
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/models/gosms_confirm_wizard.py:0
+msgid "Code sent to %s"
+msgstr "კოდი გაიგზავნა ნომერზე %s"
+
+#. module: gec_gosms
+#: model:ir.model,name:gec_gosms.model_res_company model:ir.model.fields,field_description:gec_gosms.field_gosms_confirm_wizard__company_id model:ir.model.fields,field_description:gec_gosms.field_gosms_message__company_id model:ir.model.fields,field_description:gec_gosms.field_sms_sms__record_company_id
+msgid "Company"
+msgstr "კომპანია"
+
+#. module: gec_gosms
+#: model:ir.model,name:gec_gosms.model_res_config_settings
+msgid "Config Settings"
+msgstr "კონფიგურაციის პარამეტრები"
+
+#. module: gec_gosms
+#: model:ir.ui.menu,name:gec_gosms.gosms_menu_configuration
+msgid "Configuration"
+msgstr "კონფიგურაცია"
+
+#. module: gec_gosms
+#: model_terms:ir.ui.view,arch_db:gec_gosms.gosms_confirm_wizard_view_form
+msgid "Confirm"
+msgstr "დადასტურება"
+
+#. module: gec_gosms
+#: model:ir.model.fields.selection,name:gec_gosms.selection__gosms_message__kind__code
+msgid "Confirmation Code"
+msgstr "დამადასტურებელი კოდი"
+
+#. module: gec_gosms
+#: model_terms:ir.ui.view,arch_db:gec_gosms.gosms_message_view_search
+msgid "Confirmation Codes"
+msgstr "დამადასტურებელი კოდები"
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/models/gosms_confirm_wizard.py:0
+msgid "Confirmed with the SMS code sent to %s."
+msgstr "დადასტურებულია ნომერზე %s გაგზავნილი SMS კოდით."
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_message__partner_id
+msgid "Contact"
+msgstr "კონტაქტი"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_confirm_wizard__create_uid model:ir.model.fields,field_description:gec_gosms.field_gosms_message__create_uid model:ir.model.fields,field_description:gec_gosms.field_gosms_send_wizard__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_confirm_wizard__create_date model:ir.model.fields,field_description:gec_gosms.field_gosms_message__create_date model:ir.model.fields,field_description:gec_gosms.field_gosms_send_wizard__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_sms_sms__gosms_urgent
+msgid "Deliver Even if Blocked"
+msgstr "ჩაბარდეს ბლოკირებულ ნომრებზეც"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_send_wizard__urgent
+msgid "Deliver even to numbers that blocked SMS"
+msgstr "ჩაბარდეს იმ ნომრებზეც, რომლებმაც SMS-ები დაბლოკეს"
+
+#. module: gec_gosms
+#: model:ir.model.fields.selection,name:gec_gosms.selection__gosms_message__state__delivered
+msgid "Delivered"
+msgstr "მიწოდებული"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_message__direction
+msgid "Direction"
+msgstr "მიმართულება"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_confirm_wizard__display_name model:ir.model.fields,field_description:gec_gosms.field_gosms_message__display_name model:ir.model.fields,field_description:gec_gosms.field_gosms_send_wizard__display_name model:ir.model.fields,field_description:gec_gosms.field_res_company__display_name model:ir.model.fields,field_description:gec_gosms.field_res_config_settings__display_name model:ir.model.fields,field_description:gec_gosms.field_sms_composer__display_name model:ir.model.fields,field_description:gec_gosms.field_sms_sms__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_message__encoding
+msgid "Encoding"
+msgstr "კოდირება"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_message__event_id
+msgid "Event"
+msgstr "მოვლენა"
+
+#. module: gec_gosms
+#: model:ir.model.fields.selection,name:gec_gosms.selection__gosms_message__state__expired
+msgid "Expired"
+msgstr "ვადაგასული"
+
+#. module: gec_gosms
+#: model:ir.model.fields.selection,name:gec_gosms.selection__gosms_message__state__error model_terms:ir.ui.view,arch_db:gec_gosms.gosms_message_view_search
+msgid "Failed"
+msgstr "ვერ გაიგზავნა"
+
+#. module: gec_gosms
+#: model:ir.module.module,shortdesc:base.module_gec_gosms model:ir.ui.menu,name:gec_gosms.gosms_menu_root model_terms:ir.ui.view,arch_db:gec_gosms.res_config_settings_view_form
+msgid "GoSMS"
+msgstr "GoSMS"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_res_company__gosms_api_key model:ir.model.fields,field_description:gec_gosms.field_res_config_settings__gosms_api_key
+msgid "GoSMS API Key"
+msgstr "GoSMS-ის API გასაღები"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_message__gosms_id
+msgid "GoSMS ID"
+msgstr "GoSMS ID"
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/tools/sms_api.py:0
+msgid "GoSMS cannot find this message. Check that it was sent with this GoSMS account."
+msgstr "GoSMS ამ შეტყობინებას ვერ პოულობს. შეამოწმეთ, ამ GoSMS ანგარიშით გაიგზავნა თუ არა."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/tools/sms_api.py:0
+msgid "GoSMS cannot set this up: check the sender name, and for SMS codes the OTP settings, on app.gosms.ge."
+msgstr "GoSMS ამის გამართვას ვერ ახერხებს: შეამოწმეთ გამგზავნის სახელი, ხოლო SMS კოდებისთვის — OTP პარამეტრები app.gosms.ge-ზე."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/models/res_company.py:0
+msgid "GoSMS could not be reached. Try again in a minute."
+msgstr "GoSMS-თან დაკავშირება ვერ მოხერხდა. სცადეთ ერთ წუთში."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/tools/sms_api.py:0
+msgid "GoSMS could not send the code. Try again."
+msgstr "GoSMS-მა კოდის გაგზავნა ვერ შეძლო. სცადეთ ხელახლა."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/models/res_company.py:0
+msgid "GoSMS did not answer in time: the message may have been sent. Check it before sending again."
+msgstr "GoSMS-მა დროულად არ უპასუხა: შეტყობინება შესაძლოა უკვე გაიგზავნა. ხელახლა გაგზავნამდე შეამოწმეთ ის."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/tools/sms_api.py:0
+msgid "GoSMS did not confirm this message. Check it before sending again."
+msgstr "GoSMS-მა ეს შეტყობინება არ დაადასტურა. ხელახლა გაგზავნამდე შეამოწმეთ ის."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/tools/sms_api.py:0
+msgid "GoSMS does not accept this phone number. Correct it and try again."
+msgstr "GoSMS ამ ტელეფონის ნომერს არ იღებს. შეასწორეთ ნომერი და სცადეთ ხელახლა."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/models/res_config_settings.py:0
+msgid "GoSMS is connected. SMS balance: %s"
+msgstr "GoSMS დაკავშირებულია. SMS ბალანსი: %s"
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/tools/sms_api.py:0
+msgid "GoSMS refused the message: the text is too long or a value is missing."
+msgstr "GoSMS-მა შეტყობინება უარყო: ტექსტი ძალიან გრძელია ან რომელიმე მნიშვნელობა აკლია."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/models/res_company.py:0
+msgid "GoSMS refused the request: %s"
+msgstr "GoSMS-მა მოთხოვნა უარყო: %s"
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/models/gosms_message.py:0
+msgid "GoSMS status: %s."
+msgstr "GoSMS-ის სტატუსი: %s."
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_confirm_wizard__id model:ir.model.fields,field_description:gec_gosms.field_gosms_message__id model:ir.model.fields,field_description:gec_gosms.field_gosms_send_wizard__id model:ir.model.fields,field_description:gec_gosms.field_res_company__id model:ir.model.fields,field_description:gec_gosms.field_res_config_settings__id model:ir.model.fields,field_description:gec_gosms.field_sms_composer__id model:ir.model.fields,field_description:gec_gosms.field_sms_sms__id
+msgid "ID"
+msgstr "იდენტიფიკატორი"
+
+#. module: gec_gosms
+#: model:ir.model.fields.selection,name:gec_gosms.selection__gosms_message__direction__inbound model_terms:ir.ui.view,arch_db:gec_gosms.gosms_message_view_search
+msgid "Incoming"
+msgstr "შემომავალი"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_message__kind
+msgid "Kind"
+msgstr "ტიპი"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_confirm_wizard__write_uid model:ir.model.fields,field_description:gec_gosms.field_gosms_message__write_uid model:ir.model.fields,field_description:gec_gosms.field_gosms_send_wizard__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_confirm_wizard__write_date model:ir.model.fields,field_description:gec_gosms.field_gosms_message__write_date model:ir.model.fields,field_description:gec_gosms.field_gosms_send_wizard__write_date
+msgid "Last Updated on"
+msgstr "ბოლო განახლების თარიღი"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_message__body model:ir.model.fields,field_description:gec_gosms.field_gosms_send_wizard__body model_terms:ir.ui.view,arch_db:gec_gosms.gosms_message_view_form
+msgid "Message"
+msgstr "შეტყობინება"
+
+#. module: gec_gosms
+#: model:ir.actions.act_window,name:gec_gosms.gosms_message_action model:ir.ui.menu,name:gec_gosms.gosms_menu_messages model_terms:ir.ui.view,arch_db:gec_gosms.gosms_message_view_list
+msgid "Messages"
+msgstr "შეტყობინებები"
+
+#. module: gec_gosms
+#: model:ir.model.fields.selection,name:gec_gosms.selection__gosms_message__state__undelivered
+msgid "Not Delivered"
+msgstr "მიუწოდებელი"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_res_company__gosms_nosms_number model:ir.model.fields,field_description:gec_gosms.field_res_config_settings__gosms_nosms_number
+msgid "Opt-out Number"
+msgstr "NoSMS ნომერი"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_confirm_wizard__otp_hash
+msgid "Otp Hash"
+msgstr "OTP ჰეში"
+
+#. module: gec_gosms
+#: model:ir.model.fields.selection,name:gec_gosms.selection__gosms_message__direction__outgoing model_terms:ir.ui.view,arch_db:gec_gosms.gosms_message_view_search
+msgid "Outgoing"
+msgstr "გამავალი"
+
+#. module: gec_gosms
+#: model:ir.model,name:gec_gosms.model_sms_sms
+msgid "Outgoing SMS"
+msgstr "გამავალი SMS"
+
+#. module: gec_gosms
+#: model_terms:ir.ui.view,arch_db:gec_gosms.res_config_settings_view_form
+msgid "Paste this address into Webhook URL and DLR URL on app.gosms.ge."
+msgstr "ეს მისამართი ჩასვით app.gosms.ge-ზე, Webhook URL-სა და DLR URL-ში."
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_confirm_wizard__phone
+msgid "Phone"
+msgstr "ტელეფონი"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_message__number
+msgid "Phone Number"
+msgstr "ტელეფონის ნომერი"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_send_wizard__numbers
+msgid "Phone Numbers"
+msgstr "ტელეფონის ნომრები"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_message__failure_reason
+msgid "Reason"
+msgstr "მიზეზი"
+
+#. module: gec_gosms
+#: model:ir.model.fields.selection,name:gec_gosms.selection__gosms_message__state__received
+msgid "Received"
+msgstr "მიღებული"
+
+#. module: gec_gosms
+#: model_terms:ir.ui.view,arch_db:gec_gosms.res_config_settings_view_form
+msgid "Register Sender Name"
+msgstr "გამგზავნის სახელის რეგისტრაცია"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_confirm_wizard__request
+msgid "Request"
+msgstr "მოთხოვნა"
+
+#. module: gec_gosms
+#: model:ir.model.fields.selection,name:gec_gosms.selection__gosms_message__kind__sms
+msgid "SMS"
+msgstr "SMS"
+
+#. module: gec_gosms
+#: model_terms:ir.ui.view,arch_db:gec_gosms.gosms_confirm_wizard_view_form
+msgid "SMS Code"
+msgstr "SMS კოდი"
+
+#. module: gec_gosms
+#: model:ir.model,name:gec_gosms.model_gosms_confirm_wizard
+msgid "SMS Code Confirmation"
+msgstr "SMS კოდით დადასტურება"
+
+#. module: gec_gosms
+#: model:ir.model,name:gec_gosms.model_gosms_message
+msgid "SMS Message"
+msgstr "SMS შეტყობინება"
+
+#. module: gec_gosms
+#: model_terms:ir.ui.view,arch_db:gec_gosms.gosms_message_view_search
+msgid "Search Messages"
+msgstr "შეტყობინებების ძიება"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_message__segments
+msgid "Segments"
+msgstr "სეგმენტები"
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/models/gosms_confirm_wizard.py:0
+msgid "Select one record at a time: each SMS code confirms one record."
+msgstr "ერთდროულად აირჩიეთ მხოლოდ ერთი ჩანაწერი: თითო SMS კოდი ერთ ჩანაწერს ადასტურებს."
+
+#. module: gec_gosms
+#: model_terms:ir.ui.view,arch_db:gec_gosms.gosms_send_wizard_view_form
+msgid "Send"
+msgstr "გაგზავნა"
+
+#. module: gec_gosms
+#: model_terms:ir.ui.view,arch_db:gec_gosms.res_config_settings_view_form
+msgid "Send Odoo SMS and confirmation codes through GoSMS.ge. For codes, the sender name and how long a code is valid are set in the OTP settings on app.gosms.ge."
+msgstr "Odoo-ს SMS-ებისა და დამადასტურებელი კოდების გაგზავნა GoSMS.ge-ით. კოდებისთვის გამგზავნის სახელი და კოდის მოქმედების ვადა app.gosms.ge-ის OTP პარამეტრებში მიეთითება."
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_res_company__gosms_sms_enabled model:ir.model.fields,field_description:gec_gosms.field_res_config_settings__gosms_sms_enabled
+msgid "Send Odoo SMS through GoSMS"
+msgstr "Odoo-ს SMS-ების GoSMS-ით გაგზავნა"
+
+#. module: gec_gosms
+#: model:ir.actions.act_window,name:gec_gosms.gosms_send_wizard_action model:ir.model,name:gec_gosms.model_gosms_send_wizard model:ir.ui.menu,name:gec_gosms.gosms_menu_send model_terms:ir.ui.view,arch_db:gec_gosms.gosms_send_wizard_view_form
+msgid "Send SMS"
+msgstr "SMS-ის გაგზავნა"
+
+#. module: gec_gosms
+#: model:ir.model,name:gec_gosms.model_sms_composer
+msgid "Send SMS Wizard"
+msgstr "SMS-ის გაგზავნის ფორმა"
+
+#. module: gec_gosms
+#: model:ir.module.module,summary:base.module_gec_gosms
+msgid "Send SMS, receive replies and confirm actions with one-time codes through GoSMS.ge"
+msgstr "SMS-ების გაგზავნა, პასუხების მიღება და მოქმედებების ერთჯერადი კოდით დადასტურება GoSMS.ge-ის მეშვეობით"
+
+#. module: gec_gosms
+#: model_terms:ir.ui.view,arch_db:gec_gosms.gosms_confirm_wizard_view_form
+msgid "Send a New Code"
+msgstr "ახალი კოდის გაგზავნა"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_res_company__gosms_sender model:ir.model.fields,field_description:gec_gosms.field_res_config_settings__gosms_sender
+msgid "Sender Name"
+msgstr "გამგზავნის სახელი"
+
+#. module: gec_gosms
+#: model:ir.model.fields.selection,name:gec_gosms.selection__gosms_message__state__sent
+msgid "Sent"
+msgstr "გაგზავნილი"
+
+#. module: gec_gosms
+#: model:ir.model.fields,help:gec_gosms.field_gosms_send_wizard__numbers
+msgid "Separate the numbers with commas."
+msgstr "ნომრები ერთმანეთისგან მძიმით გამოყავით."
+
+#. module: gec_gosms
+#: model:ir.ui.menu,name:gec_gosms.gosms_menu_settings
+msgid "Settings"
+msgstr "პარამეტრები"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_message__sms_uuid
+msgid "Sms Uuid"
+msgstr "SMS-ის UUID"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_gosms_message__state model_terms:ir.ui.view,arch_db:gec_gosms.gosms_message_view_search
+msgid "Status"
+msgstr "სტატუსი"
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/tools/sms_api.py:0
+msgid "The GoSMS API key is wrong or missing. Fix it in Settings."
+msgstr "GoSMS-ის API გასაღები არასწორია ან არ არის მითითებული. შეასწორეთ ის პარამეტრებში."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/tools/sms_api.py:0
+msgid "The GoSMS SMS balance is used up. Top it up on app.gosms.ge."
+msgstr "GoSMS-ის SMS ბალანსი ამოიწურა. შეავსეთ ის app.gosms.ge-ზე."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/tools/sms_api.py:0
+msgid "The GoSMS sender name is not registered or not active. Check it on app.gosms.ge."
+msgstr "GoSMS-ის გამგზავნის სახელი დარეგისტრირებული ან გააქტიურებული არ არის. შეამოწმეთ ის app.gosms.ge-ზე."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/tools/sms_api.py:0
+msgid "The code has expired. Send a new code."
+msgstr "კოდს ვადა გაუვიდა. გაგზავნეთ ახალი კოდი."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/models/gosms_confirm_wizard.py:0
+msgid "The code is wrong. Attempts left: %s."
+msgstr "კოდი არასწორია. დარჩენილი მცდელობები: %s."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/models/gosms_confirm_wizard.py:0
+msgid "The code is wrong. Check the SMS and try again."
+msgstr "კოდი არასწორია. შეამოწმეთ SMS და სცადეთ ხელახლა."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/tools/sms_api.py:0
+msgid "The opt-out number is not valid or not set up on GoSMS. Check it on app.gosms.ge."
+msgstr "NoSMS ნომერი არასწორია ან GoSMS-ში გამართული არ არის. შეამოწმეთ ის app.gosms.ge-ზე."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/models/gosms_confirm_wizard.py:0
+msgid "The phone number %s is not valid. Correct it and try again."
+msgstr "ტელეფონის ნომერი %s არასწორია. შეასწორეთ და სცადეთ ხელახლა."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/models/res_config_settings.py:0
+msgid "The sender name %s is registered on GoSMS."
+msgstr "გამგზავნის სახელი %s GoSMS-ში დარეგისტრირებულია."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/models/gosms_confirm_wizard.py:0
+msgid "This action needs an SMS code, so it can only be run from the Odoo screen."
+msgstr "ეს მოქმედება SMS კოდს საჭიროებს, ამიტომ მისი შესრულება მხოლოდ Odoo-ს ეკრანიდან შეიძლება."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/tools/sms_api.py:0
+msgid "This code was already used. Send a new code."
+msgstr "ეს კოდი უკვე გამოყენებულია. გაგზავნეთ ახალი კოდი."
+
+#. module: gec_gosms
+#: model:ir.model.constraint,message:gec_gosms.constraint_gosms_message_company_event_unique
+msgid "This message was already received."
+msgstr "ეს შეტყობინება უკვე მიღებულია."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/tools/sms_api.py:0
+msgid "This sender name already exists on GoSMS. Check it on app.gosms.ge."
+msgstr "გამგზავნის ეს სახელი GoSMS-ში უკვე არსებობს. შეამოწმეთ ის app.gosms.ge-ზე."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/models/res_company.py:0
+msgid "Too many codes were requested. Wait %s minutes, then send a new code."
+msgstr "მოთხოვნილია ძალიან ბევრი კოდი. დაიცადეთ %s წუთი და შემდეგ გაგზავნეთ ახალი კოდი."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/tools/sms_api.py:0
+msgid "Too many codes were requested. Wait a few minutes, then send a new code."
+msgstr "მოთხოვნილია ძალიან ბევრი კოდი. დაიცადეთ რამდენიმე წუთი და შემდეგ გაგზავნეთ ახალი კოდი."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/tools/sms_api.py:0
+msgid "Too many failed attempts: GoSMS has paused codes for a while. Try again later."
+msgstr "ძალიან ბევრი წარუმატებელი მცდელობის გამო GoSMS-მა კოდების გაგზავნა დროებით შეაჩერა. სცადეთ მოგვიანებით."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/models/res_company.py:0
+msgid "Too many failed attempts: GoSMS has paused codes. Try again in %s minutes."
+msgstr "ძალიან ბევრი წარუმატებელი მცდელობის გამო GoSMS-მა კოდების გაგზავნა შეაჩერა. სცადეთ %s წუთში."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/models/gosms_send_wizard.py:0
+msgid "Turn on \"Send Odoo SMS through GoSMS\" in Settings first."
+msgstr "ჯერ პარამეტრებში ჩართეთ „Odoo-ს SMS-ების GoSMS-ით გაგზავნა“."
+
+#. module: gec_gosms
+#. odoo-python
+#: code:addons/gec_gosms/models/gosms_confirm_wizard.py:0
+msgid "Type the code from the SMS first."
+msgstr "ჯერ შეიყვანეთ SMS-ით მიღებული კოდი."
+
+#. module: gec_gosms
+#: model_terms:ir.ui.view,arch_db:gec_gosms.gosms_confirm_wizard_view_form
+msgid "Type the code from the SMS:"
+msgstr "შეიყვანეთ SMS-ით მიღებული კოდი:"
+
+#. module: gec_gosms
+#: model:ir.model.fields,help:gec_gosms.field_gosms_send_wizard__urgent
+msgid "Use it only for messages that must arrive, such as security alerts."
+msgstr "გამოიყენეთ მხოლოდ ისეთი შეტყობინებებისთვის, რომლებიც აუცილებლად უნდა ჩაბარდეს, მაგალითად, უსაფრთხოების გაფრთხილებებისთვის."
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_res_company__gosms_webhook_secret model:ir.model.fields,field_description:gec_gosms.field_res_config_settings__gosms_webhook_secret
+msgid "Webhook Secret"
+msgstr "Webhook-ის საიდუმლო გასაღები"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_res_company__gosms_webhook_token model:ir.model.fields,field_description:gec_gosms.field_res_config_settings__gosms_webhook_token
+msgid "Webhook Token"
+msgstr "Webhook-ის ტოკენი"
+
+#. module: gec_gosms
+#: model:ir.model.fields,field_description:gec_gosms.field_res_config_settings__gosms_webhook_url
+msgid "Webhook URL"
+msgstr "Webhook-ის მისამართი"
+
+#. module: gec_gosms
+#: model_terms:ir.ui.view,arch_db:gec_gosms.gosms_send_wizard_view_form
+msgid "e.g. 555 12 34 56, 599 00 00 00"
+msgstr "მაგ.: 555 12 34 56, 599 00 00 00"

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="gec_income_tax_report.RsForm30Grid">
+        <section class="o_rs_form30_grid" t-att-class="this.className" t-ref="this.gridRef">
+            <header class="o_rsf30_toolbar">
+                <div class="o_rsf30_title">
+                    <span class="o_rsf30_mark">RS</span>
+                    <span>
+                        <strong>Form No. 30 — Payment Annex</strong>
+                        <small>RS.GE form worktable</small>
+                    </span>
+                </div>
+                <div class="o_rsf30_toolbar_stats">
+                    <span class="o_rsf30_stat">
+                        <i class="oi" data-icon="list_alt" aria-hidden="true"/>
+                        <t t-out="this.list.count"/> rows
+                    </span>
+                    <span t-if="this.warningCount" class="o_rsf30_stat o_rsf30_stat_warning">
+                        <i class="oi" data-icon="warning" aria-hidden="true"/>
+                        <t t-out="this.warningCount"/> warnings
+                    </span>
+                    <span t-if="this.blockerCount" class="o_rsf30_stat text-danger">
+                        <i class="oi" data-icon="error" aria-hidden="true"/>
+                        <t t-out="this.blockerCount"/> blockers
+                    </span>
+                    <span t-if="this.leftOutCount" class="o_rsf30_stat">
+                        <i class="oi" data-icon="block" aria-hidden="true"/>
+                        <t t-out="this.leftOutCount"/> left out of the file
+                    </span>
+                </div>
+                <t t-call="gec_income_tax_report.RsForm30Grid.ToolbarActions"/>
+            </header>
+
+            <t t-call="gec_income_tax_report.RsForm30Grid.Pager"/>
+
+            <div class="o_rsf30_table_wrap">
+                <table class="o_rsf30_table" t-att-style="this.tableStyle">
+                    <t t-call="gec_income_tax_report.RsForm30Grid.Colgroup"/>
+                    <thead>
+                        <tr class="o_rsf30_group_headers">
+                            <th rowspan="2" class="o_rsf30_sticky_col">№</th>
+                            <th rowspan="2">Payment recipient identification number</th>
+                            <th colspan="2">Payment recipient name</th>
+                            <th rowspan="2">Address</th>
+                            <th rowspan="2">Residency (country)</th>
+                            <th rowspan="2">Income recipient category</th>
+                            <th colspan="2">Payment</th>
+                            <th colspan="2">Reliefs</th>
+                            <th rowspan="2">Payment date</th>
+                            <th rowspan="2">Withholding tax rate</th>
+                            <th rowspan="2">Tax withheld at source (GEL)</th>
+                            <th rowspan="2">Tax exempt or reduced under an international agreement</th>
+                            <th rowspan="2">Foreign tax paid eligible for credit under a double-taxation agreement</th>
+                            <th rowspan="2">Paid from Treasury</th>
+                            <th rowspan="2">In File</th>
+                            <th rowspan="2">Exported On</th>
+                        </tr>
+                        <tr class="o_rsf30_leaf_headers">
+                            <th>First name / Legal form</th>
+                            <th>Last name / Name</th>
+                            <th>Type</th>
+                            <th>Amount (GEL)</th>
+                            <th>Employee pension contribution paid in the employee's name and at the employee's expense under the Law on Funded Pensions</th>
+                            <th>Other relief</th>
+                        </tr>
+                        <t t-call="gec_income_tax_report.RsForm30Grid.FiltersRow"/>
+                    </thead>
+                    <tbody>
+                        <tr t-if="!this.visibleRecords.length" class="o_rsf30_empty_row">
+                            <td t-att-colspan="this.columns.length + 1">
+                                <span class="o_rsf30_empty_icon"><i class="oi" data-icon="table_chart" aria-hidden="true"/></span>
+                                <strong t-if="this.records.length">No lines match the filters</strong>
+                                <strong t-else="">No lines yet</strong>
+                                <small t-if="!this.records.length">Click “Generate Lines” to create the lines.</small>
+                            </td>
+                        </tr>
+                        <t t-foreach="this.visibleRecords" t-as="record" t-key="record.id">
+                            <tr t-att-class="{
+                                    'o_rsf30_warning_row': this.issueLevel(record) === 'warning',
+                                    'o_rsf30_blocker_row': this.issueLevel(record) === 'blocker',
+                                }">
+                                <td class="o_rsf30_row_actions o_rsf30_sticky_col">
+                                    <span class="o_rsf30_row_number" t-out="record_index + 1 + this.list.offset"/>
+                                    <span class="o_rsf30_source" t-att-title="this.sourceLabel(record)"
+                                          t-att-data-source="record.data.source"/>
+                                    <t t-call="gec_income_tax_report.RsForm30Grid.SourceLink"/>
+                                    <button t-if="this.isManualRow(record)" type="button" class="o_rsf30_open_source"
+                                            t-att-title="this.manualRowTitle"
+                                            t-att-aria-label="this.manualRowTitle"
+                                            t-on-click.stop="() => this.openManualRow(record)">
+                                        <i class="oi" data-icon="edit" aria-hidden="true"/>
+                                    </button>
+                                    <i t-if="this.issueLevel(record)" t-att-class="'oi o_rsf30_warning_icon ' + this.issueClass(record)"
+                                       t-att-data-icon="this.issueIcon(record)" t-att-data-level="this.issueLevel(record)"
+                                       t-att-title="record.data.warning_display || record.data.warning" aria-hidden="true"/>
+                                </td>
+                                <t t-call="gec_income_tax_report.RsForm30Grid.Cells"/>
+                            </tr>
+                        </t>
+                    </tbody>
+                    <t t-call="gec_income_tax_report.RsForm30Grid.Totals"/>
+                </table>
+            </div>
+            <footer class="o_rsf30_hint">
+                <i class="oi" data-icon="info" aria-hidden="true"/>
+                Lines are created with “Generate Lines” and cannot be edited in this table. A yellow background indicates data that must be reviewed.
+                <div>Manual rows are added with “Add Manual Row” and opened with the pencil button.</div>
+                <div>Filters and footer totals apply to this page.</div>
+            </footer>
+        </section>
+    </t>
+
+    <t t-name="gec_income_tax_report.RsForm30Grid.ToolbarActions">
+        <div class="o_rsf30_toolbar_actions">
+            <t t-call="gec_income_tax_report.RsForm30Grid.FitColumnsButton"/>
+            <button t-if="this.hasFilters" type="button" class="btn btn-secondary btn-sm"
+                    t-on-click="this.clearFilters">
+                <i class="oi me-1" data-icon="ink_eraser" aria-hidden="true"/>
+                Clear Filters
+            </button>
+        </div>
+    </t>
+
+    <t t-name="gec_income_tax_report.RsForm30Grid.FitColumnsButton">
+        <button type="button" class="btn btn-secondary btn-sm" t-on-click="this.resetColumnWidths"
+                title="Automatically fit column widths">
+            <i class="oi me-1" data-icon="arrow_range" aria-hidden="true"/>
+            Fit Columns
+        </button>
+    </t>
+
+    <t t-name="gec_income_tax_report.RsForm30Grid.Pager">
+        <div class="o_rsf30_pager" t-if="this.list.count &gt; this.list.limit">
+            <Pager t-props="this.pagerProps"/>
+        </div>
+    </t>
+
+    <t t-name="gec_income_tax_report.RsForm30Grid.Colgroup">
+        <colgroup>
+            <col class="o_rsf30_col_actions"/>
+            <t t-foreach="this.columns" t-as="column" t-key="column.field">
+                <col t-att-class="column.cssClass" t-att-style="this.columnStyle(column)"/>
+            </t>
+        </colgroup>
+    </t>
+
+    <t t-name="gec_income_tax_report.RsForm30Grid.FiltersRow">
+        <tr class="o_rsf30_filters">
+            <th class="o_rsf30_sticky_col">
+                <button t-if="this.hasFilters" type="button" title="Clear filters"
+                        class="o_rsf30_clear_filter" t-on-click="this.clearFilters">
+                    <i class="oi" data-icon="close" aria-hidden="true"/>
+                </button>
+            </th>
+            <t t-foreach="this.columns" t-as="column" t-key="column.field">
+                <th>
+                    <select t-if="column.filterType === 'many2one'"
+                            t-att-value="this.state.filters[column.field]"
+                            t-on-change="(event) => this.onFilterInput(column.field, event)">
+                        <option value="">All</option>
+                        <t t-foreach="this.filterOptions(column.field)" t-as="option" t-key="option.value">
+                            <option t-att-value="option.value" t-out="option.label"/>
+                        </t>
+                    </select>
+                    <select t-elif="column.filterType === 'boolean'"
+                            t-att-value="this.state.filters[column.field]"
+                            t-on-change="(event) => this.onFilterInput(column.field, event)">
+                        <option value="">All</option>
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select>
+                    <input t-else="" t-att-type="column.filterType === 'date' ? 'date' : 'search'"
+                           t-att-value="this.state.filters[column.field]"
+                           t-on-input="(event) => this.onFilterInput(column.field, event)"
+                           aria-label="Filter"/>
+                    <span class="o_rsf30_resize_handle" role="separator"
+                          title="Drag to resize the column"
+                          t-on-mousedown.stop.prevent="(event) => this.startColumnResize(column, event)"/>
+                </th>
+            </t>
+        </tr>
+    </t>
+
+    <t t-name="gec_income_tax_report.RsForm30Grid.SourceLink">
+        <a t-if="this.canOpenSource(record)" class="o_rsf30_open_source"
+           t-att-href="this.sourceUrl(record)" target="_blank"
+           rel="noopener noreferrer"
+           t-att-title="this.sourceButtonTitle(record)"
+           t-att-aria-label="this.sourceButtonTitle(record)"
+           t-on-click.stop="">
+            <i class="oi" data-icon="open_in_new" aria-hidden="true"/>
+        </a>
+    </t>
+
+    <t t-name="gec_income_tax_report.RsForm30Grid.Cells">
+        <t t-foreach="this.columns" t-as="column" t-key="column.field">
+            <td t-att-class="column.cssClass">
+                <a t-if="this.isPartnerColumn(column) &amp;&amp; this.partnerUrl(record)"
+                   class="o_rsf30_partner_link" t-att-href="this.partnerUrl(record)"
+                   t-on-click.prevent.stop="(ev) => this.openPartner(record, ev)">
+                    <Field name="column.field" record="record" readonly="true"/>
+                </a>
+                <Field t-elif="column.filterType === 'many2one'"
+                       name="column.field" record="record"
+                       readonly="true" canOpen="false"/>
+                <Field t-else="" name="column.field" record="record" readonly="true"/>
+            </td>
+        </t>
+    </t>
+
+    <t t-name="gec_income_tax_report.RsForm30Grid.Totals">
+        <tfoot t-if="this.visibleRecords.length">
+            <t t-set="pageTotals" t-value="this.totals"/>
+            <tr>
+                <td class="o_rsf30_sticky_col">Σ</td>
+                <t t-foreach="this.columns" t-as="column" t-key="column.field">
+                    <td t-out="pageTotals[column.field] || ''"/>
+                </t>
+            </tr>
+        </tfoot>
+    </t>
+
+</templates>

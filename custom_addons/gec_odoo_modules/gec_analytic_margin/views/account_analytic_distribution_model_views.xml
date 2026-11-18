@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Both core views are extended by `account` in non-primary mode and nothing copies them onto another model,
+         so adding fields here cannot leak into the Timesheets Analysis pivot. -->
+
+    <record id="account_analytic_distribution_model_form_abc" model="ir.ui.view">
+        <field name="name">account.analytic.distribution.model.form.abc</field>
+        <field name="model">account.analytic.distribution.model</field>
+        <field name="inherit_id" ref="analytic.account_analytic_distribution_model_form_view"/>
+        <field name="arch" type="xml">
+
+            <field name="analytic_distribution" position="after">
+                <field name="gec_activity_id"
+                       groups="gec_analytic_margin.group_gec_abc"
+                       options="{'no_quick_create': True}"
+                       class="w-50"/>
+            </field>
+
+            <xpath expr="//sheet/group" position="after">
+                <notebook groups="gec_analytic_margin.group_gec_abc"
+                          invisible="not gec_activity_id">
+                    <page string="Activity-Based Costing" name="gec_abc">
+
+                        <div class="alert alert-warning" role="alert"
+                             invisible="not gec_activity_shared_count">
+                            <field name="gec_activity_shared_warning" nolabel="1"/>
+                        </div>
+                        <field name="gec_activity_shared_count" invisible="1"/>
+
+                        <div class="mb-3">
+                            <button name="action_gec_preview_quantities" type="object"
+                                    string="Preview Quantities" class="btn-secondary"
+                                    icon="search"/>
+                            <button name="action_gec_open_runs" type="object"
+                                    string="Allocation Runs" class="btn-secondary ms-2"
+                                    icon="play_arrow"/>
+                        </div>
+
+                        <group>
+                            <group string="What Is Counted">
+                                <field name="gec_driver_label" placeholder="hour, ticket, deployment"/>
+                                <field name="gec_source_model_id" options="{'no_create': True}"/>
+                                <field name="gec_source_analytic_path"
+                                       placeholder="project_id.account_id"/>
+                                <field name="gec_source_model_name" invisible="1"/>
+                                <field name="gec_source_domain" widget="domain"
+                                       options="{'model': 'gec_source_model_name'}"
+                                       invisible="not gec_source_model_id"/>
+                                <field name="gec_source_domain"
+                                       placeholder="[('state', '=', 'done')]"
+                                       invisible="gec_source_model_id"/>
+                                <field name="gec_source_date_field" placeholder="date"/>
+                                <field name="gec_match_own_activity"/>
+                            </group>
+                            <group string="How It Is Measured">
+                                <field name="gec_measure"/>
+                                <field name="gec_measure_field"
+                                       invisible="gec_measure != 'field'"/>
+                                <field name="gec_weight_by_employee_cost"/>
+                                <field name="gec_practical_capacity"/>
+                                <field name="gec_rate_mode"/>
+                                <field name="gec_standard_rate"
+                                       invisible="gec_rate_mode != 'standard'"/>
+                            </group>
+                        </group>
+
+                        <group>
+                            <group string="Next Period (budgeting)">
+                                <field name="gec_currency_id" invisible="1"/>
+                                <field name="gec_planned_quantity"/>
+                                <field name="gec_planned_cost" readonly="1"
+                                       invisible="not gec_planned_cost"/>
+                                <div class="alert alert-warning mb-0" role="alert"
+                                     colspan="2"
+                                     invisible="gec_planned_capacity_gap &lt;= 0">
+                                    The plan needs
+                                    <field name="gec_planned_capacity_gap"
+                                           class="oe_inline" readonly="1"/>
+                                    more than this activity can deliver. Add
+                                    capacity, or the work will not fit.
+                                </div>
+                            </group>
+                            <group string="Is This Work Worth Doing?">
+                                <field name="gec_value_added"/>
+                            </group>
+                        </group>
+
+                        <separator string="Allocation Rules Using This Activity"/>
+                        <field name="gec_rule_ids"
+                               context="{'default_driver': 'activity',
+                                         'default_activity_id': gec_activity_id,
+                                         'default_company_id': company_id}">
+                            <list editable="bottom" open_form_view="True">
+                                <field name="sequence" widget="handle"/>
+                                <field name="step"/>
+                                <field name="name"/>
+                                <field name="source_plan_id" options="{'no_create': True}"/>
+                                <field name="source_account_ids" widget="many2many_tags"
+                                       optional="show" options="{'no_create': True}"
+                                       domain="[('plan_id', '=', source_plan_id)]"/>
+                                <field name="source_gl_account_ids" widget="many2many_tags"
+                                       optional="show" options="{'no_create': True}"/>
+                                <field name="source_component_id" optional="hide"
+                                       options="{'no_create': True}"/>
+                                <field name="target_plan_id" options="{'no_create': True}"
+                                       domain="[('id', '!=', source_plan_id)]"/>
+                                <field name="gec_source_warning" optional="show"
+                                       string="⚠"/>
+                                <field name="share_mode"/>
+                                <field name="resource_share"/>
+                                <field name="driver" optional="show"/>
+                                <field name="company_id" column_invisible="True"/>
+                                <field name="active" optional="hide" widget="boolean_toggle"/>
+                            </list>
+                        </field>
+                        <p class="text-muted">
+                            One rule per pool of cost. The share says how much of
+                            that pool belongs to this activity — the rest stays on
+                            the source. Pools and periods are the reason these stay
+                            their own records: a distribution rule has neither.
+                        </p>
+
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="account_analytic_distribution_model_list_abc" model="ir.ui.view">
+        <field name="name">account.analytic.distribution.model.list.abc</field>
+        <field name="model">account.analytic.distribution.model</field>
+        <field name="inherit_id" ref="analytic.account_analytic_distribution_model_tree_view"/>
+        <field name="arch" type="xml">
+            <field name="analytic_distribution" position="after">
+                <field name="gec_activity_id"
+                       groups="gec_analytic_margin.group_gec_abc"
+                       options="{'no_quick_create': True}"
+                       optional="show"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

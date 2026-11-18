@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="gec_access_manager.MenuPanel">
+        <t t-set="panel" t-value="this.panel"/>
+        <div class="o_gec_menu_panel">
+            <div class="o_gec_menu_panel_head mb-2">
+                <div t-if="panel.menu.depth" class="text-muted small" t-out="panel.menu.path"/>
+                <h4 class="mb-1" t-out="panel.menu.name"/>
+                <div t-if="this.isData" class="small">
+                    <span class="badge text-bg-light border" t-out="panel.model_label"/>
+                    <t t-if="panel.also.length">
+                        <span class="text-muted ms-1">also opened by:</span>
+                        <span class="ms-1" t-att-title="panel.also.join('\n')"
+                              t-out="panel.also.length === 1 ? panel.also[0] : panel.also[0] + ' (+' + (panel.also.length - 1) + ')'"/>
+                    </t>
+                </div>
+                <div t-if="this.isData and panel.also.length" class="small text-muted mt-1">
+                    These settings apply to these records in every app and menu that shows them.
+                </div>
+            </div>
+
+            <div t-if="panel.hidden" class="o_gec_exposure mb-3">
+                <div class="alert alert-warning py-2 small mb-2">
+                    <strong>Hidden from the menu only. </strong>
+                    <t t-if="this.state.exposure and !this.state.exposure.members">This profile has no users.</t>
+                    <t t-elif="this.exposureModels.length">This data is still open:</t>
+                    <button t-if="!this.props.readonly" type="button" class="btn btn-link btn-sm p-0 ms-1"
+                            t-on-click="() => this.showMenu()">Show it again</button>
+                </div>
+                <div t-foreach="this.exposureModels" t-as="item" t-key="item.model"
+                     class="d-flex flex-wrap align-items-start gap-2 py-1 border-top o_gec_exposure_row"
+                     t-att-data-model="item.model" t-att-data-status="item.status">
+                    <t t-set="chip" t-value="this.exposureChip(item)"/>
+                    <t t-set="buttonLabel" t-value="this.exposureButton(item)"/>
+                    <span class="fw-bold" t-out="item.label"/>
+                    <span t-attf-class="badge text-bg-{{ chip.type }}" t-out="chip.label"/>
+                    <div class="flex-grow-1 small text-muted">
+                        <div t-foreach="this.exposureLines(item)" t-as="line" t-key="line_index" t-out="line"/>
+                    </div>
+                    <button t-if="buttonLabel and !this.props.readonly" type="button" class="btn btn-sm o_gec_exposure_button"
+                            t-att-class="item.status === 'blocked' ? 'btn-outline-secondary' : 'btn-outline-danger'"
+                            t-on-click="() => this.confirmExposure(item)" t-out="buttonLabel"/>
+                </div>
+                <div t-if="this.stillReadableBy" class="small text-muted border-top pt-1 o_gec_exposure_readable">
+                    Still readable by: <t t-out="this.stillReadableBy"/>
+                </div>
+                <div t-if="this.runsAs" class="small text-warning-emphasis border-top pt-1 o_gec_exposure_runs_as">
+                    <i class="oi oi-fw" data-icon="warning"/>
+                    These users run automatic jobs. Blocking these records can make those jobs fail without warning.
+                    <t t-out="this.runsAs"/>
+                </div>
+                <div t-if="this.exposureUnknown" class="small text-muted border-top pt-1 o_gec_exposure_unknown">
+                    Screens that could not be checked: <t t-out="this.exposureUnknown"/>
+                </div>
+            </div>
+
+            <div t-if="this.selectedMember or this.branchModels.length" class="o_gec_panel_block mb-3 o_gec_result">
+                <h5 class="o_gec_panel_title" t-out="this.resultTitle"/>
+                <label t-if="this.members.length" class="d-flex flex-wrap align-items-center gap-2 mb-2 small o_gec_result_for">
+                    <span>Show for</span>
+                    <select class="form-select form-select-sm w-auto o_gec_result_user" t-on-change="this.onResultUser">
+                        <option value="0" t-att-selected="!this.selectedMember">This profile's groups</option>
+                        <option t-foreach="this.members" t-as="member" t-key="member.id"
+                                t-att-value="member.id" t-att-selected="member.id === this.props.resultUser"
+                                t-out="member.name"/>
+                    </select>
+                    <span t-if="this.panel.members_more" class="text-muted">(first 50)</span>
+                </label>
+                <div t-if="this.selectedMember and !this.result" class="small text-muted o_gec_result_loading">Loading...</div>
+                <div t-if="this.result?.exempt" class="small text-muted o_gec_result_note" t-out="this.exemptNote"/>
+                <div t-if="this.result?.not_applied" class="small text-muted o_gec_result_note o_gec_result_not_applied"
+                     t-out="this.notAppliedNote"/>
+                <div t-foreach="this.shownModels" t-as="item" t-key="item.model" class="o_gec_result_row"
+                     t-att-data-model="item.model">
+                    <div class="o_gec_result_name">
+                        <span class="fw-bold" t-out="item.name"/>
+                        <span t-if="item.shared" class="o_gec_tag o_gec_result_shared">Shared with other apps</span>
+                    </div>
+                    <t t-foreach="this.RESULT_OPS" t-as="op" t-key="op[0]">
+                        <t t-set="cell" t-value="this.resultCell(item, op[0])"/>
+                        <span class="o_gec_result_cell" t-att-data-op="op[0]"
+                              t-att-data-allowed="item.ops[op[0]].allowed ? 1 : 0" t-att-title="cell.title"
+                              t-att-tabindex="item.ops[op[0]].allowed ? false : 0">
+                            <span t-out="op[1]"/>
+                            <i t-attf-class="oi oi-fw {{ cell.color }}" t-att-data-icon="cell.icon"
+                               role="img" t-att-aria-label="cell.label"/>
+                        </span>
+                    </t>
+                    <span t-if="item.ops.read.allowed" class="o_gec_result_records small text-muted"
+                          t-out="this.recordsLabel(item)"/>
+                    <t t-set="taken" t-value="this.takenAway(item)"/>
+                    <span t-if="taken" class="o_gec_result_taken small text-danger" t-out="taken"/>
+                </div>
+                <button t-if="this.resultRows.rest.length" type="button"
+                        class="btn btn-link btn-sm p-0 mt-1 o_gec_result_toggle"
+                        t-on-click="() => this.toggleResultRows()" t-out="this.moreModelsLabel"/>
+                <div t-if="this.result?.more" class="small text-muted mt-1 o_gec_result_more" t-out="this.moreLabel"/>
+                <div t-if="this.branchModels.length" class="small text-muted mt-2 o_gec_result_legend">
+                    Grey: the groups do not allow it. Red: an access profile blocks it.
+                </div>
+                <div t-if="this.result?.readonly_everywhere" class="small text-muted mt-2 o_gec_result_note">
+                    'Read only everywhere' is on: users cannot create, edit or delete anything.
+                </div>
+                <div t-foreach="this.rowNotes" t-as="item" t-key="item.model"
+                     class="small text-muted mt-2 o_gec_result_note o_gec_result_row_note"
+                     t-att-data-model="item.model">
+                    <t t-out="this.rowNote(item)"/>
+                    <button t-if="!this.props.readonly" type="button" class="btn btn-link btn-sm p-0 ms-1"
+                            t-on-click="() => this.props.openRow(item.row_id)">Open the row</button>
+                </div>
+                <div t-foreach="this.sharedNotes" t-as="item" t-key="item.model"
+                     class="small text-muted mt-2 o_gec_result_note o_gec_result_shared_note"
+                     t-att-data-model="item.model" t-out="this.sharedNote(item)"/>
+            </div>
+
+            <div t-if="panel.grants" class="o_gec_panel_block mb-3 o_gec_grants">
+                <h5 class="o_gec_panel_title">What the Odoo group gives</h5>
+                <t t-if="panel.grants.length">
+                    <div t-foreach="panel.grants" t-as="grant" t-key="grant.privilege_id"
+                         class="mb-2 o_gec_grant" t-att-data-privilege="grant.privilege_id">
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <span class="fw-bold" t-out="grant.name"/>
+                            <t t-if="grant.levels?.length">
+                                <div t-if="grant.ladder" class="btn-group btn-group-sm flex-wrap o_gec_grant_picker" role="group">
+                                    <button type="button" class="btn o_gec_grant_level"
+                                            t-att-class="this.ladderLevel(grant) ? 'btn-outline-secondary' : 'btn-primary'"
+                                            t-att-disabled="this.props.readonly"
+                                            t-on-click="() => this.setGrant(grant, null)">Nothing extra</button>
+                                    <button t-foreach="grant.levels" t-as="level" t-key="level.id" type="button"
+                                            class="btn o_gec_grant_level"
+                                            t-att-class="this.ladderLevel(grant) === level.id ? 'btn-primary' : 'btn-outline-secondary'"
+                                            t-att-data-group="level.id"
+                                            t-att-disabled="this.props.readonly or level.locked"
+                                            t-att-title="level.locked ? this.lockedTitle : ''"
+                                            t-on-click="() => this.setGrant(grant, level)">
+                                        <i t-if="level.locked" class="oi oi-fw" data-icon="lock"/>
+                                        <t t-out="level.name"/>
+                                    </button>
+                                </div>
+                                <div t-else="" class="d-flex flex-wrap gap-3 o_gec_grant_picker">
+                                    <CheckBox t-foreach="grant.levels" t-as="level" t-key="level.id"
+                                              value="grant.granted_ids.includes(level.id)"
+                                              disabled="this.props.readonly or level.locked"
+                                              onChange="(on) => this.toggleGrant(grant, level, on)">
+                                        <i t-if="level.locked" class="oi oi-fw" data-icon="lock" t-att-title="this.lockedTitle"/>
+                                        <t t-out="level.name"/>
+                                    </CheckBox>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <span class="o_gec_grant_levels" t-out="this.grantedNames(grant)"/>
+                                <button type="button" class="btn btn-link btn-sm p-0 o_gec_grant_change"
+                                        t-att-disabled="this.props.readonly"
+                                        t-on-click="() => this.props.openGrants(grant.privilege_id)">Change</button>
+                            </t>
+                        </div>
+                        <t t-foreach="this.grantedGroups(grant)" t-as="group" t-key="group.id">
+                            <div t-if="group.comment" class="small text-muted o_gec_grant_comment" t-out="group.comment"/>
+                        </t>
+                    </div>
+                    <div class="small text-muted">
+                        The level you choose opens the app for this profile's users. It is saved right away. To
+                        limit what they can do in the app, use 'Limit further'.
+                        <button type="button" class="btn btn-link btn-sm p-0 align-baseline o_gec_grant_page"
+                                t-on-click="() => this.props.openGrants(panel.grants[0].privilege_id)">All apps on 'What they get'</button>
+                    </div>
+                </t>
+                <div t-else="" class="small text-muted">Every internal user already has this app.</div>
+            </div>
+
+            <div t-if="this.isBranch" class="o_gec_panel_block mb-3">
+                <h5 class="o_gec_panel_title">Limit further (optional)</h5>
+                <div class="btn-group btn-group-sm flex-wrap mb-2" role="group">
+                    <button t-foreach="this.LEVELS" t-as="level" t-key="level[0]" type="button"
+                            class="btn o_gec_level"
+                            t-att-class="panel.level === level[0] ? 'btn-primary' : 'btn-outline-secondary'"
+                            t-att-data-level="level[0]" t-att-disabled="this.props.readonly"
+                            t-on-click="() => this.setLevel(level[0])" t-out="level[1]"/>
+                </div>
+                <span t-if="!panel.level" class="badge text-bg-light border ms-2 align-top">Custom</span>
+                <t t-set="values" t-value="this.branchValues"/>
+                <div class="d-flex flex-wrap gap-3 align-items-center o_gec_branch_rights">
+                    <CheckBox t-foreach="this.RIGHTS" t-as="right" t-key="right[0]"
+                              value="!!(values[right[0]])" disabled="this.props.readonly"
+                              name="right[0]"
+                              onChange="(value) => this.setBranchRight(right[0], value)">
+                        <t t-out="right[1]"/>
+                    </CheckBox>
+                </div>
+                <div class="d-flex flex-wrap gap-3 align-items-center mt-2">
+                    <label class="mb-0">Records
+                        <select class="form-select form-select-sm d-inline-block w-auto ms-1 o_gec_branch_records"
+                                t-att-disabled="this.props.readonly" t-on-change="this.onBranchRecords">
+                            <option t-foreach="this.branchRecordChoices" t-as="choice" t-key="choice[0]"
+                                    t-att-value="choice[0]" t-att-selected="choice[0] === values.records"
+                                    t-out="choice[1]"/>
+                        </select>
+                    </label>
+                    <CheckBox value="!!(values.edit_draft_only)" disabled="this.props.readonly"
+                              onChange="(value) => this.setBranchRight('edit_draft_only', value)">
+                        Edit drafts only
+                    </CheckBox>
+                    <CheckBox value="!!(values.include_shared)" disabled="this.props.readonly"
+                              onChange="(value) => this.setBranchRight('include_shared', value)">
+                        Also shared data
+                    </CheckBox>
+                </div>
+                <div t-if="this.groupLimits(this.branchModels)" class="small text-muted mt-1 o_gec_group_limits">
+                    The group already limits the records.
+                </div>
+                <div class="small text-muted mt-1">
+                    <t t-out="this.branchSource"/>
+                    <button t-if="panel.rule and !this.props.readonly" type="button"
+                            class="btn btn-link btn-sm p-0 ms-1 o_gec_menu_reset"
+                            t-on-click="() => this.props.apply({kind: 'menu_reset'})">
+                        <t t-if="panel.inherited">Back to the settings of <t t-out="panel.inherited.menu"/></t>
+                        <t t-else="">Remove the limit</t>
+                    </button>
+                </div>
+            </div>
+
+            <div t-if="panel.allowed and panel.allowed.length" class="o_gec_panel_block mb-3">
+                <h5 class="o_gec_panel_title">Allowed records</h5>
+                <div t-foreach="panel.allowed" t-as="kind" t-key="kind.kind" class="mb-2 o_gec_allowed"
+                     t-att-data-kind="kind.kind">
+                    <div class="fw-bold" t-out="kind.label"/>
+                    <div class="d-flex flex-wrap gap-1 align-items-center">
+                        <span t-foreach="kind.records" t-as="record" t-key="record.line_id"
+                              class="badge rounded-pill text-bg-light border">
+                            <t t-out="record.name"/>
+                            <button t-if="!this.props.readonly" type="button" class="btn btn-link btn-sm p-0 ms-1"
+                                    t-on-click="() => this.removeAllowed(kind, record)" title="Remove">×</button>
+                        </span>
+                        <span t-if="!kind.records.length and !kind.per_user" class="text-muted small">All</span>
+                        <select t-if="!this.props.readonly" class="form-select form-select-sm w-auto"
+                                t-on-change="(ev) => this.onAddAllowed(kind, ev)">
+                            <option value="">Add...</option>
+                            <option t-foreach="this.allowedChoices(kind)" t-as="choice" t-key="choice.id"
+                                    t-att-value="choice.id" t-out="choice.display_name"/>
+                        </select>
+                        <CheckBox value="kind.per_user" disabled="this.props.readonly"
+                                  onChange="(value) => this.setPerUser(kind, value)">
+                            Each user's own
+                        </CheckBox>
+                    </div>
+                </div>
+            </div>
+
+            <div t-if="this.isData" class="o_gec_panel_block">
+                <h5 class="o_gec_panel_title">Limit further (optional)</h5>
+                <div class="d-flex flex-wrap gap-3 align-items-center o_gec_data_rights">
+                    <span t-foreach="this.RIGHTS" t-as="right" t-key="right[0]" class="d-inline-flex align-items-center">
+                        <CheckBox value="!!(panel.rights[right[0]])" disabled="this.props.readonly"
+                                  name="right[0]"
+                                  onChange="(value) => this.setDataRight(right[0], value)">
+                            <t t-out="right[1]"/>
+                        </CheckBox>
+                        <span t-if="!this.groupGives(this.dataModels, right[0])" class="text-muted small ms-1">(this profile's groups do not allow it)</span>
+                    </span>
+                </div>
+                <div class="d-flex flex-wrap gap-3 align-items-center mt-2">
+                    <label class="mb-0">Records
+                        <select class="form-select form-select-sm d-inline-block w-auto ms-1 o_gec_data_records"
+                                t-att-disabled="this.props.readonly" t-on-change="this.onDataRecords">
+                            <option t-foreach="this.recordChoices" t-as="choice" t-key="choice[0]"
+                                    t-att-value="choice[0]" t-att-selected="choice[0] === panel.rights.records"
+                                    t-out="choice[1]"/>
+                        </select>
+                    </label>
+                    <CheckBox t-if="panel.drafts_possible" value="!!(panel.rights.edit_draft_only)"
+                              disabled="this.props.readonly"
+                              onChange="(value) => this.setDataRight('edit_draft_only', value)">
+                        Edit drafts only
+                    </CheckBox>
+                </div>
+                <div t-if="this.groupLimits(this.dataModels)" class="small text-muted mt-1 o_gec_group_limits">
+                    The group already limits the records.
+                </div>
+                <div class="small text-muted mt-1">
+                    <t t-out="this.dataSource"/>
+                    <button t-if="panel.source === 'data' and !this.props.readonly" type="button"
+                            class="btn btn-link btn-sm p-0 ms-1 o_gec_data_reset"
+                            t-on-click="() => this.props.apply({kind: 'data_reset'})">
+                        Use the menu's settings again
+                    </button>
+                </div>
+            </div>
+
+            <div t-if="this.isData or this.isBranch" class="o_gec_panel_block o_gec_advanced">
+                <h5 class="o_gec_panel_title" t-att-class="{'mb-0': !this.state.advanced}">
+                    <button type="button" class="btn btn-link p-0 text-reset o_gec_advanced_toggle"
+                            t-on-click="() => this.toggleAdvanced()">
+                        <i class="oi oi-fw" t-att-data-icon="this.state.advanced ? 'expand_more' : 'chevron_right'"/>
+                        Advanced
+                    </button>
+                </h5>
+                <t t-if="this.state.advanced">
+                    <div t-if="this.isBranch" class="small text-muted">
+                        These settings also cover the sub-menus. A sub-menu or a screen with its own settings uses
+                        those instead. Records that other apps also use (customers, products) stay open unless you
+                        tick 'Also shared data'. The 'Records' choice does not affect the Configuration menus: a
+                        salesperson still sees every sales team.
+                    </div>
+                    <t t-if="this.isData">
+                        <button t-if="!this.props.readonly" type="button" class="btn btn-link btn-sm p-0"
+                                t-on-click="() => this.props.openRule()">Custom filter...</button>
+                        <t t-foreach="this.sections" t-as="section" t-key="section.key">
+                            <div class="o_gec_panel_section mt-2" t-att-data-section="section.key">
+                                <button type="button" class="btn btn-link p-0 fw-bold text-reset o_gec_section_toggle"
+                                        t-on-click="() => this.toggleSection(section.key)">
+                                    <i class="oi oi-fw" t-att-data-icon="this.state.open[section.key] ? 'expand_more' : 'chevron_right'"/>
+                                    <t t-out="section.label"/>
+                                </button>
+                                <div t-if="this.state.open[section.key]" class="ps-3 pt-1">
+                                    <t t-if="section.key === 'fields'">
+                                        <input t-if="panel.fields.length > 12" type="search"
+                                               class="form-control form-control-sm mb-1" placeholder="Search a field..."
+                                               t-on-input="this.onFieldSearch"/>
+                                        <div t-foreach="this.shownFields" t-as="field" t-key="field.name"
+                                             class="o_gec_panel_row" t-att-data-field="field.name">
+                                            <span class="o_gec_panel_label" t-out="field.label"/>
+                                            <div class="btn-group btn-group-sm">
+                                                <button t-foreach="this.FIELD_MODES" t-as="mode" t-key="mode[0]" type="button"
+                                                        class="btn" t-att-data-mode="mode[0]"
+                                                        t-att-class="mode[0] !== field.mode ? 'btn-outline-secondary' : (mode[0] === 'keep' ? 'btn-secondary' : 'btn-primary')"
+                                                        t-att-disabled="this.props.readonly"
+                                                        t-on-click="() => this.setField(field, mode[0])" t-out="mode[1]"/>
+                                            </div>
+                                            <button t-if="field.mode !== 'hide'" type="button"
+                                                    class="btn btn-sm o_gec_no_export"
+                                                    t-att-class="field.no_export ? 'btn-primary' : 'btn-outline-secondary'"
+                                                    t-att-disabled="this.props.readonly"
+                                                    t-att-title="this.noExportTitle(field)"
+                                                    t-on-click="() => this.setNoExport(field, !field.no_export)">
+                                                No export
+                                            </button>
+                                            <input t-if="field.mode !== 'keep'" type="text"
+                                                   class="form-control form-control-sm o_gec_condition"
+                                                   placeholder="Only when... (e.g. state == 'done')"
+                                                   t-att-value="field.condition" t-att-disabled="this.props.readonly"
+                                                   t-on-change="(ev) => this.onFieldCondition(field, ev)"/>
+                                        </div>
+                                        <div t-if="!panel.fields.length" class="text-muted small">No field on these screens.</div>
+                                    </t>
+                                    <t t-elif="section.key === 'buttons'">
+                                        <div t-foreach="panel.buttons" t-as="button" t-key="button.button_type + button.button_name"
+                                             class="o_gec_panel_row" t-att-data-button="button.button_name">
+                                            <span class="o_gec_panel_label" t-out="button.label"/>
+                                            <div class="btn-group btn-group-sm">
+                                                <button t-foreach="this.BUTTON_MODES" t-as="mode" t-key="mode[0]" type="button"
+                                                        class="btn" t-att-data-mode="mode[0]"
+                                                        t-att-class="mode[0] !== this.buttonMode(button) ? 'btn-outline-secondary' : (mode[0] === 'visible' ? 'btn-secondary' : 'btn-primary')"
+                                                        t-att-disabled="this.props.readonly"
+                                                        t-on-click="() => this.setButton(button, mode[0])" t-out="mode[1]"/>
+                                            </div>
+                                        </div>
+                                        <div t-if="!panel.buttons.length" class="text-muted small">No button on these screens.</div>
+                                        <div class="small text-muted">Blocked: the button is hidden and Odoo also refuses the action.</div>
+                                    </t>
+                                    <t t-elif="section.elementType">
+                                        <t t-set="elements" t-value="this.elementsOf(section.elementType)"/>
+                                        <div t-foreach="elements" t-as="element"
+                                             t-key="element.element_type + ':' + element.element_name"
+                                             class="o_gec_panel_row" t-att-data-element="element.element_name">
+                                            <CheckBox value="!element.hidden" disabled="this.props.readonly"
+                                                      onChange="(value) => this.setElement(element, value)">
+                                                <t t-out="element.label"/>
+                                            </CheckBox>
+                                        </div>
+                                        <div t-if="!elements.length" class="text-muted small" t-out="section.empty"/>
+                                    </t>
+                                    <t t-elif="section.entries">
+                                        <div t-foreach="section.entries" t-as="entry" t-key="entry.type + entry.id"
+                                             class="o_gec_panel_row">
+                                            <CheckBox value="!entry.hidden" disabled="this.props.readonly"
+                                                      onChange="(value) => this.setPrint(entry, value)">
+                                                <t t-out="entry.label"/>
+                                            </CheckBox>
+                                        </div>
+                                        <div t-if="!section.entries.length" class="text-muted small" t-out="section.empty"/>
+                                    </t>
+                                    <t t-elif="section.key === 'switches'">
+                                        <div t-foreach="this.switchItems" t-as="item" t-key="item[0]"
+                                             class="o_gec_panel_row">
+                                            <CheckBox value="!!(panel.rights[item[0]])" disabled="this.props.readonly"
+                                                      onChange="(value) => this.setDataRight(item[0], value)">
+                                                <t t-out="item[1]"/>
+                                            </CheckBox>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+                    </t>
+                </t>
+            </div>
+
+            <div t-if="!this.isData and !this.isBranch and !panel.allowed" class="text-muted">
+                This menu opens no records. You can only show or hide it.
+            </div>
+        </div>
+    </t>
+
+</templates>

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Business Process Management — User Guide</title>
+<style>
+:root {
+  --navy: #153749; --teal-dark: #226263; --teal: #049978; --orange: #F05324; --yellow: #F0B91C;
+  --bg: #ffffff; --fg: #1d2b36; --muted: #5b6b77; --line: #e3e8ec; --soft: #f4f7f8;
+  --accent: #049978; --accent-soft: #e6f5f1; --warn: #b83a12; --warn-soft: #fff3ec;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #10222d; --fg: #e6edf1; --muted: #a8b8c2; --line: #24404f; --soft: #173040;
+          --accent: #3fc6a4; --accent-soft: #13352f; --warn: #ff9b75; --warn-soft: #3a2419; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.65 "Noto Sans Georgian", "BPG Arial", "Segoe UI", system-ui, sans-serif; }
+header.hero { background: linear-gradient(120deg, var(--navy) 0%, var(--teal-dark) 100%); color: #fff; }
+header.hero .in { max-width: 1180px; margin: 0 auto; padding: 34px 40px 30px; display: flex; gap: 22px; align-items: center; }
+header.hero img { width: 72px; height: 72px; background: rgba(255,255,255,.96); border-radius: 18px; padding: 8px; }
+header.hero h1 { margin: 0; font-size: 30px; line-height: 1.25; }
+header.hero p { margin: 6px 0 0; color: #bfe9dc; }
+header.hero .bar { height: 4px; background: var(--orange); }
+.wrap { display: grid; grid-template-columns: 270px minmax(0, 1fr); max-width: 1180px; margin: 0 auto; }
+nav { position: sticky; top: 0; align-self: start; max-height: 100vh; overflow-y: auto; padding: 26px 18px; border-right: 1px solid var(--line); font-size: 14px; }
+nav h2 { font-size: 13px; color: var(--muted); margin: 0 0 10px; }
+nav a { display: block; color: var(--fg); text-decoration: none; padding: 5px 9px; border-radius: 7px; }
+nav a:hover { background: var(--accent-soft); color: var(--accent); }
+main { padding: 30px 40px 70px; min-width: 0; }
+.lead { color: var(--muted); margin: 0 0 20px; font-size: 17px; }
+h2 { font-size: 23px; margin: 46px 0 12px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--navy); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) h2 { color: #fff; } }
+h2 .num { color: var(--orange); margin-right: 6px; }
+h3 { font-size: 17px; margin: 26px 0 8px; }
+p, li { max-width: 80ch; }
+code, kbd { font-family: ui-monospace, Consolas, monospace; font-size: 13.5px; background: var(--soft); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; }
+kbd { border-bottom-width: 2px; font-weight: 600; }
+figure { margin: 18px 0 28px; }
+figure img { max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: 10px; display: block; box-shadow: 0 6px 20px rgba(21,55,73,.08); }
+figcaption { color: var(--muted); font-size: 14px; margin-top: 7px; }
+table { border-collapse: collapse; width: 100%; margin: 12px 0 20px; font-size: 15px; }
+th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+th { background: var(--soft); font-weight: 600; }
+.note, .warn, .new { border-radius: 10px; padding: 12px 16px; margin: 16px 0; }
+.note { background: var(--accent-soft); border-left: 4px solid var(--accent); }
+.warn { background: var(--warn-soft); border-left: 4px solid var(--warn); }
+.new { background: var(--soft); border-left: 4px solid var(--yellow); }
+.steps { counter-reset: s; list-style: none; padding: 0; }
+.steps > li { counter-increment: s; position: relative; padding: 2px 0 10px 40px; }
+.steps > li::before { content: counter(s); position: absolute; left: 0; top: 2px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 14px; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+.pill { display: inline-block; padding: 0 9px; border-radius: 10px; font-size: 13px; background: var(--soft); border: 1px solid var(--line); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+footer { background: var(--navy); color: #fff; }
+footer .in { max-width: 1180px; margin: 0 auto; padding: 16px 40px; display: flex; gap: 18px; align-items: center; flex-wrap: wrap; font-size: 13px; }
+footer img { height: 34px; width: auto; }
+footer .url { color: #049978; margin-left: auto; }
+@media (max-width: 860px) {
+  .wrap, .grid2 { grid-template-columns: 1fr; }
+  nav { position: static; max-height: none; border-right: 0; border-bottom: 1px solid var(--line); padding: 16px; }
+  main { padding: 20px 16px 60px; }
+  header.hero .in, footer .in { padding-left: 16px; padding-right: 16px; }
+  header.hero .in { gap: 14px; }
+  header.hero img { width: 52px; height: 52px; border-radius: 13px; }
+  header.hero h1 { font-size: 21px; overflow-wrap: anywhere; }
+  header.hero .in > div { min-width: 0; }
+  table { display: block; overflow-x: auto; }
+}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="in">
+    {{imgraw:app_icon.png}}
+    <div>
+      <h1>Business Process Management (BPMN)</h1>
+      <p>User guide · version 1.4 · Odoo 19 and 20 · Community and Enterprise</p>
+    </div>
+  </div>
+  <div class="bar"></div>
+</header>
+<div class="wrap">
+<nav>
+  <h2>Contents</h2>
+  <a href="#about">1. What the module does</a>
+  <a href="#roles">2. Roles</a>
+  <a href="#map">3. Map and process walkthrough</a>
+  <a href="#create">4. Drawing a diagram</a>
+  <a href="#style">5. Colors, layout, view</a>
+  <a href="#keys">6. Keyboard shortcuts</a>
+  <a href="#shapes">7. BPMN elements</a>
+  <a href="#knowledge">8. Instructions, links, responsible</a>
+  <a href="#card">9. Process card, level, tags</a>
+  <a href="#import">10. Import: draw.io, Visio, BPMN</a>
+  <a href="#review">11. Review queue</a>
+  <a href="#lifecycle">12. Approval, versions, control</a>
+  <a href="#dashboard">13. Dashboard</a>
+  <a href="#export">14. Export</a>
+  <a href="#faq">15. FAQ</a>
+  <a href="#admin">16. For administrators</a>
+</nav>
+<main>
+<p class="lead">The guide is also available inside the module: the <b>Processes → User Guide</b> menu, a button in the diagram's top bar, and small <span class="pill">?</span> marks next to panel sections, in dialogs and in hints — they open the matching chapter directly. The guide opens in the user's language (Georgian or English).</p>
+
+<h2 id="about"><span class="num">1.</span>What the module does</h2>
+<p>The module is the company's official, interactive process map inside Odoo. Any employee can see <b>who does what, and in which order</b>; clicking a step shows its work instruction, and one button takes them to the matching Odoo screen. Process managers draw, import and approve the processes.</p>
+<div class="note">The module <b>does not block</b> Odoo buttons and does not change the status of sales, purchases, stock operations or invoices. It describes, teaches and guides — it is not a workflow engine.</div>
+<div class="new"><b>New in version 1.4:</b> text formatting (size, bold, italic, underline, alignment); exact position and size; grouping and locking; tidying arrows and editing arrow labels; <b>printing and PDF</b> (A4/A3, splitting into pages, step list); <b>protection when two managers edit at the same time</b>; side panel with tabs, collapsible sections and adjustable width; hints on the form — what to click and when; choosing a <b>small or major change</b> at publication; “?” links to the guide; the guide in English too.</div>
+<div class="new"><b>In version 1.2:</b> connection points on every side of a shape, arrow routing based on the chosen side, arrow “jumps” at crossings, pools snapping to each other, the <b>management dashboard</b> (workload, handoffs between roles, portfolio, process health, reviews, read confirmations).</div>
+<div class="new"><b>In version 1.1:</b> an improved editor (colors, highlighting of shapes you can connect to, quick append/create of elements with search, alignment, minimap, grid, keyboard shortcuts), a new side panel and step-by-step process walkthrough, a comment on the responsible and automatic lane names, the process card (SIPOC + KPI), architecture levels L0–L4, tags, periodic review, read confirmation, colors carried over from draw.io/Visio.</div>
+
+<h2 id="roles"><span class="num">2.</span>Roles</h2>
+<table>
+<tr><th>Role</th><th>Who gets it</th><th>What they can do</th></tr>
+<tr><td><b>Viewer</b></td><td>Every internal user, automatically</td><td>Sees only <b>published</b> processes, reads instructions, opens links, downloads the diagram, confirms having read it.</td></tr>
+<tr><td><b>Process Manager</b></td><td>Assigned by the administrator: <i>Settings → Users → Business Processes → Process Manager</i></td><td>Creates and draws processes, imports files, assigns responsibles, submits for review, publishes, creates new versions, sees who has read a process.</td></tr>
+</table>
+
+<h2 id="map"><span class="num">3.</span>Map and process walkthrough</h2>
+<p>The <b>Processes → Process Map</b> menu shows all published processes as cards: thumbnail, level (L0–L4), code, tags, version and owner. The cards are grouped by type.</p>
+<figure>{{img:01_process_map.png}}<figcaption>Process Map</figcaption></figure>
+<p>For viewers, the process <b>Diagram</b> tab opens read-only. On the right is the side panel:</p>
+<ul>
+<li><b>Process overview</b> (when nothing is selected): the number of steps, roles and links, the <span class="pill">▷ Walk through the process</span> button, step search and the “Who does what” list.</li>
+<li><b>Step card</b> (after a click): <i>Who</i> — the lane and its responsible, with the comment; <i>What to do</i> — the instruction (lists formatted); <i>Open in Odoo</i> — link tiles; <i>Flow</i> — previous and next steps. Click the next step to walk through the process to the end.</li>
+<li>On the diagram, the current step is highlighted in green and the next steps with a yellow dashed line. A green <span class="pill">🔗</span> mark in a shape's corner means it has a link.</li>
+</ul>
+<figure>{{img:02_viewer_card.png}}<figcaption>Step card and process walkthrough (full-screen mode)</figcaption></figure>
+<p>A link tile opens the matching Odoo menu, record or web page. If the link is broken or you have no access to it, the tile is red and does not work.</p>
+<p><b>Search across all processes:</b> in the search box, search by name, code, tag, <i>diagram element</i> (e.g. “Invoice”) or <i>responsible</i> (e.g. “Warehouse”). The <b>Responsibilities</b> menu shows which lane belongs to which department across all processes.</p>
+
+<h2 id="create"><span class="num">4.</span>Drawing a diagram (Process Manager)</h2>
+<ol class="steps">
+<li><b>All Processes → New</b>. Fill in the name, code (e.g. <code>SCM-07</code>), type, level, owner and parent process (if this is a sub-process).</li>
+<li>The <b>Diagram</b> tab opens the editor (a green <span class="pill">● Editing</span> mark in the top bar). For more room, press <kbd>F</kbd> or the full-screen button.</li>
+<li>Drag a shape from the palette on the left, or press <kbd>N</kbd> and search by name (e.g. “timer”).</li>
+<li>With a shape selected, press <kbd>A</kbd> — pick the next step in the dialog; it is placed and connected automatically. You can do the same from the menu next to the shape (context pad).</li>
+<li>To connect, use the context pad arrow (or <kbd>C</kbd>): while you draw, <b>every shape you are allowed to connect to lights up green</b> according to BPMN rules, and the source shape turns orange. The same happens when you drag the end of an existing arrow onto another shape.</li>
+<li>To change the text, double-click the shape (or press <kbd>E</kbd>), or change the name in the panel header. To change the type, use the <span class="pill">⇄</span> button in the panel or <kbd>R</kbd>.</li>
+<li>Changes go to the form automatically; save with <kbd>Ctrl</kbd>+<kbd>S</kbd> (Mac: <kbd>⌘</kbd>+<kbd>S</kbd>) or the cloud icon next to the form title.</li>
+</ol>
+<figure>{{img:03_modeler_overview.png}}<figcaption>The editor in full screen: palette, grid, zoom buttons and process overview</figcaption></figure>
+<figure>{{img:08_connect_highlight.png}}<figcaption>While drawing an arrow, the shapes you can connect to light up green</figcaption></figure>
+<h3 id="ports">Connection points, routing and crossings</h3>
+<ul>
+<li>When you hover over a shape, <b>connection points</b> appear on all its sides (3 per side on a task, 4 on an event or gateway). Drag from a point to start the arrow exactly there.</li>
+<li>While you draw an arrow, the points of allowed target shapes light up green; the arrow “snaps” to the nearest point (dark green point). Hold <kbd>Ctrl</kbd> to attach the arrow anywhere.</li>
+<li>The arrow leaves from the chosen side (downwards from the bottom point, to the right from the right point) and enters the target from the chosen side; the connection point is kept when the shape is moved. Moving an arrow end to another point works the same way.</li>
+<li>Where a horizontal arrow crosses a vertical one, it <b>“jumps”</b> over it with a small arc — it is clear that the lines do not join. This is display only: it shows in SVG/PNG export but is not written to the BPMN file.</li>
+<li>When you drag a pool to the top or bottom edge of another pool, it <b>snaps exactly</b> to it and also aligns on the left edge.</li>
+</ul>
+<figure>{{img:12_ports.png}}<figcaption>Connection points: on hover (left) and while drawing an arrow — the target's green points</figcaption></figure>
+<figure>{{img:13_line_jump.png}}<figcaption>The arrow leaves the bottom point downwards; at the crossing the horizontal line “jumps”</figcaption></figure>
+<div class="note"><b>Pool and lanes:</b> place a “Pool/participant” from the palette; click the pool and its context pad shows “Add lane above/below” and “Divide into two/three lanes”. Each lane is usually one department or role.</div>
+<p>The <b>Drawing tips</b> in the overview panel sum up these techniques; for the full list of shortcuts press <kbd>?</kbd>.</p>
+
+<h2 id="style"><span class="num">5.</span>Colors, layout, view</h2>
+<div class="grid2">
+<div>
+<h3 id="colors">Colors</h3>
+<p>Select one or more shapes/arrows and, in the panel's <b>Style</b> section, pick a preset color (based on the GEC palette: teal, navy, orange, yellow and more) or your own <b>Fill</b> and <b>Line and text</b>. <span class="pill">↺</span> restores the default. The same palette is available from the color icon in the context pad.</p>
+<p>Colors are stored in the standard BPMN color extension, so they show in Camunda Modeler and bpmn.io and carry over to the draw.io export.</p>
+</div>
+<div><figure>{{img:05b_task_style.png}}<figcaption>The “Appearance” tab: Style, Text, Position and size</figcaption></figure></div>
+</div>
+<h3 id="layout">Arranging</h3>
+<p>When several shapes are selected (<kbd>Shift</kbd>+click or lasso <kbd>L</kbd>), the panel shows <b>Arrange</b>: align left/center/right/top/middle/bottom and distribute evenly. While you drag a shape, orange guide lines appear and shapes snap to the grid. <kbd>S</kbd> (space tool) adds or removes space between shapes.</p>
+<figure>{{img:05c_multi.png}}<figcaption>Several elements: arranging and coloring at once</figcaption></figure>
+<h3 id="text">Text format: size, bold, italic, underline, alignment</h3>
+<p>Select one or more elements. In the panel's <b>Text</b> section:</p>
+<ul>
+<li><span class="pill">A−</span> / <span class="pill">A+</span> — text size (from 9 to 32). The current size is shown in the middle; a gray number means the element has no size of its own and uses the diagram's size;</li>
+<li><b>B</b> / <i>I</i> / <u>U</u> — bold, italic, underline;</li>
+<li>align left / center / right — for tasks, sub-processes and annotations (where the text is inside the shape);</li>
+<li><span class="pill">Clear text format</span> restores the default.</li>
+</ul>
+<p>Shortcuts: <kbd>Ctrl</kbd>+<kbd>B</kbd> / <kbd>I</kbd> / <kbd>U</kbd> and <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>&gt;</kbd> / <kbd>&lt;</kbd> (size). Every change is undone in one step (<kbd>Ctrl</kbd>+<kbd>Z</kbd>), even when several elements were selected.</p>
+<figure>{{img:05e_text_format.png}}<figcaption>Task text: size 14, bold</figcaption></figure>
+<p><b>Diagram text size</b> — with nothing selected, choose <span class="pill">Small</span>, <span class="pill">Normal</span>, <span class="pill">Large</span> or <span class="pill">Extra large</span> in the panel. The size applies to every element that has no size of its own — handy for showing on screen or printing.</p>
+<p><b>Multi-line names</b> — in the panel header field, <kbd>Shift</kbd>+<kbd>Enter</kbd> starts a new line and <kbd>Enter</kbd> finishes.</p>
+<p><b>Copy style</b> — in the “Style” section, <span class="pill">Copy style</span> remembers the element's colors and text format; select other elements and click <span class="pill">Paste style</span>.</p>
+<p><b>Same size</b> — when several tasks are selected, the <span class="pill">Same size as the first selected</span> button in “Arrange” gives them all the size of the first one (the center stays in place).</p>
+<div class="note">The text format is stored in the layout part of the BPMN file under its own namespace (<code>odoostyle</code>). Camunda and other tools open the file without problems; they simply do not show the format. When exporting to draw.io and importing from it, size, bold/italic/underline and alignment are kept.</div>
+<h3 id="geometry">Exact position and size</h3>
+<p>With one shape selected, enter <b>X</b>, <b>Y</b>, <b>W</b> (width) and <b>H</b> (height) in pixels in the panel's <b>Position and size</b> section and press <kbd>Enter</kbd>. Size can be changed for tasks, sub-processes, pools and lanes (minimum 50×40); events and gateways have the standard BPMN size.</p>
+<h3 id="group">Grouping and locking</h3>
+<ul>
+<li><b>Group</b> — select several shapes → “Group and lock” → <span class="pill">Group</span>. Clicking any member selects the whole group, and dragging moves them all together. To select one member on its own: <kbd>Alt</kbd>+click. <span class="pill">Ungroup</span> removes the group.</li>
+<li><b>Lock</b> — <span class="pill">Lock</span> prevents the shape from being moved, resized or deleted (a padlock mark shows). Text, color, instruction and links can still be edited. Useful for pools and lanes, so they do not shift by accident.</li>
+</ul>
+<h3 id="tidy">Tidying arrows</h3>
+<p>If an arrow you moved by hand has collected many bends, select it and click <span class="pill">Tidy the route</span> in the panel — the arrow is rerouted along the shortest right-angled path. With several elements selected, the <span class="pill">Tidy N arrows</span> button straightens all selected arrows at once. Connection points (sides) you chose by hand are kept. <kbd>Ctrl</kbd>+<kbd>Z</kbd> undoes the change in one step.</p>
+<h3 id="linetype">Line type: solid, dashed, dotted</h3>
+<p>In BPMN, the look of a line means the type of connection, so dashes are not a free choice — you choose the <b>connection type</b>. Select an arrow: the panel's <b>Line type</b> section shows the allowed options with a picture and an explanation.</p>
+<table>
+<tr><th>Look</th><th>Type</th><th>How you get it</th></tr>
+<tr><td>Solid arrow</td><td><b>Sequence flow</b></td><td>A normal arrow inside one pool</td></tr>
+<tr><td>Slash at the start</td><td><b>Default flow</b></td><td>Chosen in the panel (on an arrow leaving a gateway or task)</td></tr>
+<tr><td>Diamond at the start</td><td><b>Conditional flow</b></td><td>Chosen in the panel (on an arrow leaving a task); write the condition as the label</td></tr>
+<tr><td>Dashed, open arrow</td><td><b>Message flow</b></td><td>Automatically, when you connect two different pools</td></tr>
+<tr><td>Dotted</td><td><b>Association / Data association</b></td><td>Automatically, when you connect an annotation, document or data store</td></tr>
+</table>
+<figure>{{img:05d_line_type.png}}<figcaption>Arrow panel: choosing the line type</figcaption></figure>
+<p>The line <b>color</b> is changed in the “Style” section. Line thickness does not exist in the BPMN standard and would not carry over to other tools, so the editor does not offer it.</p>
+<h3 id="arrowtext">Arrow labels</h3>
+<ul>
+<li><b>Writing and editing</b> — double-click the arrow or its label, or select the arrow and type the text in the panel header field. A single click on the label opens the arrow's panel.</li>
+<li><b>Quick labels</b> — on an arrow leaving a gateway, the panel has <span class="pill">Yes</span> / <span class="pill">No</span> buttons.</li>
+<li><b>Position</b> — a new label is placed beside the middle of the arrow and does not cover the line. You can drag the label; in the “Appearance” tab, <span class="pill">Put the text back in place</span> puts it beside the arrow again. With several elements selected, the same button fixes all labels at once.</li>
+<li><b>Readability</b> — labels of arrows, events and gateways have a thin white background, so they stay readable even when they sit on a line (also in export and print).</li>
+<li>Size, bold, italic and underline also work on arrow labels (“Appearance” → “Text”).</li>
+</ul>
+<h3 id="repeat">Repeat (loop, multiple instances)</h3>
+<p>In the task and sub-process panel, <b>Repeat</b>: <span class="pill">Once</span>, <span class="pill">Repeated</span> (loop until a condition is met), <span class="pill">For each, at the same time</span> (|||) and <span class="pill">For each, one after another</span> (≡). The standard BPMN marker appears on the shape.</p>
+<h3 id="view">View</h3>
+<ul>
+<li>Zoom — the buttons at the bottom left, <kbd>Ctrl</kbd>+mouse wheel; clicking the percentage = 100%; <kbd>0</kbd> — fit to screen;</li>
+<li><b>Side panel</b> — the panel of a selected element has two tabs: <b>Content</b> (Who, instruction, links, flow, line type, repeat) and <b>Appearance</b> (style, text, position and size, route). The tab you opened last stays open when you move to another element. Clicking a section title collapses/expands it; dragging the panel's left edge changes its width (double-click — default). Everything is stored in the browser.</li>
+<li><b>Minimap</b> (<kbd>M</kbd>) — for finding your way in a large diagram; <b>Grid</b> (<kbd>G</kbd>); <b>Side panel</b> (<kbd>P</kbd>) — hide it if you need more room. Your choice is stored in the browser.</li>
+</ul>
+
+<h2 id="keys"><span class="num">6.</span>Keyboard shortcuts</h2>
+<p>Shortcuts work when the diagram is active — click the canvas first. The full list opens with <kbd>?</kbd> or the keyboard button in the top bar.</p>
+<figure>{{img:09_shortcuts.png}}<figcaption>Shortcuts dialog</figcaption></figure>
+<table>
+<tr><th>Key</th><th>Action</th><th>Key</th><th>Action</th></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>Save</td><td><kbd>A</kbd></td><td>Append an element after the selected one</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Y</kbd></td><td>Undo / Redo</td><td><kbd>N</kbd></td><td>Create an element (with search)</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>C</kbd> / <kbd>V</kbd></td><td>Copy / Paste</td><td><kbd>E</kbd></td><td>Edit the text</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>A</kbd></td><td>Select all</td><td><kbd>R</kbd></td><td>Change type</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>F</kbd></td><td>Find an element</td><td><kbd>C</kbd> / <kbd>H</kbd> / <kbd>L</kbd> / <kbd>S</kbd></td><td>Connect / hand / lasso / space</td></tr>
+<tr><td><kbd>Del</kbd></td><td>Delete</td><td><kbd>F</kbd> / <kbd>P</kbd> / <kbd>M</kbd> / <kbd>G</kbd> / <kbd>0</kbd></td><td>Full screen / panel / minimap / grid / fit</td></tr>
+<tr><td>Arrow keys</td><td>Move the selection (<kbd>Shift</kbd> — faster)</td><td><kbd>Esc</kbd></td><td>Close menus, leave full screen</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>P</kbd></td><td>Print the diagram / PDF</td><td><kbd>Alt</kbd>+click</td><td>Select one member of a group</td></tr>
+</table>
+
+<h2 id="shapes"><span class="num">7.</span>BPMN elements</h2>
+<p>All elements of BPMN 2.0 process and collaboration diagrams are supported. The most common ones are directly in the palette; all others are available through <kbd>N</kbd>/<kbd>A</kbd> search or by changing the type (<kbd>R</kbd>).</p>
+<table>
+<tr><th>Group</th><th>In the palette</th><th>Also available (search / change type)</th></tr>
+<tr><td>Events</td><td>Start, intermediate, end; message and timer start</td><td>Message, timer, conditional, signal, escalation, error, compensation, cancel, link, terminate, multiple; boundary (interrupting / non-interrupting)</td></tr>
+<tr><td>Gateways</td><td>Exclusive (XOR), parallel (AND)</td><td>Inclusive (OR), event-based, complex</td></tr>
+<tr><td>Activities</td><td>Task, user and service task, call activity, sub-process</td><td>Manual, send, receive, business rule and script task; event and ad-hoc sub-process, transaction; markers: loop, multi-instance, compensation</td></tr>
+<tr><td>Data and artifacts</td><td>Data object and data store, group, text annotation</td><td>—</td></tr>
+<tr><td>Participants</td><td>Pool</td><td>Lanes (from the pool's context pad), empty pool</td></tr>
+<tr><td>Flows</td><td>Connect tool</td><td>Conditional and default flow; between pools — message flow</td></tr>
+</table>
+<div class="warn">BPMN 2.0 Choreography and Conversation diagrams are not supported (a bpmn-js limitation). They are practically never used for documenting processes.</div>
+
+<h2 id="knowledge"><span class="num">8.</span>Instructions, links, responsible</h2>
+<h3 id="instruction">Work instruction</h3>
+<p>Select a shape and fill in the <b>Work instruction</b> in the panel: what has to be done, which rule applies, which check is performed. A line starting with <code>-</code> is shown to viewers as a list; <code>1.</code> as a numbered list. The text is stored in the standard BPMN <code>documentation</code> field, so it also shows in Camunda and Signavio.</p>
+<h3 id="links">Links</h3>
+<p>In the panel of a step without links, the <b>Links</b> section is open from the start; if the step already has a link, click <span class="pill">+ Add a link</span>. At the top, choose the type with a button (chip) — each has a short hint below it explaining what it means — and type a name in the search field. <b>Enter</b> picks the first result.</p>
+<ul>
+<li><b>Odoo screen</b> — a menu, e.g. “Sales / Orders”. Employees see only the menus they have access to.</li>
+<li><b>Knowledge article</b> (Enterprise, if Knowledge is installed) — a detailed instruction. Type the title: if no such article exists, the list shows <span class="pill">+ Create “…”</span> — the article is created and linked to the step right away; then open it from the link and fill it in.</li>
+<li><b>Document</b> (Enterprise, Documents) — a form, template or policy.</li>
+<li><b>Other process</b> — a process that continues from here, or a sub-process. Here too you can create a new process directly by typing its name.</li>
+<li><b>Attached file</b> — only files attached to this process (in the chatter), not those of other records.</li>
+<li><b>Web address</b> — an <code>https://</code>, <code>http://</code>, <code>mailto:</code> or internal Odoo <code>/…</code> link, optionally with a name shown to employees.</li>
+</ul>
+<p>In the viewer, links appear on the step card in the <b>“Open in Odoo”</b> section, each with its type icon and label (e.g. “Knowledge article”) — one click opens it.</p>
+<div class="note">Only a Process Manager can create a new record from the diagram; for a Knowledge article, they also need the right to create articles in Knowledge.</div>
+<figure>{{img:05_task_links.png}}<figcaption>Task panel, “Content” tab: instruction, link, flow</figcaption></figure>
+<h3 id="responsible">Responsible (for a lane) — name and comment</h3>
+<p>Select a lane (or a pool, if it has no lanes) and, in the <b>Responsible</b> section, search for a department, job position (requires the Employees app), user group or user. Every step in the lane takes on this responsibility.</p>
+<ul>
+<li><b>The lane name is set automatically</b> to the responsible's name if the lane has no name or its name matched the previous responsible. Otherwise (e.g. the lane is called “Shift supervisor” and the responsible is “Warehouse”) the name is not changed and a <span class="pill">Use “…” as lane name</span> button appears.</li>
+<li>The <b>“Lane name follows the responsible”</b> flag links the two: if the department is renamed in Odoo, the panel shows the new name and one click updates the lane too.</li>
+<li><b>Comment</b> — a clarification of the role or a note (e.g. “The check is approved by the shift supervisor”). Viewers see it on the “Who” card of every step.</li>
+</ul>
+<figure>{{img:04_lane_responsible.png}}<figcaption>Lane responsible with a comment; the lane name follows the responsible</figcaption></figure>
+<div class="note">Links and responsibles are also stored with a technical identifier (XML ID). So after moving to another database, standard menus still open correctly, and anything that cannot be found is marked on the diagram as broken.</div>
+
+<h2 id="card"><span class="num">9.</span>Process card, level, tags</h2>
+<p>The <b>Process Card</b> tab describes the process with the SIPOC logic: <b>Trigger</b>, <b>Suppliers</b>, <b>Inputs</b>, <b>Outputs</b>, <b>Customers</b>, and <b>Indicators (KPI)</b> — what is measured, the target, the frequency and the data source. KPI targets can be changed even in a published version; the rest of the card is part of the version.</p>
+<figure>{{img:10_process_card.png}}<figcaption>Process card and KPIs</figcaption></figure>
+<table>
+<tr><th>Field</th><th>Meaning</th></tr>
+<tr><td><b>Process Type</b></td><td>Core (operational), supporting, management — the standard classification (Porter's value chain, the ISO 9001 process approach). There is no need to add new types; use tags for additional views.</td></tr>
+<tr><td><b>Level</b></td><td>Depth in the process architecture, similar to APQC PCF: L0 value chain/category → L1 process group → L2 process → L3 sub-process → L4 activity/procedure. When you choose a parent, the level moves down by one automatically.</td></tr>
+<tr><td><b>Tags</b></td><td>Free, colored views (ISO 9001, Customer facing, Critical…). Managed in <i>Configuration → Tags</i>.</td></tr>
+</table>
+
+<h2 id="import"><span class="num">10.</span>Import: draw.io, Visio, BPMN</h2>
+<p><b>Processes → Import Diagram</b> (or the <b>Import Diagram</b> button on a draft's form — to replace the existing diagram).</p>
+<figure>{{img:06_import_wizard.png}}<figcaption>Import wizard</figcaption></figure>
+<table>
+<tr><th>Source</th><th>How to prepare the file</th></tr>
+<tr><td><b>draw.io / diagrams.net</b></td><td><i>File → Save as</i> → <code>.drawio</code> (or <code>.xml</code>). <i>File → Export as → SVG / PNG</i> also works if <b>“Include a copy of my diagram”</b> is checked. In a multi-page file, each page becomes a separate process (or choose “First page only”).</td></tr>
+<tr><td><b>Microsoft Visio</b></td><td><i>File → Save As → Visio Drawing (*.vsdx)</i>. An old <code>.vsd</code> file must first be saved as <code>.vsdx</code>.</td></tr>
+<tr><td><b>Camunda Modeler, Signavio, bpmn.io, Bizagi, ARIS…</b></td><td>BPMN 2.0 XML export (<code>.bpmn</code>). If the file has no layout, it is laid out automatically when opened.</td></tr>
+</table>
+<h3>What the converter recognizes</h3>
+<ul>
+<li>All shapes of the draw.io <b>BPMN 2.0</b> library, swimlanes, Cross-Functional Flowchart;</li>
+<li>Shapes of the Visio <b>BPMN Diagram</b> template (based on shape data), Cross-Functional Flowchart lanes, Basic Flowchart;</li>
+<li>Plain drawings: rectangle → task, diamond → exclusive gateway, circle/oval → event, document → data object, cylinder → data store, text → annotation;</li>
+<li><b>Colors</b>: shape fill and line color (default white/black colors are not carried over, so the diagram keeps the module's style).</li>
+</ul>
+<h3>What happens after import</h3>
+<ol class="steps">
+<li>Lanes are compared with departments, job positions and groups <b>with exactly the same name</b>. Matches are linked automatically.</li>
+<li><b>Every</b> lane is flagged with a <span class="pill">!</span> mark: “Confirm the automatic match” or “Assign a department / role”. Shapes whose type was guessed are flagged too (“Check the element type”).</li>
+<li>A report is written to the chatter: what was converted, what was skipped and why.</li>
+</ol>
+<div class="note"><b>Tip:</b> in draw.io, use the <i>More Shapes → BPMN 2.0</i> library and attach connectors to shapes. In Visio, use the BPMN or Cross-Functional Flowchart template. Give lanes exactly the name of the Odoo department — they are then linked automatically.</div>
+<p>To run the lane matching again (e.g. after creating departments), click <b>Match Lanes</b> on the draft.</p>
+
+<h3 id="demo">Demo data: try every case</h3>
+<p>At the bottom of the import wizard there is <span class="pill">Load demo data</span> (for Process Managers only). One click creates sample processes in Georgian, with the tag <b>“დემო”</b> (“demo”) and the code <code>DEMO-…</code>:</p>
+<table>
+<tr><th>Process</th><th>What it shows</th></tr>
+<tr><td><b>Operational / Supporting processes</b> (“ოპერაციული პროცესები” / “მხარდამჭერი პროცესები”, L0)</td><td>Value chain: blocks that open sub-processes; the Process Map hierarchy</td></tr>
+<tr><td><b>Purchase request</b> (“შესყიდვის მოთხოვნა”, L2, v1.0 published + v1.1 draft)</td><td>4 lanes (one deliberately without a responsible), an outside party (collapsed pool) with messages, conditional and default flows, timer, escalation, multi-instance task, data object and data store, annotation, colors, every link type (menu, other process, attached file, Knowledge article — if installed, web address), KPIs, read confirmation; in v1.1 — a broken link in the review queue</td></tr>
+<tr><td><b>Supplier invoice payment</b> (“მომწოდებლის ინვოისის გადახდა”)</td><td>Inclusive gateway with conditions, 3 lanes</td></tr>
+<tr><td><b>New employee onboarding</b> (“ახალი თანამშრომლის მიღება”, in review)</td><td>Parallel gateway, sequential multi-instance task, intermediate timer, sub-process call</td></tr>
+<tr><td><b>Granting IT access</b> (“IT წვდომის მინიჭება”, L3)</td><td>Sub-process, loop, conditional and default flow from a task, <b>overdue review</b></td></tr>
+<tr><td><b>Advance expense report</b> (“ავანსის ხარჯების ანგარიშგება”)</td><td>Versions: v1.0 deprecated, v2.0 published; a lane assigned to a specific user</td></tr>
+<tr><td><b>Annual budget planning</b> (“წლიური ბიუჯეტის დაგეგმვა”, management, L1)</td><td>Mandatory read confirmation that no one has confirmed yet</td></tr>
+<tr><td><b>Import from draw.io / Visio (demo)</b> (“იმპორტი draw.io-დან (დემო)” / “იმპორტი Visio-დან (დემო)”)</td><td>A real import of test files built into the module: items to review, lane matching</td></tr>
+</table>
+<figure>{{img:17_demo_purchase.png}}<figcaption>Demo process “Purchase request”</figcaption></figure>
+<p>For the responsibles, departments (if Employees is installed) or user groups are created: Purchasing, Finance, Human Resources, IT, Management, Warehouse, Employees. If a record with the same name already exists, the existing one is used.</p>
+<p><span class="pill">Remove demo data</span> is in the same place. Only what the demo created is deleted, together with the versions created from those processes. Your own processes stay; if one of them was under a demo process, it moves to the top level. Departments, groups and tags that existed before are not deleted.</p>
+<div class="note">Demo data is meant for a test or demonstration database. If you load it on a production database, remember to remove it afterwards — demo processes are also counted in the dashboard figures.</div>
+
+<h2 id="review"><span class="num">11.</span>Review queue</h2>
+<p>The <b>Review Queue</b> menu collects the flagged elements of all processes: what has to be done and where. <b>Open</b> takes you to the process and selects that element directly.</p>
+<figure>{{img:07_review_queue.png}}<figcaption>Review Queue</figcaption></figure>
+<p>In the diagram's top bar, the <span class="pill">⚠ N to review</span> button moves through the flagged elements one by one; the overview panel lists them too. After fixing an element, click <b>Mark as reviewed</b>; choosing a responsible on a lane clears the flag by itself. Only Process Managers see the flags.</p>
+
+<h2 id="lifecycle"><span class="num">12.</span>Approval, versions, control</h2>
+<table>
+<tr><th>Status</th><th>Who sees it</th><th>Editing</th><th>Next step</th></tr>
+<tr><td>Draft</td><td>Managers</td><td>Yes</td><td>Submit for Review / Publish</td></tr>
+<tr><td>In Review</td><td>Managers</td><td>No</td><td>Publish / Back to Draft</td></tr>
+<tr><td>Published</td><td>Everyone</td><td>No</td><td>New Version / Deprecate</td></tr>
+<tr><td>Deprecated</td><td>Managers</td><td>No</td><td>Restore / New Version</td></tr>
+</table>
+<h3 id="edit">How do I change a process?</h3>
+<p>Only a <b>Draft</b> can be edited. In any other status, a hint shows at the top of the form, and the diagram's top bar has a green button that takes you straight to the editable version:</p>
+<table>
+<tr><th>Where you are</th><th>What you click</th><th>What happens</th></tr>
+<tr><td>In Review</td><td><b>Back to Draft</b></td><td>The same version becomes editable again</td></tr>
+<tr><td>Published</td><td><b>New Version</b></td><td>A draft is created; 1.0 stays valid until you publish the new one (at publication you choose: 1.1 or 2.0)</td></tr>
+<tr><td>An old version, while a new one is being prepared</td><td><b>Open</b></td><td>The version in preparation opens (no second draft is created)</td></tr>
+<tr><td>Deprecated</td><td><b>Restore</b> or <b>New Version</b></td><td>It is published again, or a draft is created</td></tr>
+</table>
+<figure>{{img:19_form_hint.png}}<figcaption>Published version: the hint at the top of the form and the “New version to edit” button in the diagram bar</figcaption></figure>
+<ul>
+<li><b>New Version</b> creates a draft copy of the published version (including the diagram, the card and the KPIs). Whether the change is small or major is chosen at publication (see <a href="#versions">Small and major changes</a>). When the new one is published, the old one automatically becomes “Deprecated” — no history is lost (the <b>Versions</b> button).</li>
+<li><b>Deprecate</b> deletes nothing: the process disappears from the Process Map but stays in “All Processes” (grayed out) and comes back with <b>Restore</b>. The button asks for confirmation.</li>
+<li>By default, “All Processes” shows <b>Current Versions</b> — all statuses except old versions replaced by a newer one. For old ones choose the <b>Old Versions</b> filter, for archived ones <b>Archived</b>. A process is deleted permanently only with “Delete” in the Actions menu.</li>
+<li>Only one version can be in preparation at a time. Publishing, deprecating and restoring are logged in the chatter.</li>
+</ul>
+<h3 id="versions">Small and major changes (version number)</h3>
+<p>Clicking <b>Publish</b> opens a dialog. For the first version it only asks for confirmation. For every later version the dialog shows two cards — <b>Small change</b> and <b>Major change</b> — with the new number, examples and what happens; you publish with the button of one card (<span class="pill">Publish as a small change</span> or <span class="pill">Publish as a major change</span>), so a version cannot be published without this choice:</p>
+<table>
+<tr><th></th><th>Small change</th><th>Major change</th></tr>
+<tr><td><b>New number</b></td><td>1.0 → <b>1.1</b></td><td>1.x → <b>2.0</b></td></tr>
+<tr><td><b>Examples</b></td><td>wording, a link, a clearer instruction, a typo, a renamed department</td><td>new or removed steps, another role does the work, a new control or approval, a different order</td></tr>
+<tr><td><b>For employees</b></td><td>they keep working as before</td><td>they have to change how they work</td></tr>
+<tr><td><b>Read confirmation</b> (if enabled)</td><td>kept: whoever confirmed the previous version does not need to confirm again</td><td>asked again from everyone</td></tr>
+</table>
+<figure>{{img:18_publish_dialog.png}}<figcaption>Publish dialog: small or major change</figcaption></figure>
+<p><b>Rule of thumb if in doubt:</b> if someone who knows the old version would do something wrong with the new one, it is a major change.</p>
+<p>In the dialog you can write <b>What Changed</b> — a sentence or two for the history. It shows in the chatter, in the “Version &amp; Review” tab and in the version list (the “Kind of Change” column). You do not need to change the new version number by hand: it is set automatically at publication. Only the first version can be given a different number by hand (e.g. 3.2, if you are moving it over from a paper procedure).</p>
+<div class="note">Where this approach comes from: the “major.minor” number comes from software (Semantic Versioning) and is widely used in document management. ISO 9001 (7.5.3) requires change control and identifiable versions but does not prescribe a numbering scheme — here the number answers one important question: do employees need to read it again?</div>
+<h3 id="concurrent">Two managers on one diagram</h3>
+<p>If another manager also has the draft open, the top bar shows a yellow <span class="pill">Also editing: name</span> mark (refreshed once a minute). Changes no longer silently overwrite each other:</p>
+<ul>
+<li>whoever saves first has their version saved;</li>
+<li>the second save is rejected and a warning appears above the diagram: who saved and when. Buttons: <span class="pill">Download my version</span> (a .bpmn copy) and <span class="pill">Load the saved version</span>. You can redo your own changes or bring in your copy (import → replace);</li>
+<li>the warning appears even before you save, as soon as someone else saves — so you do not keep working in vain.</li>
+</ul>
+<h3 id="periodic">Periodic review</h3>
+<p>In the <b>Version &amp; Review</b> tab, set <b>Review Every (months)</b> (12 by default). At publication, the <b>Next Review</b> date is calculated; when it is due, the process owner gets a to-do activity “Periodic process review”, and the date moves to the next cycle. The <b>Review Due</b> filter shows overdue processes.</p>
+<h3 id="ack">Read confirmation</h3>
+<p>If <b>Read Confirmation</b> is enabled, employees see an <span class="pill">I have read it</span> button on the published process. Confirmations are stored per version: after a <b>major change</b> the new version has to be read again; after a <b>small change</b> the previous confirmations carry over (marked “Carried Over” in the list). The manager sees the <b>Read by N</b> button and the full list (<i>Configuration → Read Confirmations</i>).</p>
+<figure>{{img:11_published_ack.png}}<figcaption>Published version: the “I have read it” button, counters and history</figcaption></figure>
+
+<h2 id="dashboard"><span class="num">13.</span>Dashboard for management</h2>
+<p>The <b>Processes → Dashboard</b> menu shows the full picture of the company's processes. All figures are calculated from the diagrams, so there is nothing extra to fill in. Filters: type, level, tag; a manager can switch on <b>Including drafts</b> (the current version of each process).</p>
+<figure>{{img:14_dashboard.png}}<figcaption>Key figures, workload by role and portfolio</figcaption></figure>
+<table>
+<tr><th>Block</th><th>What it shows</th><th>What it is for</th></tr>
+<tr><td><b>Key figures</b></td><td>Processes, steps, decisions, roles, handoffs; how many lanes have an Odoo responsible, how many steps have an instruction and an Odoo link; overdue reviews; items to review (for managers)</td><td>Completeness of the documentation at a glance</td></tr>
+<tr><td><b>Workload by role</b></td><td>How many steps each role performs (department, job position, group or lane), how many processes it takes part in, how many handoffs it is involved in; a “no responsible” mark</td><td>Finding overloaded and unassigned roles; clicking a bar opens all steps of that role</td></tr>
+<tr><td><b>Handoffs between roles</b></td><td>Matrix: how often work passes from one role (row) to another (column); the darker, the more</td><td>Coordination “hotspots” — where time and information are most often lost; clicking a cell opens the matching processes</td></tr>
+<tr><td><b>Portfolio</b></td><td>Processes by type (core/supporting/management) and level (L0–L4); for managers — all versions by status</td><td>Balance of the architecture: e.g. many L2 processes but few L3 procedures</td></tr>
+<tr><td><b>Publications</b></td><td>Versions published in the last 12 months, by month</td><td>How alive the process knowledge base is</td></tr>
+<tr><td><b>Process health</b></td><td>Table: steps, decisions, roles, handoffs, % of instructions and responsibles, next review, health score (0–100: responsible 30, instruction 40, links 10, timely review 10, no items to review 10) — good (≥80), fair (50–79), weak (&lt;50). Click a column to sort</td><td>Which process needs attention first</td></tr>
+<tr><td><b>Upcoming reviews</b>, <b>Read confirmations</b></td><td>Reviews due in the next 90 days and overdue ones; how many internal users have confirmed the current version (for managers)</td><td>Control and ISO 9001 records</td></tr>
+</table>
+<figure>{{img:15_dashboard_matrix.png}}<figcaption>Handoff matrix and publications</figcaption></figure>
+<figure>{{img:16_dashboard_health.png}}<figcaption>Process health, reviews and read confirmations</figcaption></figure>
+<div class="note">Viewers see data of published processes only; items to review, statuses and read-confirmation statistics are visible to managers only. <b>Workload</b> here means the responsibility defined in the processes (the number of steps), not the volume of operations actually performed in Odoo.</div>
+
+<h2 id="export"><span class="num">14.</span>Export</h2>
+<table>
+<tr><th>Format</th><th>Where</th><th>Use</th></tr>
+<tr><td>BPMN 2.0 (<code>.bpmn</code>)</td><td>Top bar → Download, or the <b>BPMN</b> button</td><td>Camunda Modeler, Signavio, bpmn.io; import into another Odoo database</td></tr>
+<tr><td>draw.io (<code>.drawio</code>)</td><td>Download, or the <b>draw.io</b> button (last saved version)</td><td>Open and edit in draw.io; colors, instruction (tooltip) and links (Edit Data) are kept</td></tr>
+<tr><td>SVG / PNG</td><td>Download</td><td>Presentations, Word, ISO 9001 procedures</td></tr>
+<tr><td>Print / PDF</td><td>Download → <b>Print / PDF...</b> or <kbd>Ctrl</kbd>+<kbd>P</kbd></td><td>On paper or as PDF: procedures, audits, posting at the workplace</td></tr>
+</table>
+<h3 id="print">Printing and PDF</h3>
+<p>In the dialog, choose:</p>
+<ul>
+<li><b>Paper</b> — A4 or A3; <b>Orientation</b> — automatic (based on the diagram's shape), landscape or portrait;</li>
+<li><b>Layout</b> — <span class="pill">Fit on one page</span> (the diagram fits on one sheet; if the text comes out too small, the dialog warns you) or <span class="pill">Split into pages</span> at 100%, 75% or 50%. When split, the sheets overlap by 6 mm and are labeled like a map (A1, B1, A2…), so they are easy to tape together;</li>
+<li><b>Add</b> — process details (owner, status, purpose, inputs/outputs), the step list (instruction, who performs it, links) and step numbers on the diagram that match the numbers in the list.</li>
+</ul>
+<figure>{{img:20_print_dialog.png}}<figcaption>Print dialog: paper, layout, additions and preview</figcaption></figure>
+<p>The preview shows how the diagram will be split. <b>Print</b> opens the browser's print dialog; for PDF, choose “Save as PDF” as the printer. The top of every page shows the process name, code, version and status (an unapproved version is marked in orange), the bottom shows who printed it and when. Unsaved changes are printed too. Your choices are stored in the browser.</p>
+
+<h2 id="faq"><span class="num">15.</span>FAQ</h2>
+<h3 id="faq-map">Why is my process not on the map?</h3>
+<p>The map shows only published processes. Drafts, versions in review and deprecated versions are in the <b>All Processes</b> menu (managers only).</p>
+<h3 id="faq-gone">A process disappeared — was it deleted?</h3>
+<p>Almost never. <b>Deprecate</b> and publishing a new version delete nothing. Filters in “All Processes”: <b>Deprecated</b>, <b>Old Versions</b> (replaced by a newer one), <b>Archived</b>. A process is deleted permanently only with “Delete” in the Actions menu.</p>
+<h3 id="faq-edit">Why can't I change the diagram?</h3>
+<p>Editing is possible only in a draft and only for Process Managers. The hint at the top of the form and the green button in the diagram's top bar (<span class="pill">New version to edit</span>, <span class="pill">Back to draft to edit</span> or <span class="pill">Open version …</span>) take you straight to the editable version. Details: <a href="#edit">How do I change a process?</a></p>
+<h3 id="faq-conflict">“X saved a newer version” — what do I do?</h3>
+<p>Another manager was editing the same draft and saved first. Click <span class="pill">Download my version</span>, then <span class="pill">Load the saved version</span>, and redo your changes. Details: <a href="#concurrent">Two managers on one diagram</a>.</p>
+<h3>Shortcuts don't work</h3>
+<p>Click an empty spot on the diagram — shortcuts work when the canvas is active. <kbd>Ctrl</kbd>+<kbd>S</kbd> also works in the panel fields.</p>
+<h3>Will everything come over exactly from draw.io/Visio?</h3>
+<p>A drawing made with the BPMN library — almost completely, colors included. For free-form drawings, the module guesses the shape type and flags such shapes for review. Fonts and the exact bends of lines are not carried over: connectors are redrawn at right angles.</p>
+<h3>What is not supported</h3>
+<ul>
+<li>The old Visio <code>.vsd</code> format (save it as <code>.vsdx</code>); export to Visio;</li>
+<li>BPMN Choreography and Conversation diagrams;</li>
+<li>Automatic execution of the process (this is not a workflow engine — on purpose);</li>
+<li>Multiple languages for diagram content (names, instructions).</li>
+</ul>
+<h3>What is the “BPMN.io” logo in the corner?</h3>
+<p>The license of the diagram library (bpmn-js) requires this logo to stay visible. Hiding it violates the license.</p>
+
+<h2 id="admin"><span class="num">16.</span>For administrators</h2>
+<ul>
+<li><b>Installation / upgrade:</b> add the <code>bpmn_process_management</code> folder to the addons path → <i>Apps → Update Apps List</i> → “BPMN Process Management” → Install (or Upgrade when updating). No additional Python packages are needed.</li>
+<li><b>Roles:</b> every internal user is a Viewer automatically; Process Manager is assigned on the user form.</li>
+<li><b>Language:</b> the administrator activates a language once (<i>Settings → Languages → Add Language</i>), then each user chooses it in <i>My Preferences → Language</i>. The whole module interface switches, including the editor and the buttons of this guide. Translation: <code>i18n/ka.po</code>; for a new language — <code>i18n/bpmn_process_management.pot</code>. The guide is available in two languages: Georgian users get the Georgian version, everyone else gets English (<code>/bpmn_process_management/guide</code>).</li>
+<li><b>Scheduled action:</b> “Business Processes: periodic review reminders” runs once a day (<i>Settings → Technical → Scheduled Actions</i>).</li>
+<li><b>Multi-company:</b> “Company” empty = the process applies to all companies; filled in = to that company only. KPIs and confirmations follow the process.</li>
+<li><b>Link to departments:</b> enabled if Employees (hr) is installed. Knowledge and Documents links — in Enterprise, if those apps are installed.</li>
+</ul>
+</main>
+</div>
+<footer><div class="in">{{imgraw:gec_logo_white.png}}<span>From discovery to lasting impact.</span><span class="url">www.gecbusiness.com</span></div></footer>
+</body>
+</html>

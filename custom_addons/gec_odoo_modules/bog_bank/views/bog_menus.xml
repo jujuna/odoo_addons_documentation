@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_bog_root"
+              name="Bank of Georgia"
+              sequence="91"
+              web_icon="bog_bank,static/description/icon.png"
+              groups="bog_bank.group_bog_user"/>
+
+    <menuitem id="menu_bog_payments"
+              name="Transfers"
+              parent="menu_bog_root"
+              action="action_bog_payment"
+              sequence="5"/>
+
+    <menuitem id="menu_bog_pending_approval"
+              name="Pending Approval"
+              parent="menu_bog_root"
+              action="action_bog_pending_approval"
+              sequence="6"/>
+
+    <menuitem id="menu_bog_connection"
+              name="Connections"
+              parent="menu_bog_root"
+              action="action_bog_connection"
+              sequence="10"/>
+
+    <menuitem id="menu_bog_statement_import"
+              name="Import Statement"
+              parent="menu_bog_root"
+              action="action_bog_statement_import"
+              sequence="15"/>
+
+    <menuitem id="menu_bog_statement"
+              name="Statements"
+              parent="menu_bog_root"
+              action="action_bog_statement"
+              sequence="17"/>
+
+    <menuitem id="menu_bog_approval"
+              name="Approvers"
+              parent="menu_bog_root"
+              action="action_bog_approval"
+              groups="bog_bank.group_bog_manager"
+              sequence="19"/>
+
+    <menuitem id="menu_bog_api_log"
+              name="API Logs"
+              parent="menu_bog_root"
+              action="action_bog_api_log"
+              groups="bog_bank.group_bog_manager"
+              sequence="20"/>
+</odoo>

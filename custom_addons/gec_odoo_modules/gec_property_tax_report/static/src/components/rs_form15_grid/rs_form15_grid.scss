@@ -1,0 +1,737 @@
+.o_rs_form15_grid {
+    --rsf15-accent: var(--o-brand-primary, #714b67);
+    --rsf15-accent-dark: #56384f;
+    --rsf15-accent-soft: #f4f0f3;
+    --rsf15-border: var(--o-border-color, #dee2e6);
+    --rsf15-header: #f8f9fa;
+    --rsf15-header-strong: #f0f2f4;
+    --rsf15-text: #27313d;
+    --rsf15-text-muted: #697482;
+
+    border: 1px solid var(--rsf15-border);
+    border-radius: 6px;
+    background: var(--o-view-background-color, #fff);
+    box-shadow: 0 1px 3px rgba(20, 29, 40, 0.06);
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+
+    .o_rsf15_toolbar {
+        min-height: 58px;
+        padding: 9px 14px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        border-bottom: 1px solid var(--rsf15-border);
+        color: var(--rsf15-text);
+        background: var(--o-view-background-color, #fff);
+    }
+
+    .o_rsf15_title {
+        min-width: 300px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        strong,
+        small {
+            display: block;
+        }
+
+        strong {
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        small {
+            margin-top: 2px;
+            color: var(--rsf15-text-muted);
+            font-size: 11px;
+        }
+    }
+
+    .o_rsf15_mark {
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
+        display: grid;
+        place-items: center;
+        border: 1px solid #dacdd6;
+        border-radius: 6px;
+        color: var(--rsf15-accent-dark);
+        background: var(--rsf15-accent-soft);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+    }
+
+    .o_rsf15_toolbar_stats {
+        display: flex;
+        align-items: center;
+        margin-left: auto;
+    }
+
+    .o_rsf15_stat {
+        padding: 2px 12px;
+        color: var(--rsf15-text-muted);
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+
+        + .o_rsf15_stat {
+            border-left: 1px solid var(--rsf15-border);
+        }
+    }
+
+    .o_rsf15_stat_warning {
+        color: #996515;
+    }
+
+    .o_rsf15_toolbar_actions {
+        display: flex;
+        gap: 8px;
+
+        .btn {
+            min-height: 32px;
+            padding-right: 12px;
+            padding-left: 12px;
+            border-radius: 4px;
+            box-shadow: none;
+            font-weight: 500;
+
+            &:hover {
+                border-color: #b8a5b2;
+            }
+
+            &:focus-visible {
+                border-color: var(--rsf15-accent);
+                box-shadow: 0 0 0 3px rgba(113, 75, 103, 0.14);
+            }
+        }
+    }
+
+    .o_rsf15_pager {
+        display: flex;
+        justify-content: flex-end;
+        padding: 6px 12px;
+        border-bottom: 1px solid var(--rsf15-border);
+        background: var(--rsf15-header);
+    }
+
+    .o_rsf15_table_wrap {
+        max-height: 620px;
+        overflow: auto;
+        overscroll-behavior: contain;
+        scrollbar-gutter: stable;
+    }
+
+    .o_rsf15_table {
+        width: 100%;
+        min-width: 100%;
+        table-layout: fixed;
+        border-spacing: 0;
+        border-collapse: separate;
+        color: var(--o-main-text-color, var(--rsf15-text));
+        font-size: 12px;
+
+        .o_rsf15_col_actions { width: 96px; }
+        .o_rsf15_col_type { width: 260px; }
+        .o_rsf15_col_name { width: 200px; }
+        .o_rsf15_col_territory { width: 230px; }
+        .o_rsf15_col_year { width: 120px; }
+        .o_rsf15_col_nbv { width: 190px; }
+        .o_rsf15_col_coefficient { width: 150px; }
+        .o_rsf15_col_exemption { width: 150px; }
+        .o_rsf15_col_basis { width: 230px; }
+        .o_rsf15_col_rate { width: 120px; }
+        .o_rsf15_col_tax { width: 160px; }
+        .o_rsf15_col_advance { width: 170px; }
+        .o_rsf15_col_difference { width: 165px; }
+        .o_rsf15_col_months { width: 120px; }
+        .o_rsf15_col_prorated { width: 185px; }
+
+        .o_rsf15_col_land_territory { width: 320px; }
+        .o_rsf15_col_land_type { width: 240px; }
+        .o_rsf15_col_area { width: 140px; }
+        .o_rsf15_col_taxable_area { width: 200px; }
+
+        th,
+        td {
+            border-right: 1px solid var(--rsf15-border);
+            border-bottom: 1px solid var(--rsf15-border);
+        }
+
+        tr > :last-child {
+            border-right: 0;
+        }
+
+        thead {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+
+            th {
+                position: relative;
+                padding: 8px;
+                color: #4f585f;
+                background: var(--rsf15-header);
+                text-align: center;
+                vertical-align: middle;
+                font-weight: 600;
+                line-height: 1.35;
+            }
+        }
+
+        .o_rsf15_group_headers {
+            height: 58px;
+
+            th {
+                background: var(--rsf15-header-strong);
+                font-size: 12px;
+                font-weight: 600;
+            }
+        }
+
+        .o_rsf15_leaf_headers {
+            height: 126px;
+
+            th {
+                padding: 12px 10px;
+                vertical-align: bottom;
+            }
+        }
+
+        .o_rsf15_filters {
+            height: 44px;
+
+            th {
+                padding: 5px 6px;
+                background: #fff;
+            }
+
+            input,
+            select {
+                width: 100%;
+                height: 31px;
+                padding: 3px 7px;
+                border: 1px solid #cbd2d8;
+                border-radius: 5px;
+                color: var(--o-main-text-color, #2f353b);
+                background: var(--o-input-background-color, #fff);
+                font-size: 11px;
+
+                &:focus {
+                    border-color: var(--rsf15-accent);
+                    box-shadow: 0 0 0 2px rgba(113, 75, 103, 0.13);
+                    outline: 0;
+                }
+            }
+
+            .o_rsf15_resize_handle {
+                position: absolute;
+                top: 0;
+                right: -4px;
+                z-index: 3;
+                width: 9px;
+                height: 100%;
+                cursor: col-resize;
+                touch-action: none;
+
+                &::after {
+                    content: "";
+                    position: absolute;
+                    top: 6px;
+                    bottom: 6px;
+                    left: 4px;
+                    width: 1px;
+                    background: transparent;
+                    transition: background-color 120ms ease;
+                }
+
+                &:hover::after {
+                    background: var(--rsf15-accent);
+                }
+            }
+        }
+
+        tbody tr {
+            height: 56px;
+            background: var(--o-view-background-color, #fff);
+            transition: background-color 120ms ease, box-shadow 120ms ease;
+
+            &:hover {
+                background: #f8f9fb;
+            }
+
+            &.o_rsf15_warning_row {
+                background: #fff9e8;
+            }
+
+        }
+
+        tbody td {
+            padding: 7px 8px;
+            vertical-align: middle;
+            background: inherit;
+            overflow: hidden;
+
+            .o_field_widget {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .o_field_many2one_selection,
+            .o_input_dropdown,
+            input:not([type="checkbox"]),
+            select,
+            textarea {
+                max-width: 100%;
+            }
+
+            .o_rsf15_cell_with_suffix {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+
+                .o_field_widget {
+                    flex: 1 1 auto;
+                    min-width: 0;
+                }
+            }
+
+            .o_rsf15_cell_suffix {
+                flex: 0 0 auto;
+                color: var(--rsf15-text-muted);
+                white-space: nowrap;
+            }
+        }
+
+        .o_rsf15_col_year,
+        .o_rsf15_col_nbv,
+        .o_rsf15_col_coefficient,
+        .o_rsf15_col_exemption,
+        .o_rsf15_col_rate,
+        .o_rsf15_col_tax,
+        .o_rsf15_col_advance,
+        .o_rsf15_col_difference,
+        .o_rsf15_col_months,
+        .o_rsf15_col_prorated,
+        .o_rsf15_col_area,
+        .o_rsf15_col_taxable_area {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .o_rsf15_col_treasury {
+            text-align: center;
+        }
+
+        .o_rsf15_sticky_col {
+            position: sticky;
+            left: 0;
+            z-index: 6;
+            box-shadow: 3px 0 5px rgba(37, 46, 54, 0.06);
+        }
+
+        tbody .o_rsf15_sticky_col,
+        tfoot .o_rsf15_sticky_col {
+            z-index: 2;
+            background: inherit;
+        }
+
+        tfoot {
+            position: sticky;
+            bottom: 0;
+            z-index: 4;
+
+            td {
+                height: 40px;
+                padding: 7px 9px;
+                color: var(--rsf15-accent-dark);
+                background: var(--rsf15-accent-soft);
+                text-align: right;
+                font-weight: 700;
+                font-variant-numeric: tabular-nums;
+            }
+        }
+    }
+
+    .o_rsf15_row_actions {
+        padding: 4px !important;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .o_rsf15_row_number {
+        color: var(--rsf15-text-muted);
+        font-size: 11px;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .o_rsf15_source {
+        width: 7px;
+        height: 7px;
+        display: inline-block;
+        margin-left: 3px;
+        border-radius: 50%;
+        background: #8a949e;
+
+        &[data-source="payslip"] { background: #4f73d9; }
+        &[data-source="payment"] { background: #7b55c7; }
+        &[data-source="manual"] { background: var(--rsf15-accent); }
+    }
+
+    .o_rsf15_open_source {
+        width: 21px;
+        height: 21px;
+        display: inline-grid;
+        margin-left: 3px;
+        padding: 0;
+        place-items: center;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        color: #65717e;
+        background: transparent;
+        text-decoration: none;
+        vertical-align: middle;
+        font-size: 11px;
+        line-height: 1;
+
+        &:hover,
+        &:focus-visible {
+            border-color: #dacdd6;
+            color: var(--rsf15-accent-dark);
+            background: var(--rsf15-accent-soft);
+            outline: 0;
+        }
+    }
+
+    .o_rsf15_warning_icon {
+        margin-left: 4px;
+        color: #c58200;
+        cursor: help;
+    }
+
+    .o_rsf15_clear_filter {
+        width: 27px;
+        height: 27px;
+        padding: 0;
+        border: 1px solid #cbd2d8;
+        border-radius: 5px;
+        color: #68727b;
+        background: #fff;
+    }
+
+    .o_rsf15_empty_row td {
+        height: 190px;
+        text-align: center;
+        color: var(--rsf15-text-muted);
+
+        strong,
+        small {
+            display: block;
+        }
+
+        strong {
+            margin-top: 10px;
+            color: var(--o-main-text-color, #2f353b);
+            font-size: 14px;
+        }
+
+        small {
+            margin-top: 4px;
+        }
+    }
+
+    .o_rsf15_empty_icon {
+        width: 48px;
+        height: 48px;
+        display: inline-grid;
+        place-items: center;
+        border-radius: 50%;
+        color: var(--rsf15-accent);
+        background: var(--rsf15-accent-soft);
+        font-size: 20px;
+    }
+
+    .o_rsf15_hint {
+        padding: 8px 12px;
+        border-top: 1px solid var(--rsf15-border);
+        color: var(--rsf15-text-muted);
+        background: var(--rsf15-header);
+        font-size: 11px;
+    }
+
+    @media (max-width: 1200px) {
+        .o_rsf15_toolbar {
+            flex-wrap: wrap;
+        }
+
+        .o_rsf15_toolbar_stats {
+            margin-left: auto;
+        }
+
+        .o_rsf15_toolbar_actions {
+            width: 100%;
+
+            .btn {
+                flex: 1 1 auto;
+            }
+        }
+
+        .o_rsf15_table_wrap {
+            max-height: 68vh;
+        }
+
+        .o_rsf15_table {
+            font-size: 11px;
+
+            .o_rsf15_group_headers th {
+                font-size: 12px;
+            }
+        }
+    }
+
+    @media (max-width: 680px) {
+        .o_rsf15_toolbar {
+            gap: 10px;
+            padding: 10px;
+        }
+
+        .o_rsf15_title {
+            min-width: 0;
+            flex: 1 1 100%;
+
+            small {
+                display: none;
+            }
+        }
+
+        .o_rsf15_toolbar_stats {
+            width: 100%;
+            margin-left: 0;
+        }
+
+        .o_rsf15_toolbar_actions {
+            overflow-x: auto;
+
+            .btn {
+                min-width: max-content;
+            }
+        }
+
+        .o_rsf15_hint {
+            line-height: 1.45;
+        }
+    }
+}
+
+body.o_rsf15_resizing,
+body.o_rsf15_resizing * {
+    cursor: col-resize !important;
+    user-select: none !important;
+}
+
+.o_rs_form15_grid {
+    .o_rsf15_table {
+        .o_rsf15_col_vehicle { width: 220px; }
+        .o_rsf15_col_plate { width: 230px; }
+        .o_rsf15_col_engine { width: 260px; }
+        .o_rsf15_col_employee { width: 220px; }
+        .o_rsf15_col_person { width: 240px; }
+        .o_rsf15_col_personal_no { width: 210px; }
+        .o_rsf15_col_car_tax { width: 180px; }
+
+        .o_rsf15_col_car_tax {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        tbody tr.o_rsf15_edited_row > td {
+            background: var(--rsf15-accent-soft);
+            box-shadow: inset 0 0 0 1px var(--rsf15-accent);
+        }
+    }
+
+    .o_rsf15_edit_row {
+        border: 0;
+        padding: 0 2px;
+        background: transparent;
+        color: var(--rsf15-text-muted);
+        line-height: 1;
+
+        &:hover {
+            color: var(--rsf15-accent);
+        }
+    }
+
+    .o_rsf15_remove_row {
+        border: 0;
+        padding: 0 2px;
+        background: transparent;
+        color: var(--rsf15-border);
+        line-height: 1;
+
+        &:hover {
+            color: #b32d2e;
+        }
+    }
+}
+
+.o_rs_form15_grid {
+    .o_rsf15_table {
+        .o_rsf15_col_svc_id { width: 210px; }
+        .o_rsf15_col_svc_first { width: 180px; }
+        .o_rsf15_col_svc_last { width: 180px; }
+        .o_rsf15_col_svc_address { width: 230px; }
+        .o_rsf15_col_svc_country { width: 210px; }
+        .o_rsf15_col_svc_type { width: 260px; }
+
+        .o_rsf15_col_svc_amount {
+            width: 160px;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+    }
+}
+
+.o_rs_form15_grid.o_rsf15_centered {
+    .o_rsf15_table {
+        tbody td,
+        tfoot td {
+            text-align: center;
+        }
+
+        tbody td {
+            .o_field_widget,
+            .o_input,
+            input,
+            select {
+                text-align: center;
+            }
+        }
+    }
+}
+
+.o_rs_form15_grid.o_rsf15_summary {
+    .o_rsf15_summary_table {
+        table-layout: auto;
+
+        td {
+            padding: 7px 10px;
+            border-bottom: 1px solid var(--rsf15-border);
+            vertical-align: middle;
+        }
+
+        tbody tr:hover td { background: var(--rsf15-accent-soft); }
+
+        tbody td.o_rsf15_summary_value {
+            padding-right: 18px;
+        }
+    }
+
+    .o_rsf15_summary_label { width: 55%; }
+    .o_rsf15_summary_note { width: 20%; color: #4f585f; }
+
+    .o_rsf15_summary_code {
+        width: 64px;
+        color: var(--rsf15-accent-dark);
+        text-align: center;
+        font-weight: 600;
+    }
+
+    .o_rsf15_summary_value {
+        width: 190px;
+        text-align: right;
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .o_rsf15_summary_value_content {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        .o_field_widget {
+            flex: 1;
+            min-width: 0;
+        }
+    }
+
+    .o_rsf15_summary_padlock {
+        flex: 0 0 auto;
+        color: #9aa4ad;
+    }
+
+    .o_rsf15_summary_explain {
+        flex: 0 0 auto;
+        border: 0;
+        padding: 0 2px;
+        background: transparent;
+        color: var(--rsf15-text-muted);
+        line-height: 1;
+
+        &:hover {
+            color: var(--rsf15-accent);
+        }
+    }
+
+    .o_rsf15_summary_wand {
+        flex: 0 0 auto;
+        color: var(--rsf15-accent);
+    }
+
+    .o_rsf15_summary_locked td { background: var(--rsf15-header); }
+
+    .o_rsf15_summary_section td {
+        background: var(--rsf15-accent);
+        color: #fff;
+        text-align: center;
+        font-weight: 600;
+    }
+
+    // A column the portal derives and locks: the value we send is a cross-check.
+    .o_rsf15_locked_cell {
+        background: var(--rsf15-header);
+    }
+
+    .o_rsf15_lock {
+        flex: 0 0 auto;
+        margin-left: 4px;
+        color: #9aa4ad;
+        font-size: 11px;
+    }
+
+    // A cell the portal hides for this row: movable property has no acquisition year
+    // and no revaluation coefficient, and land with no exemption has no taxable area.
+    .o_rsf15_hidden_cell {
+        background: repeating-linear-gradient(
+            135deg, transparent, transparent 5px,
+            rgba(154, 164, 173, .16) 5px, rgba(154, 164, 173, .16) 10px);
+        color: #9aa4ad;
+        text-align: center;
+    }
+
+    .o_rsf15_negative {
+        color: var(--rsf15-danger, #b42318);
+    }
+}
+
+// The explanation dialog renders outside the grid, so this block is top level.
+.o_rsf15_explain {
+    h4 { font-size: 1.05rem; font-weight: 600; }
+    h5 { font-size: .9rem; font-weight: 600; color: #5f6b79; }
+
+    .o_rsf15_explain_table {
+        font-size: .85rem;
+
+        th {
+            background: #f0f2f4;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        td.font-monospace { font-variant-numeric: tabular-nums; }
+    }
+}

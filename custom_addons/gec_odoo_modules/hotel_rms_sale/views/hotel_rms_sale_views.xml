@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hotel_rms_property_view_form" model="ir.ui.view">
+        <field name="name">hotel.rms.property.form.sale</field>
+        <field name="model">hotel.rms.property</field>
+        <field name="inherit_id" ref="hotel_rms.hotel_rms_property_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='strategy']//field[@name='price_step']" position="after">
+                <field name="pricelist_id"/>
+            </xpath>
+            <xpath expr="//page[@name='rooms']//field[@name='code']" position="after">
+                <field name="product_tmpl_id" options="{'no_create': True}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hotel_rms_price_view_form" model="ir.ui.view">
+        <field name="name">hotel.rms.price.form.sale</field>
+        <field name="model">hotel.rms.price</field>
+        <field name="inherit_id" ref="hotel_rms.hotel_rms_price_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//widget[@name='rms_price_panel']" position="before">
+                <field name="not_for_sale" invisible="1"/>
+                <div class="mb-3" invisible="not not_for_sale">
+                    <span class="badge text-bg-warning">Not for sale</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hotel_rms_price_view_search" model="ir.ui.view">
+        <field name="name">hotel.rms.price.search.sale</field>
+        <field name="model">hotel.rms.price</field>
+        <field name="inherit_id" ref="hotel_rms.hotel_rms_price_view_search"/>
+        <field name="arch" type="xml">
+            <filter name="locked" position="after">
+                <filter name="not_for_sale" string="Not for sale" domain="[('not_for_sale', '=', True)]"/>
+            </filter>
+        </field>
+    </record>
+</odoo>

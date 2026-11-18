@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_analytic_account_form_headcount" model="ir.ui.view">
+        <field name="name">account.analytic.account.form.headcount</field>
+        <field name="model">account.analytic.account</field>
+        <field name="inherit_id" ref="analytic.view_account_analytic_account_form"/>
+        <field name="arch" type="xml">
+            <field name="plan_id" position="after">
+                <field name="gec_headcount"/>
+                <field name="gec_function_component_id" options="{'no_create': True}"/>
+                <field name="gec_revenue_stream_id" options="{'no_create': True}"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

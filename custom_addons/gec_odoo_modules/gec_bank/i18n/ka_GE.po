@@ -1,0 +1,980 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* gec_bank
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#. module: gec_bank
+#: model:ir.module.module,description:base.module_gec_bank
+msgid ""
+"\n"
+"Common base of the Georgian bank integrations (Basis Bank, TBC Bank, Bank of Georgia).\n"
+"\n"
+"Holds what every bank client needs and none of them should write twice: the row writes\n"
+"that let a send survive a crash, the audit log written on its own cursor, secret\n"
+"redaction, the approver and connection mixins, and the channel hooks on\n"
+"account.payment.method.line that a consumer such as Pay Salaries (gec_payroll_bank)\n"
+"calls. Installing a bank module brings this module and no payroll.\n"
+"\n"
+"Full documentation: README.md and README_DEV.md in the module directory.\n"
+msgstr ""
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid "%(bank)s state: %(old)s → %(new)s"
+msgstr "%(bank)s — სტატუსი: %(old)s → %(new)s"
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid "%(bank)s transfer manually confirmed by %(user)s."
+msgstr "გადარიცხვა (%(bank)s) ხელით დაადასტურა: %(user)s."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid ""
+"%(sent)s sent, %(failed)s failed, %(uncertain)s uncertain.\n"
+"%(details)s"
+msgstr ""
+"%(sent)s გაიგზავნა, %(failed)s ვერ გაიგზავნა, %(uncertain)s გაურკვეველია.\n"
+"%(details)s"
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid "%(sent)s transfer(s) sent."
+msgstr "გაიგზავნა %(sent)s გადარიცხვა."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid ""
+"%s approved this transfer but may no longer approve, so the approval was "
+"withdrawn. Submit it for approval again."
+msgstr ""
+"ეს გადარიცხვა დაამტკიცა მომხმარებელმა %s, რომელსაც დამტკიცების უფლება აღარ "
+"აქვს, ამიტომ დამტკიცება გაუქმდა. ხელახლა გაგზავნეთ დასამტკიცებლად."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment_method_line.py:0
+msgid "%s has no IBAN, so the bank cannot identify the sender."
+msgstr "%s: არ აქვს IBAN, ამიტომ ბანკი ვერ ამოიცნობს გამგზავნს."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment_method_line.py:0
+msgid ""
+"%s has no Outstanding Payments account, so its payments would post no "
+"journal entry at all."
+msgstr ""
+"%s: გადასახდელი გადახდების ანგარიში მითითებული არ არის, ამიტომ ამ მეთოდის "
+"გადახდები ბუღალტრულ გატარებას საერთოდ არ შექმნის."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid ""
+"%s is at the bank, or may be, so it cannot move to another bank or payment "
+"method."
+msgstr ""
+"%s ბანკშია ან შესაძლოა ბანკში იყოს, ამიტომ მისი სხვა ბანკზე ან გადახდის "
+"მეთოდზე გადატანა შეუძლებელია."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment_method_line.py:0
+msgid "%s is not an outbound payment method."
+msgstr "%s გამავალი გადახდის მეთოდი არ არის."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment_method_line.py:0
+msgid "%s is not on a bank journal."
+msgstr "%s ბანკის ჟურნალზე არ არის."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid ""
+"%s rejected this transfer, so the payment is marked Rejected. Reset it to "
+"draft, correct it, confirm and send it again."
+msgstr ""
+"ბანკმა (%s) ეს გადარიცხვა უარყო, ამიტომ გადახდა მონიშნულია, როგორც "
+"უარყოფილი. დააბრუნეთ მონახაზზე, შეასწორეთ, დაადასტურეთ და გაგზავნეთ ხელახლა."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/gec_bank_connection_mixin.py:0
+msgid ""
+"A bank connection with API logs cannot be deleted: the logs are the audit "
+"trail of its transfers. Set it to Draft or Blocked instead."
+msgstr ""
+"API ლოგების მქონე საბანკო კავშირის წაშლა შეუძლებელია: ლოგები მისი "
+"გადარიცხვების აუდიტის კვალია. ნაცვლად ამისა, გადაიყვანეთ სტატუსში „მონახაზი“"
+" ან „დაბლოკილი“."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/gec_bank_connection_mixin.py:0
+msgid "API Logs"
+msgstr "API ლოგები"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_oauth_mixin__access_token
+msgid "Access Token"
+msgstr "წვდომის ტოკენი"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_connection_mixin__message_needaction
+msgid "Action Needed"
+msgstr "საჭიროა მოქმედება"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_approval_mixin__active
+#: model:ir.model.fields.selection,name:gec_bank.selection__basisbank_connection__state__active
+#: model:ir.model.fields.selection,name:gec_bank.selection__bog_connection__state__active
+#: model:ir.model.fields.selection,name:gec_bank.selection__gec_bank_connection_mixin__state__active
+#: model:ir.model.fields.selection,name:gec_bank.selection__tbc_connection__state__active
+msgid "Active"
+msgstr "აქტიური"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_connection_mixin__allow_self_approval
+msgid "Allow Self-Approval"
+msgstr "საკუთარი გადარიცხვის დამტკიცების ნებართვა"
+
+#. module: gec_bank
+#: model:ir.model.fields.selection,name:gec_bank.selection__basisbank_connection__processing_mode__odoo_approve
+#: model:ir.model.fields.selection,name:gec_bank.selection__bog_connection__processing_mode__odoo_approve
+#: model:ir.model.fields.selection,name:gec_bank.selection__gec_bank_connection_mixin__processing_mode__odoo_approve
+#: model:ir.model.fields.selection,name:gec_bank.selection__tbc_connection__processing_mode__odoo_approve
+msgid "Approve in Odoo first"
+msgstr "ჯერ Odoo-ში დამტკიცება"
+
+#. module: gec_bank
+#: model:ir.model.fields.selection,name:gec_bank.selection__account_payment__gec_bank_state__approved
+msgid "Approved"
+msgstr "დამტკიცებული"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_account_payment__gec_bank_approved_by
+msgid "Approved By"
+msgstr "დაამტკიცა"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_account_payment__gec_bank_approved_date
+msgid "Approved On"
+msgstr "დამტკიცების თარიღი"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_connection_mixin__message_attachment_count
+msgid "Attachment Count"
+msgstr "დანართების რაოდენობა"
+
+#. module: gec_bank
+#: model:ir.model.fields.selection,name:gec_bank.selection__account_payment__gec_bank_state__awaiting_approval
+msgid "Awaiting Approval"
+msgstr "დამტკიცების მოლოდინში"
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid "Bank"
+msgstr "ბანკი"
+
+#. module: gec_bank
+#: model:ir.model,name:gec_bank.model_gec_bank_service
+msgid "Bank API Client Base"
+msgstr "ბანკის API კლიენტის საფუძველი"
+
+#. module: gec_bank
+#: model:ir.model,name:gec_bank.model_gec_bank_api_log_mixin
+msgid "Bank API Log Mixin"
+msgstr "ბანკის API ჟურნალის მიქსინი"
+
+#. module: gec_bank
+#: model:ir.model,name:gec_bank.model_gec_bank_approval_mixin
+msgid "Bank Approver Mixin"
+msgstr "ბანკის დამმტკიცებლის მიქსინი"
+
+#. module: gec_bank
+#: model:ir.module.module,shortdesc:base.module_gec_bank
+msgid "Bank Channels"
+msgstr "საბანკო არხები"
+
+#. module: gec_bank
+#: model:ir.model,name:gec_bank.model_gec_bank_connection_mixin
+msgid "Bank Connection Mixin"
+msgstr "ბანკის კავშირის მიქსინი"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_account_payment__gec_bank_error
+msgid "Bank Error"
+msgstr "ბანკის შეცდომა"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_account_bank_statement_line__gec_bank_match_keys
+msgid "Bank Match Keys"
+msgstr "ბანკის შესადარებელი გასაღებები"
+
+#. module: gec_bank
+#: model:ir.model,name:gec_bank.model_gec_bank_oauth_mixin
+msgid "Bank OAuth Token Mixin"
+msgstr "ბანკის OAuth ტოკენის მიქსინი"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_account_payment__gec_bank_reference
+msgid "Bank Reference"
+msgstr "ბანკის ID"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_account_payment__gec_bank_request_id
+msgid "Bank Request ID"
+msgstr "მოთხოვნის ID"
+
+#. module: gec_bank
+#: model:ir.model,name:gec_bank.model_gec_bank_sendable
+msgid "Bank Sendable Mixin"
+msgstr "ბანკის გაგზავნის მიქსინი"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_account_payment__gec_bank_state
+msgid "Bank State"
+msgstr "ბანკის სტატუსი"
+
+#. module: gec_bank
+#: model:ir.model.fields.selection,name:gec_bank.selection__account_payment__gec_bank_confirmed_source__statement
+msgid "Bank Statement"
+msgstr "ბანკის ამონაწერი"
+
+#. module: gec_bank
+#: model:ir.model,name:gec_bank.model_account_bank_statement_line
+msgid "Bank Transaction"
+msgstr "ბანკის ამონაწერის სტრიქონი"
+
+#. module: gec_bank
+#: model:ir.model,name:gec_bank.model_gec_bank_guard_mixin
+msgid "Bank Transfer Field Guard"
+msgstr "საბანკო გადარიცხვის ველების დაცვა"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_account_payment__gec_bank_code
+msgid "Bank Transfer Method"
+msgstr "საბანკო გადარიცხვის მეთოდი"
+
+#. module: gec_bank
+#: model:ir.model,name:gec_bank.model_account_batch_payment
+msgid "Batch Payment"
+msgstr "სერიული გადახდა"
+
+#. module: gec_bank
+#: model:ir.model.fields.selection,name:gec_bank.selection__basisbank_connection__state__blocked
+#: model:ir.model.fields.selection,name:gec_bank.selection__bog_connection__state__blocked
+#: model:ir.model.fields.selection,name:gec_bank.selection__gec_bank_connection_mixin__state__blocked
+#: model:ir.model.fields.selection,name:gec_bank.selection__tbc_connection__state__blocked
+msgid "Blocked"
+msgstr "დაბლოკილი"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_approval_mixin__company_id
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_connection_mixin__company_id
+msgid "Company"
+msgstr "კომპანია"
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid ""
+"Confirm these payments before sending them, so their journal entry exists "
+"before the money leaves the bank: %s"
+msgstr ""
+"გაგზავნამდე დაადასტურეთ ეს გადახდები, რომ მათი ბუღალტრული გატარება "
+"არსებობდეს მანამ, სანამ თანხა ბანკიდან გავა: %s"
+
+#. module: gec_bank
+#: model:ir.model.fields.selection,name:gec_bank.selection__account_payment__gec_bank_state__confirmed
+msgid "Confirmed"
+msgstr "დადასტურებული"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_account_payment__gec_bank_confirmed_source
+msgid "Confirmed By"
+msgstr "დაადასტურა"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_approval_mixin__delegate_ids
+msgid "Delegates"
+msgstr "დელეგატები"
+
+#. module: gec_bank
+#: model:ir.model.fields.selection,name:gec_bank.selection__basisbank_connection__processing_mode__direct
+#: model:ir.model.fields.selection,name:gec_bank.selection__bog_connection__processing_mode__direct
+#: model:ir.model.fields.selection,name:gec_bank.selection__gec_bank_connection_mixin__processing_mode__direct
+#: model:ir.model.fields.selection,name:gec_bank.selection__tbc_connection__processing_mode__direct
+msgid "Direct (bank auto-confirms)"
+msgstr "პირდაპირი (ბანკი ავტომატურად ადასტურებს)"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_account_bank_statement_line__display_name
+#: model:ir.model.fields,field_description:gec_bank.field_account_batch_payment__display_name
+#: model:ir.model.fields,field_description:gec_bank.field_account_journal__display_name
+#: model:ir.model.fields,field_description:gec_bank.field_account_move__display_name
+#: model:ir.model.fields,field_description:gec_bank.field_account_move_line__display_name
+#: model:ir.model.fields,field_description:gec_bank.field_account_payment__display_name
+#: model:ir.model.fields,field_description:gec_bank.field_account_payment_method_line__display_name
+#: model:ir.model.fields,field_description:gec_bank.field_account_payment_register__display_name
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_api_log_mixin__display_name
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_approval_mixin__display_name
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_connection_mixin__display_name
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_guard_mixin__display_name
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_oauth_mixin__display_name
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_sendable__display_name
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_service__display_name
+msgid "Display Name"
+msgstr "სახელი"
+
+#. module: gec_bank
+#: model:ir.model.fields.selection,name:gec_bank.selection__basisbank_connection__state__draft
+#: model:ir.model.fields.selection,name:gec_bank.selection__bog_connection__state__draft
+#: model:ir.model.fields.selection,name:gec_bank.selection__gec_bank_connection_mixin__state__draft
+#: model:ir.model.fields.selection,name:gec_bank.selection__tbc_connection__state__draft
+msgid "Draft"
+msgstr "მონახაზი"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_api_log_mixin__duration_ms
+msgid "Duration (ms)"
+msgstr "ხანგრძლივობა (მწმ)"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_api_log_mixin__endpoint
+msgid "Endpoint"
+msgstr "ენდპოინტი"
+
+#. module: gec_bank
+#: model:ir.model.fields.selection,name:gec_bank.selection__basisbank_connection__state__error
+#: model:ir.model.fields.selection,name:gec_bank.selection__bog_connection__state__error
+#: model:ir.model.fields.selection,name:gec_bank.selection__gec_bank_connection_mixin__state__error
+#: model:ir.model.fields.selection,name:gec_bank.selection__tbc_connection__state__error
+msgid "Error"
+msgstr "შეცდომა"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_api_log_mixin__error_message
+msgid "Error Message"
+msgstr "შეცდომის შეტყობინება"
+
+#. module: gec_bank
+#: model:ir.model.fields.selection,name:gec_bank.selection__account_payment__gec_bank_state__failed
+msgid "Failed"
+msgstr "წარუმატებელი"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_connection_mixin__message_follower_ids
+msgid "Followers"
+msgstr "გამომწერები"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_connection_mixin__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "გამომწერები (პარტნიორები)"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_api_log_mixin__http_status
+msgid "HTTP Status"
+msgstr "HTTP სტატუსი"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_connection_mixin__has_message
+msgid "Has Message"
+msgstr "აქვს შეტყობინება"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_account_bank_statement_line__id
+#: model:ir.model.fields,field_description:gec_bank.field_account_batch_payment__id
+#: model:ir.model.fields,field_description:gec_bank.field_account_journal__id
+#: model:ir.model.fields,field_description:gec_bank.field_account_move__id
+#: model:ir.model.fields,field_description:gec_bank.field_account_move_line__id
+#: model:ir.model.fields,field_description:gec_bank.field_account_payment__id
+#: model:ir.model.fields,field_description:gec_bank.field_account_payment_method_line__id
+#: model:ir.model.fields,field_description:gec_bank.field_account_payment_register__id
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_api_log_mixin__id
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_approval_mixin__id
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_connection_mixin__id
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_guard_mixin__id
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_oauth_mixin__id
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_sendable__id
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_service__id
+msgid "ID"
+msgstr "იდენტიფიკატორი"
+
+#. module: gec_bank
+#: model:ir.model.fields,help:gec_bank.field_gec_bank_connection_mixin__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "თუ მონიშნულია, ახალი შეტყობინებები საჭიროებს თქვენს ყურადღებას."
+
+#. module: gec_bank
+#: model:ir.model.fields,help:gec_bank.field_gec_bank_connection_mixin__message_has_error
+#: model:ir.model.fields,help:gec_bank.field_gec_bank_connection_mixin__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "თუ მონიშნულია, ზოგიერთ შეტყობინებას აქვს მიწოდების შეცდომა."
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_connection_mixin__message_is_follower
+msgid "Is Follower"
+msgstr "არის გამომწერი"
+
+#. module: gec_bank
+#: model:ir.model,name:gec_bank.model_account_journal
+msgid "Journal"
+msgstr "ჟურნალი"
+
+#. module: gec_bank
+#: model:ir.model,name:gec_bank.model_account_move
+msgid "Journal Entry"
+msgstr "ბუღალტრული გატარება"
+
+#. module: gec_bank
+#: model:ir.model,name:gec_bank.model_account_move_line
+msgid "Journal Item"
+msgstr "საბუღალტრო სტრიქონი"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_connection_mixin__last_error_message
+msgid "Last Error"
+msgstr "ბოლო შეცდომა"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_connection_mixin__last_error_code
+msgid "Last Error Code"
+msgstr "ბოლო შეცდომის კოდი"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_connection_mixin__log_retention_days
+msgid "Log Retention (days)"
+msgstr "ჟურნალის შენახვის ვადა (დღე)"
+
+#. module: gec_bank
+#: model:ir.model.fields.selection,name:gec_bank.selection__account_payment__gec_bank_confirmed_source__manual
+msgid "Manual"
+msgstr "ხელით"
+
+#. module: gec_bank
+#: model:ir.model.fields.selection,name:gec_bank.selection__basisbank_connection__processing_mode__bank_confirm
+#: model:ir.model.fields.selection,name:gec_bank.selection__bog_connection__processing_mode__bank_confirm
+#: model:ir.model.fields.selection,name:gec_bank.selection__gec_bank_connection_mixin__processing_mode__bank_confirm
+#: model:ir.model.fields.selection,name:gec_bank.selection__tbc_connection__processing_mode__bank_confirm
+msgid "Manual confirmation in Internet Banking"
+msgstr "ხელით დადასტურება ინტერნეტ-ბანკში"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_connection_mixin__message_has_error
+msgid "Message Delivery error"
+msgstr "შეტყობინების მიწოდების შეცდომა"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_connection_mixin__message_ids
+msgid "Messages"
+msgstr "შეტყობინებები"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_approval_mixin__name
+msgid "Name"
+msgstr "სახელი"
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/gec_bank_approval_mixin.py:0
+msgid "New Approver"
+msgstr "ახალი დამმტკიცებელი"
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/gec_bank_connection_mixin.py:0
+msgid "No %(bank)s connection is configured for company %(company)s."
+msgstr ""
+"კომპანიისთვის %(company)s კავშირი ბანკთან (%(bank)s) კონფიგურირებული არ "
+"არის."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid "No %s transfer awaiting approval in this selection."
+msgstr ""
+"არჩეულ ჩანაწერებში დამტკიცების მოლოდინში მყოფი გადარიცხვა (%s) არ არის."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid "No pending %s transfer in this selection."
+msgstr "არჩეულ ჩანაწერებში მოლოდინში მყოფი გადარიცხვა (%s) არ არის."
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_connection_mixin__message_needaction_counter
+msgid "Number of Actions"
+msgstr "ქმედებების რაოდენობა"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_connection_mixin__message_has_error_counter
+msgid "Number of errors"
+msgstr "შეცდომების რაოდენობა"
+
+#. module: gec_bank
+#: model:ir.model.fields,help:gec_bank.field_gec_bank_connection_mixin__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "მოქმედების მომთხოვნი შეტყობინებების რაოდენობა"
+
+#. module: gec_bank
+#: model:ir.model.fields,help:gec_bank.field_gec_bank_connection_mixin__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "მიწოდების შეცდომის მქონე შეტყობინებების რაოდენობა"
+
+#. module: gec_bank
+#: model:ir.model.fields,help:gec_bank.field_gec_bank_connection_mixin__allow_self_approval
+msgid ""
+"Off (recommended): the user who created a transfer cannot approve it, so "
+"releasing money always takes two people. Turn it on only if your team has "
+"nobody else to approve."
+msgstr ""
+"გამორთული (რეკომენდებული): გადარიცხვის შემქმნელი მომხმარებელი მას ვერ "
+"დაამტკიცებს, ამიტომ თანხის გაშვებას ყოველთვის ორი ადამიანი სჭირდება. ჩართეთ "
+"მხოლოდ მაშინ, თუ გუნდში დამტკიცება სხვას არავის შეუძლია."
+
+#. module: gec_bank
+#: model:ir.model.fields,help:gec_bank.field_account_payment__gec_bank_request_id
+msgid ""
+"Our id for the transfer, sent with every attempt so the bank can refuse a "
+"second one."
+msgstr ""
+"გადარიცხვის ჩვენი იდენტიფიკატორი. იგზავნება ყოველ მცდელობასთან ერთად, რომ "
+"ბანკმა მეორე გადარიცხვა უარყოს."
+
+#. module: gec_bank
+#: model:ir.model,name:gec_bank.model_account_payment_register
+msgid "Pay"
+msgstr "გადახდა"
+
+#. module: gec_bank
+#: model:ir.model,name:gec_bank.model_account_payment
+msgid "Payment"
+msgstr "გადახდა"
+
+#. module: gec_bank
+#: model:ir.model,name:gec_bank.model_account_payment_method_line
+msgid "Payment Method Line"
+msgstr "გადახდის მეთოდები"
+
+#. module: gec_bank
+#: model:ir.model.fields.selection,name:gec_bank.selection__account_payment__gec_bank_state__pending
+msgid "Pending"
+msgstr "მოლოდინში"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_approval_mixin__approver_id
+msgid "Primary Approver"
+msgstr "მთავარი დამმტკიცებელი"
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/gec_bank_approval_mixin.py:0
+msgid "Primary Approver cannot also be a delegate. Remove from the Delegates."
+msgstr ""
+"ძირითადი დამამტკიცებელი ვერ იქნება დელეგატიც. ამოიღეთ ის დელეგატებიდან."
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_connection_mixin__processing_mode
+msgid "Processing Mode"
+msgstr "დამუშავების რეჟიმი"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_api_log_mixin__request_payload
+msgid "Request"
+msgstr "მოთხოვნა"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_api_log_mixin__response_payload
+msgid "Response"
+msgstr "პასუხი"
+
+#. module: gec_bank
+#: model:ir.model.fields,help:gec_bank.field_gec_bank_connection_mixin__log_retention_days
+msgid ""
+"Routine API log entries older than this are removed by Odoo's daily vacuum, "
+"so the log table cannot grow without bound. Set 0 to keep everything. "
+"Transfer logs are never deleted - they are the audit trail for money "
+"movement."
+msgstr ""
+"ამაზე ძველ რიგით API ჩანაწერებს Odoo-ს ყოველდღიური გასუფთავება შლის, რომ "
+"ჟურნალი უსასრულოდ არ გაიზარდოს. ყველაფრის შესანახად მიუთითეთ 0. "
+"გადარიცხვების ჩანაწერები არასოდეს იშლება — ისინი თანხის მოძრაობის აუდიტის "
+"კვალია."
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_connection_mixin__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "SMS მიწოდების შეცდომა"
+
+#. module: gec_bank
+#: model:ir.model.fields.selection,name:gec_bank.selection__account_payment__gec_bank_state__sending
+msgid "Sending"
+msgstr "იგზავნება"
+
+#. module: gec_bank
+#: model:ir.model.fields.selection,name:gec_bank.selection__account_payment__gec_bank_state__sent
+msgid "Sent"
+msgstr "გაგზავნილი"
+
+#. module: gec_bank
+#: model:ir.module.module,summary:base.module_gec_bank
+msgid ""
+"Shared base of the bank integrations: durable sends, audit logs, approvers, "
+"channel hooks"
+msgstr ""
+"საბანკო ინტეგრაციების საერთო საფუძველი: დაცული გაგზავნა, API ჟურნალი, "
+"დამმტკიცებლები, არხების წესები"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_connection_mixin__state
+msgid "State"
+msgstr "მდგომარეობა"
+
+#. module: gec_bank
+#: model:ir.model.fields.selection,name:gec_bank.selection__account_payment__gec_bank_confirmed_source__status
+msgid "Status Check"
+msgstr "სტატუსის შემოწმება"
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid "Submitted for %s approval."
+msgstr "გაიგზავნა დასამტკიცებლად (%s)."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/gec_bank_connection_mixin.py:0
+msgid "The %(bank)s connection is blocked. Contact the bank."
+msgstr "კავშირი ბანკთან (%(bank)s) დაბლოკილია. დაუკავშირდით ბანკს."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid "The %s connection does not require approval in Odoo."
+msgstr "კავშირს ბანკთან (%s) Odoo-ში დამტკიცება არ სჭირდება."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment_method_line.py:0
+msgid ""
+"The Outstanding Payments account of %s is a bank/cash account, so payments "
+"would be marked paid before the bank confirms them."
+msgstr ""
+"%s: გადასახდელი გადახდების ანგარიშად ბანკის/სალაროს ანგარიშია მითითებული, "
+"ამიტომ გადახდები გადახდილად მოინიშნება მანამ, სანამ ბანკი მათ დაადასტურებს."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment_method_line.py:0
+msgid ""
+"The Outstanding Payments account of %s is the journal's own account; "
+"payments would never wait for the bank statement."
+msgstr ""
+"%s: გადასახდელი გადახდების ანგარიშად თავად ჟურნალის ანგარიშია მითითებული; "
+"გადახდები ბანკის ამონაწერს ვერასდროს დაელოდება."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment_method_line.py:0
+msgid "The Outstanding Payments account of %s must allow reconciliation."
+msgstr "%s: გადასახდელი გადახდების ანგარიშს შეჯერება უნდა ჰქონდეს დაშვებული."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid ""
+"The approval was reset because the amount, recipient or purpose changed "
+"after approval. Submit it for approval again before sending."
+msgstr ""
+"დამტკიცება გაუქმდა, რადგან დამტკიცების შემდეგ შეიცვალა თანხა, მიმღები ან "
+"დანიშნულება. გაგზავნამდე ხელახლა გააგზავნეთ დასამტკიცებლად."
+
+#. module: gec_bank
+#: model:ir.model.fields,help:gec_bank.field_account_payment__gec_bank_reference
+msgid "The bank's own id for the transfer."
+msgstr "გადარიცხვის იდენტიფიკატორი, რომელიც ბანკმა მიანიჭა."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid ""
+"The outcome of the previous send is unknown. Recover it from the bank first "
+"- resending could pay twice."
+msgstr ""
+"წინა გაგზავნის შედეგი უცნობია. ჯერ აღადგინეთ იგი ბანკიდან — ხელახლა "
+"გაგზავნისას თანხა შეიძლება ორჯერ გადაირიცხოს."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/gec_bank_guard_mixin.py:0
+msgid ""
+"These fields are set by the bank integration and cannot be changed directly:"
+" %s"
+msgstr ""
+"ამ ველებს ბანკის ინტეგრაცია ავსებს და მათი პირდაპირ შეცვლა შეუძლებელია: %s"
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid ""
+"These payments are already matched with the bank statement, rejected or "
+"cancelled, so they cannot be sent: %s"
+msgstr ""
+"ეს გადახდები უკვე შეჯერებულია ბანკის ამონაწერთან, უარყოფილია ან გაუქმებულია,"
+" ამიტომ მათი გაგზავნა შეუძლებელია: %s"
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid ""
+"These payments are at the bank, or may be, so their journal entry cannot be "
+"reset, cancelled or deleted. Check them with the bank first (refresh, "
+"recover or resync): %s"
+msgstr ""
+"ეს გადახდები ბანკშია ან შესაძლოა ბანკში იყოს, ამიტომ მათი ბუღალტრული "
+"გატარების მონახაზზე დაბრუნება, გაუქმება ან წაშლა შეუძლებელია. ჯერ ბანკთან "
+"გადაამოწმეთ (სტატუსის განახლებით, აღდგენით ან ხელახალი სინქრონიზაციით): %s"
+
+#. module: gec_bank
+#: model:ir.model.constraint,message:gec_bank.constraint_account_payment_gec_bank_reference_uniq
+msgid "This bank reference already exists for this company."
+msgstr "ბანკის ეს ID ამ კომპანიაში უკვე არსებობს."
+
+#. module: gec_bank
+#: model:ir.model.constraint,message:gec_bank.constraint_account_payment_gec_bank_request_uniq
+msgid "This bank request id already exists for this company."
+msgstr "მოთხოვნის ეს ID ამ კომპანიაში უკვე არსებობს."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/gec_bank_service.py:0
+msgid ""
+"This payment is being changed by another operation. Reload it and send "
+"again."
+msgstr ""
+"ამ გადახდას ამჟამად სხვა ოპერაცია ცვლის. განაახლეთ და გაგზავნეთ ხელახლა."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid "This payment is not an outbound %s transfer."
+msgstr "ეს გადახდა არ არის გამავალი გადარიცხვა (%s)."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid "This payment is not sent through a bank integration."
+msgstr "ეს გადახდა ბანკის ინტეგრაციით არ იგზავნება."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid ""
+"This payment moved from %(old)s to %(new)s. The earlier transfer's values "
+"were cleared:"
+msgstr ""
+"გადახდის ბანკი შეიცვალა: %(old)s → %(new)s. წინა გადარიცხვის მონაცემები "
+"გასუფთავდა:"
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid "This payment was already sent."
+msgstr "ეს გადახდა უკვე გაგზავნილია."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid ""
+"This transfer failed. Correct it, then use Reset to Pending before sending "
+"it again."
+msgstr ""
+"ეს გადარიცხვა ვერ შესრულდა. შეასწორეთ და ხელახლა გაგზავნამდე გამოიყენეთ "
+"„მოლოდინში დაბრუნება“."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid ""
+"This transfer is already being sent, was already sent, or its outcome is "
+"unknown (recover it from the bank). Reload the payment to see its current "
+"state."
+msgstr ""
+"ეს გადარიცხვა უკვე იგზავნება, უკვე გაიგზავნა ან მისი შედეგი უცნობია "
+"(აღადგინეთ იგი ბანკიდან). მიმდინარე სტატუსის სანახავად განაახლეთ გადახდა."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid "This transfer must be approved in Odoo before sending."
+msgstr "ეს გადარიცხვა გაგზავნამდე უნდა დამტკიცდეს Odoo-ში."
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_gec_bank_oauth_mixin__token_expiry
+msgid "Token Expiry"
+msgstr "ტოკენის ვადა"
+
+#. module: gec_bank
+#: model:ir.model.fields.selection,name:gec_bank.selection__account_payment__gec_bank_state__unknown
+msgid "Unknown"
+msgstr "უცნობი"
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/gec_bank_approval_mixin.py:0
+msgid "You are not authorized to approve %s transfers."
+msgstr "თქვენ არ გაქვთ გადარიცხვების დამტკიცების უფლება (%s)."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/gec_bank_approval_mixin.py:0
+msgid ""
+"You created this transfer, so you cannot approve it. Ask another approver, "
+"or enable 'Allow Self-Approval' on the %s connection if your team has no "
+"second person."
+msgstr ""
+"ეს გადარიცხვა თქვენ შექმენით, ამიტომ მას ვერ დაამტკიცებთ. მიმართეთ სხვა "
+"დამამტკიცებელს ან, თუ გუნდში მეორე პირი არ არის, ბანკთან კავშირზე (%s) "
+"ჩართეთ „საკუთარი გადარიცხვის დამტკიცების ნებართვა“."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid "no bank"
+msgstr "ბანკის გარეშე"
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid ""
+"state %(state)s, reference %(reference)s, request id %(request)s, approved "
+"by %(approver)s"
+msgstr ""
+"სტატუსი: %(state)s, ბანკის ID: %(reference)s, მოთხოვნის ID: %(request)s, "
+"დაამტკიცა: %(approver)s"
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid "%s uses a receiver account that is not trusted for outgoing payments."
+msgstr "%s: იყენებს მიმღების ანგარიშს, რომელიც სანდო არ არის გამავალი გადახდებისთვის."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid "These payments are at the bank, or may be, so they cannot be unmatched from what they pay or taken out of their batch. Check them with the bank first (refresh, recover or resync): %s"
+msgstr "ეს გადახდები ბანკშია ან შესაძლოა ბანკში იყოს, ამიტომ მათი შეჯერების მოხსნა იმასთან, რასაც ფარავენ, ან სერიული გადახდიდან ამოღება შეუძლებელია. ჯერ ბანკთან გადაამოწმეთ (სტატუსის განახლებით, აღდგენით ან ხელახალი სინქრონიზაციით): %s"
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid ""
+"These payments withhold tax at payment, so the bank would receive the gross "
+"amount: %s. Withholding is booked in the journal entry now: cancel the "
+"payment and pay the net from the entry."
+msgstr ""
+"ეს გადახდები გადასახადს გადახდისას აკავებს, ამიტომ ბანკი ბრუტო თანხას "
+"გადარიცხავდა: %s. წყაროსთან დაკავება ახლა ბუღალტრულ გატარებაში აისახება: "
+"გააუქმეთ გადახდა და ნეტო თანხა გატარებიდან გადაიხადეთ."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/gec_bank_connection_mixin.py:0
+msgid ""
+"A bank connection with API logs cannot be deleted: the logs are the audit "
+"trail of its transfers."
+msgstr ""
+"API ლოგების მქონე საბანკო კავშირის წაშლა შეუძლებელია: ლოგები მისი "
+"გადარიცხვების აუდიტის კვალია."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid ""
+"%s: the receiver's bank account is not trusted yet; ask a user who may "
+"validate bank accounts to switch on 'Trust bank account' on it, then send "
+"again."
+msgstr ""
+"%s: მიმღების საბანკო ანგარიში ჯერ სანდო არ არის; სთხოვეთ საბანკო ანგარიშების "
+"დადასტურების უფლების მქონე მომხმარებელს, ამ ანგარიშზე ჩართოს „სანდო საბანკო "
+"ანგარიში“, შემდეგ კი ხელახლა გაგზავნეთ."
+
+#. module: gec_bank
+#: model:ir.model,name:gec_bank.model_res_partner_bank
+msgid "Bank Account"
+msgstr "საბანკო ანგარიში"
+
+#. module: gec_bank
+#: model:ir.model,name:gec_bank.model_account_partial_reconcile
+msgid "Partial Reconcile"
+msgstr "ნაწილობრივი შეჯერება"
+
+#. module: gec_bank
+#: model:ir.model.fields,field_description:gec_bank.field_account_payment__gec_bank_prepared_by
+msgid "Last Changed By"
+msgstr "ბოლოს შეცვალა"
+
+#. module: gec_bank
+#: model:ir.model.fields,help:gec_bank.field_account_payment__gec_bank_prepared_by
+msgid ""
+"Who last changed what the transfer is built from (amount, recipient, "
+"purpose); like the creator, this user cannot approve it."
+msgstr ""
+"ვინ შეცვალა ბოლოს გადარიცხვის ძირითადი მონაცემები (თანხა, მიმღები, "
+"დანიშნულება); შემქმნელის მსგავსად, ეს მომხმარებელი მას ვერ დაამტკიცებს."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid ""
+"Only %s users may send, reset, recover, cancel or confirm these transfers."
+msgstr ""
+"ამ გადარიცხვების გაგზავნა, მოლოდინში დაბრუნება, აღდგენა, გაუქმება ან "
+"დადასტურება მხოლოდ ბანკის (%s) მომხმარებლებს შეუძლიათ."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid ""
+"These payments are at the bank, or may be, so their journal's bank cannot "
+"change: %s. Settle them with the bank first."
+msgstr ""
+"ეს გადახდები ბანკშია ან შესაძლოა ბანკში იყოს, ამიტომ მათი ჟურნალის ბანკის "
+"შეცვლა შეუძლებელია: %s. ჯერ ბანკთან მოაგვარეთ მათი საკითხი."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/gec_bank_approval_mixin.py:0
+msgid ""
+"You created this transfer or changed its amount, recipient or purpose, so "
+"you cannot approve it. Ask another approver, or enable 'Allow Self-"
+"Approval' on the %s connection if your team has no second person."
+msgstr ""
+"ეს გადარიცხვა თქვენ შექმენით ან შეცვალეთ მისი თანხა, მიმღები ან "
+"დანიშნულება, ამიტომ მას ვერ დაამტკიცებთ. მიმართეთ სხვა დამამტკიცებელს ან, "
+"თუ გუნდში მეორე პირი არ არის, ბანკთან კავშირზე (%s) ჩართეთ „საკუთარი "
+"გადარიცხვის დამტკიცების ნებართვა“."
+
+#. module: gec_bank
+#. odoo-python
+#: code:addons/gec_bank/models/account_payment.py:0
+msgid "%s rejected this transfer, so the payment is marked Rejected. To send it again: Reset to Draft, correct it, Confirm, then Reset to Pending and send it."
+msgstr "ბანკმა (%s) ეს გადარიცხვა უარყო, ამიტომ გადახდა მონიშნულია, როგორც უარყოფილი. ხელახლა გასაგზავნად: „მონახაზზე დაბრუნება“, შეასწორეთ, „დადასტურება“, შემდეგ „მოლოდინში დაბრუნება“ და გაგზავნეთ."

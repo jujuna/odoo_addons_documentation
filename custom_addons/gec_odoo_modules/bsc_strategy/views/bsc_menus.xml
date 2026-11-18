@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_bsc_root"
+              name="Balanced Scorecard"
+              web_icon="bsc_strategy,static/description/icon.png"
+              sequence="95"
+              groups="bsc_strategy.group_bsc_contributor"/>
+
+    <!-- Omitting action keeps the old value on upgrade; the root is a folder, so clear any action. -->
+    <record id="menu_bsc_root" model="ir.ui.menu">
+        <field name="action" eval="False"/>
+    </record>
+
+    <menuitem id="menu_bsc_strategy"
+              name="Strategy"
+              parent="menu_bsc_root"
+              sequence="10"/>
+
+    <menuitem id="menu_bsc_scorecard"
+              name="Scorecards"
+              parent="menu_bsc_strategy"
+              action="action_bsc_scorecard"
+              sequence="10"/>
+
+    <menuitem id="menu_bsc_objective"
+              name="Objectives"
+              parent="menu_bsc_strategy"
+              action="action_bsc_objective"
+              sequence="20"/>
+
+    <menuitem id="menu_bsc_kpi"
+              name="Key Performance Indicators"
+              parent="menu_bsc_strategy"
+              action="action_bsc_kpi"
+              sequence="30"/>
+
+    <menuitem id="menu_bsc_initiative"
+              name="Initiatives"
+              parent="menu_bsc_strategy"
+              action="action_bsc_initiative"
+              sequence="40"/>
+
+    <menuitem id="menu_bsc_data_entry"
+              name="Data Entry"
+              parent="menu_bsc_root"
+              action="action_bsc_data_entry"
+              sequence="20"/>
+
+    <menuitem id="menu_bsc_review_root"
+              name="Reviews"
+              parent="menu_bsc_root"
+              sequence="30"/>
+
+    <menuitem id="menu_bsc_review"
+              name="Strategy Reviews"
+              parent="menu_bsc_review_root"
+              action="action_bsc_review"
+              sequence="10"/>
+
+    <menuitem id="menu_bsc_period"
+              name="Periods"
+              parent="menu_bsc_review_root"
+              action="action_bsc_period"
+              sequence="20"/>
+
+    <menuitem id="menu_bsc_analysis_root"
+              name="Analysis"
+              parent="menu_bsc_root"
+              sequence="40"/>
+
+    <menuitem id="menu_bsc_measurement_analysis"
+              name="KPI Performance"
+              parent="menu_bsc_analysis_root"
+              action="action_bsc_measurement_analysis"
+              sequence="10"/>
+
+    <menuitem id="menu_bsc_config"
+              name="Configuration"
+              parent="menu_bsc_root"
+              sequence="90"
+              groups="bsc_strategy.group_bsc_admin"/>
+
+    <menuitem id="menu_bsc_perspective"
+              name="Perspectives"
+              parent="menu_bsc_config"
+              action="action_bsc_perspective"
+              sequence="10"/>
+
+    <menuitem id="menu_bsc_initiative_stage"
+              name="Initiative Stages"
+              parent="menu_bsc_config"
+              action="action_bsc_initiative_stage"
+              sequence="20"/>
+
+</odoo>

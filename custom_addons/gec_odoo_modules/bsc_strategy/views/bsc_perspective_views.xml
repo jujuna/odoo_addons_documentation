@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_bsc_perspective_list" model="ir.ui.view">
+        <field name="name">bsc.perspective.list</field>
+        <field name="model">bsc.perspective</field>
+        <field name="arch" type="xml">
+            <list string="Perspectives" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="default_weight"/>
+                <field name="description" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bsc_perspective_form" model="ir.ui.view">
+        <field name="name">bsc.perspective.form</field>
+        <field name="model">bsc.perspective</field>
+        <field name="arch" type="xml">
+            <form string="Perspective">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="sequence"
+                                   help="Bottom-to-top order on the strategy map."/>
+                        </group>
+                        <group>
+                            <field name="default_weight"/>
+                            <field name="color" widget="color_picker"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bsc_perspective" model="ir.actions.act_window">
+        <field name="name">Perspectives</field>
+        <field name="res_model">bsc.perspective</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define your perspectives</p>
+            <p>The four classic perspectives are created for you. They are not
+               fixed: rename them, reorder them, or add your own - an ESG or a
+               health-and-safety perspective is a perfectly normal adaptation.</p>
+        </field>
+    </record>
+
+</odoo>

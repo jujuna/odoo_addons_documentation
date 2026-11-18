@@ -1,0 +1,1293 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bank Payment Flows</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: a routing slip. Four vertical lanes (You, Odoo, Bank, Books) read top to bottom,
+   one tab per bank, a shared overview and salary tab, then risks and doc drift. */
+:root {
+  --paper: #eef2f4;
+  --sheet: #ffffff;
+  --sheet-2: #f6f8f9;
+  --ink: #14202b;
+  --ink-2: #4b5966;
+  --rule: #d3dbe1;
+  --accent: #1d5f8a;
+  --basis: #0d7768;
+  --tbc: #2a63a8;
+  --bog: #b8581a;
+  --lane-you: #8a5b00;
+  --lane-odoo: #6a4a8c;
+  --lane-books: #3e6b4f;
+  --ok: #2c7a4b;
+  --warn: #a8700f;
+  --crit: #b3312f;
+  --unk: #6650b0;
+  --tint: 12%;
+  --f-display: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --radius: 6px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0e141a; --sheet: #151d25; --sheet-2: #1a242e; --ink: #e3e9ef; --ink-2: #9aa8b5;
+    --rule: #2b3743; --accent: #6fb0dc; --basis: #3fbfa9; --tbc: #78a8e6; --bog: #e59152;
+    --lane-you: #e0ac4a; --lane-odoo: #b597d8; --lane-books: #84c29b;
+    --ok: #63c08a; --warn: #e2ad4b; --crit: #ef7a73; --unk: #a796ea; --tint: 20%;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0e141a; --sheet: #151d25; --sheet-2: #1a242e; --ink: #e3e9ef; --ink-2: #9aa8b5;
+  --rule: #2b3743; --accent: #6fb0dc; --basis: #3fbfa9; --tbc: #78a8e6; --bog: #e59152;
+  --lane-you: #e0ac4a; --lane-odoo: #b597d8; --lane-books: #84c29b;
+  --ok: #63c08a; --warn: #e2ad4b; --crit: #ef7a73; --unk: #a796ea; --tint: 20%;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 15px/1.55 var(--f-body);
+  padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px);
+}
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+code, .mono { font-family: var(--f-mono); font-size: .86em; }
+code { background: color-mix(in srgb, var(--ink) 7%, transparent); padding: .05em .35em; border-radius: 3px; overflow-wrap: anywhere; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; }
+@media (max-width: 480px) { .wrap { padding-inline: 16px; } }
+
+/* Masthead */
+.masthead { padding-block: 36px 22px; }
+.eyebrow { font: 500 12px/1.4 var(--f-mono); letter-spacing: .04em; color: var(--ink-2); text-transform: uppercase; }
+h1 { font: 800 clamp(2.1rem, 5vw, 3.4rem)/1.02 var(--f-display); font-stretch: 78%; letter-spacing: -.01em; margin: 10px 0 12px; text-wrap: balance; }
+.lede { max-width: 68ch; font-size: 1.06rem; color: var(--ink-2); margin: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 18px; font-size: 13px; color: var(--ink-2); align-items: center; }
+.legend .grp { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+
+/* Tabs */
+.tabbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: color-mix(in srgb, var(--paper) 92%, transparent); backdrop-filter: blur(6px); border-bottom: 1px solid var(--rule); }
+.tabs { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: thin; }
+.tab { appearance: none; border: 0; background: none; color: var(--ink-2); font: 600 14px/1 var(--f-body); padding: 14px 14px 12px; border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap; display: flex; gap: 8px; align-items: center; }
+.tab:hover { color: var(--ink); }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--tabc, var(--accent)); }
+.tab .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--tabc, var(--accent)); }
+.tab .count { font: 500 11px/1 var(--f-mono); background: color-mix(in srgb, var(--crit) var(--tint), transparent); color: var(--crit); padding: 3px 6px; border-radius: 9px; }
+
+/* Panels */
+.panel { padding-block: 28px 64px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 34px; }
+.panel > * { min-width: 0; }
+.js .panel[hidden] { display: none; }
+section > h2, .panel > header h2 { font: 750 1.55rem/1.15 var(--f-display); font-stretch: 85%; margin: 0 0 6px; text-wrap: balance; }
+h3 { font: 700 1.08rem/1.25 var(--f-display); font-stretch: 92%; margin: 0 0 8px; }
+.sub { color: var(--ink-2); margin: 0 0 16px; max-width: 72ch; }
+p { margin: 0 0 10px; max-width: 72ch; }
+
+.bankhead { display: grid; gap: 14px; padding: 22px; background: var(--sheet); border: 1px solid var(--rule); border-top: 5px solid var(--bc); border-radius: var(--radius); }
+.bankhead h2 { font: 800 2rem/1.05 var(--f-display); font-stretch: 80%; margin: 0; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px 22px; }
+.fact { min-width: 0; }
+.fact dt { font: 500 11px/1.3 var(--f-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); }
+.fact dd { margin: 2px 0 0; font-weight: 500; overflow-wrap: anywhere; }
+
+/* Chips */
+.chip { display: inline-flex; align-items: center; gap: 5px; font: 500 12px/1 var(--f-mono); padding: 4px 8px; border-radius: 4px; border: 1px solid color-mix(in srgb, var(--c, var(--ink-2)) 45%, transparent); background: color-mix(in srgb, var(--c, var(--ink-2)) var(--tint), transparent); color: var(--c, var(--ink)); white-space: nowrap; }
+.chip.ok { --c: var(--ok); } .chip.warn { --c: var(--warn); } .chip.crit { --c: var(--crit); } .chip.unk { --c: var(--unk); }
+.chip.neutral { --c: var(--ink-2); }
+.tag { font: 600 10.5px/1 var(--f-mono); letter-spacing: .05em; text-transform: uppercase; padding: 3px 6px; border-radius: 3px; white-space: nowrap; }
+.tag.certain { background: color-mix(in srgb, var(--ok) var(--tint), transparent); color: var(--ok); }
+.tag.likely { background: color-mix(in srgb, var(--warn) var(--tint), transparent); color: var(--warn); }
+.tag.unver { background: color-mix(in srgb, var(--unk) var(--tint), transparent); color: var(--unk); }
+.lanechip { font: 600 10.5px/1 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--lc); }
+
+/* Callout */
+.callout { display: grid; gap: 6px; padding: 16px 18px; border-radius: var(--radius); background: color-mix(in srgb, var(--cc, var(--accent)) 9%, var(--sheet)); border: 1px solid color-mix(in srgb, var(--cc, var(--accent)) 35%, transparent); }
+.callout strong.k { font: 700 1rem/1.3 var(--f-display); font-stretch: 92%; color: var(--cc, var(--accent)); }
+.callout p { margin: 0; }
+
+/* Common path rail */
+.rail { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; counter-reset: st; }
+.stage { position: relative; padding: 16px 18px 16px 16px; background: var(--sheet); border: 1px solid var(--rule); margin-right: 14px; border-radius: var(--radius); display: grid; gap: 6px; align-content: start; min-width: 0; }
+.stage:not(:last-child)::after { content: ""; position: absolute; right: -14px; top: 26px; border: 7px solid transparent; border-left-color: var(--ink-2); }
+.stage .n { font: 700 12px/1 var(--f-mono); color: var(--ink-2); }
+.stage h3 { margin: 0; }
+.stage p { font-size: 13.5px; color: var(--ink-2); margin: 0; }
+.stage .fn { font: 500 11.5px/1.45 var(--f-mono); color: var(--lane-odoo); overflow-wrap: anywhere; }
+.stage .ledger { font: 12px/1.45 var(--f-mono); color: var(--lane-books); border-top: 1px dashed var(--rule); padding-top: 6px; }
+@media (max-width: 900px) {
+  .rail { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .stage { margin-right: 0; }
+  .stage:not(:last-child)::after { right: auto; left: 22px; top: auto; bottom: -15px; border: 7px solid transparent; border-top-color: var(--ink-2); }
+}
+
+/* Swimlanes */
+.lanes { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); overflow: hidden; }
+.lanehead, .lrow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.lanehead { border-bottom: 1px solid var(--rule); background: var(--sheet-2); }
+.lanehead div { padding: 10px 14px; font: 700 12px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--lc); border-right: 1px solid var(--rule); }
+.lanehead div:last-child { border-right: 0; }
+.lbody { position: relative; padding-block: 8px; background-image: linear-gradient(to right, var(--rule) 1px, transparent 1px); background-size: 25% 100%; background-position: -1px 0; }
+.lrow { padding: 5px 0; align-items: start; }
+.lrow.phase { display: block; padding: 10px 14px 4px; }
+.lrow.phase span { font: 600 11px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); background: var(--sheet); padding-right: 8px; }
+.card { grid-column: var(--col); margin-inline: 8px; padding: 10px 12px; border-radius: 5px; background: var(--sheet); border: 1px solid color-mix(in srgb, var(--lc) 40%, var(--rule)); border-left: 4px solid var(--lc); display: grid; gap: 4px; min-width: 0; }
+.card.call { border-style: dashed; border-left-style: solid; background: color-mix(in srgb, var(--lc) 6%, var(--sheet)); }
+.card .t { font-weight: 600; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.card .t .n { font: 600 11px/1 var(--f-mono); color: var(--ink-2); }
+.card .d { font-size: 13.5px; color: var(--ink-2); }
+.card .d code { font-size: .82em; }
+.card .res { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+.card .ref { font: 11.5px/1.3 var(--f-mono); color: var(--ink-2); opacity: .85; overflow-wrap: anywhere; }
+.card .lanechip { display: none; }
+.l-you { --lc: var(--lane-you); } .l-odoo { --lc: var(--lane-odoo); } .l-bank { --lc: var(--bc, var(--accent)); } .l-books { --lc: var(--lane-books); }
+@media (max-width: 760px) {
+  .lanehead { display: none; }
+  .lbody { background-image: none; padding: 10px 0; }
+  .lrow { display: block; }
+  .card { margin: 0 12px; }
+  .card .lanechip { display: inline; }
+}
+.card .fn { font: 500 12px/1.45 var(--f-mono); color: var(--lane-odoo); overflow-wrap: anywhere; }
+.card .fn::before { content: "ƒ "; opacity: .6; }
+
+/* Call chains */
+.chains { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 900px) { .chains { grid-template-columns: minmax(0, 1fr); } }
+.chain { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); padding: 14px 16px; min-width: 0; }
+.chain h3 { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.chain h3 small { font: 500 11px/1 var(--f-mono); color: var(--ink-2); letter-spacing: .04em; text-transform: uppercase; }
+.tree, .tree ul { list-style: none; margin: 0; padding: 0; }
+.tree ul { margin-left: 7px; padding-left: 14px; border-left: 1px solid var(--rule); }
+.tree li { position: relative; padding: 3px 0; }
+.tree ul > li::before { content: ""; position: absolute; left: -14px; top: 13px; width: 10px; border-top: 1px solid var(--rule); }
+.tree .f { font: 500 12.8px/1.45 var(--f-mono); color: var(--ink); overflow-wrap: anywhere; }
+.tree .m { color: var(--lane-odoo); }
+.tree .api { color: var(--bc, var(--accent)); }
+.tree .loc { display: inline-block; max-width: 100%; font: 11.5px/1.4 var(--f-mono); color: var(--ink-2); margin-left: 6px; overflow-wrap: anywhere; }
+.tree .note { font-size: 12.5px; color: var(--ink-2); margin-left: 6px; }
+.tree .chip { font-size: 11px; padding: 2px 6px; margin-left: 6px; }
+.fnref td:first-child { white-space: nowrap; }
+.fnref code { white-space: nowrap; }
+
+/* State track */
+.track { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 4px; padding: 16px; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); }
+.st { font: 600 12.5px/1 var(--f-mono); padding: 8px 10px; border-radius: 5px; background: var(--sheet-2); border: 1px solid var(--rule); white-space: nowrap; }
+.st.good { border-color: color-mix(in srgb, var(--ok) 55%, transparent); color: var(--ok); background: color-mix(in srgb, var(--ok) var(--tint), var(--sheet)); }
+.st.mode { border-style: dashed; }
+.arr { display: inline-flex; align-items: center; gap: 4px; font: 11.5px/1.2 var(--f-body); color: var(--ink-2); padding: 0 2px; }
+.arr::after { content: "\2192"; font-size: 15px; color: var(--ink-2); }
+.tracknote { font-size: 12.5px; color: var(--ink-2); margin-top: 8px; }
+
+/* Tables */
+.tbl { overflow-x: auto; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); }
+table { border-collapse: collapse; width: 100%; font-size: 13.8px; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--rule); }
+tr:last-child td { border-bottom: 0; }
+thead th { font: 600 11.5px/1.3 var(--f-mono); letter-spacing: .05em; text-transform: uppercase; color: var(--ink-2); background: var(--sheet-2); white-space: nowrap; }
+tbody th { font-weight: 600; white-space: nowrap; }
+td { font-variant-numeric: tabular-nums; }
+.matrix th.b { color: var(--bc); }
+.matrix td, .matrix th { min-width: 150px; }
+.matrix tbody th { min-width: 130px; }
+.num { text-align: right; font-family: var(--f-mono); font-size: 13px; }
+
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 900px) { .grid2, .grid3 { grid-template-columns: minmax(0, 1fr); } }
+.box { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); padding: 16px 18px; min-width: 0; }
+.box ul, .risk ul { margin: 6px 0 0; padding-left: 18px; }
+.box li { margin: 3px 0; }
+
+/* Module stack */
+.stack { display: grid; gap: 10px; }
+.stack .row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.mod { padding: 12px 14px; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); border-top: 4px solid var(--mc, var(--ink-2)); min-width: 0; }
+.mod b { font-family: var(--f-mono); font-size: 13px; display: block; margin-bottom: 3px; }
+.mod span { font-size: 13px; color: var(--ink-2); }
+.stack .wide { grid-column: 1 / -1; }
+@media (max-width: 700px) { .stack .row { grid-template-columns: minmax(0, 1fr); } }
+
+/* Risks */
+.risks { display: grid; gap: 14px; }
+.risk { background: var(--sheet); border: 1px solid var(--rule); border-left: 6px solid var(--rc); border-radius: var(--radius); padding: 16px 18px; display: grid; gap: 8px; }
+.risk.high { --rc: var(--crit); } .risk.med { --rc: var(--warn); } .risk.low { --rc: var(--unk); } .risk.info { --rc: var(--ink-2); }
+.risk .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.risk .sev { font: 700 11px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--rc); }
+.risk h3 { margin: 0; flex: 1 1 320px; }
+.risk dl { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 4px 14px; margin: 0; font-size: 14px; }
+.risk dt { color: var(--ink-2); font-size: 12.5px; font-family: var(--f-mono); padding-top: 2px; }
+.risk dd { margin: 0; min-width: 0; }
+@media (max-width: 560px) { .risk dl { grid-template-columns: minmax(0, 1fr); } .risk dt { padding-top: 6px; } }
+
+.ledgertbl td { font-family: var(--f-mono); font-size: 12.5px; white-space: nowrap; }
+.foot { color: var(--ink-2); font-size: 13px; border-top: 1px solid var(--rule); padding-block: 18px 40px; }
+@media (prefers-reduced-motion: no-preference) { .panel { animation: rise .25s ease-out; } @keyframes rise { from { transform: translateY(4px); } to { transform: none; } } }
+</style>
+</head>
+<body>
+<header class="masthead wrap">
+  <div class="eyebrow">gec_odoo_modules · Odoo 20 · read from code at 8ff5211 · 2026-10-11</div>
+  <h1>Bank Payment Flows</h1>
+  <p class="lede">How an ordinary payment and a salary run travel from Odoo to Basis Bank, TBC Bank and Bank of Georgia: who clicks what, what Odoo saves before it calls the bank, what each bank answers, and what finally proves the money left.</p>
+  <div class="legend">
+    <div class="grp"><span class="lanechip l-you">You</span>·<span class="lanechip l-odoo">Odoo</span>·<span class="lanechip l-bank">Bank</span>·<span class="lanechip l-books">Books</span></div>
+    <div class="grp"><span class="tag certain">Certain</span> read in code <span class="tag likely">Likely</span> strong inference <span class="tag unver">Unverified</span> not checked</div>
+  </div>
+</header>
+
+<div class="tabbar">
+  <nav class="tabs wrap" role="tablist" aria-label="Sections">
+    <button class="tab" role="tab" id="tab-overview" aria-controls="overview" aria-selected="true">Overview</button>
+    <button class="tab" role="tab" id="tab-basis" aria-controls="basis" aria-selected="false" style="--tabc: var(--basis)"><span class="dot"></span>Basis Bank</button>
+    <button class="tab" role="tab" id="tab-tbc" aria-controls="tbc" aria-selected="false" style="--tabc: var(--tbc)"><span class="dot"></span>TBC Bank</button>
+    <button class="tab" role="tab" id="tab-bog" aria-controls="bog" aria-selected="false" style="--tabc: var(--bog)"><span class="dot"></span>Bank of Georgia</button>
+    <button class="tab" role="tab" id="tab-salaries" aria-controls="salaries" aria-selected="false">Salaries</button>
+    <button class="tab" role="tab" id="tab-risks" aria-controls="risks" aria-selected="false">Risks <span class="count">7</span></button>
+    <button class="tab" role="tab" id="tab-drift" aria-controls="drift" aria-selected="false">Docs vs code</button>
+  </nav>
+</div>
+
+<main class="wrap">
+
+<!-- ============================== OVERVIEW ============================== -->
+<div class="panel" id="p-overview" role="tabpanel" aria-labelledby="tab-overview">
+
+  <div class="callout" style="--cc: var(--crit)">
+    <strong class="k">Paid in Odoo is not money at the bank</strong>
+    <p>A payment is posted against the channel's <b>Outstanding Payments</b> account (120410) before anything is sent. The bill or payslip shows Paid at that moment. Only a bank statement line for the same amount proves the money left, and only then does 120410 go back to zero.</p>
+  </div>
+
+  <section>
+    <h2>The path every payment takes</h2>
+    <p class="sub">The order is the same for all three banks. Basis Bank keeps its own state names; TBC and Bank of Georgia share one <b>Bank State</b> from <code>gec_bank</code>. The ƒ lines are the shared <code>gec_bank</code> methods; Basis has its own, shown on its tab.</p>
+    <div class="rail">
+      <div class="stage"><span class="n">1</span><h3>Create and post</h3><p>Payment on the bank's journal with its API method. Status <b>Pending</b>.</p><div class="fn">action_post()</div><div class="ledger">Dr 310110 Payable<br>Cr 120410 Outstanding</div></div>
+      <div class="stage"><span class="n">2</span><h3>Approve</h3><p>Only in <b>Approve in Odoo first</b> mode (default): Submit, then a named approver approves. The creator cannot approve unless self-approval is on.</p><div class="fn">_gec_bank_submit_approval() · _gec_bank_approve()</div></div>
+      <div class="stage"><span class="n">3</span><h3>Claim, then call</h3><p>Odoo saves <b>Sending</b> and a request id on its own connection before it calls the bank. A double click or a crash cannot send twice.</p><div class="fn">_gec_bank_reserve_send() → gec.bank.service._reserve_send()</div></div>
+      <div class="stage"><span class="n">4</span><h3>Bank answers</h3><p>Accepted: <b>Sent</b>. Refused: <b>Failed</b>, payment Rejected. No answer or 5xx: <b>Unknown</b>, never Failed.</p><div class="fn">_gec_bank_write_result() → gec.bank.service._durable_write()</div></div>
+      <div class="stage"><span class="n">5</span><h3>Statement confirms</h3><p>A debit line with the same amount matches the payment. A reference alone is never enough. Status <b>Confirmed</b>.</p><div class="fn">_gec_bank_auto_match() → _gec_bank_reconcile_payment()</div><div class="ledger">Dr 120410 Outstanding<br>Cr 120110 Bank</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Shared methods in gec_bank</h2>
+    <p class="sub">The methods under each stage above. TBC and Bank of Georgia call them directly and plug in their own <code>_gec_bank_send_one()</code> and <code>_gec_bank_refresh_one()</code>. Basis wraps the same primitives in its own <code>_basisbank_*</code> methods. Paths are under <code>gec_bank/models/</code>.</p>
+    <div class="tbl">
+      <table class="fnref">
+        <thead><tr><th>Stage</th><th>Method chain</th><th>Where</th><th>Used by</th></tr></thead>
+        <tbody>
+          <tr><td>Approve</td><td><code>_gec_bank_submit_approval()</code> · <code>_gec_bank_approve()</code></td><td class="mono">account_payment.py:290, 310</td><td>TBC, BOG</td></tr>
+          <tr><td>Check</td><td><code>_gec_bank_check_transfer()</code> → <code>_gec_bank_check_sendable()</code></td><td class="mono">account_payment.py:329, 226</td><td>TBC, BOG; Basis calls the second one</td></tr>
+          <tr><td>Send loop</td><td><code>_gec_bank_send_transfers()</code> → <code>_gec_bank_send_each()</code> → <code>_gec_bank_send_one()</code></td><td class="mono">account_payment.py:386, 367, 140</td><td>TBC, BOG (bank overrides the last)</td></tr>
+          <tr><td>Claim</td><td><code>_gec_bank_reserve_send()</code> → <code>gec.bank.service._reserve_send()</code></td><td class="mono">account_payment.py:419 · gec_bank_service.py:72</td><td>TBC, BOG; Basis through <code>_basisbank_reserve_send()</code></td></tr>
+          <tr><td>Write the answer</td><td><code>_gec_bank_write_result()</code> → <code>gec.bank.service._durable_write()</code> → <code>_gec_bank_after_durable()</code>; <code>_gec_bank_mirror_vals()</code> sets <code>is_sent</code> or Rejected</td><td class="mono">account_payment.py:437, 256, 241 · gec_bank_service.py:39</td><td>TBC, BOG; Basis through <code>_basisbank_write_result()</code></td></tr>
+          <tr><td>Status</td><td><code>_gec_bank_refresh_status()</code> · cron <code>_gec_bank_poll_status()</code> → <code>_gec_bank_refresh_one()</code></td><td class="mono">account_payment.py:487, 494, 144</td><td>TBC, BOG (bank overrides the last)</td></tr>
+          <tr><td>Manual confirm</td><td><code>_gec_bank_confirm_manual()</code></td><td class="mono">account_payment.py:477</td><td>TBC, BOG</td></tr>
+          <tr><td>Statement</td><td>statement line <code>create()</code> → <code>_gec_bank_auto_match()</code> → <code>_gec_bank_matches_payment()</code> → <code>_gec_bank_reconcile_payment()</code></td><td class="mono">account_bank_statement_line.py:14, 19, 62, 84</td><td>TBC, BOG; Basis calls only the last</td></tr>
+          <tr><td>Undo fences</td><td><code>action_draft()</code> · <code>action_cancel()</code> · <code>_unlink_except_at_bank()</code> → <code>_gec_bank_check_not_at_bank()</code></td><td class="mono">account_payment.py:214, 218, 223, 179</td><td>All three</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>The three banks side by side</h2>
+    <p class="sub">Each row is one decision point. Details and code locations are on each bank's tab.</p>
+    <div class="tbl">
+      <table class="matrix">
+        <thead><tr><th></th><th class="b" style="--bc: var(--basis)">Basis Bank</th><th class="b" style="--bc: var(--tbc)">TBC Bank</th><th class="b" style="--bc: var(--bog)">Bank of Georgia</th></tr></thead>
+        <tbody>
+          <tr><th>Journal BIC · method</th><td><code>CBASGE22</code> · <code>basisbank_transfer</code></td><td><code>TBCBGE22</code> · <code>tbc_transfer</code></td><td><code>BAGAGE22</code> · <code>bog_transfer</code></td></tr>
+          <tr><th>Login</th><td>Session login; every send needs a Digipass OTP</td><td>OAuth client credentials, token cached about 1 h</td><td>OAuth token from BOG's identity server, Bearer calls</td></tr>
+          <tr><th>State engine</th><td>Own: <b>Basis Bank State</b></td><td>Shared <b>Bank State</b></td><td>Shared <b>Bank State</b> plus Awaiting Confirmation and Created at Bank</td></tr>
+          <tr><th>One payment</th><td><code>main/uploadsingletransfersbatch</code> with one item</td><td><code>POST /bab/v1/transfers/single</code>, one order</td><td><code>POST documents/domestic</code> or <code>/foreign</code></td></tr>
+          <tr><th>A batch</th><td>One request, one OTP: a package (salary, GEL, treasury) or a multi-transfer</td><td>No batch call: one request per payment</td><td>One bulk call (max 500 lines), or Send One by One</td></tr>
+          <tr><th>Timeout</th><td>15 s</td><td>60 s</td><td>60 s</td></tr>
+          <tr><th>Extra human step</th><td>OTP on every send; in bank-confirm mode, confirm in the bank portal</td><td>In bank-confirm mode, release in TBC Internet Bank</td><td>The document must be signed, by the bank itself or in Business Online</td></tr>
+          <tr><th>Status after send</th><td>Bank report (GetReport): Resync, Import Statement, 48 h check cron <span class="chip ok">on</span></td><td>Status call: Refresh, or hourly poll <span class="chip warn">off on prod1</span></td><td>Status call: Refresh Status, or hourly polls <span class="chip warn">off on prod1</span></td></tr>
+          <tr><th>Confirmed by</th><td>Statement line only</td><td>Bank status Finished / Completed, or statement line</td><td>Status letter <code>P</code>, or statement line</td></tr>
+          <tr><th>State Treasury</th><td>Treasury transfer by Treasury Code</td><td>Treasury transfer, 9-digit code</td><td>Refused for salary runs; manual payments not refused <span class="tag likely">Likely</span></td></tr>
+          <tr><th>Salary format</th><td>Salary package (operation 5)</td><td>Single transfers</td><td>Bulk with IsSalary; BULK up to 10,000 GEL, else MT103</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div>
+      <h2>Processing Mode</h2>
+      <p class="sub">Set on each bank connection. Same three choices for all banks.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Mode</th><th>What changes</th></tr></thead>
+          <tbody>
+            <tr><th>Approve in Odoo first</th><td>Default. Submit and Approve in Odoo before Send. Two people unless self-approval is on.</td></tr>
+            <tr><th>Manual confirmation in Internet Banking</th><td>Send from Pending. Someone releases the transfer in the bank's own portal.</td></tr>
+            <tr><th>Direct</th><td>Send from Pending. The bank executes on its own; TBC asks for the status right away.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <h2>Crons on gec20_prod1</h2>
+      <p class="sub">Read from the database on 2026-10-11. All six modules are installed there.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Job</th><th>Every</th><th>State</th></tr></thead>
+          <tbody>
+            <tr><td>Basis: 48 h report confirmation check</td><td class="num">1 h</td><td><span class="chip ok">on</span></td></tr>
+            <tr><td>Payroll: flag batches never confirmed</td><td class="num">4 h</td><td><span class="chip ok">on</span></td></tr>
+            <tr><td>TBC: transfer status poll</td><td class="num">1 h</td><td><span class="chip warn">off</span></td></tr>
+            <tr><td>BOG: document and batch status polls</td><td class="num">1 h</td><td><span class="chip warn">off</span></td></tr>
+            <tr><td>All three: daily statement sync</td><td class="num">1 d</td><td><span class="chip warn">off</span></td></tr>
+            <tr><td>TBC, BOG: live statement snapshots</td><td class="num">2 h</td><td><span class="chip warn">off</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Which module does what</h2>
+    <p class="sub">Dependencies point one way: the bank modules depend on <code>gec_bank</code> and plug into <code>gec_payroll_bank</code>; neither base names a bank.</p>
+    <div class="stack">
+      <div class="row">
+        <div class="mod" style="--mc: var(--basis)"><b>basis_bank</b><span>Own states, OTP send, packages, GetReport statements, 48 h check.</span></div>
+        <div class="mod" style="--mc: var(--tbc)"><b>tbc_bank</b><span>Single-transfer API, status poll, statements. Uses the shared transfer flow.</span></div>
+        <div class="mod" style="--mc: var(--bog)"><b>bog_bank</b><span>Document and bulk API, signing, cancel at bank. Uses the shared transfer flow.</span></div>
+      </div>
+      <div class="row">
+        <div class="mod wide" style="--mc: var(--lane-odoo)"><b>gec_bank</b><span>Shared base: crash-safe claim and durable write, Bank State and its buttons, approvers, audit log, channel checks, statement matching, payroll hook declarations.</span></div>
+      </div>
+      <div class="row">
+        <div class="mod wide" style="--mc: var(--lane-books)"><b>gec_payroll_bank</b> <span>Pay Salaries wizard: routes payslip liabilities to channels, creates payments with the standard register, seals batches, watchdog. No network calls. <b class="mono" style="display:inline">geo_payroll</b> supplies the account layout (310310, 332010, 331320).</span></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ============================== BASIS ============================== -->
+<div class="panel" id="p-basis" role="tabpanel" aria-labelledby="tab-basis" hidden style="--bc: var(--basis)">
+  <header class="bankhead">
+    <h2>Basis Bank</h2>
+    <dl class="facts">
+      <div class="fact"><dt>Journal BIC</dt><dd><code>CBASGE22</code></dd></div>
+      <div class="fact"><dt>Method</dt><dd><code>basisbank_transfer</code></dd></div>
+      <div class="fact"><dt>API</dt><dd><code>bis.bankonline.ge/v2/api/…</code></dd></div>
+      <div class="fact"><dt>Auth</dt><dd>Session login + Digipass OTP per send</dd></div>
+      <div class="fact"><dt>Timeout</dt><dd>15 s</dd></div>
+      <div class="fact"><dt>Transfer types</dt><dd>Internal · National · Treasury · Foreign</dd></div>
+    </dl>
+  </header>
+
+  <section>
+    <h2>One payment, step by step</h2>
+    <p class="sub">Basis does not use the shared Bank State. It reuses the shared claim, durable write and guards, with its own state field <b>Basis Bank State</b>.</p>
+    <div class="lanes">
+      <div class="lanehead"><div class="l-you">You</div><div class="l-odoo">Odoo</div><div class="l-bank">Basis Bank</div><div class="l-books">Books</div></div>
+      <div class="lbody">
+        <div class="lrow phase"><span>Prepare</span></div>
+        <div class="lrow"><div class="card l-you" style="--col:1"><span class="lanechip">You</span><div class="t"><span class="n">1</span>Create the payment</div><div class="d">Basis journal, transfer type, recipient account. National and Treasury must be GEL. Memo or reference required.</div><div class="fn">create() → _compute_basisbank_state()</div><div class="res"><span class="chip neutral">Pending</span></div></div></div>
+        <div class="lrow"><div class="card l-you" style="--col:1"><span class="lanechip">You</span><div class="t"><span class="n">2</span>Submit for Approval</div><div class="d">Approve-in-Odoo mode only.</div><div class="fn">action_basisbank_submit_for_approval()</div><div class="res"><span class="chip neutral">Awaiting Approval</span></div></div></div>
+        <div class="lrow"><div class="card l-you" style="--col:1"><span class="lanechip">Approver</span><div class="t"><span class="n">3</span>Approve</div><div class="d">Primary approver or delegate.</div><div class="fn">action_basisbank_approve()</div><div class="res"><span class="chip neutral">Awaiting OTP</span></div></div></div>
+        <div class="lrow phase"><span>Send</span></div>
+        <div class="lrow"><div class="card l-you" style="--col:1"><span class="lanechip">You</span><div class="t"><span class="n">4</span>Send to Basis Bank</div><div class="d">The OTP dialog opens. A draft payment is posted now.</div><div class="fn">action_basisbank_send() → action_post() → _basisbank_otp_dialog()</div></div><div class="card l-books" style="--col:4"><span class="lanechip">Books</span><div class="t">Payment entry</div><div class="d mono">Dr 310110 / Cr 120410</div><div class="fn">action_post()</div></div></div>
+        <div class="lrow"><div class="card l-you" style="--col:1"><span class="lanechip">You</span><div class="t"><span class="n">5</span>Type the Digipass OTP</div><div class="d">The dialog row is deleted, then the send runs.</div><div class="fn">otp wizard action_confirm() → basisbank_send_with_otp(otp)</div></div></div>
+        <div class="lrow"><div class="card l-odoo" style="--col:2"><span class="lanechip">Odoo</span><div class="t"><span class="n">6</span>Claim</div><div class="d">Write access checked; <b>Sending</b> saved on its own cursor before the call.</div><div class="fn">_basisbank_reserve_send() → gec.bank.service._reserve_send()</div><div class="res"><span class="chip unk">Sending</span></div><div class="ref">basis_bank/models/account_payment.py:388-410</div></div></div>
+        <div class="lrow"><div class="card l-odoo call" style="grid-column: 2 / 4"><span class="lanechip">Odoo → Bank</span><div class="t"><span class="n">7</span>POST main/uploadsingletransfersbatch</div><div class="d">One item. Sender = journal IBAN. National and foreign items carry the receiver's BIC. Treasury items carry <code>TreasuryCode</code>.</div><div class="fn">basisbank_build_single_item() → basisbank.service.upload_single_batch()</div><div class="ref">basis_bank/services/basisbank_service.py:161-170</div></div></div>
+        <div class="lrow"><div class="card l-bank" style="--col:3"><span class="lanechip">Bank</span><div class="t"><span class="n">8</span>Bank answers</div><div class="res"><span class="chip ok">0 → Sent to Bank</span><span class="chip neutral">2, 3 → back</span><span class="chip unk">999 / timeout → Unknown</span><span class="chip crit">other → Failed</span></div><div class="fn">_basisbank_apply_single_response() → _basisbank_write_result() · _basisbank_reject()</div></div></div>
+        <div class="lrow phase"><span>Prove</span></div>
+        <div class="lrow"><div class="card l-you" style="--col:1"><span class="lanechip">You</span><div class="t"><span class="n">9</span>Import Statement or Resync from Bank</div><div class="d">Or wait for the hourly 48 h check.</div><div class="fn">action_import() · action_basisbank_resync() · _cron_basisbank_confirm_or_reset()</div></div><div class="card l-bank call" style="--col:3"><span class="lanechip">Bank → Odoo</span><div class="t">main/getreport</div><div class="d">Bank report lines. Import id <code>basisbank/&lt;journal&gt;/&lt;BankInternalID&gt;</code>.</div><div class="fn">basisbank.service.fetch_report_items() → get_report()</div></div></div>
+        <div class="lrow"><div class="card l-odoo" style="--col:2"><span class="lanechip">Odoo</span><div class="t"><span class="n">10</span>Match</div><div class="d">Debit lines only. Match by BankInternalID; DocNum only when the payment has no stored bank id. Not found after 48 h: <b>Not in Bank Report</b>.</div><div class="fn">statement line create() → _basisbank_auto_match() → _basisbank_confirm_from_statement() · _basisbank_flag_not_in_report()</div><div class="res"><span class="chip ok">Confirmed by Statement</span></div></div><div class="card l-books" style="--col:4"><span class="lanechip">Books</span><div class="t">Reconciled</div><div class="d mono">Dr 120410 / Cr Bank</div><div class="fn">_gec_bank_reconcile_payment()</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Payment states</h2>
+    <div class="track">
+      <span class="st">Pending</span><span class="arr">Submit</span><span class="st mode">Awaiting Approval</span><span class="arr">Approve</span><span class="st mode">Awaiting OTP</span><span class="arr">Send + OTP</span><span class="st">Sending</span><span class="arr">bank accepts</span><span class="st">Sent to Bank</span><span class="arr">statement line</span><span class="st good">Confirmed by Statement</span>
+    </div>
+    <p class="tracknote">Dashed states exist only in Approve-in-Odoo mode. In Direct and bank-confirm mode, Pending goes straight to the send.</p>
+    <div class="tbl" style="margin-top:12px">
+      <table>
+        <thead><tr><th>Off the path</th><th>When</th><th>What you do</th></tr></thead>
+        <tbody>
+          <tr><th><span class="chip unk">Unknown</span></th><td>Code 999, a timeout, or a crash after the claim. The bank may have the transfer.</td><td><b>Resync from Bank</b>. Never send again blind.</td></tr>
+          <tr><th><span class="chip crit">Failed</span></th><td>The bank refused. The payment becomes Rejected; its entry is kept.</td><td>Fix the cause, <b>Reset to Pending</b>, send again.</td></tr>
+          <tr><th><span class="chip warn">Not in Bank Report</span></th><td>The 48 h check did not find a sent payment in the bank report.</td><td>Check with the bank, then Resync.</td></tr>
+          <tr><th><span class="chip neutral">back</span></th><td>Codes 2 or 3: wrong OTP or expired session. Nothing reached the bank.</td><td>Send again with a new OTP.</td></tr>
+          <tr><th><span class="chip neutral">Pending</span></th><td>Something the bank receives was edited during approval (amount, partner, account, memo, journal, type).</td><td>Approval is voided; approve again.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div>
+      <h2>Batches</h2>
+      <p class="sub">One OTP sends the whole batch. The endpoint is chosen from the batch content.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Batch content</th><th>Op</th><th>Endpoint</th></tr></thead>
+          <tbody>
+            <tr><td>Salary flag, GEL, one sender account</td><td class="num">5</td><td><code>main/uploadpackagesalary</code></td></tr>
+            <tr><td>Internal transfers only, GEL</td><td class="num">4</td><td><code>main/uploadpackagegel</code></td></tr>
+            <tr><td>Treasury transfers only, GEL</td><td class="num">6</td><td><code>main/uploadpackagetreasury</code></td></tr>
+            <tr><td>Anything else</td><td class="num">7</td><td><code>main/uploadsingletransfersbatch</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="tracknote">Op numbers are labels in Odoo only; no payload carries one. Package name = batch name. Package items carry no receiver BIC; whether Basis needs one there is <span class="tag unver">Unverified</span>. Source: <code>basis_bank/models/account_batch_payment.py:76-92</code>.</p>
+    </div>
+    <div>
+      <h2>Batch states</h2>
+      <div class="track">
+        <span class="st">Draft</span><span class="arr"></span><span class="st mode">Awaiting Approval</span><span class="arr"></span><span class="st mode">Awaiting OTP</span><span class="arr"></span><span class="st">Sending</span><span class="arr"></span><span class="st">Sent (Pending Confirmation)</span><span class="arr">all lines confirmed</span><span class="st good">Done</span>
+      </div>
+      <p class="tracknote">In bank-confirm mode the batch waits as <b>Awaiting IB Confirmation</b> instead of Sent. Odoo moves it to Done only when every live payment is confirmed by statement; nothing reads the portal confirmation. Failed and Unknown work as for payments.</p>
+      <div class="box" style="margin-top:12px">
+        <h3>Your buttons</h3>
+        <ul>
+          <li><b>Submit for Approval</b>, <b>Approve</b>: Approve-in-Odoo mode.</li>
+          <li><b>Send to Basis Bank</b>: opens the OTP dialog; posts drafts.</li>
+          <li><b>Resync from Bank</b>: reads the bank report; settles Unknown.</li>
+          <li><b>Reset to Pending</b>: after a failure.</li>
+          <li><b>Import Statement</b>: wizard on the journal; confirms and reconciles.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Call chains</h2>
+    <p class="sub">Who calls whom, in order. Paths are under <code>basis_bank/</code> unless they start with <code>gec_bank/</code>; a bare <code>:123</code> is a line in the file named just above.</p>
+    <div class="chains">
+      <div class="chain">
+        <h3>Send one payment <small>button + OTP</small></h3>
+        <ul class="tree">
+          <li><span class="f"><span class="m">account.payment</span>.action_basisbank_send()</span><span class="loc">models/account_payment.py:369</span>
+            <ul>
+              <li><span class="f">_basisbank_check_approved()</span><span class="loc">models/basisbank_sendable.py:54</span></li>
+              <li><span class="f">action_post()</span><span class="note">drafts only</span></li>
+              <li><span class="f">_basisbank_check_single_sendable()</span><span class="loc">models/account_payment.py:286</span></li>
+              <li><span class="f">_basisbank_otp_dialog()</span><span class="loc">models/basisbank_sendable.py:74</span></li>
+            </ul>
+          </li>
+          <li><span class="f"><span class="m">otp wizard</span>.action_confirm()</span><span class="loc">wizard/basisbank_otp_wizard.py:21</span>
+            <ul>
+              <li><span class="f"><span class="m">account.payment</span>.basisbank_send_with_otp(otp)</span><span class="loc">models/account_payment.py:388</span>
+                <ul>
+                  <li><span class="f">basisbank_build_single_item()</span><span class="loc">:231</span></li>
+                  <li><span class="f">_basisbank_ensure_session()</span><span class="loc">models/basisbank_sendable.py:68</span></li>
+                  <li><span class="f">_basisbank_reserve_send()</span><span class="loc">models/account_payment.py:487</span><span class="chip unk">Sending</span>
+                    <ul><li><span class="f">basisbank.service._reserve_send()</span><span class="note">from gec.bank.service</span><span class="loc">gec_bank/models/gec_bank_service.py:72</span></li></ul>
+                  </li>
+                  <li><span class="f api">basisbank.service.upload_single_batch()</span><span class="loc">services/basisbank_service.py:161</span>
+                    <ul><li><span class="f">_call()</span><span class="note">POST main/uploadsingletransfersbatch</span><span class="loc">:214</span></li></ul>
+                  </li>
+                  <li><span class="f">_basisbank_apply_single_response()</span><span class="loc">models/account_payment.py:420</span>
+                    <ul>
+                      <li><span class="f">_basisbank_write_result()</span><span class="note">durable</span><span class="loc">:503</span></li>
+                      <li><span class="f">_basisbank_reject()</span><span class="note">failed → Rejected</span><span class="loc">:467</span></li>
+                    </ul>
+                  </li>
+                  <li><span class="note">On any exception: <code>_basisbank_write_result({'basisbank_state': 'unknown'})</code></span></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <div class="chain">
+        <h3>Send a batch <small>one OTP</small></h3>
+        <ul class="tree">
+          <li><span class="f"><span class="m">account.batch.payment</span>.action_send_basisbank()</span><span class="loc">models/account_batch_payment.py:127</span>
+            <ul>
+              <li><span class="f">_basisbank_check_approved()</span> · <span class="f">action_post()</span><span class="note">drafts</span></li>
+              <li><span class="f">_basisbank_check_payments()</span><span class="loc">:211</span></li>
+              <li><span class="f">_basisbank_otp_dialog()</span></li>
+            </ul>
+          </li>
+          <li><span class="f"><span class="m">otp wizard</span>.action_confirm()</span><span class="loc">wizard/basisbank_otp_wizard.py:21</span>
+            <ul>
+              <li><span class="f"><span class="m">account.batch.payment</span>.basisbank_send_with_otp(otp)</span><span class="loc">models/account_batch_payment.py:149</span>
+                <ul>
+                  <li><span class="f">_basisbank_payments_to_send()</span><span class="loc">:205</span></li>
+                  <li><span class="f">_basisbank_build_request()</span><span class="note">endpoint from <code>_compute_basisbank_endpoint()</code> :76</span><span class="loc">:241</span></li>
+                  <li><span class="f">_basisbank_claim(payments)</span><span class="loc">:191</span><span class="chip unk">payments Sending</span></li>
+                  <li><span class="f">_gec_bank_internal_write({'basisbank_state': 'sending'})</span><span class="note">batch row, same transaction</span></li>
+                  <li><span class="f">_basisbank_send_request()</span><span class="loc">:260</span>
+                    <ul>
+                      <li><span class="f api">basisbank.service.upload_package()</span><span class="note">op 4, 5, 6</span><span class="loc">services/basisbank_service.py:141</span></li>
+                      <li><span class="f api">basisbank.service.upload_single_batch()</span><span class="note">op 7</span><span class="loc">:161</span></li>
+                    </ul>
+                  </li>
+                  <li><span class="f">_basisbank_apply_response()</span><span class="loc">models/account_batch_payment.py:268</span></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <div class="chain">
+        <h3>Approve, recover, reset</h3>
+        <ul class="tree">
+          <li><span class="f">action_basisbank_submit_for_approval()</span><span class="loc">models/account_payment.py:350 · batch :109</span></li>
+          <li><span class="f">action_basisbank_approve()</span><span class="loc">models/basisbank_sendable.py:36</span></li>
+          <li><span class="f">action_basisbank_resync()</span><span class="loc">models/account_payment.py:576 · batch :401</span>
+            <ul>
+              <li><span class="f">_basisbank_find_report_item()</span><span class="loc">:540</span> → <span class="f api">basisbank.service.fetch_report_items()</span></li>
+              <li><span class="f">_basisbank_confirm_from_statement()</span><span class="loc">:189</span></li>
+            </ul>
+          </li>
+          <li><span class="f">action_basisbank_reset_to_pending()</span><span class="loc">models/account_payment.py:723 · batch :368</span></li>
+          <li><span class="f">cron _cron_basisbank_confirm_or_reset()</span><span class="loc">models/account_payment.py:609</span><span class="chip ok">on</span>
+            <ul>
+              <li><span class="f api">fetch_report_items()</span> → <span class="f">_basisbank_match_report_items()</span><span class="loc">:552</span></li>
+              <li><span class="f">_basisbank_flag_not_in_report()</span><span class="loc">:683</span></li>
+              <li><span class="f">_basisbank_update_batches_after_check()</span><span class="loc">:705</span></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <div class="chain">
+        <h3>Statement</h3>
+        <ul class="tree">
+          <li><span class="f"><span class="m">statement import wizard</span>.action_import()</span><span class="loc">wizard/basisbank_statement_import_wizard.py:40</span>
+            <ul>
+              <li><span class="f api">basisbank.service.fetch_report_items()</span> → <span class="f api">get_report()</span><span class="note">POST main/getreport</span><span class="loc">services/basisbank_service.py:184, 172</span></li>
+              <li><span class="f">_build_line_vals()</span><span class="loc">wizard/basisbank_statement_import_wizard.py:105</span></li>
+              <li><span class="f">journal._create_bank_statements()</span>
+                <ul>
+                  <li><span class="f"><span class="m">account.bank.statement.line</span>.create()</span><span class="loc">models/account_bank_statement_line.py:16</span>
+                    <ul>
+                      <li><span class="f">_basisbank_auto_match()</span><span class="loc">:21</span>
+                        <ul>
+                          <li><span class="f">payment._basisbank_confirm_from_statement()</span><span class="loc">models/account_payment.py:189</span></li>
+                          <li><span class="f">line._gec_bank_reconcile_payment()</span><span class="loc">gec_bank/models/account_bank_statement_line.py:84</span></li>
+                          <li><span class="f">batch._basisbank_set_done_when_confirmed()</span><span class="loc">models/account_batch_payment.py:353</span></li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li><span class="f">cron _cron_daily_statement_sync()</span><span class="loc">models/basisbank_connection.py:215</span><span class="chip warn">off</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="box">
+    <h3>Salary runs through Basis</h3>
+    <ul>
+      <li>Pre-flight names every recipient whose bank account has no BIC. Treasury Code recipients are exempt.</li>
+      <li>Each payment: GEL only; Treasury Code partner → <b>Treasury</b>; BIC starting <code>CBASGE22</code> → <b>Internal</b>; any other BIC → <b>National</b>. Memo required.</li>
+      <li>Salary batches get the salary flag and go as a salary package (op 5). Authority batches go by content (op 4, 6 or 7).</li>
+      <li>Basis has its own watchdog map. <b>Sending</b> maps to <code>pending</code>, see Risk 1.</li>
+    </ul>
+    <p class="tracknote">Source: <code>basis_bank/models/account_payment_method_line.py:8-103</code></p>
+  </section>
+</div>
+
+<!-- ============================== TBC ============================== -->
+<div class="panel" id="p-tbc" role="tabpanel" aria-labelledby="tab-tbc" hidden style="--bc: var(--tbc)">
+  <header class="bankhead">
+    <h2>TBC Bank</h2>
+    <dl class="facts">
+      <div class="fact"><dt>Journal BIC</dt><dd><code>TBCBGE22</code></dd></div>
+      <div class="fact"><dt>Method</dt><dd><code>tbc_transfer</code></dd></div>
+      <div class="fact"><dt>API</dt><dd><code>api.tbcbank.ge</code> · test: <code>test-api.tbcbank.ge</code></dd></div>
+      <div class="fact"><dt>Auth</dt><dd>OAuth client credentials, scopes <code>bab_accounts bab_transfers</code></dd></div>
+      <div class="fact"><dt>Timeout</dt><dd>60 s</dd></div>
+      <div class="fact"><dt>Send unit</dt><dd>One request per payment, always</dd></div>
+    </dl>
+  </header>
+
+  <section>
+    <h2>One payment, step by step</h2>
+    <p class="sub">TBC runs on the shared transfer flow in <code>gec_bank</code>: the same Bank State, buttons and statement matching as Bank of Georgia.</p>
+    <div class="lanes">
+      <div class="lanehead"><div class="l-you">You</div><div class="l-odoo">Odoo</div><div class="l-bank">TBC Bank</div><div class="l-books">Books</div></div>
+      <div class="lbody">
+        <div class="lrow phase"><span>Prepare</span></div>
+        <div class="lrow"><div class="card l-you" style="--col:1"><span class="lanechip">You</span><div class="t"><span class="n">1</span>Create the payment</div><div class="d">Georgian IBAN; the type follows the IBAN (default National). For the State Treasury, type the treasury code. Memo becomes <code>description</code>, max 140.</div><div class="fn">_compute_tbc_transfer_type() · _compute_gec_bank_state()</div><div class="res"><span class="chip neutral">Pending</span></div></div><div class="card l-books" style="--col:4"><span class="lanechip">Books</span><div class="t">Payment entry</div><div class="d mono">Dr Payable / Cr 120410</div><div class="fn">action_post()</div></div></div>
+        <div class="lrow"><div class="card l-you" style="--col:1"><span class="lanechip">You</span><div class="t"><span class="n">2</span>Submit for TBC Approval</div><div class="d">Approve-in-Odoo mode only.</div><div class="fn">action_tbc_submit_approval() → _gec_bank_submit_approval()</div><div class="res"><span class="chip neutral">Awaiting Approval</span></div></div></div>
+        <div class="lrow"><div class="card l-you" style="--col:1"><span class="lanechip">Approver</span><div class="t"><span class="n">3</span>Approve</div><div class="res"><span class="chip neutral">Approved</span></div><div class="fn">action_tbc_approve() → _gec_bank_approve()</div></div></div>
+        <div class="lrow phase"><span>Send</span></div>
+        <div class="lrow"><div class="card l-you" style="--col:1"><span class="lanechip">You</span><div class="t"><span class="n">4</span>Send to TBC</div><div class="d">Refused when Unknown, Failed, already sent, not approved, or no longer Paid.</div><div class="fn">action_tbc_send() → _gec_bank_send_transfers() → _tbc_send_one() → _gec_bank_check_transfer() · _tbc_check_order()</div></div><div class="card l-odoo" style="--col:2"><span class="lanechip">Odoo</span><div class="t"><span class="n">5</span>Claim</div><div class="d">Request id (random, below 10^9, reused on retry) and <b>Sending</b> saved before the call.</div><div class="fn">_gec_bank_reserve_send() → gec.bank.service._reserve_send()</div><div class="res"><span class="chip unk">Sending</span></div><div class="ref">gec_bank/models/gec_bank_service.py:89-96</div></div></div>
+        <div class="lrow"><div class="card l-odoo call" style="grid-column: 2 / 4"><span class="lanechip">Odoo → Bank</span><div class="t"><span class="n">6</span>POST /bab/v1/transfers/single</div><div class="d">Body <code>{"singleTransferOrders": [order]}</code>, <code>transferExternalId</code> = request id. Token from <code>/oauth/token</code>, re-login once on 401.</div><div class="fn">_tbc_build_order() → tbc.service.import_single_transfer()</div><div class="ref">tbc_bank/services/tbc_bank_service.py:291-298</div></div></div>
+        <div class="lrow"><div class="card l-bank" style="--col:3"><span class="lanechip">Bank</span><div class="t"><span class="n">7</span>Bank answers</div><div class="res"><span class="chip ok">207 + transferId → Sent</span><span class="chip crit">207 failed[] → Failed</span><span class="chip neutral">400 duplicate → lookup</span><span class="chip crit">other 4xx → Failed</span><span class="chip unk">5xx / none → Unknown</span></div><div class="d">Direct mode: Odoo asks for the status at once.</div><div class="fn">_tbc_apply_send_result() → _gec_bank_write_result() · _tbc_resolve_duplicate()</div></div></div>
+        <div class="lrow"><div class="card l-you" style="--col:1"><span class="lanechip">You</span><div class="t"><span class="n">8</span>Release in TBC Internet Bank</div><div class="d">Bank-confirm mode only. No money moves before this.</div></div></div>
+        <div class="lrow phase"><span>Prove</span></div>
+        <div class="lrow"><div class="card l-you" style="--col:1"><span class="lanechip">You</span><div class="t"><span class="n">9</span>Refresh</div><div class="d">The hourly poll exists but is off on prod1.</div><div class="fn">action_tbc_refresh_status() → _gec_bank_refresh_status() → _tbc_refresh_status() · cron _cron_tbc_status_poll()</div></div><div class="card l-bank call" style="--col:3"><span class="lanechip">Bank → Odoo</span><div class="t">GET transfers/single/{id}/status</div><div class="d">Finished, Completed → Confirmed. Failed, Cancelled, Deleted, Error → Failed (unless already Confirmed).</div><div class="fn">tbc.service.get_single_transfer_status()</div></div></div>
+        <div class="lrow"><div class="card l-odoo" style="--col:2"><span class="lanechip">Odoo</span><div class="t"><span class="n">10</span>Statement match</div><div class="d">Line key = TBC reference or request id, a debit of the same amount, on a Sent or Unknown payment.</div><div class="fn">statement line create() → _gec_bank_auto_match() → _gec_bank_matches_payment()</div><div class="res"><span class="chip ok">Confirmed</span></div></div><div class="card l-books" style="--col:4"><span class="lanechip">Books</span><div class="t">Reconciled</div><div class="d mono">Dr 120410 / Cr Bank</div><div class="fn">_gec_bank_reconcile_payment()</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Payment states (shared Bank State)</h2>
+    <div class="track">
+      <span class="st">Pending</span><span class="arr">Submit</span><span class="st mode">Awaiting Approval</span><span class="arr">Approve</span><span class="st mode">Approved</span><span class="arr">Send</span><span class="st">Sending</span><span class="arr">207 + id</span><span class="st">Sent</span><span class="arr">status or statement</span><span class="st good">Confirmed</span>
+    </div>
+    <div class="tbl" style="margin-top:12px">
+      <table>
+        <thead><tr><th>Off the path</th><th>When</th><th>What you do</th></tr></thead>
+        <tbody>
+          <tr><th><span class="chip unk">Unknown</span></th><td>No answer or 5xx. TBC may have the transfer.</td><td><b>Refresh</b> or <b>Recover</b> (looks it up by request id; result Sent). Recover on Sending is refused for 15 minutes.</td></tr>
+          <tr><th><span class="chip crit">Failed</span></th><td>4xx, a failed order, or a final bank status Failed / Cancelled / Deleted / Error. Payment Rejected.</td><td><b>Reset to Pending</b> (Failed only), fix, send again.</td></tr>
+          <tr><th><span class="chip ok">Confirmed</span> by hand</th><td>You have other proof the money left.</td><td><b>Confirm Manually</b>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Call chains</h2>
+    <p class="sub">Paths are under <code>tbc_bank/</code> unless they start with <code>gec_bank/</code>; a bare <code>:123</code> is a line in the file named just above.</p>
+    <div class="chains">
+      <div class="chain">
+        <h3>Send one payment <small>Send to TBC</small></h3>
+        <ul class="tree">
+          <li><span class="f"><span class="m">account.payment</span>.action_tbc_send()</span><span class="loc">models/account_payment.py:202</span>
+            <ul>
+              <li><span class="f">_gec_bank_send_transfers('tbc_transfer')</span><span class="loc">gec_bank/models/account_payment.py:386</span>
+                <ul>
+                  <li><span class="note">One payment: <code>_gec_bank_check_own()</code> then send. Several: <code>_gec_bank_send_each()</code> :367, a savepoint each, then <code>_gec_bank_report_sends()</code> :395</span></li>
+                  <li><span class="f">_gec_bank_send_one()</span> → <span class="f">_tbc_send_one()</span><span class="loc">models/account_payment.py:151, 205</span>
+                    <ul>
+                      <li><span class="f">_gec_bank_check_transfer()</span><span class="loc">gec_bank/models/account_payment.py:329</span></li>
+                      <li><span class="f">_gec_bank_connection()</span><span class="loc">:277</span></li>
+                      <li><span class="f">_tbc_check_order()</span><span class="loc">models/account_payment.py:302</span></li>
+                      <li><span class="f">_gec_bank_reserve_send()</span><span class="loc">gec_bank/models/account_payment.py:419</span><span class="chip unk">Sending</span>
+                        <ul><li><span class="f">gec.bank.service._reserve_send()</span><span class="loc">gec_bank/models/gec_bank_service.py:72</span></li></ul>
+                      </li>
+                      <li><span class="f">_tbc_build_order()</span><span class="loc">models/account_payment.py:422</span></li>
+                      <li><span class="f api">tbc.service.import_single_transfer()</span><span class="loc">services/tbc_bank_service.py:291</span>
+                        <ul><li><span class="f">_call()</span> → <span class="f">_ensure_token()</span> → <span class="f">authenticate()</span><span class="note">POST /oauth/token</span><span class="loc">:119, 112, 55</span></li></ul>
+                      </li>
+                      <li><span class="f">_tbc_apply_send_result()</span><span class="loc">models/account_payment.py:217</span>
+                        <ul>
+                          <li><span class="f">_gec_bank_write_result()</span><span class="note">durable</span><span class="loc">gec_bank/models/account_payment.py:437</span></li>
+                          <li><span class="f">_tbc_resolve_duplicate()</span><span class="note">400 duplicate → <code>get_single_transfer_by_external_id()</code></span><span class="loc">models/account_payment.py:275</span></li>
+                          <li><span class="f">_tbc_refresh_status()</span><span class="note">Direct mode only</span><span class="loc">:483</span></li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <div class="chain">
+        <h3>Batch buttons</h3>
+        <ul class="tree">
+          <li><span class="f"><span class="m">account.batch.payment</span>.action_tbc_submit_approval()</span><span class="loc">models/account_batch_payment.py:13</span>
+            <ul><li><span class="f">payment_ids.action_tbc_submit_approval()</span> → <span class="f">_gec_bank_submit_approval()</span><span class="loc">gec_bank/models/account_payment.py:290</span></li></ul>
+          </li>
+          <li><span class="f"><span class="m">account.batch.payment</span>.action_tbc_approve()</span><span class="loc">models/account_batch_payment.py:18</span>
+            <ul><li><span class="f">payment_ids.action_tbc_approve()</span> → <span class="f">_gec_bank_approve()</span><span class="loc">gec_bank/models/account_payment.py:310</span></li></ul>
+          </li>
+          <li><span class="f"><span class="m">account.batch.payment</span>.action_tbc_send_batch()</span><span class="loc">models/account_batch_payment.py:24</span>
+            <ul>
+              <li><span class="f">payment_ids._gec_bank_own('tbc_transfer')</span><span class="note">filtered by state</span></li>
+              <li><span class="f">_gec_bank_send_each()</span><span class="note">→ <code>_tbc_send_one()</code> per payment</span><span class="loc">gec_bank/models/account_payment.py:367</span></li>
+              <li><span class="f">_gec_bank_report_sends()</span><span class="loc">:395</span></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <div class="chain">
+        <h3>Status and recovery</h3>
+        <ul class="tree">
+          <li><span class="f">action_tbc_refresh_status()</span><span class="loc">models/account_payment.py:480</span>
+            <ul><li><span class="f">_gec_bank_refresh_status()</span><span class="loc">gec_bank/models/account_payment.py:487</span>
+              <ul><li><span class="f">_gec_bank_refresh_one()</span> → <span class="f">_tbc_refresh_status()</span><span class="loc">models/account_payment.py:156, 483</span>
+                <ul><li><span class="f api">tbc.service.get_single_transfer_status()</span><span class="loc">services/tbc_bank_service.py:306</span></li></ul>
+              </li></ul>
+            </li></ul>
+          </li>
+          <li><span class="f">cron _cron_tbc_status_poll()</span><span class="loc">models/account_payment.py:513</span><span class="chip warn">off</span>
+            <ul><li><span class="f">_gec_bank_poll_status()</span><span class="note">Sent or Unknown, 100 per run</span><span class="loc">gec_bank/models/account_payment.py:494</span></li></ul>
+          </li>
+          <li><span class="f">action_tbc_recover()</span><span class="loc">models/account_payment.py:363</span>
+            <ul><li><span class="f api">tbc.service.get_single_transfer_by_external_id()</span><span class="loc">services/tbc_bank_service.py:300</span></li></ul>
+          </li>
+          <li><span class="f">action_tbc_reset_to_pending()</span><span class="loc">models/account_payment.py:342</span></li>
+          <li><span class="f">action_tbc_confirm_manual()</span> → <span class="f">_gec_bank_confirm_manual()</span><span class="loc">:358 · gec_bank/models/account_payment.py:477</span></li>
+        </ul>
+      </div>
+
+      <div class="chain">
+        <h3>Statement</h3>
+        <ul class="tree">
+          <li><span class="f">cron _cron_daily_statement_sync()</span><span class="loc">models/tbc_connection.py:61</span><span class="chip warn">off</span></li>
+          <li><span class="f">cron _cron_fetch_live_statements()</span><span class="loc">models/tbc_statement.py:78</span><span class="chip warn">off</span></li>
+          <li><span class="f"><span class="m">account.bank.statement.line</span>.create()</span><span class="loc">gec_bank/models/account_bank_statement_line.py:14</span>
+            <ul>
+              <li><span class="f">_gec_bank_auto_match()</span><span class="note">keys: <code>gec_bank_reference</code>, <code>gec_bank_request_id</code></span><span class="loc">:19</span>
+                <ul>
+                  <li><span class="f">_gec_bank_matches_payment()</span><span class="note">debit, same amount</span><span class="loc">:62</span></li>
+                  <li><span class="f">payment._gec_bank_internal_write()</span><span class="note">Confirmed, source statement</span></li>
+                  <li><span class="f">_gec_bank_reconcile_payment()</span><span class="loc">:84</span></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div class="box">
+      <h3>Batches</h3>
+      <ul>
+        <li>TBC has no batch call in Odoo. <b>Send to TBC</b> on a batch sends each payment as its own request, each in its own savepoint, so one failure does not stop the rest.</li>
+        <li><b>Approve TBC Transfers</b> approves every payment in the batch; there is no batch-level approval record.</li>
+        <li>The batch Send picks Pending, Approved and Awaiting Approval payments; the last group is then refused one by one.</li>
+        <li>The batch state is recomputed after every durable write on its payments.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h3>Salary runs through TBC</h3>
+      <ul>
+        <li>Pre-flight refuses a treasury code that is not 9 digits and any non-Georgian IBAN.</li>
+        <li>Treasury Code partner → Treasury transfer with that code, filled by Odoo (no typing).</li>
+        <li>Watchdog state comes from each payment's Bank State through the shared map (Salaries tab).</li>
+        <li>You send with <b>Send to TBC</b> and approve with <b>Approve TBC Transfers</b> on each batch.</li>
+      </ul>
+    </div>
+  </section>
+</div>
+
+<!-- ============================== BOG ============================== -->
+<div class="panel" id="p-bog" role="tabpanel" aria-labelledby="tab-bog" hidden style="--bc: var(--bog)">
+  <header class="bankhead">
+    <h2>Bank of Georgia</h2>
+    <dl class="facts">
+      <div class="fact"><dt>Journal BIC</dt><dd><code>BAGAGE22</code></dd></div>
+      <div class="fact"><dt>Method</dt><dd><code>bog_transfer</code></dd></div>
+      <div class="fact"><dt>API</dt><dd><code>api.businessonline.ge/api</code></dd></div>
+      <div class="fact"><dt>Auth</dt><dd>OAuth token from <code>account.bog.ge</code>, Bearer</dd></div>
+      <div class="fact"><dt>Timeout</dt><dd>60 s</dd></div>
+      <div class="fact"><dt>Key idea</dt><dd>Odoo creates a <b>document</b>; it must be signed before money moves</dd></div>
+    </dl>
+  </header>
+
+  <section>
+    <h2>One payment, step by step</h2>
+    <p class="sub">Bank of Georgia runs on the shared transfer flow and adds two states: <b>Awaiting Confirmation</b> (BOG warned, nothing created) and <b>Created at Bank</b> (document exists, unsigned, no money moved).</p>
+    <div class="lanes">
+      <div class="lanehead"><div class="l-you">You</div><div class="l-odoo">Odoo</div><div class="l-bank">Bank of Georgia</div><div class="l-books">Books</div></div>
+      <div class="lbody">
+        <div class="lrow phase"><span>Prepare</span></div>
+        <div class="lrow"><div class="card l-you" style="--col:1"><span class="lanechip">You</span><div class="t"><span class="n">1</span>Create the payment</div><div class="d">Domestic or Foreign. Bank code from the field or the recipient's BIC. IsSalary and dispatch type (BULK / MT103) are set by payroll; on a manual payment you choose.</div><div class="fn">_compute_gec_bank_code() · _compute_gec_bank_state()</div><div class="res"><span class="chip neutral">Pending</span></div></div><div class="card l-books" style="--col:4"><span class="lanechip">Books</span><div class="t">Payment entry</div><div class="d mono">Dr Payable / Cr 120410</div><div class="fn">action_post()</div></div></div>
+        <div class="lrow"><div class="card l-you" style="--col:1"><span class="lanechip">You + Approver</span><div class="t"><span class="n">2</span>Submit, Approve</div><div class="d">Approve-in-Odoo mode only.</div><div class="fn">action_bog_submit_approval() · action_bog_approve()</div><div class="res"><span class="chip neutral">Approved</span></div></div></div>
+        <div class="lrow phase"><span>Send</span></div>
+        <div class="lrow"><div class="card l-you" style="--col:1"><span class="lanechip">You</span><div class="t"><span class="n">3</span>Send to BOG</div><div class="d">A confirmation dialog first.</div><div class="fn">action_bog_send() → _gec_bank_send_transfers() → _bog_send_one() → _bog_check_sendable() · _bog_prepare_send()</div></div><div class="card l-odoo" style="--col:2"><span class="lanechip">Odoo</span><div class="t"><span class="n">4</span>Claim</div><div class="d"><b>Sending</b> and the request id saved before the call.</div><div class="fn">_bog_reserve_send() → _gec_bank_reserve_send()</div><div class="res"><span class="chip unk">Sending</span></div></div></div>
+        <div class="lrow"><div class="card l-odoo call" style="grid-column: 2 / 4"><span class="lanechip">Odoo → Bank</span><div class="t"><span class="n">5</span>POST documents/domestic | documents/foreign</div><div class="d">A bare JSON array with one document: <code>UniqueId</code>, bank code, <code>IsSalary</code>, <code>DispatchType</code>.</div><div class="fn">_bog_build_document() → bog.service.create_domestic() · create_foreign()</div><div class="ref">bog_bank/services/bog_service.py:430-447</div></div></div>
+        <div class="lrow"><div class="card l-bank" style="--col:3"><span class="lanechip">Bank</span><div class="t"><span class="n">6</span>Bank answers</div><div class="res"><span class="chip ok">0 + key → Created at Bank</span><span class="chip warn">333, 444, 701 → Awaiting Confirmation</span><span class="chip crit">363, 4xx, other → Failed</span><span class="chip unk">702, 5xx, none → Unknown</span></div><div class="d">Created counts as held: Odoo marks the payment sent.</div><div class="fn">_bog_apply_send_result() → _gec_bank_write_result()</div></div></div>
+        <div class="lrow"><div class="card l-bank" style="--col:3"><span class="lanechip">Bank or you</span><div class="t"><span class="n">7</span>Document signed</div><div class="d">By the bank itself or by someone in Business Online, depending on how the API application is registered.</div></div></div>
+        <div class="lrow phase"><span>Prove</span></div>
+        <div class="lrow"><div class="card l-you" style="--col:1"><span class="lanechip">You</span><div class="t"><span class="n">8</span>Refresh Status</div><div class="d">The hourly poll exists but is off on prod1.</div><div class="fn">action_bog_refresh_status() → _gec_bank_refresh_status() → _bog_refresh_status() · cron _cron_bog_status_poll()</div></div><div class="card l-bank call" style="--col:3"><span class="lanechip">Bank → Odoo</span><div class="t">GET documents/status/{key}</div><div class="d">Exact letter: A, Z → Created · S, T → Sent · P → Confirmed · R, D, C → Failed.</div><div class="fn">bog.service.get_document_status() → _bog_status_vals()</div><div class="ref">bog_bank/models/account_payment.py:570-588</div></div></div>
+        <div class="lrow"><div class="card l-odoo" style="--col:2"><span class="lanechip">Odoo</span><div class="t"><span class="n">9</span>Statement match</div><div class="d">Line key = BOG reference or document number, debit of the same amount.</div><div class="fn">statement line create() → _gec_bank_auto_match() → _gec_bank_matches_payment()</div><div class="res"><span class="chip ok">Confirmed</span></div></div><div class="card l-books" style="--col:4"><span class="lanechip">Books</span><div class="t">Reconciled</div><div class="d mono">Dr 120410 / Cr Bank</div><div class="fn">_gec_bank_reconcile_payment()</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Payment states</h2>
+    <div class="track">
+      <span class="st">Pending</span><span class="arr">Submit</span><span class="st mode">Awaiting Approval</span><span class="arr">Approve</span><span class="st mode">Approved</span><span class="arr">Send</span><span class="st">Sending</span><span class="arr">0 + key</span><span class="st">Created at Bank</span><span class="arr">signed (S, T)</span><span class="st">Sent</span><span class="arr">P or statement</span><span class="st good">Confirmed</span>
+    </div>
+    <div class="tbl" style="margin-top:12px">
+      <table>
+        <thead><tr><th>Off the path</th><th>When</th><th>What you do</th></tr></thead>
+        <tbody>
+          <tr><th><span class="chip warn">Awaiting Confirmation</span></th><td>BOG answered with a warning code (333, 444, 701). The document was not created.</td><td>Check the warning, then <b>Create Anyway</b>, or reset.</td></tr>
+          <tr><th><span class="chip neutral">Created at Bank</span></th><td>Document exists, nobody signed. No money moved.</td><td><b>Cancel at Bank</b> (only while unsigned), <b>Refresh Status</b>, or sign in Business Online.</td></tr>
+          <tr><th><span class="chip unk">Unknown</span></th><td>No answer, 5xx, or code 702.</td><td><b>Recover</b> or <b>Refresh Status</b>. Never send again blind.</td></tr>
+          <tr><th><span class="chip crit">Failed</span></th><td>Refused, or final status R, D or C. Payment Rejected.</td><td><b>Reset to Pending</b> (Sending only after 15 minutes), fix, send again.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Call chains</h2>
+    <p class="sub">Paths are under <code>bog_bank/</code> unless they start with <code>gec_bank/</code>; a bare <code>:123</code> is a line in the file named just above.</p>
+    <div class="chains">
+      <div class="chain">
+        <h3>Send one payment <small>Send to BOG</small></h3>
+        <ul class="tree">
+          <li><span class="f"><span class="m">account.payment</span>.action_bog_send()</span><span class="loc">models/account_payment.py:279</span>
+            <ul>
+              <li><span class="f">_gec_bank_send_transfers('bog_transfer')</span><span class="loc">gec_bank/models/account_payment.py:386</span>
+                <ul>
+                  <li><span class="f">_gec_bank_send_one()</span> → <span class="f">_bog_send_one()</span><span class="loc">models/account_payment.py:225, 309</span>
+                    <ul>
+                      <li><span class="f">_bog_check_sendable()</span><span class="loc">:288</span> → <span class="f">_gec_bank_check_transfer()</span> · <span class="f">_gec_bank_check_instructions()</span><span class="loc">:295</span></li>
+                      <li><span class="f">_bog_prepare_send()</span><span class="loc">:302</span> → <span class="f">_gec_bank_connection()</span> · <span class="f">_bog_ensure_attachments_uploaded()</span><span class="loc">:494</span></li>
+                      <li><span class="f">_bog_reserve_send()</span><span class="loc">:282</span> → <span class="f">_gec_bank_reserve_send()</span><span class="loc">gec_bank/models/account_payment.py:419</span><span class="chip unk">Sending</span></li>
+                      <li><span class="f">_bog_build_document()</span><span class="loc">models/account_payment.py:517</span></li>
+                      <li><span class="f api">bog.service.create_domestic()</span> · <span class="f api">create_foreign()</span><span class="loc">services/bog_service.py:430, 443</span>
+                        <ul><li><span class="f">_call()</span> → <span class="f">_ensure_token()</span> → <span class="f">authenticate()</span><span class="loc">:197, 170, 101</span></li></ul>
+                      </li>
+                      <li><span class="f">_bog_apply_send_result()</span><span class="loc">models/account_payment.py:322</span> → <span class="f">_gec_bank_write_result()</span><span class="loc">gec_bank/models/account_payment.py:437</span></li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <div class="chain">
+        <h3>Send a batch <small>bulk or one by one</small></h3>
+        <ul class="tree">
+          <li><span class="f"><span class="m">account.batch.payment</span>.action_bog_send_batch()</span><span class="loc">models/account_batch_payment.py:129</span>
+            <ul>
+              <li><span class="f">_bog_sendable_payments()</span><span class="note">refuses lines at the bank, max 500, no mix</span><span class="loc">:93</span></li>
+              <li><span class="f">_bog_build_file_name()</span><span class="loc">:122</span></li>
+              <li><span class="f">_bog_claim(payments)</span><span class="loc">:164</span><span class="chip unk">lines Sending</span></li>
+              <li><span class="f api">bog.service.create_bulk_domestic()</span> · <span class="f api">create_bulk_foreign()</span><span class="loc">services/bog_service.py:449, 461</span></li>
+              <li><span class="f">_bog_apply_bulk_result()</span><span class="loc">models/account_batch_payment.py:183</span> → <span class="f">_bog_refresh_bulk_status()</span><span class="note">automatic</span><span class="loc">:261</span></li>
+            </ul>
+          </li>
+          <li><span class="f">action_bog_send_batch_individually()</span><span class="loc">:238</span> → <span class="f">_gec_bank_send_each()</span><span class="loc">gec_bank/models/account_payment.py:367</span></li>
+          <li><span class="f">action_bog_refresh_bulk_status()</span><span class="loc">models/account_batch_payment.py:255</span>
+            <ul>
+              <li><span class="f">_bog_refresh_bulk_status()</span><span class="loc">:261</span> → <span class="f api">bog.service.get_bulk_status()</span><span class="loc">services/bog_service.py:467</span></li>
+              <li><span class="f">_bog_apply_bulk_lines()</span> · <span class="f">_bog_fail_members()</span><span class="loc">models/account_batch_payment.py:335, 317</span></li>
+            </ul>
+          </li>
+          <li><span class="f">cron _cron_bog_bulk_status_poll()</span><span class="loc">:373</span><span class="chip warn">off</span></li>
+          <li><span class="f">action_bog_cancel_batch()</span><span class="loc">:393</span> → <span class="f api">bog.service.delete_bulk()</span><span class="loc">services/bog_service.py:471</span></li>
+        </ul>
+      </div>
+
+      <div class="chain">
+        <h3>Status and recovery</h3>
+        <ul class="tree">
+          <li><span class="f">action_bog_refresh_status()</span><span class="loc">models/account_payment.py:567</span>
+            <ul><li><span class="f">_gec_bank_refresh_status()</span> → <span class="f">_bog_refresh_status()</span><span class="loc">gec_bank/models/account_payment.py:487 · models/account_payment.py:590</span>
+              <ul>
+                <li><span class="f api">bog.service.get_document_status()</span><span class="loc">services/bog_service.py:476</span></li>
+                <li><span class="f">_bog_status_vals()</span><span class="note">exact status letter</span><span class="loc">models/account_payment.py:570</span></li>
+              </ul>
+            </li></ul>
+          </li>
+          <li><span class="f">cron _cron_bog_status_poll()</span><span class="loc">:626</span><span class="chip warn">off</span> → <span class="f">_gec_bank_poll_status()</span><span class="loc">gec_bank/models/account_payment.py:494</span></li>
+          <li><span class="f">action_bog_create_anyway()</span><span class="note">from Awaiting Confirmation</span><span class="loc">models/account_payment.py:437</span></li>
+          <li><span class="f">action_bog_cancel_document()</span><span class="loc">:682</span> → <span class="f api">bog.service.delete_document()</span><span class="loc">services/bog_service.py:485</span></li>
+          <li><span class="f">action_bog_recover()</span><span class="loc">models/account_payment.py:634</span></li>
+          <li><span class="f">action_bog_reset_to_pending()</span><span class="loc">:458</span></li>
+          <li><span class="f">action_bog_confirm_manual()</span> → <span class="f">_gec_bank_confirm_manual()</span><span class="loc">:711 · gec_bank/models/account_payment.py:477</span></li>
+        </ul>
+      </div>
+
+      <div class="chain">
+        <h3>Statement</h3>
+        <ul class="tree">
+          <li><span class="f">cron _cron_daily_statement_sync()</span><span class="loc">models/bog_connection.py:70</span><span class="chip warn">off</span></li>
+          <li><span class="f">cron _cron_fetch_live_statements()</span><span class="loc">models/bog_statement.py:84</span><span class="chip warn">off</span></li>
+          <li><span class="f"><span class="m">account.bank.statement.line</span>.create()</span><span class="loc">gec_bank/models/account_bank_statement_line.py:14</span>
+            <ul>
+              <li><span class="f">_gec_bank_auto_match()</span><span class="note">keys: <code>gec_bank_reference</code>, <code>bog_document_no</code></span><span class="loc">:19</span>
+                <ul>
+                  <li><span class="f">_gec_bank_matches_payment()</span><span class="note">debit, same amount</span><span class="loc">:62</span></li>
+                  <li><span class="f">payment._gec_bank_internal_write()</span><span class="note">Confirmed, source statement</span></li>
+                  <li><span class="f">_gec_bank_reconcile_payment()</span><span class="loc">:84</span></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div>
+      <h2>Batches: two ways to send</h2>
+      <div class="tbl">
+        <table>
+          <thead><tr><th></th><th>Send to BOG</th><th>Send One by One</th></tr></thead>
+          <tbody>
+            <tr><th>Calls</th><td>One <code>POST documents/bulk/domestic|foreign?fileName=…</code></td><td>One document call per payment</td></tr>
+            <tr><th>Limits</th><td>Max 500 lines; file name max 50 characters; no domestic and foreign mix</td><td>None beyond each payment's checks</td></tr>
+            <tr><th>Refused when</th><td colspan="2">Any member is Sending, Created, Sent or Unknown</td></tr>
+            <tr><th>Answer</th><td>Key → batch and lines Created, then an automatic status refresh. 4xx → Failed. 0 / 5xx → batch and lines Unknown.</td><td>Batch Created if every payment is held, else Partially Failed</td></tr>
+            <tr><th>Status</th><td><code>GET documents/bulk/status/{key}</code>: S → Sent · C, R, D → Failed (D marks lines Unknown) · N, U, B, I, P, A, Z → Created</td><td>Per payment; the batch poll skips it (no bulk key)</td></tr>
+            <tr><th>Cancel</th><td>Cancel at Bank, only while Created (DELETE)</td><td>Per payment</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <h2>Batch states</h2>
+      <div class="track">
+        <span class="st">Draft</span><span class="arr"></span><span class="st">Sending</span><span class="arr"></span><span class="st">Created at Bank</span><span class="arr"></span><span class="st">Sent / Signed</span><span class="arr"></span><span class="st good">Confirmed</span>
+      </div>
+      <p class="tracknote">Plus Partially Failed, Failed and Unknown.</p>
+      <div class="box" style="margin-top:12px">
+        <h3>Salary runs through BOG</h3>
+        <ul>
+          <li>Domestic transfer. <b>IsSalary</b> only on salary batches, not on authority batches.</li>
+          <li>Dispatch <b>BULK</b> up to 10,000 GEL, otherwise <b>MT103</b>. A line over 10,000 still travels in the same bulk call <span class="tag likely">Likely</span>.</li>
+          <li>Pre-flight needs a Georgian IBAN with a bank code.</li>
+          <li><b>State Treasury rows are refused</b> at pre-flight: "Bank of Georgia sends no treasury transfers from Odoo." Route income tax to Basis or TBC.</li>
+        </ul>
+        <p class="tracknote">Source: <code>bog_bank/models/account_payment_method_line.py:40-90</code></p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ============================== SALARIES ============================== -->
+<div class="panel" id="p-salaries" role="tabpanel" aria-labelledby="tab-salaries" hidden style="--bc: var(--accent)">
+  <section>
+    <h2>Pay Salaries, from payslip to bank</h2>
+    <p class="sub">Steps 1 to 6 run in one click and one database transaction: any refusal rolls back postings, payments, the Paid state and remembered routing. Sending is a separate, later action on each batch.</p>
+    <div class="lanes">
+      <div class="lanehead"><div class="l-you">You</div><div class="l-odoo">Odoo</div><div class="l-bank">Bank</div><div class="l-books">Books</div></div>
+      <div class="lbody">
+        <div class="lrow phase"><span>One transaction</span></div>
+        <div class="lrow"><div class="card l-you" style="--col:1"><span class="lanechip">Payroll Administrator</span><div class="t"><span class="n">1</span>Pay Salaries</div><div class="d">From the payslip form, list or pay-run card. Validated payslips with positive net. Also needs an accounting group.</div><div class="fn">hr.payslip.action_gec_pay_salaries()</div></div><div class="card l-odoo" style="--col:2"><span class="lanechip">Odoo</span><div class="t"><span class="n">2</span>Propose channels</div><div class="d">Per employee: Salary Bank, else Default Salary Bank. Per authority (Pension Agency, State Treasury): the default.</div><div class="fn">wizard default_get() → _gec_default_channel() · _gec_authority_vals()</div></div></div>
+        <div class="lrow"><div class="card l-odoo" style="--col:2"><span class="lanechip">Odoo</span><div class="t"><span class="n">3</span>Pre-flight</div><div class="d">Every refusal listed at once: batch payroll entries on, no work contact, NET rule without account, untrusted or missing bank account, strays, plus each bank's own check.</div><div class="fn">action_pay() → _gec_payroll_pay() → _gec_payroll_check_payable() · _gec_payroll_check_channels() → _gec_bank_check()</div></div></div>
+        <div class="lrow"><div class="card l-odoo" style="--col:2"><span class="lanechip">Odoo</span><div class="t"><span class="n">4</span>Payments</div><div class="d">Standard payment register. Authority legs first, one payment per partner across payslips. Then salaries, one payment per payslip.</div><div class="fn">account.payment.register._create_payments() → _gec_payroll_apply_channel_vals() → _gec_bank_payment_vals()</div></div><div class="card l-books" style="--col:4"><span class="lanechip">Books</span><div class="t">Liabilities closed</div><div class="d mono">Dr 310310 / 332010 / 331320<br>Cr 120410</div></div></div>
+        <div class="lrow"><div class="card l-odoo" style="--col:2"><span class="lanechip">Odoo</span><div class="t"><span class="n">5</span>Check and mark Paid</div><div class="d">Every NET and authority line must be closed, or nothing is created.</div><div class="fn">_gec_payroll_assert_settled() → action_payslip_paid()</div><div class="res"><span class="chip warn">Payslip Paid</span></div></div></div>
+        <div class="lrow"><div class="card l-odoo" style="--col:2"><span class="lanechip">Odoo</span><div class="t"><span class="n">6</span>Seal batches</div><div class="d">One batch per channel, kind (salary or authority) and currency, in Draft. The Payroll Payment Batches list opens.</div><div class="fn">_gec_payroll_create_batches() → _gec_bank_batch_vals() · _gec_payroll_handoff()</div></div></div>
+        <div class="lrow phase"><span>Later, per batch</span></div>
+        <div class="lrow"><div class="card l-you" style="--col:1"><span class="lanechip">You</span><div class="t"><span class="n">7</span>Send each batch</div><div class="d">Basis: Send to Basis Bank + OTP. TBC: Approve TBC Transfers, Send to TBC. BOG: Send to BOG or Send One by One.</div><div class="fn">action_send_basisbank() · action_tbc_send_batch() · action_bog_send_batch()</div></div><div class="card l-bank call" style="--col:3"><span class="lanechip">Bank</span><div class="t">Bank's own flow</div><div class="d">Exactly as on that bank's tab.</div></div></div>
+        <div class="lrow"><div class="card l-odoo" style="--col:2"><span class="lanechip">Odoo</span><div class="t"><span class="n">8</span>Watchdog, every 4 h</div><div class="d">Reads each batch's handoff state and opens a to-do for the batch creator when something needs a person.</div><div class="fn">_cron_gec_payroll_stale_batches() → _gec_payroll_handoff_state() → _gec_bank_handoff_state()</div></div><div class="card l-books" style="--col:4"><span class="lanechip">Books</span><div class="t">Statement</div><div class="d mono">Dr 120410 / Cr Bank</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Call chain</h2>
+    <p class="sub">Paths are under <code>gec_payroll_bank/</code> unless they start with another module; a bare <code>:123</code> is a line in the file named just above. <code>channel</code> is the payment method line, and its hooks are answered by the bank module (table below).</p>
+    <div class="chains">
+      <div class="chain">
+        <h3>Pay Salaries <small>one transaction</small></h3>
+        <ul class="tree">
+          <li><span class="f"><span class="m">hr.payslip</span>.action_gec_pay_salaries()</span><span class="loc">models/hr_payslip.py:18</span></li>
+          <li><span class="f"><span class="m">hr.payroll.pay.wizard</span>.default_get()</span><span class="loc">wizard/hr_payroll_pay_wizard.py:29</span>
+            <ul><li><span class="f">_gec_default_channel()</span> · <span class="f">_gec_authority_vals()</span><span class="loc">:88, 100</span></li></ul>
+          </li>
+          <li><span class="f"><span class="m">hr.payroll.pay.wizard</span>.action_pay()</span><span class="loc">:142</span>
+            <ul>
+              <li><span class="f">_gec_remember_routing()</span><span class="loc">:171</span></li>
+              <li><span class="f"><span class="m">hr.payslip</span>._gec_payroll_pay()</span><span class="loc">models/hr_payslip.py:293</span>
+                <ul>
+                  <li><span class="f">action_post()</span><span class="note">draft payslip entries</span></li>
+                  <li><span class="f">_gec_payroll_check_payable()</span><span class="loc">:134</span></li>
+                  <li><span class="f">_gec_payroll_authority_lines()</span> · <span class="f">_gec_payroll_employee_lines()</span><span class="loc">:101, 82</span></li>
+                  <li><span class="f">_gec_payroll_check_channels()</span><span class="loc">:204</span>
+                    <ul>
+                      <li><span class="f">channel._gec_bank_config_errors()</span><span class="loc">gec_bank/models/account_payment_method_line.py:129</span></li>
+                      <li><span class="f">_gec_payroll_check_recipients()</span><span class="loc">models/hr_payslip.py:240</span></li>
+                      <li><span class="f api">channel._gec_bank_check(kind, lines)</span><span class="note">bank hook</span></li>
+                    </ul>
+                  </li>
+                  <li><span class="f"><span class="m">account.payment.register</span>._create_payments()</span><span class="note">context from <code>_gec_payroll_register_context()</code> :269; lock, snapshot, guards</span><span class="loc">models/account_payment_register.py:8</span></li>
+                  <li><span class="f">_gec_payroll_apply_channel_vals()</span><span class="loc">models/hr_payslip.py:376</span>
+                    <ul>
+                      <li><span class="f">_gec_payroll_check_payment_account()</span><span class="loc">:360</span></li>
+                      <li><span class="f api">channel._gec_bank_payment_vals(kind, payment)</span><span class="note">bank hook</span></li>
+                    </ul>
+                  </li>
+                  <li><span class="f">_gec_payroll_assert_settled()</span><span class="loc">:391</span> → <span class="f">action_payslip_paid()</span><span class="chip warn">Paid</span></li>
+                  <li><span class="f">_gec_payroll_create_batches()</span><span class="loc">:423</span> → <span class="f api">channel._gec_bank_batch_vals(kind)</span></li>
+                  <li><span class="f">_gec_payroll_handoff()</span><span class="note">opens the batch list, sends nothing</span><span class="loc">:467</span></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <div class="chain">
+        <h3>After the run</h3>
+        <ul class="tree">
+          <li><span class="f">Send each batch</span><span class="note">from its form</span>
+            <ul>
+              <li><span class="f">action_send_basisbank()</span><span class="loc">basis_bank/models/account_batch_payment.py:127</span></li>
+              <li><span class="f">action_tbc_approve()</span> · <span class="f">action_tbc_send_batch()</span><span class="loc">tbc_bank/models/account_batch_payment.py:18, 24</span></li>
+              <li><span class="f">action_bog_send_batch()</span> · <span class="f">action_bog_send_batch_individually()</span><span class="loc">bog_bank/models/account_batch_payment.py:129, 238</span></li>
+            </ul>
+          </li>
+          <li><span class="f"><span class="m">account.batch.payment</span>._cron_gec_payroll_stale_batches()</span><span class="loc">models/account_batch_payment.py:109</span><span class="chip ok">on, 4 h</span>
+            <ul>
+              <li><span class="f">_gec_payroll_handoff_state()</span><span class="loc">:95</span>
+                <ul><li><span class="f api">channel._gec_bank_handoff_state(batch)</span><span class="note">Basis: own map. TBC, BOG: <code>_gec_bank_merge_handoff_states()</code></span><span class="loc">gec_bank/models/account_payment_method_line.py:90, 115</span></li></ul>
+              </li>
+              <li><span class="note">To-do for <code>create_uid</code> plus a chatter note, per the watchdog table below</span></li>
+            </ul>
+          </li>
+          <li><span class="f"><span class="m">account.batch.payment</span>._unlink_except_transmitted_payroll()</span><span class="note">a payroll batch with payments cannot be deleted</span><span class="loc">models/account_batch_payment.py:49</span></li>
+          <li><span class="f">_check_gec_payroll_envelope()</span><span class="note">same journal, channel, company, date</span><span class="loc">:81</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Hooks each bank answers</h2>
+    <p class="sub">Declared in <code>gec_bank</code>, overridden in each bank's <code>models/account_payment_method_line.py</code>. Numbers are line numbers in that file. A dash means the bank keeps the default.</p>
+    <div class="tbl">
+      <table class="fnref">
+        <thead><tr><th>Hook</th><th>Called by</th><th>gec_bank default</th><th style="color:var(--basis)">basis_bank</th><th style="color:var(--tbc)">tbc_bank</th><th style="color:var(--bog)">bog_bank</th></tr></thead>
+        <tbody>
+          <tr><td><code>_gec_bank_transfer_flow()</code></td><td>payment Bank State, handoff</td><td class="num">40 · False</td><td>–</td><td class="num">12 · True</td><td class="num">15 · True</td></tr>
+          <tr><td><code>_gec_bank_channel_kind()</code></td><td>wizard, engine</td><td class="num">46 · file / manual</td><td class="num">24 · api</td><td class="num">18 · api</td><td class="num">21 · api</td></tr>
+          <tr><td><code>_gec_bank_extra_config_errors()</code></td><td><code>_gec_bank_config_errors()</code></td><td class="num">138</td><td class="num">29</td><td class="num">23</td><td class="num">26</td></tr>
+          <tr><td><code>_gec_bank_check(kind, lines)</code></td><td>pre-flight</td><td class="num">59</td><td class="num">37 · BIC</td><td class="num">32 · IBAN, 9-digit code</td><td class="num">35 · IBAN, bank code, no Treasury</td></tr>
+          <tr><td><code>_gec_bank_payment_vals(kind, payment)</code></td><td>after each register run</td><td class="num">68</td><td class="num">61 · type, GEL, memo</td><td class="num">64 · treasury code</td><td class="num">75 · IsSalary, BULK / MT103</td></tr>
+          <tr><td><code>_gec_bank_batch_vals(kind)</code></td><td>batch create</td><td class="num">82</td><td class="num">86 · salary flag</td><td>–</td><td>–</td></tr>
+          <tr><td><code>_gec_bank_handoff_state(batch)</code></td><td>watchdog</td><td class="num">90 · shared map</td><td class="num">92 · own map</td><td>–</td><td>–</td></tr>
+          <tr><td><code>_gec_bank_handoff_map()</code></td><td>shared map</td><td class="num">104</td><td>–</td><td>–</td><td class="num">92 · Awaiting Confirmation, Created</td></tr>
+          <tr><td><code>_gec_bank_transfer_handoff_states()</code></td><td>shared map</td><td class="num">108</td><td>–</td><td>–</td><td class="num">100 · bulk send state</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div>
+      <h2>Worked example</h2>
+      <p class="sub">Gross 1,000.00 GEL. Pension 2% employee + 2% company, income tax 20% of 980.00.</p>
+      <div class="tbl">
+        <table class="ledgertbl">
+          <thead><tr><th>Moment</th><th>Debit</th><th>Credit</th><th class="num">GEL</th></tr></thead>
+          <tbody>
+            <tr><td>Payslip</td><td>720100 Salaries</td><td>310310 Net payable</td><td class="num">784.00</td></tr>
+            <tr><td></td><td>720100 Salaries</td><td>332010 Pension</td><td class="num">20.00</td></tr>
+            <tr><td></td><td>720100 Salaries</td><td>331320 Income tax</td><td class="num">196.00</td></tr>
+            <tr><td></td><td>740900 Pension exp.</td><td>332010 Pension</td><td class="num">20.00</td></tr>
+            <tr><td>Create Payments</td><td>310310 Net payable</td><td>120410 Outstanding</td><td class="num">784.00</td></tr>
+            <tr><td></td><td>332010 Pension</td><td>120410 Outstanding</td><td class="num">40.00</td></tr>
+            <tr><td></td><td>331320 Income tax</td><td>120410 Outstanding</td><td class="num">196.00</td></tr>
+            <tr><td>Statement</td><td>120410 Outstanding</td><td>120110 Bank</td><td class="num">1,020.00</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="tracknote">After Create Payments the payslip is Paid and 120410 holds 1,020.00 open until the statement arrives.</p>
+    </div>
+    <div>
+      <h2>Who gets paid how</h2>
+      <div class="tbl">
+        <table>
+          <thead><tr><th></th><th style="color:var(--basis)">Basis</th><th style="color:var(--tbc)">TBC</th><th style="color:var(--bog)">BOG</th></tr></thead>
+          <tbody>
+            <tr><th>Net salary<br><span class="mono" style="font-weight:400">employee IBAN</span></th><td>Salary package, op 5</td><td>Single transfer each</td><td>Bulk, IsSalary, BULK ≤ 10,000</td></tr>
+            <tr><th>Pension<br><span class="mono" style="font-weight:400">Pension Agency</span></th><td>Transfer in an authority batch</td><td>Single transfer</td><td>Bulk, no IsSalary</td></tr>
+            <tr><th>Income tax<br><span class="mono" style="font-weight:400">Treasury 101001000</span></th><td>Treasury transfer</td><td>Treasury transfer, 9-digit code</td><td><span class="chip crit">refused</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div>
+      <h2>What the watchdog does</h2>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Handoff state</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td><span class="chip crit">partial</span> <span class="chip crit">failed</span> <span class="chip unk">uncertain</span></td><td>To-do at once: "check with the bank before reversing or resending."</td></tr>
+            <tr><td><span class="chip neutral">pending</span> <span class="chip neutral">prepared</span></td><td>To-do only when the batch was created over 48 h ago: "not sent … no money has moved. Send it, or cancel its payments."</td></tr>
+            <tr><td><span class="chip ok">transmitted</span> <span class="chip ok">confirmed</span></td><td>State recorded, no to-do.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="tracknote">Skips manual-acknowledged batches and batches last seen confirmed. The 48 h clock runs from the batch's creation, not the payment date.</p>
+    </div>
+    <div>
+      <h2>Bank state → handoff state</h2>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Handoff</th><th style="color:var(--basis)">Basis (batch state)</th><th>TBC + BOG (payment Bank State)</th></tr></thead>
+          <tbody>
+            <tr><th>prepared</th><td>Draft, Awaiting Approval, Awaiting OTP</td><td>Pending, Awaiting Approval, Approved; BOG: Awaiting Confirmation</td></tr>
+            <tr><th>pending</th><td><b style="color:var(--crit)">Sending</b></td><td>BOG: Created at Bank</td></tr>
+            <tr><th>uncertain</th><td>Unknown; any line Unknown or Not in Report</td><td>Sending, Unknown; BOG: bulk send Sending or Unknown</td></tr>
+            <tr><th>transmitted</th><td>Sent (Pending Confirmation), Awaiting IB Confirmation</td><td>Sent</td></tr>
+            <tr><th>confirmed</th><td>Done</td><td>Confirmed (all payments)</td></tr>
+            <tr><th>failed · partial</th><td>All lines Failed · some Failed or Not in Report</td><td>All Failed · some Failed</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="tracknote">The shared map treats Sending as uncertain because a send ends within about a minute. Basis maps it to pending, see Risk 1.</p>
+    </div>
+  </section>
+</div>
+
+<!-- ============================== RISKS ============================== -->
+<div class="panel" id="p-risks" role="tabpanel" aria-labelledby="tab-risks" hidden>
+  <header>
+    <h2>Risks, most serious first</h2>
+    <p class="sub">Found while tracing the flows on 2026-10-11. None of them is fixed.</p>
+  </header>
+  <div class="risks">
+    <article class="risk high">
+      <div class="top"><span class="sev">High</span><h3>A Basis salary batch stuck in Sending is reported as "not sent"</h3><span class="tag certain">Certain</span></div>
+      <dl>
+        <dt>What happens</dt><dd>Basis maps batch state <b>Sending</b> to handoff <code>pending</code>. Once the batch is 48 h old, the watchdog tells its creator "no money has moved. Send it, or cancel its payments." The bank may already hold the package. The Basis guide says a Sending payment must not be resent and needs Resync.</dd>
+        <dt>Where</dt><dd><a href="basis_bank/models/account_payment_method_line.py">basis_bank/models/account_payment_method_line.py:12</a>; message in <a href="gec_payroll_bank/models/account_batch_payment.py">gec_payroll_bank/models/account_batch_payment.py:139-143</a></dd>
+        <dt>Open question</dt><dd>Whether a batch can stay in Sending that long. A crash may roll the batch row back to Draft while its payments stay Sending <span class="tag likely">Likely</span>, untested. Either way the batch should read <code>uncertain</code>.</dd>
+        <dt>Fix idea</dt><dd>Map Basis <b>Sending</b> to <code>uncertain</code> (as the shared map does) and treat any member payment in Sending as uncertain.</dd>
+      </dl>
+    </article>
+    <article class="risk med">
+      <div class="top"><span class="sev">Medium</span><h3>TBC and BOG status polls are off, so a later bank rejection goes unseen</h3><span class="tag certain">Certain</span> crons <span class="tag likely">Likely</span> effect</div>
+      <dl>
+        <dt>What happens</dt><dd>The status polls ship inactive and are inactive on gec20_prod1. After Sent, a payment changes only on Refresh, an imported statement, or the one check made right after sending (TBC in Direct mode, a BOG bulk send). The watchdog records Sent as <code>transmitted</code> and raises nothing, so a transfer TBC or BOG rejects later stays Sent in Odoo.</dd>
+        <dt>Where</dt><dd><a href="tbc_bank/data/ir_cron_data.xml">tbc_bank/data/ir_cron_data.xml:24-31</a>, <a href="bog_bank/data/ir_cron_data.xml">bog_bank/data/ir_cron_data.xml:24-41</a></dd>
+        <dt>Fix idea</dt><dd>Activate the polls on databases with a live TBC or BOG connection, or make the statement sync mandatory.</dd>
+      </dl>
+    </article>
+    <article class="risk med">
+      <div class="top"><span class="sev">Medium</span><h3>Basis send does not check the payment method</h3><span class="tag certain">Certain</span></div>
+      <dl>
+        <dt>What happens</dt><dd>The send checks the journal (Basis, outbound, type set, config), not that the payment uses the Basis method. The user guide tells users to pick it.</dd>
+        <dt>Where</dt><dd><a href="basis_bank/models/account_payment.py">basis_bank/models/account_payment.py:286-303</a></dd>
+      </dl>
+    </article>
+    <article class="risk med">
+      <div class="top"><span class="sev">Medium</span><h3>BOG refuses the State Treasury only for salary runs</h3><span class="tag likely">Likely</span></div>
+      <dl>
+        <dt>What happens</dt><dd>The refusal lives in the payroll hook <code>_gec_bank_check</code>, whose only caller is Pay Salaries. No refusal was found for a manual BOG payment to a Treasury Code partner. The user guide lists the refusal without the payroll limit.</dd>
+        <dt>Where</dt><dd><a href="bog_bank/models/account_payment_method_line.py">bog_bank/models/account_payment_method_line.py:45-63</a>; caller <a href="gec_payroll_bank/models/hr_payslip.py">gec_payroll_bank/models/hr_payslip.py:236</a></dd>
+      </dl>
+    </article>
+    <article class="risk low">
+      <div class="top"><span class="sev">Low</span><h3>Basis "Awaiting IB Confirmation" leaves only through a statement</h3><span class="tag certain">Certain</span></div>
+      <dl>
+        <dt>What happens</dt><dd>In bank-confirm mode the batch waits for the portal confirmation, but Odoo never reads it; only Done (all lines confirmed by statement) moves it. With the daily statement sync off, it waits for a manual import or Resync.</dd>
+        <dt>Where</dt><dd><a href="basis_bank/models/account_batch_payment.py">basis_bank/models/account_batch_payment.py:353-366</a></dd>
+      </dl>
+    </article>
+    <article class="risk low">
+      <div class="top"><span class="sev">Low</span><h3>BOG salary lines over 10,000 GEL stay in the bulk call</h3><span class="tag likely">Likely</span></div>
+      <dl>
+        <dt>What happens</dt><dd>Payroll sets MT103 on those lines, but a batch send still posts every line in one bulk request. The guide says larger amounts go as individual MT103 automatically. Whether BOG accepts MT103 lines in a bulk call is <span class="tag unver">Unverified</span>.</dd>
+        <dt>Where</dt><dd><a href="bog_bank/models/account_batch_payment.py">bog_bank/models/account_batch_payment.py:152-162</a></dd>
+      </dl>
+    </article>
+    <article class="risk info">
+      <div class="top"><span class="sev">By design</span><h3>Paid payslips before any money moves</h3><span class="tag certain">Certain</span></div>
+      <dl>
+        <dt>What happens</dt><dd>Pay Salaries marks payslips Paid when the payments are created. A batch nobody sends still shows Paid payslips. The watchdog after 48 h is the only reminder.</dd>
+      </dl>
+    </article>
+  </div>
+</div>
+
+<!-- ============================== DRIFT ============================== -->
+<div class="panel" id="p-drift" role="tabpanel" aria-labelledby="tab-drift" hidden>
+  <header>
+    <h2>Where the docs disagree with the code</h2>
+    <p class="sub">The code is right in every row below. None of these docs has been updated yet. This page replaces <code>bank_flow_lab.html</code> and <code>bank_integrations_map.html</code>, which predate the 2026-10 refactor.</p>
+  </header>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Doc</th><th>Doc says</th><th>Code does</th><th>Code</th></tr></thead>
+      <tbody>
+        <tr><td class="mono" style="color:var(--basis)">basis_bank/README.md:239</td><td>Mixed or any National batch → op 7</td><td>Salary flag is checked first → op 5</td><td class="mono">account_batch_payment.py:85-86</td></tr>
+        <tr><td class="mono" style="color:var(--basis)">documentations/basis_bank.md:10</td><td>"Basis Bank Status"</td><td>Field label "Basis Bank State"</td><td class="mono">account_payment.py:63</td></tr>
+        <tr><td class="mono" style="color:var(--basis)">documentations/basis_bank.md:42, 123-124</td><td>Line references to :168 and :632</td><td>Confirmation at :189-200, cron at :609</td><td class="mono">account_payment.py</td></tr>
+        <tr><td class="mono" style="color:var(--basis)">documentations/basis_bank.md:105</td><td>Watchdog acts at once on failed or uncertain</td><td>Also on partial</td><td class="mono">gec_payroll_bank account_batch_payment.py:14</td></tr>
+        <tr><td class="mono" style="color:var(--basis)">documentations/basis_bank.md:197</td><td>Send, matching and crons untested</td><td>test_basis_flows.py and test_basis_protected_fields.py exist <span class="tag likely">Likely</span> cover them</td><td class="mono">basis_bank/tests/</td></tr>
+        <tr><td class="mono" style="color:var(--basis)">basis_bank/README.md:111, 203</td><td>Confirm it in the bank's portal</td><td>Odoo leaves Awaiting IB Confirmation only through statement matching</td><td class="mono">account_batch_payment.py:353-366</td></tr>
+        <tr><td class="mono" style="color:var(--tbc)">tbc_bank/README.md:178-179, 233-234</td><td>Only a line with the TBC reference confirms</td><td>The request id matches too</td><td class="mono">account_journal.py:73-74</td></tr>
+        <tr><td class="mono" style="color:var(--tbc)">tbc_bank/README.md:237-238</td><td>Only Pending and Approved go out from a batch</td><td>Awaiting Approval is picked too, then refused</td><td class="mono">account_batch_payment.py:39-40</td></tr>
+        <tr><td class="mono" style="color:var(--tbc)">tbc_bank/README.md:101</td><td>No account (State Treasury) → Treasury</td><td>Stays National and the send is refused until changed</td><td class="mono">account_payment.py:113-115, 318-319</td></tr>
+        <tr><td class="mono" style="color:var(--tbc)">tbc_bank/README.md:48</td><td>Unknown → Recover → Confirmed</td><td>Recover sets Sent</td><td class="mono">account_payment.py:391-395</td></tr>
+        <tr><td class="mono" style="color:var(--tbc)">tbc_bank/README_DEV.md:26</td><td>No migrations</td><td><code>migrations/20.0.1.6.0/pre-migrate.py</code> exists</td><td class="mono">tbc_bank/migrations/</td></tr>
+        <tr><td class="mono" style="color:var(--tbc)">tbc_bank/BIS_API.md §3, §7-9</td><td><code>import_batch_transfer</code> at service:372; refs :69, :610, :631, :357</td><td>No such method; actual lines 483, 513, 291</td><td class="mono">tbc_bank_service.py</td></tr>
+        <tr><td class="mono" style="color:var(--bog)">bog_bank/README.md:207</td><td>Treasury refusal, general</td><td>Payroll pre-flight only</td><td class="mono">account_payment_method_line.py:45-63</td></tr>
+        <tr><td class="mono" style="color:var(--bog)">bog_bank/README.md:136-137</td><td>Press Refresh Batch Status after a bulk send</td><td>Refreshes automatically</td><td class="mono">account_batch_payment.py:229-234</td></tr>
+        <tr><td class="mono" style="color:var(--bog)">bog_bank/README.md:268</td><td>Larger amounts go as individual MT103</td><td>Stay in the bulk call <span class="tag likely">Likely</span></td><td class="mono">account_batch_payment.py:152-162</td></tr>
+        <tr><td class="mono" style="color:var(--bog)">bog_bank/bog.md:405</td><td>State from substrings of Status</td><td>Exact letter match</td><td class="mono">account_payment.py:576-577</td></tr>
+        <tr><td class="mono" style="color:var(--bog)">bog_bank/bog.md:382-383</td><td>Lines from BulkLineStatus, DocumentNo first</td><td>DocumentStatuses first, UniqueId first</td><td class="mono">account_batch_payment.py:281-282, 345-347</td></tr>
+        <tr><td class="mono" style="color:var(--bog)">bog_bank/bog.md:377-381, 403-408</td><td>Line references (cap at :14 and others)</td><td>Cap at :18; other refs moved</td><td class="mono">account_batch_payment.py</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <section class="box">
+    <h3>Not verified for this page</h3>
+    <ul>
+      <li>Whether Basis needs a receiver BIC inside package items.</li>
+      <li>Whether a crash leaves a Basis batch and its payments in different states.</li>
+      <li>Whether BOG accepts MT103 lines inside a bulk call.</li>
+      <li>No live bank call was made; every flow here is read from code and the module guides.</li>
+    </ul>
+  </section>
+</div>
+
+</main>
+
+<footer class="foot wrap">
+  Sources: each module's README.md and README_DEV.md, <code>documentations/payroll_payment_flow.md</code>, and the code at the cited lines. Paths are relative to <code>custom_addons/gec_odoo_modules/</code>.
+</footer>
+
+<script>
+(function () {
+  document.documentElement.classList.add('js');
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  var ids = tabs.map(function (t) { return t.getAttribute('aria-controls'); });
+  function show(id, focus) {
+    if (ids.indexOf(id) < 0) id = 'overview';
+    tabs.forEach(function (t) {
+      var on = t.getAttribute('aria-controls') === id;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById('p-' + t.getAttribute('aria-controls')).hidden = !on;
+      if (on && focus) t.focus();
+    });
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () {
+      var id = t.getAttribute('aria-controls');
+      show(id);
+      try { history.replaceState(null, '', '#' + id); } catch (e) { location.hash = id; }
+    });
+    t.addEventListener('keydown', function (e) {
+      var k = e.key, n = null;
+      if (k === 'ArrowRight') n = (i + 1) % tabs.length;
+      if (k === 'ArrowLeft') n = (i - 1 + tabs.length) % tabs.length;
+      if (n !== null) { e.preventDefault(); tabs[n].click(); tabs[n].focus(); }
+    });
+  });
+  show((location.hash || '').slice(1));
+  window.addEventListener('hashchange', function () { show(location.hash.slice(1)); });
+})();
+</script>
+</body>
+</html>

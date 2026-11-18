@@ -1,0 +1,957 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* signify
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-29 12:12+0000\n"
+"PO-Revision-Date: 2026-10-29 11:45+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian (ka_GE)\n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#. module: signify
+#: model:ir.module.module,description:base.module_signify
+msgid ""
+"\n"
+"Send a PDF, DOC or DOCX attached to any Odoo record to Signify for signing. The status is\n"
+"followed by a scheduled action, and the signed files and the evidence report are brought back\n"
+"to Odoo.\n"
+"\n"
+"Full documentation: README.md and README_DEV.md in the module directory.\n"
+msgstr ""
+"\n"
+"Odoo-ს ნებისმიერ ჩანაწერზე მიმაგრებული PDF, DOC ან DOCX ფაილის ხელმოსაწერად გაგზავნა Signify-ში. სტატუსს\n"
+"თვალს ადევნებს დაგეგმილი მოქმედება, ხელმოწერილი ფაილები და მტკიცებულების ანგარიში კი Odoo-ში\n"
+"ბრუნდება.\n"
+"\n"
+"სრული დოკუმენტაცია: README.md და README_DEV.md მოდულის საქაღალდეში.\n"
+
+#. module: signify
+#: model:ir.model.fields,help:signify.field_signify_recipient__personal_id
+msgid ""
+"11-digit personal number for the Georgian ID card and remote ID; taken from the contact's Tax ID when it is one"
+msgstr ""
+"11-ნიშნა პირადი ნომერი ქართული პირადობის მოწმობისა და დისტანციური იდენტიფიკაციისთვის; ივსება კონტაქტის "
+"საგადასახადო ID-დან, თუ ის პირადი ნომერია"
+
+#. module: signify
+#: model:ir.model.fields,help:signify.field_signify_recipient__placement_keyword
+msgid "A word printed in the document where the signature goes, e.g. Director"
+msgstr "დოკუმენტში არსებული სიტყვა, რომლის ადგილზეც ხელმოწერა განთავსდება, მაგ. დირექტორი"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_connection__access_token
+msgid "Access Token"
+msgstr "წვდომის ტოკენი"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_document__message_needaction
+msgid "Action Needed"
+msgstr "საჭიროა მოქმედება"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_recipient__action_time
+msgid "Action Time"
+msgstr "მოქმედების დრო"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_connection__active
+msgid "Active"
+msgstr "აქტიური"
+
+#. module: signify
+#: model:res.groups,name:signify.group_signify_manager
+msgid "Administrator"
+msgstr "ადმინისტრატორი"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_document__workflow_type__parallel
+msgid "All at Once"
+msgstr "ყველა ერთდროულად"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_recipient__role__approver
+msgid "Approver"
+msgstr "დამმტკიცებელი"
+
+#. module: signify
+#: model_terms:ir.ui.view,arch_db:signify.signify_connection_view_search
+msgid "Archived"
+msgstr "დაარქივებული"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_document__message_attachment_count
+msgid "Attachment Count"
+msgstr "დანართების რაოდენობა"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_recipient__auth_type
+msgid "Signing Method"
+msgstr "დადასტურების მეთოდი"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_recipient__auto_sign_type
+msgid "Automatic Signature"
+msgstr "ავტომატური ხელმოწერის ტიპი"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_recipient__role__auto_signer
+msgid "Automatic Signer"
+msgstr "ავტომატური ხელმომწერი"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_recipient__auth_type__basic
+msgid "Basic"
+msgstr "მარტივი"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_recipient__role__receive_signed_copy
+msgid "CC"
+msgstr "ასლის მიმღები"
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/tools/signify_api.py:0
+msgid "Check that each signer's Signature Keyword matches searchable text in the uploaded file."
+msgstr "შეამოწმეთ, რომ თითოეული ხელმომწერის ხელმოწერის საკვანძო სიტყვა ატვირთულ ფაილში მოძებნად ტექსტს ემთხვევა."
+
+#. module: signify
+#: model_terms:ir.ui.view,arch_db:signify.res_config_settings_view_form
+msgid "Client ID"
+msgstr "კლიენტის ID"
+
+#. module: signify
+#: model_terms:ir.ui.view,arch_db:signify.res_config_settings_view_form
+msgid "Client Secret"
+msgstr "კლიენტის საიდუმლო"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_connection__company_id model:ir.model.fields,field_description:signify.field_signify_document__company_id model:ir.model.fields,field_description:signify.field_signify_recipient__company_id
+msgid "Company"
+msgstr "კომპანია"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_recipient__auto_sign_type__company_seal
+msgid "Company Seal"
+msgstr "კომპანიის ბეჭედი"
+
+#. module: signify
+#: model:ir.model,name:signify.model_res_config_settings
+msgid "Config Settings"
+msgstr "კონფიგურაციის პარამეტრები"
+
+#. module: signify
+#: model:ir.ui.menu,name:signify.menu_signify_configuration
+msgid "Configuration"
+msgstr "კონფიგურაცია"
+
+#. module: signify
+#: model_terms:ir.ui.view,arch_db:signify.signify_connection_view_list
+msgid "Connect Signify Account"
+msgstr "Signify-ის ანგარიშის დაკავშირება"
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/tools/signify_api.py:0
+msgid ""
+"Connect your Signify account first (Signify > Configuration > Signify "
+"Accounts)."
+msgstr "ჯერ დააკავშირეთ თქვენი Signify-ის ანგარიში (Signify > კონფიგურაცია > Signify-ის ანგარიშები)."
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_connection__connected
+msgid "Connected"
+msgstr "დაკავშირებულია"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_recipient__contact_type
+msgid "Send Invitation By"
+msgstr "მიწოდების არხი"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_connection__create_uid model:ir.model.fields,field_description:signify.field_signify_document__create_uid model:ir.model.fields,field_description:signify.field_signify_recipient__create_uid
+#: model_terms:ir.ui.view,arch_db:signify.signify_document_view_search
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_connection__create_date model:ir.model.fields,field_description:signify.field_signify_document__create_date model:ir.model.fields,field_description:signify.field_signify_recipient__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_document__state__deleted
+msgid "Deleted"
+msgstr "წაშლილი"
+
+#. module: signify
+#: model_terms:ir.ui.view,arch_db:signify.signify_connection_view_list
+msgid "Disconnect"
+msgstr "გათიშვა"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_res_config_settings__display_name model:ir.model.fields,field_description:signify.field_signify_connection__display_name model:ir.model.fields,field_description:signify.field_signify_document__display_name model:ir.model.fields,field_description:signify.field_signify_recipient__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_recipient__document_id
+msgid "Document"
+msgstr "დოკუმენტი"
+
+#. module: signify
+#: model:ir.actions.act_window,name:signify.action_signify_document model:ir.ui.menu,name:signify.menu_signify_documents
+msgid "Documents"
+msgstr "დოკუმენტები"
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_connection.py:0
+msgid "Documents sent with this account are still in progress in Signify."
+msgstr "ამ ანგარიშით გაგზავნილი დოკუმენტების დამუშავება Signify-ში ჯერ არ დასრულებულა."
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_recipient__status__finished
+msgid "Done"
+msgstr "დასრულდა"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_document__state__draft model_terms:ir.ui.view,arch_db:signify.signify_document_view_search
+msgid "Draft"
+msgstr "მონახაზი"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_recipient__qualified_type__eu
+msgid "EU Qualified"
+msgstr "ევროკავშირის კვალიფიციური"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_recipient__qualified_type__eu_allow_os
+msgid "EU Qualified, One-Shot Allowed"
+msgstr "ევროკავშირის კვალიფიციური, ერთჯერადი სერტიფიკატის შესაძლებლობით"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_connection__email model:ir.model.fields.selection,name:signify.selection__signify_recipient__contact_type__email
+msgid "Email"
+msgstr "ელ-ფოსტა"
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_document.py:0
+msgid "Enter a Signature Keyword for %(signer)s using text that appears in the uploaded file."
+msgstr "ხელმომწერისთვის (%(signer)s) მიუთითეთ ხელმოწერის საკვანძო სიტყვა, რომელიც ატვირთულ ფაილში წერია."
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_document.py:0
+msgid "Choose SMS Code or another Signing Method for %(recipient)s: with Link and Basic, Signify cannot prove who signed."
+msgstr "მიმღებისთვის (%(recipient)s) აირჩიეთ „SMS კოდი“ ან სხვა დადასტურების მეთოდი: ბმულით და მარტივი მეთოდით Signify ვერ დაადასტურებს, ვინ მოაწერა ხელი."
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_document.py:0
+msgid "Add a mobile number to the Phone of %(recipient)s: SMS invitations and SMS codes need it."
+msgstr "მიმღების (%(recipient)s) ველში „ტელეფონი“ მიუთითეთ მობილურის ნომერი: ის სჭირდება SMS-ით მოწვევასა და SMS კოდს."
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_document__evidence_attachment_id
+msgid "Evidence Report"
+msgstr "მტკიცებულების ანგარიში"
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_document.py:0
+msgid "Evidence report received from Signify"
+msgstr "მტკიცებულების ანგარიში მიღებულია Signify-დან"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_connection__expiry
+msgid "Expiry"
+msgstr "ვადის გასვლის დრო"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_document__file
+msgid "File"
+msgstr "ფაილი"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_document__file_name
+msgid "File Name"
+msgstr "ფაილის სახელი"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_document__message_follower_ids
+msgid "Followers"
+msgstr "გამომწერები"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_document__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "გამომწერები (პარტნიორები)"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_recipient__qualified_type__geo_stamp
+msgid "Georgian Company Stamp"
+msgstr "კომპანიის ელექტრონული ბეჭედი"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_recipient__qualified_type__geo_id_card
+msgid "Georgian ID Card"
+msgstr "პირადობის ელექტრონული მოწმობა"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_recipient__auto_sign_type__geo_qualified
+msgid "Georgian Qualified"
+msgstr "ქართული კვალიფიციური ხელმოწერა"
+
+#. module: signify
+#: model:ir.model.fields,help:signify.field_res_config_settings__signify_redirect_url
+msgid ""
+"Give this URL to Signify to whitelist. Set the system parameter "
+"web.base.url.freeze so it does not change."
+msgstr "გადაეცით ეს მისამართი Signify-ს თეთრ სიაში დასამატებლად. დააყენეთ სისტემური პარამეტრი web.base.url.freeze, რათა ის არ შეიცვალოს."
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_document__has_message
+msgid "Has Message"
+msgstr "აქვს შეტყობინება"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_res_config_settings__id model:ir.model.fields,field_description:signify.field_signify_connection__id model:ir.model.fields,field_description:signify.field_signify_document__id model:ir.model.fields,field_description:signify.field_signify_recipient__id
+msgid "ID"
+msgstr "იდენტიფიკატორი"
+
+#. module: signify
+#: model:ir.model.fields,help:signify.field_signify_document__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "თუ მონიშნულია, ახალი შეტყობინებები საჭიროებს თქვენს ყურადღებას."
+
+#. module: signify
+#: model:ir.model.fields,help:signify.field_signify_document__message_has_error
+msgid "If checked, some messages have a delivery error."
+msgstr "თუ მონიშნულია, ზოგიერთ შეტყობინებას აქვს მიწოდების შეცდომა."
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_document__workflow_type__serial
+msgid "In Order"
+msgstr "რიგითობით"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_recipient__status__no_action_required_interrupted
+msgid "Interrupted"
+msgstr "შეწყვეტილი"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_document__message_is_follower
+msgid "Is Follower"
+msgstr "არის გამომწერი"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_connection__write_uid model:ir.model.fields,field_description:signify.field_signify_document__write_uid model:ir.model.fields,field_description:signify.field_signify_recipient__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_connection__write_date model:ir.model.fields,field_description:signify.field_signify_document__write_date model:ir.model.fields,field_description:signify.field_signify_recipient__write_date
+msgid "Last Updated on"
+msgstr "ბოლო განახლების თარიღი"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_recipient__contact_type__link
+msgid "Link"
+msgstr "ბმული"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_document__reference_doc
+msgid "Linked To"
+msgstr "მიბმული ჩანაწერი"
+
+#. module: signify
+#: model_terms:ir.ui.view,arch_db:signify.signify_document_view_form
+msgid "Message"
+msgstr "შეტყობინება"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_document__message_has_error
+msgid "Message Delivery error"
+msgstr "შეტყობინების მიწოდების შეცდომა"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_document__message
+msgid "Message for Recipients"
+msgstr "შეტყობინება მიმღებებისთვის"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_document__message_ids
+msgid "Messages"
+msgstr "შეტყობინებები"
+
+#. module: signify
+#: model_terms:ir.ui.view,arch_db:signify.signify_connection_view_search
+msgid "My Accounts"
+msgstr "ჩემი ანგარიშები"
+
+#. module: signify
+#: model_terms:ir.ui.view,arch_db:signify.signify_document_view_search
+msgid "My Documents"
+msgstr "ჩემი დოკუმენტები"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_document__name
+msgid "Name"
+msgstr "სახელი"
+
+#. module: signify
+#: model:res.groups.privilege,placeholder:signify.res_groups_privilege_signify
+msgid "No"
+msgstr "არა"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_recipient__status__no_action_required
+msgid "Not Needed"
+msgstr "არ არის საჭირო"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_document__message_needaction_counter
+msgid "Number of Actions"
+msgstr "ქმედებების რაოდენობა"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_document__message_has_error_counter
+msgid "Number of errors"
+msgstr "შეცდომების რაოდენობა"
+
+#. module: signify
+#: model:ir.model.fields,help:signify.field_signify_document__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "ქმედების მომთხოვნი შეტყობინებების რაოდენობა"
+
+#. module: signify
+#: model:ir.model.fields,help:signify.field_signify_document__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "მიწოდების შეცდომის მქონე შეტყობინებების რაოდენობა"
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_document.py:0
+msgid "Only Signify can change the status and the signed files of a document."
+msgstr "დოკუმენტის სტატუსისა და ხელმოწერილი ფაილების შეცვლა მხოლოდ Signify-ს შეუძლია."
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_recipient.py:0
+msgid "Only Signify can change the status of a recipient."
+msgstr "მიმღების სტატუსის შეცვლა მხოლოდ Signify-ს შეუძლია."
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_recipient.py:0
+msgid "A recipient cannot be moved to another document: delete it and add it there."
+msgstr "მიმღების სხვა დოკუმენტზე გადატანა შეუძლებელია: წაშალეთ ის და დაამატეთ სხვა დოკუმენტში."
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_connection.py:0
+msgid "Only Signify users can connect a Signify account."
+msgstr "Signify-ის ანგარიშის დაკავშირება მხოლოდ Signify-ის მომხმარებლებს შეუძლიათ."
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_document.py:0
+msgid "Only a draft document can be sent."
+msgstr "გაგზავნა შესაძლებელია მხოლოდ მონახაზი დოკუმენტისთვის."
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_document.py:0
+msgid "Only a sent document can be recalled."
+msgstr "გამოთხოვა შესაძლებელია მხოლოდ გაგზავნილი დოკუმენტისთვის."
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_recipient.py:0
+msgid "Only link recipients have a signing page."
+msgstr "ხელმოწერის გვერდი მხოლოდ ბმულით მიმღებებს აქვთ."
+
+#. module: signify
+#: model_terms:ir.ui.view,arch_db:signify.signify_document_view_form
+msgid "Open Signing Page"
+msgstr "ხელმოწერის გვერდის გახსნა"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_recipient__partner_id
+msgid "Recipient"
+msgstr "მიმღები"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_recipient__personal_id
+msgid "Personal Number"
+msgstr "პირადი ნომერი"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_recipient__auth_type__qualified
+msgid "Qualified"
+msgstr "კვალიფიციური"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_recipient__qualified_type
+msgid "Certificate"
+msgstr "კვალიფიციური ხელმოწერის ტიპი"
+
+#. module: signify
+#: model_terms:ir.ui.view,arch_db:signify.signify_document_view_form
+msgid "Recall"
+msgstr "გამოთხოვა"
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_document.py:0
+msgid "A signed document cannot be deleted: it keeps the signed files and the evidence report."
+msgstr "ხელმოწერილი დოკუმენტის წაშლა შეუძლებელია: მასში ინახება ხელმოწერილი ფაილები და მტკიცებულების ანგარიში."
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_document.py:0
+msgid "Recall a sent document before deleting it."
+msgstr "გაგზავნილი დოკუმენტის წასაშლელად ჯერ გამოითხოვეთ ის."
+
+#. module: signify
+#: model_terms:ir.ui.view,arch_db:signify.signify_document_view_form
+msgid "Recall this document? The recipients will no longer be able to sign it."
+msgstr "გამოვითხოვოთ დოკუმენტი? მიმღებები მას ხელს ვეღარ მოაწერენ."
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_document__state__canceled model_terms:ir.ui.view,arch_db:signify.signify_document_view_search
+msgid "Recalled"
+msgstr "გამოთხოვილი"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_document__recipient_ids model_terms:ir.ui.view,arch_db:signify.signify_document_view_form
+msgid "Recipients"
+msgstr "მიმღებები"
+
+#. module: signify
+#: model_terms:ir.ui.view,arch_db:signify.res_config_settings_view_form
+msgid "Redirect URL"
+msgstr "გადამისამართების URL"
+
+#. module: signify
+#: model_terms:ir.ui.view,arch_db:signify.signify_document_view_form
+msgid "Refresh Status"
+msgstr "სტატუსის განახლება"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_connection__refresh_token
+msgid "Refresh Token"
+msgstr "განახლების ტოკენი"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_document__state__rejected model:ir.model.fields.selection,name:signify.selection__signify_recipient__status__rejected model_terms:ir.ui.view,arch_db:signify.signify_document_view_search
+msgid "Rejected"
+msgstr "უარყოფილი"
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_document.py:0
+msgid "Rejected in Signify by %(names)s. %(reasons)s"
+msgstr "Signify-ში უარყოფილია (%(names)s). %(reasons)s"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_recipient__auth_type__remote_id
+msgid "Remote ID"
+msgstr "დისტანციური იდენტიფიკაცია"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_recipient__role
+msgid "Role"
+msgstr "როლი"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_recipient__contact_type__mobile
+msgid "SMS"
+msgstr "SMS"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_recipient__auth_type__sms_otp
+msgid "SMS Code"
+msgstr "SMS კოდი"
+
+#. module: signify
+#: model_terms:ir.ui.view,arch_db:signify.signify_document_view_form
+msgid "Send"
+msgstr "გაგზავნა"
+
+#. module: signify
+#: model_terms:ir.ui.view,arch_db:signify.res_config_settings_view_form
+msgid "Send documents for e-signature with Signify"
+msgstr "დოკუმენტების ელექტრონულად ხელმოსაწერად გაგზავნა Signify-ით"
+
+#. module: signify
+#: model:ir.module.module,summary:base.module_signify
+msgid "Send documents for e-signature with Signify and bring the signed files back"
+msgstr "დოკუმენტების ხელმოსაწერად გაგზავნა Signify-ით და ხელმოწერილი ფაილების დაბრუნება"
+
+#. module: signify
+#. odoo-javascript
+#: code:addons/signify/static/src/file_viewer/file_viewer.xml:0
+msgid "Send with Signify"
+msgstr "Signify-ით გაგზავნა"
+
+#. module: signify
+#: model_terms:ir.actions.act_window,help:signify.action_signify_document
+msgid "Send your first document for signature"
+msgstr "გაგზავნეთ პირველი დოკუმენტი ხელმოსაწერად"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_document__state__shared model_terms:ir.ui.view,arch_db:signify.signify_document_view_search
+msgid "Sent"
+msgstr "გაგზავნილი"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_document__connection_id
+msgid "Sent With"
+msgstr "გაგზავნილია ანგარიშით"
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_document.py:0
+msgid "Sent for signature with Signify: %(name)s"
+msgstr "გაიგზავნა ხელმოსაწერად Signify-ით: %(name)s"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_recipient__sequence
+msgid "Sequence"
+msgstr "მიმდევრობა"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_recipient__placement_keyword
+msgid "Signature Keyword"
+msgstr "ხელმოწერის საკვანძო სიტყვა"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_recipient__auth_type__sign_pad
+msgid "Signature Pad"
+msgstr "ხელმოწერის პლანშეტი"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_document__state__finished model_terms:ir.ui.view,arch_db:signify.signify_document_view_search
+msgid "Signed"
+msgstr "ხელმოწერილი"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_document__signed_attachment_ids model_terms:ir.ui.view,arch_db:signify.signify_document_view_form
+msgid "Signed Files"
+msgstr "ხელმოწერილი ფაილები"
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_document.py:0
+msgid "Signed files received from Signify"
+msgstr "ხელმოწერილი ფაილები მიღებულია Signify-დან"
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_document.py:0
+msgid "Signed with Signify: %(files)s"
+msgstr "ხელმოწერილია Signify-ით: %(files)s"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_recipient__role__signer
+msgid "Signer"
+msgstr "ხელმომწერი"
+
+#. module: signify
+#: model:ir.ui.menu,name:signify.menu_signify_root model:res.groups.privilege,name:signify.res_groups_privilege_signify model_terms:ir.ui.view,arch_db:signify.res_config_settings_view_form
+msgid "Signify"
+msgstr "Signify"
+
+#. module: signify
+#: model:ir.model,name:signify.model_signify_connection
+msgid "Signify Account"
+msgstr "Signify-ის ანგარიში"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_connection__signify_sub
+msgid "Signify Account ID"
+msgstr "Signify-ის ანგარიშის ID"
+
+#. module: signify
+#: model:ir.actions.act_window,name:signify.action_signify_connection model:ir.ui.menu,name:signify.menu_signify_connections
+msgid "Signify Accounts"
+msgstr "Signify-ის ანგარიშები"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_res_config_settings__signify_client_id
+msgid "Signify Client"
+msgstr "Signify კლიენტი"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_res_config_settings__signify_client_secret
+msgid "Signify Client Secret"
+msgstr "Signify კლიენტის საიდუმლო"
+
+#. module: signify
+#: model:ir.model,name:signify.model_signify_document
+msgid "Signify Document"
+msgstr "Signify დოკუმენტი"
+
+#. module: signify
+#: model:ir.module.module,shortdesc:base.module_signify
+msgid "Signify E-Signature"
+msgstr "Signify ელექტრონული ხელმოწერა"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_document__signify_ref model:ir.model.fields,field_description:signify.field_signify_recipient__signify_ref
+msgid "Signify ID"
+msgstr "Signify ID"
+
+#. module: signify
+#: model:ir.model,name:signify.model_signify_recipient
+msgid "Signify Recipient"
+msgstr "Signify მიმღები"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_res_config_settings__signify_redirect_url
+msgid "Signify Redirect Url"
+msgstr "Signify გადამისამართების URL"
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/tools/signify_api.py:0
+msgid "Signify answered with HTTP %(code)s."
+msgstr "Signify-მ უპასუხა HTTP %(code)s კოდით."
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/tools/signify_api.py:0
+msgid "Signify did not answer in time. Please try again."
+msgstr "Signify-მ დროულად არ უპასუხა. გთხოვთ, სცადოთ ხელახლა."
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_document.py:0
+msgid "Signify did not confirm every recipient. The document was not sent."
+msgstr "Signify-მ ყველა მიმღები არ დაადასტურა. დოკუმენტი არ გაიგზავნა."
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_document.py:0
+msgid "Signify did not confirm the share of %s (%s): check the Signify portal before sending it again."
+msgstr "%s: Signify-მ გაზიარება ვერ დაადასტურა (%s). ხელახლა გაგზავნამდე შეამოწმეთ Signify-ის პორტალი."
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/controllers/main.py:0
+msgid "Signify did not connect: %s"
+msgstr "Signify-თან დაკავშირება ვერ მოხერხდა: %s"
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/controllers/main.py:0 code:addons/signify/tools/signify_api.py:0
+msgid ""
+"Signify is not set up: fill in the Client ID and Client Secret in Settings."
+msgstr "Signify არ არის კონფიგურირებული: პარამეტრებში შეავსეთ კლიენტის ID და კლიენტის საიდუმლო."
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/tools/signify_api.py:0
+msgid "Signify is unreachable."
+msgstr "Signify მიუწვდომელია."
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_connection.py:0
+msgid "Signify token refresh is busy, please retry."
+msgstr "Signify-ის ტოკენის განახლება დაკავებულია, სცადეთ ხელახლა."
+
+#. module: signify
+#: model:ir.actions.server,name:signify.ir_cron_signify_sync_ir_actions_server
+msgid "Signify: Sync Document Status"
+msgstr "Signify: დოკუმენტების სტატუსის სინქრონიზაცია"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_document__state
+msgid "State"
+msgstr "სტატუსი"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_recipient__status model_terms:ir.ui.view,arch_db:signify.signify_document_view_search
+msgid "Status"
+msgstr "სტატუსი"
+
+#. module: signify
+#: model_terms:ir.ui.view,arch_db:signify.signify_document_view_form
+msgid "Text sent to the recipients with the invitation"
+msgstr "ტექსტი, რომელიც მიმღებებს მოსაწვევთან ერთად გაეგზავნება"
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/tools/signify_api.py:0
+msgid "The request to Signify failed."
+msgstr "Signify-სთან მოთხოვნა ვერ შესრულდა."
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_connection.py:0
+msgid ""
+"The Signify account %(email)s of %(user)s has expired: %(user)s must connect "
+"it again in Signify > Configuration > Signify Accounts."
+msgstr "Signify-ის ანგარიშის %(email)s (მომხმარებელი: %(user)s) ვადა ამოიწურა: %(user)s-მა უნდა დააკავშიროს ის ხელახლა (Signify > კონფიგურაცია > Signify-ის ანგარიშები)."
+
+#. module: signify
+#: model:ir.model.constraint,message:signify.constraint_signify_connection_unique_account
+msgid "This Signify account is already connected."
+msgstr "ეს Signify-ის ანგარიში უკვე დაკავშირებულია."
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/controllers/main.py:0
+msgid "This Signify connection attempt was not found. Start again from Signify Accounts; if it happens again, ask your administrator."
+msgstr "Signify-თან დაკავშირების ეს მცდელობა ვერ მოიძებნა. დაიწყეთ თავიდან Signify-ის ანგარიშებიდან; თუ განმეორდა, მიმართეთ ადმინისტრატორს."
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_document.py:0
+msgid "This document is being sent already."
+msgstr "ეს დოკუმენტი უკვე იგზავნება."
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_recipient__status__pending_on_user
+msgid "To Act"
+msgstr "ელოდება მის ხელმოწერას"
+
+#. module: signify
+#: model_terms:ir.actions.act_window,help:signify.action_signify_document
+msgid "Upload a PDF or Word file, add the people who must sign it and send it with Signify."
+msgstr "ატვირთეთ PDF ან Word ფაილი, დაამატეთ ხელმომწერები და გაგზავნეთ Signify-ით."
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_connection__user_id model:res.groups,name:signify.group_signify_user
+msgid "User"
+msgstr "მომხმარებელი"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__signify_recipient__status__pending
+msgid "Waiting"
+msgstr "ჯერ არ არის მისი რიგი"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_document__workflow_type
+msgid "Signing Order"
+msgstr "ხელმოწერის რიგითობა"
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_connection.py:0
+msgid "You can only disconnect your own Signify account."
+msgstr "შეგიძლიათ მხოლოდ საკუთარი Signify-ის ანგარიშის გათიშვა."
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_document.py:0
+msgid "You don't have access to the linked document."
+msgstr "დაკავშირებულ დოკუმენტზე წვდომა არ გაქვთ."
+
+#. module: signify
+#: model_terms:ir.ui.view,arch_db:signify.signify_document_view_form
+msgid "e.g. Service agreement"
+msgstr "მაგ. მომსახურების ხელშეკრულება"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_signify_document__rating_ids
+msgid "Ratings"
+msgstr "შეფასებები"
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_document.py:0
+msgid "Connect your Signify account before sending this document."
+msgstr "ამ დოკუმენტის გაგზავნამდე დააკავშირეთ თქვენი Signify-ის ანგარიში."
+
+#. module: signify
+#. odoo-python
+#: code:addons/signify/models/signify_document.py:0
+msgid "Open Signify Accounts"
+msgstr "Signify-ის ანგარიშების გახსნა"
+
+#. module: signify
+#: model_terms:ir.actions.act_window,help:signify.action_signify_connection
+msgid "Connect your Signify account to send documents for signature"
+msgstr "დოკუმენტების ხელმოსაწერად გასაგზავნად დააკავშირეთ თქვენი Signify-ის ანგარიში"
+
+#. module: signify
+#: model_terms:ir.actions.act_window,help:signify.action_signify_connection
+msgid "Press Connect Signify Account. The account is connected for the company chosen at the top right."
+msgstr "დააჭირეთ ღილაკს „Signify-ის ანგარიშის დაკავშირება“. ანგარიში უკავშირდება ზედა მარჯვენა კუთხეში არჩეულ კომპანიას."
+
+#. module: signify
+#: model_terms:ir.ui.view,arch_db:signify.signify_oauth_error
+msgid "Back to Signify Accounts"
+msgstr "Signify-ის ანგარიშებზე დაბრუნება"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_res_company__signify_reminder_frequency model:ir.model.fields,field_description:signify.field_res_config_settings__signify_reminder_frequency
+msgid "Reminder Frequency"
+msgstr "შეხსენების სიხშირე"
+
+#. module: signify
+#: model:ir.model.fields,field_description:signify.field_res_company__signify_reminder_max_count model:ir.model.fields,field_description:signify.field_res_config_settings__signify_reminder_max_count
+msgid "Maximum Reminders"
+msgstr "შეხსენებების მაქსიმალური რაოდენობა"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__res_company__signify_reminder_frequency__everyhour
+msgid "Every Hour"
+msgstr "ყოველ საათში"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__res_company__signify_reminder_frequency__everyday
+msgid "Every Day"
+msgstr "ყოველდღე"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__res_company__signify_reminder_frequency__every2days
+msgid "Every 2 Days"
+msgstr "ყოველ 2 დღეში"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__res_company__signify_reminder_frequency__everyweek
+msgid "Every Week"
+msgstr "ყოველ კვირაში"
+
+#. module: signify
+#: model:ir.model.fields.selection,name:signify.selection__res_company__signify_reminder_frequency__never
+msgid "Never"
+msgstr "არასოდეს"
+
+#. module: signify
+#: model_terms:ir.ui.view,arch_db:signify.res_config_settings_view_form
+msgid "Signify Reminders"
+msgstr "Signify-ის შეხსენებები"
+
+#. module: signify
+#: model_terms:ir.ui.view,arch_db:signify.res_config_settings_view_form
+msgid "Signify reminds signers and approvers who have not acted yet"
+msgstr "Signify შეხსენებას უგზავნის ხელმომწერებსა და დამმტკიცებლებს, რომლებსაც დოკუმენტი ჯერ არ მოუწერიათ ან არ დაუმტკიცებიათ"
+
+#. module: signify
+#: model:ir.model.fields,help:signify.field_res_company__signify_reminder_frequency model:ir.model.fields,help:signify.field_res_config_settings__signify_reminder_frequency
+msgid ""
+"Sent the same way as the invitation, by email or SMS; Link recipients get "
+"none. Only documents sent after a change follow it."
+msgstr ""
+"იგზავნება იმავე არხით, რომლითაც მოწვევა: ელ-ფოსტით ან SMS-ით; ბმულით "
+"მიმღებებს შეხსენება არ ეგზავნებათ. ცვლილება მხოლოდ მის შემდეგ გაგზავნილ "
+"დოკუმენტებზე ვრცელდება."
+
+#. module: signify
+#: model:ir.model.fields,help:signify.field_res_company__signify_reminder_max_count model:ir.model.fields,help:signify.field_res_config_settings__signify_reminder_max_count
+msgid "How many reminders one recipient gets at most, from 1 to 10."
+msgstr "მაქსიმუმ რამდენ შეხსენებას მიიღებს ერთი მიმღები, 1-დან 10-მდე."

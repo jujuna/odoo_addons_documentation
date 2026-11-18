@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_product_tree_inherit_rs" model="ir.ui.view">
+        <field name="name">product.product.tree.rs</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_product_tree_view"/>
+        <field name="arch" type="xml">
+            <field name="default_code" position="after">
+                <field name="is_rs_product" optional="hide" readonly="1"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="product_template_form_inherit_rs" model="ir.ui.view">
+        <field name="name">product.template.form.rs</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <field name="default_code" position="after">
+                <field name="is_rs_product" readonly="1"
+                       help="Set automatically once the product's barcode is successfully registered on RS.GE. Not editable by hand."/>
+                <field name="external_ref_count" optional="hide" string="# Refs"/>
+                <field name="is_excise"/>
+                <field name="rs_excise_id" invisible="not is_excise" required="is_excise"/>
+            </field>
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="action_send_single_barcode"
+                            string="Send to RS.GE"
+                            type="object"
+                            class="btn-primary"
+                            invisible="not barcode or is_rs_product"/>
+                </header>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="External References" name="rs_external_refs">
+                    <field name="external_ref_ids">
+                        <list editable="bottom">
+                            <field name="seller_partner_id"/>
+                            <field name="external_barcode"/>
+                            <field name="external_name"/>
+                            <field name="variant_id" optional="hide"/>
+                            <field name="uom_id" optional="show"/>
+                            <field name="origin_waybill_id" readonly="1"
+                                   widget="many2one" options="{'no_create': True}"/>
+                            <field name="origin_waybill_number" readonly="1" optional="hide"/>
+                            <field name="last_seen_date" readonly="1"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+
+    <!-- Same additions on the product.product (variant) form, opened from a waybill line; fields delegate via
+         _inherits, the Send button calls the variant wrapper. -->
+    <record id="product_variant_form_inherit_rs" model="ir.ui.view">
+        <field name="name">product.product.form.rs</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <field name="default_code" position="after">
+                <field name="is_rs_product" readonly="1"
+                       help="Set automatically once the product's barcode is successfully registered on RS.GE. Not editable by hand."/>
+                <field name="external_ref_count" optional="hide" string="# Refs"/>
+                <field name="is_excise"/>
+                <field name="rs_excise_id" invisible="not is_excise" required="is_excise"/>
+            </field>
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="action_send_single_barcode"
+                            string="Send to RS.GE"
+                            type="object"
+                            class="btn-primary"
+                            invisible="not barcode or is_rs_product"/>
+                </header>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="External References" name="rs_external_refs">
+                    <field name="external_ref_ids">
+                        <list editable="bottom">
+                            <field name="seller_partner_id"/>
+                            <field name="external_barcode"/>
+                            <field name="external_name"/>
+                            <field name="variant_id" optional="hide"/>
+                            <field name="uom_id" optional="show"/>
+                            <field name="origin_waybill_id" readonly="1"
+                                   widget="many2one" options="{'no_create': True}"/>
+                            <field name="origin_waybill_number" readonly="1" optional="hide"/>
+                            <field name="last_seen_date" readonly="1"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="product_template_search_inherit_rs" model="ir.ui.view">
+        <field name="name">product.template.search.rs</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+            <filter name="filter_to_sell" position="after">
+                <separator/>
+                <filter name="filter_excise_products"
+                        string="Excise Products"
+                        domain="[('is_excise', '=', True)]"/>
+                <filter name="filter_non_excise_products"
+                        string="Non-Excise"
+                        domain="[('is_excise', '=', False)]"/>
+            </filter>
+        </field>
+    </record>
+
+    <record id="action_send_products_to_rs_server" model="ir.actions.server">
+        <field name="name">Send to RS.GE</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="binding_model_id" ref="product.model_product_template"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">action = records.action_send_bulk_to_rs()</field>
+    </record>
+</odoo>
+

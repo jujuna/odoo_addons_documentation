@@ -1,0 +1,14 @@
+id,name,model_id,group_id/id,operation,domain
+access_basisbank_connection_user,basisbank.connection.user,basisbank.connection,basis_bank.group_basisbank_user,r,
+access_basisbank_connection_manager,basisbank.connection.manager,basisbank.connection,basis_bank.group_basisbank_manager,crud,
+rule_basisbank_connection_company,Basis Bank Connection: Multi-Company,basisbank.connection,,crud,"[('company_id', 'in', company_ids)]"
+access_basisbank_approval_user,basisbank.approval.user,basisbank.approval,basis_bank.group_basisbank_user,r,
+access_basisbank_approval_manager,basisbank.approval.manager,basisbank.approval,basis_bank.group_basisbank_manager,crud,
+rule_basisbank_approval_company,Basis Bank Approval: Multi-Company,basisbank.approval,,crud,"[('company_id', 'in', company_ids)]"
+access_basisbank_api_log_manager,basisbank.api.log.manager,basisbank.api.log,basis_bank.group_basisbank_manager,r,
+access_basisbank_api_log_system,basisbank.api.log.system,basisbank.api.log,base.group_system,crud,
+rule_basisbank_api_log_company,Basis Bank API Log: Multi-Company,basisbank.api.log,,crud,"[('company_id', 'in', company_ids)]"
+access_basisbank_otp_wizard,basisbank.otp.wizard.user,basisbank.otp.wizard,basis_bank.group_basisbank_user,crud,"[('create_uid', '=', user.id)]"
+access_basisbank_statement_import_wizard,basisbank.statement.import.wizard.user,basisbank.statement.import.wizard,basis_bank.group_basisbank_user,crud,"[('create_uid', '=', user.id)]"
+access_basisbank_resync_wizard,basisbank.resync.wizard.user,basisbank.resync.wizard,basis_bank.group_basisbank_user,crud,"[('create_uid', '=', user.id)]"
+access_basisbank_change_password_wizard,basisbank.change.password.wizard.manager,basisbank.change.password.wizard,basis_bank.group_basisbank_manager,crud,"[('create_uid', '=', user.id)]"

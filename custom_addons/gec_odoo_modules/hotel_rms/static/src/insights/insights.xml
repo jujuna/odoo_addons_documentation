@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="hotel_rms.PricingInsights">
+        <div t-attf-class="o_rms_insights {{ this.state.loading ? 'o_rms_loading' : '' }}" t-att-aria-busy="this.state.loading">
+            <t t-set="data" t-value="this.state.data"/>
+            <div class="o_rms_insights_bar o_rms_in">
+                <div class="o_rms_segmented">
+                    <button t-foreach="this.periods" t-as="period" t-key="period" type="button"
+                            t-att-class="{ active: this.state.nights === period }"
+                            t-on-click="() => this.setNights(period)">
+                        Next <t t-out="period"/> nights
+                    </button>
+                </div>
+            </div>
+
+            <div class="o_rms_insights_body">
+                <section class="o_rms_pulse">
+                    <button t-foreach="this.tiles" t-as="tile" t-key="tile.key" type="button"
+                            t-attf-class="o_rms_pulse_tile o_rms_card o_rms_in o_rms_tone_{{ tile.tone }}"
+                            t-attf-style="--i: {{ tile_index }}" t-att-title="tile.title" t-on-click="tile.open">
+                        <span class="o_rms_pulse_label" t-out="tile.label"/>
+                        <span class="o_rms_pulse_value">
+                            <CountUp value="tile.value" format="tile.format"/>
+                            <span t-if="tile.unit" class="o_rms_pulse_unit" t-out="tile.unit"/>
+                        </span>
+                        <span class="o_rms_pulse_note" t-out="tile.note"/>
+                    </button>
+                </section>
+
+                <section class="o_rms_card o_rms_in o_rms_block_nights" style="--i: 4">
+                    <h3 class="o_rms_insight_title">Next <t t-out="data.nights"/> nights</h3>
+                    <p class="o_rms_insight_note">
+                        Click a night, or drag across several nights, to open the calendar there.
+                    </p>
+                    <NightsChart t-if="this.hasNights" days="data.window" events="data.events"
+                                 currency="data.currency" onNightClick="this.props.onNightClick"/>
+                    <div t-else="" class="o_rms_empty_block">
+                        <i class="oi" data-icon="show_chart"/>
+                        <b>No bookings and no forecast for these nights yet</b>
+                        <span>Import your bookings, then run the engine.</span>
+                    </div>
+                </section>
+
+                <section class="o_rms_card o_rms_in o_rms_block_heat" style="--i: 5">
+                    <h3 class="o_rms_insight_title">Bookings gained this week</h3>
+                    <p class="o_rms_insight_note">
+                        Rooms gained per night in the last 7 days, cancellations taken off. Click a night to open it.
+                    </p>
+                    <PickupHeatmap t-if="data.heat.some((day) => day.booked)" days="data.heat"
+                                   onNightClick="this.props.onNightClick"/>
+                    <div t-else="" class="o_rms_empty_block">
+                        <i class="oi" data-icon="inbox"/>
+                        <b>No bookings in the next <t t-out="data.heatmap_days"/> nights yet</b>
+                        <span>Import your bookings to see which nights are filling up.</span>
+                    </div>
+                </section>
+
+                <section class="o_rms_card o_rms_in o_rms_block_pace" style="--i: 6">
+                    <h3 class="o_rms_insight_title">Bookings vs last year</h3>
+                    <t t-set="pace" t-value="this.pace"/>
+                    <t t-if="!pace.empty">
+                        <p t-attf-class="o_rms_verdict o_rms_tone_{{ pace.tone }}" t-out="pace.verdict"/>
+                        <p class="o_rms_insight_note">
+                            Rooms booked for the next <t t-out="data.pace_days"/> nights, against the same nights a year ago on the same day.
+                        </p>
+                        <YearPaceChart days="data.pace"/>
+                    </t>
+                    <div t-else="" class="o_rms_empty_block">
+                        <i class="oi" data-icon="history"/>
+                        <b>Nothing to compare with yet</b>
+                        <span>There are no bookings from the same nights last year.</span>
+                    </div>
+                </section>
+
+                <section class="o_rms_card o_rms_in o_rms_block_decisions" style="--i: 7">
+                    <h3 class="o_rms_insight_title">Decisions this month</h3>
+                    <t t-if="this.decisionTotal">
+                        <DecisionDoughnut accepted="data.decisions.accepted" edited="data.decisions.edited"
+                                          rejected="data.decisions.rejected" centre="this.ownChange"
+                                          centreNote="this.ownChangeNote"
+                                          onSlice="(slice) => this.openDecisions(slice)"/>
+                        <div class="o_rms_acceptance">
+                            <t t-if="data.decisions.acceptance_weeks.length > 1">
+                                <Sparkline values="data.decisions.acceptance_weeks"/>
+                                <span class="o_rms_muted" t-out="this.acceptanceNote"/>
+                            </t>
+                            <span t-else="" class="o_rms_muted">The acceptance trend shows after two weeks of decisions.</span>
+                        </div>
+                    </t>
+                    <div t-else="" class="o_rms_empty_block">
+                        <i class="oi" data-icon="check_circle"/>
+                        <b>No price was decided this month</b>
+                        <span>Review the prices that need a decision in the calendar.</span>
+                    </div>
+                </section>
+
+                <section class="o_rms_card o_rms_in o_rms_block_quality" style="--i: 8">
+                    <h3 class="o_rms_insight_title">Forecast quality</h3>
+                    <t t-if="data.accuracy.ready">
+                        <t t-set="quality" t-value="this.quality"/>
+                        <p t-attf-class="o_rms_verdict o_rms_quality_{{ quality.tone }}" t-out="quality.text"/>
+                        <p class="o_rms_insight_note">How far the forecast was from the rooms really booked, by week.</p>
+                        <AccuracyChart weeks="data.accuracy.weeks" leads="this.leads"/>
+                    </t>
+                    <div t-else="" class="o_rms_empty_block">
+                        <i class="oi" data-icon="schedule"/>
+                        <b>Needs 2 weeks of history</b>
+                        <span>The forecast is checked against the real bookings once its nights have passed.</span>
+                    </div>
+                </section>
+
+                <section class="o_rms_card o_rms_in o_rms_block_latest" style="--i: 9">
+                    <h3 class="o_rms_insight_title">Latest price changes</h3>
+                    <ul t-if="data.latest.length" class="o_rms_timeline">
+                        <li t-foreach="data.latest" t-as="change" t-key="change_index">
+                            <button type="button" class="o_rms_change" t-on-click="() => this.openPrice(change)">
+                                <span class="o_rms_change_main">
+                                    <b t-out="this.changeNight(change)"/>
+                                    <span class="o_rms_muted" t-out="change.room"/>
+                                </span>
+                                <span class="o_rms_change_price">
+                                    <span t-if="change.old_rate" class="o_rms_muted"><t t-out="this.price(change.old_rate)"/> →</span>
+                                    <PriceChange compact="true" recommended="change.new_rate" current="change.old_rate"
+                                                 currency="data.currency"/>
+                                </span>
+                                <span class="o_rms_muted o_rms_change_who">
+                                    <t t-out="change.user"/> · <t t-out="this.changeTime(change)"/>
+                                </span>
+                            </button>
+                        </li>
+                    </ul>
+                    <div t-else="" class="o_rms_empty_block">
+                        <i class="oi" data-icon="history"/>
+                        <b>No price was exported or applied yet</b>
+                        <span>Approved prices appear here after you export them.</span>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hotel_rms_price_audit_view_list" model="ir.ui.view">
+        <field name="name">hotel.rms.price.audit.list</field>
+        <field name="model">hotel.rms.price.audit</field>
+        <field name="arch" type="xml">
+            <list create="0" delete="0" edit="0">
+                <field name="create_date" string="When"/>
+                <field name="property_id" optional="hide"/>
+                <field name="stay_date"/>
+                <field name="room_type_id" optional="hide"/>
+                <field name="action" widget="badge" decoration-success="action == 'accept'"
+                       decoration-info="action == 'edit'" decoration-warning="action == 'undo'"
+                       decoration-muted="action in ('reject', 'lock', 'unlock')"/>
+                <field name="user_id"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="old_rate" invisible="not old_rate" optional="show"/>
+                <field name="new_rate" string="New price" widget="rms_price_change"
+                       options="{'current_field': 'old_rate'}"/>
+                <field name="recommended_rate" optional="hide"/>
+                <field name="vs_recommended" widget="percentage" invisible="action not in ('accept', 'edit')"
+                       optional="show"/>
+                <field name="note" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hotel_rms_price_audit_view_pivot" model="ir.ui.view">
+        <field name="name">hotel.rms.price.audit.pivot</field>
+        <field name="model">hotel.rms.price.audit</field>
+        <field name="arch" type="xml">
+            <pivot string="Decisions" disable_linking="1">
+                <field name="action" type="row"/>
+                <field name="create_date" interval="month" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="hotel_rms_price_audit_view_search" model="ir.ui.view">
+        <field name="name">hotel.rms.price.audit.search</field>
+        <field name="model">hotel.rms.price.audit</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="property_id"/>
+                <field name="room_type_id"/>
+                <field name="user_id"/>
+                <field name="stay_date"/>
+                <filter name="decisions" string="Decisions" domain="[('action', 'in', ('accept', 'edit', 'reject'))]"/>
+                <filter name="published" string="Published" domain="[('action', 'in', ('export', 'apply'))]"/>
+                <separator/>
+                <filter name="this_month" string="This month" date="create_date"/>
+                <group>
+                    <filter name="group_action" string="Action" context="{'group_by': 'action'}"/>
+                    <filter name="group_user" string="User" context="{'group_by': 'user_id'}"/>
+                    <filter name="group_month" string="Month" context="{'group_by': 'create_date:month'}"/>
+                    <filter name="group_property" string="Hotel" context="{'group_by': 'property_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hotel_rms_price_audit" model="ir.actions.act_window">
+        <field name="name">Price History</field>
+        <field name="res_model">hotel.rms.price.audit</field>
+        <field name="view_mode">list,pivot</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No price was changed yet</p>
+            <p>Every decision on a price is kept here: who accepted, changed, rejected or published it, and when.</p>
+        </field>
+    </record>
+</odoo>

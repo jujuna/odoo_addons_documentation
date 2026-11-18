@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="view_res_config_settings_inherit" model="ir.ui.view">
+        <field name="name">res.config.settings.rs.addition</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="RS.GE" string="RS.GE" name="rs_waybill">
+                    <block title="Sync Waybills">
+                        <setting>
+                            <div class="text-muted">Import waybills from RS.GE (last 30 days)</div>
+                            <div class="mt-2 d-flex gap-2">
+                                <button name="action_sync_all_waybills" type="object"
+                                        string="Fetch All Waybills From RS" class="btn-secondary"/>
+                            </div>
+                        </setting>
+                        <setting>
+                            <field name="rs_auto_sync_updated"/>
+                            <div class="text-muted">
+                                Run the 15-minute cron that pulls newly created or edited
+                                waybills (both seller and buyer side) from RS.GE.
+                            </div>
+                        </setting>
+                        <setting>
+                            <field name="rs_auto_sync_transporter"/>
+                            <div class="text-muted">
+                                Run the hourly cron that pulls transporter-side waybills
+                                from RS.GE.
+                            </div>
+                        </setting>
+                    </block>
+                    <block title="Features">
+                        <setting>
+                            <label for="rs_notification_user_ids"/>
+                            <div class="text-muted">
+                                Users who will receive email notifications about new or updated received waybills.
+                            </div>
+                            <field name="rs_notification_user_ids" widget="many2many_tags"/>
+                        </setting>
+                        <setting>
+                            <field name="rs_enable_products"/>
+                            <div class="text-muted">
+                                Sync and manage Revenue Service(RS.GE) product barcodes,
+                                Don't forget to add other information of product.
+                            </div>
+                            <div class="mt-2" invisible="not rs_enable_products">
+                                <button name="action_update_rs_products" type="object"
+                                        string="Update Products" class="btn-secondary"/>
+                            </div>
+                        </setting>
+                        <setting>
+                            <field name="rs_enable_drivers"/>
+                            <div class="text-muted">
+                                Sync Revenue Service(RS.GE) registered vehicles into Odoo's Fleet module.
+                                Vehicles get a placeholder model "Unknown (RS Import)" — refine in Fleet → Vehicles.
+                            </div>
+                            <div class="mt-2" invisible="not rs_enable_drivers">
+                                <button name="action_update_car_numbers" type="object"
+                                        string="Update Vehicles from RS" class="btn-secondary"/>
+                            </div>
+                        </setting>
+                        <setting>
+                            <field name="rs_enable_stock"/>
+                            <div class="text-muted">
+                                Enable stock integration with RS.GE waybills.
+                                Seller waybills will create Delivery Orders, Buyer waybills will
+                                create Receipts.
+                            </div>
+                            <div class="mt-2" invisible="not rs_enable_stock">
+                                <label for="rs_stock_integration_date"/>
+                                <div class="text-muted">
+                                    Only waybills activated after this date will affect stock.
+                                </div>
+                                <field name="rs_stock_integration_date" required="rs_enable_stock"/>
+                            </div>
+                        </setting>
+                        <setting>
+                            <field name="rs_mapping_cutoff_date"/>
+                            <div class="text-muted">
+                                Buyer waybills created on or after this date will use the
+                                product-mapping system (auto-resolve via seller's external
+                                barcode, ask user to map unknown ones).
+                                Older waybills are left untouched.
+                            </div>
+                        </setting>
+
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_rs_waybill_settings" model="ir.actions.act_window">
+        <field name="name">RS.GE Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">main</field>
+        <field name="context">{'module': 'rs_waybill'}</field>
+    </record>
+
+</odoo>

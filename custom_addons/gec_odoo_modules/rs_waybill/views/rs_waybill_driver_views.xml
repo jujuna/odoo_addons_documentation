@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_rs_drivers_fleet" model="ir.actions.act_window">
+        <field name="name">Car Plates</field>
+        <field name="res_model">fleet.vehicle</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No car plates yet.</p>
+            <p>Vehicles imported from RS.GE appear here. Use the <strong>Update Vehicles from RS</strong>
+            button in Settings → RS.GE to import.</p>
+        </field>
+    </record>
+
+    <record id="fleet_vehicle_form_inherit_rs" model="ir.ui.view">
+        <field name="name">fleet.vehicle.form.inherit.rs</field>
+        <field name="model">fleet.vehicle</field>
+        <field name="inherit_id" ref="fleet.fleet_vehicle_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_rs_send_car_number" type="object" string="Send to RS.GE"
+                        class="btn-secondary" invisible="not license_plate"/>
+            </xpath>
+            <xpath expr="//field[@name='driver_id']" position="after">
+                <field name="driver_vat" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="res_partner_form_inherit_rs" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.rs</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="rs_is_driver"/>
+                <field name="rs_is_foreigner" invisible="not rs_is_driver"/>
+                <field name="rs_name_locked" invisible="not rs_is_driver"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="fleet_vehicle_list_inherit_rs" model="ir.ui.view">
+        <field name="name">fleet.vehicle.list.inherit.rs</field>
+        <field name="model">fleet.vehicle</field>
+        <field name="inherit_id" ref="fleet.fleet_vehicle_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='driver_id']" position="after">
+                <field name="driver_vat" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="fleet_vehicle_search_inherit_rs" model="ir.ui.view">
+        <field name="name">fleet.vehicle.search.inherit.rs</field>
+        <field name="model">fleet.vehicle</field>
+        <field name="inherit_id" ref="fleet.fleet_vehicle_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="driver_vat" string="Driver TIN"/>
+            </xpath>
+        </field>
+    </record>
+    
+
+</odoo>

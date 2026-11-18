@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_payroll_benefit_view_list" model="ir.ui.view">
+        <field name="name">hr.payroll.benefit.list</field>
+        <field name="model">hr.payroll.benefit</field>
+        <field name="arch" type="xml">
+            <list string="Benefits &amp; Deductions">
+                <field name="name"/>
+                <field name="recurrence"/>
+                <field name="pay_mode"/>
+                <field name="advance" optional="hide"/>
+                <field name="partner_id" optional="show"/>
+                <field name="company_amount"/>
+                <field name="employee_amount"/>
+                <field name="employee_count" string="Employees"/>
+                <field name="date_from"/>
+                <field name="date_to" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_payroll_benefit_view_form" model="ir.ui.view">
+        <field name="name">hr.payroll.benefit.form</field>
+        <field name="model">hr.payroll.benefit</field>
+        <field name="arch" type="xml">
+            <form string="Benefit / Deduction">
+                <header>
+                    <button name="action_open_assign" type="object" string="Add Employees"
+                            class="btn-primary"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. Marriage Bonus, Fitpass"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="payslip_count" invisible="not advance" readonly="locked"/>
+                            <field name="recurrence" invisible="advance"/>
+                            <field name="pay_mode"/>
+                            <field name="date_from"/>
+                            <field name="date_to" invisible="advance"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="partner_id"
+                                   invisible="advance or pay_mode != 'with_salary'" readonly="locked"/>
+                            <field name="company_amount" invisible="advance"/>
+                            <field name="employee_amount"
+                                   invisible="advance or pay_mode == 'separate'"/>
+                            <field name="advance" readonly="locked"/>
+                            <field name="employee_amount" string="Advance Total"
+                                   invisible="not advance" readonly="locked"/>
+                            <field name="active" invisible="1"/>
+                            <field name="locked" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Employees" name="employees">
+                            <field name="line_ids"
+                                   context="{'default_company_amount': company_amount, 'default_employee_amount': employee_amount}">
+                                <list editable="bottom">
+                                    <field name="employee_id"/>
+                                    <field name="company_amount"
+                                           column_invisible="parent.advance"/>
+                                    <field name="employee_amount"
+                                           column_invisible="parent.advance or parent.pay_mode == 'separate'"/>
+                                    <field name="employee_amount" string="Advance Total"
+                                           column_invisible="not parent.advance" readonly="payslip_id"/>
+                                    <field name="date_from" optional="hide"/>
+                                    <field name="date_to" optional="hide"/>
+                                    <field name="state"/>
+                                    <field name="payslip_id" optional="hide"/>
+                                    <field name="payslip_ids" widget="many2many_tags"
+                                           optional="hide"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="active" column_invisible="1"/>
+                                    <field name="payslip_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Conditions" name="conditions">
+                            <field name="note" placeholder="Business conditions for this benefit..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_payroll_benefit_view_search" model="ir.ui.view">
+        <field name="name">hr.payroll.benefit.search</field>
+        <field name="model">hr.payroll.benefit</field>
+        <field name="arch" type="xml">
+            <search string="Benefits &amp; Deductions">
+                <field name="name"/>
+                <field name="line_ids" string="Employee"/>
+                <filter name="filter_with_salary" string="With Salary"
+                        domain="[('pay_mode', '=', 'with_salary')]"/>
+                <filter name="filter_separate" string="Separate Payment"
+                        domain="[('pay_mode', '=', 'separate')]"/>
+                <separator/>
+                <filter name="filter_once" string="One Time" domain="[('recurrence', '=', 'once')]"/>
+                <filter name="filter_monthly" string="Monthly" domain="[('recurrence', '=', 'monthly')]"/>
+                <separator/>
+                <filter name="filter_archived" string="Archived" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hr_payroll_benefit" model="ir.actions.act_window">
+        <field name="name">Benefits &amp; Deductions</field>
+        <field name="res_model">hr.payroll.benefit</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a benefit or deduction program</p>
+            <p>Set the amounts, pick the employees, and payroll picks it up automatically:
+               one-time or monthly, paid with the salary or as a separate payment,
+               financed by the company, the employee, or both.</p>
+        </field>
+    </record>
+
+    <record id="hr_payroll_benefit_assign_view_form" model="ir.ui.view">
+        <field name="name">hr.payroll.benefit.assign.form</field>
+        <field name="model">hr.payroll.benefit.assign</field>
+        <field name="arch" type="xml">
+            <form string="Add Employees">
+                <group>
+                    <field name="benefit_id" invisible="1"/>
+                    <field name="company_id" invisible="1"/>
+                    <field name="employee_ids" widget="many2many_tags"
+                           domain="[('company_id', '=', company_id)]"/>
+                </group>
+                <footer>
+                    <button name="action_assign" type="object" string="Add" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_payroll_benefit_payrun_view_form" model="ir.ui.view">
+        <field name="name">hr.payroll.benefit.payrun.form</field>
+        <field name="model">hr.payroll.benefit.payrun</field>
+        <field name="arch" type="xml">
+            <form string="Pay Benefits">
+                <group>
+                    <field name="name"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="date_start"/>
+                    <field name="date_end"/>
+                </group>
+                <footer>
+                    <button name="action_generate" type="object" string="Generate Payslips"
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hr_payroll_benefit_payrun" model="ir.actions.act_window">
+        <field name="name">Pay Benefits</field>
+        <field name="res_model">hr.payroll.benefit.payrun</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_hr_payroll_benefit" name="Benefits &amp; Deductions"
+              parent="hr_payroll.menu_hr_payroll_root"
+              action="action_hr_payroll_benefit" sequence="46"
+              groups="hr_payroll.group_hr_payroll_user"/>
+    <menuitem id="menu_hr_payroll_benefit_payrun" name="Pay Benefits"
+              parent="hr_payroll.menu_hr_payroll_root"
+              action="action_hr_payroll_benefit_payrun" sequence="47"
+              groups="hr_payroll.group_hr_payroll_user"/>
+</odoo>

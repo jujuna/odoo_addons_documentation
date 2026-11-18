@@ -1,0 +1,574 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="demo_tag_customer" model="business.process.tag">
+        <field name="name">Customer facing</field>
+        <field name="color">4</field>
+    </record>
+    <record id="demo_tag_iso" model="business.process.tag">
+        <field name="name">ISO 9001</field>
+        <field name="color">10</field>
+    </record>
+    <record id="demo_process_returns" model="business.process">
+        <field name="name">Return of Rejected Goods</field>
+        <field name="code">SCM-07</field>
+        <field name="category">core</field>
+        <field name="level">2</field>
+        <field name="tag_ids" eval="[(6, 0, [ref('demo_tag_customer'), ref('demo_tag_iso')])]"/>
+        <field name="trigger">A customer asks to return a delivered product</field>
+        <field name="supplier">Customer, carrier</field>
+        <field name="customer">Customer, accounting</field>
+        <field name="process_input">Return form, original invoice, returned product</field>
+        <field name="process_output">Refund or replacement, restocked or scrapped product</field>
+        <field name="ack_required" eval="True"/>
+        <field name="state">published</field>
+        <field name="description"><![CDATA[<p>How a product returned by a customer is registered, inspected and refunded.</p>]]></field>
+        <field name="bpmn_xml"><![CDATA[<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:odoo="http://gecbusiness.com/schema/bpmn/odoo/1.0" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Odoo BPMN Process Management" exporterVersion="1.0">
+  <bpmn:collaboration id="Collaboration_1">
+    <bpmn:participant id="Participant_1" processRef="Process_1" name="Returns handling"/>
+  </bpmn:collaboration>
+  <bpmn:process id="Process_1" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_2" name="Sales">
+        <bpmn:flowNodeRef>StartEvent_10</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_11</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_12</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_15</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_16</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_3" name="Warehouse">
+        <bpmn:flowNodeRef>Activity_13</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_14</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_17</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="StartEvent_10" name="Return requested">
+      <bpmn:outgoing>Flow_30</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="EventDefinition_10"/>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Activity_11" name="Register return request">
+      <bpmn:documentation>Record the return in the customer file within 1 working day.
+Check the delivery date: returns are accepted within 14 days.
+Attach the customer's return form.</bpmn:documentation><bpmn:extensionElements><odoo:link linkType="menu" xmlid="mail.menu_root_discuss" label="Discuss"/><odoo:link linkType="url" url="https://www.omg.org/spec/BPMN/2.0/" label="BPMN 2.0 specification"/></bpmn:extensionElements><bpmn:incoming>Flow_30</bpmn:incoming>
+      <bpmn:outgoing>Flow_31</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_37">
+        <bpmn:targetRef>DataObjectReference_18</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:userTask>
+    <bpmn:dataObjectReference id="DataObjectReference_18" name="Return form" dataObjectRef="DataObject_18"/>
+    <bpmn:dataObject id="DataObject_18"/>
+    <bpmn:manualTask id="Activity_13" name="Inspect product">
+      <bpmn:documentation>Inspect the returned product within 2 days.
+If the product is damaged by the customer, document it with photos.</bpmn:documentation><bpmn:incoming>Flow_32</bpmn:incoming>
+      <bpmn:outgoing>Flow_34</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:exclusiveGateway id="Gateway_12" name="Inspection needed?">
+      <bpmn:incoming>Flow_31</bpmn:incoming>
+      <bpmn:outgoing>Flow_32</bpmn:outgoing>
+      <bpmn:outgoing>Flow_33</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:boundaryEvent id="Event_14" name="2 days" attachedToRef="Activity_13">
+      <bpmn:outgoing>Flow_36</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="EventDefinition_14"/>
+    </bpmn:boundaryEvent>
+    <bpmn:serviceTask id="Activity_15" name="Refund customer">
+      <bpmn:documentation>Issue the refund to the original payment method.</bpmn:documentation><bpmn:extensionElements><odoo:link linkType="menu" xmlid="base.menu_action_res_users" label="Users"/></bpmn:extensionElements><bpmn:incoming>Flow_33</bpmn:incoming>
+      <bpmn:incoming>Flow_34</bpmn:incoming>
+      <bpmn:outgoing>Flow_35</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_17" name="Escalated">
+      <bpmn:incoming>Flow_36</bpmn:incoming>
+      <bpmn:escalationEventDefinition id="EventDefinition_17"/>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="EndEvent_16" name="Return closed">
+      <bpmn:incoming>Flow_35</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_30" sourceRef="StartEvent_10" targetRef="Activity_11"/>
+    <bpmn:sequenceFlow id="Flow_31" sourceRef="Activity_11" targetRef="Gateway_12"/>
+    <bpmn:sequenceFlow id="Flow_32" sourceRef="Gateway_12" targetRef="Activity_13" name="Yes"/>
+    <bpmn:sequenceFlow id="Flow_33" sourceRef="Gateway_12" targetRef="Activity_15" name="No"/>
+    <bpmn:sequenceFlow id="Flow_34" sourceRef="Activity_13" targetRef="Activity_15"/>
+    <bpmn:sequenceFlow id="Flow_35" sourceRef="Activity_15" targetRef="EndEvent_16"/>
+    <bpmn:sequenceFlow id="Flow_36" sourceRef="Event_14" targetRef="EndEvent_17"/>
+    <bpmn:textAnnotation id="TextAnnotation_19">
+      <bpmn:text>Within 14 days of delivery</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_38" sourceRef="TextAnnotation_19" targetRef="StartEvent_10"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1">
+      <bpmndi:BPMNShape id="Participant_1_di" bpmnElement="Participant_1" isHorizontal="true">
+        <dc:Bounds x="47" y="96" width="961" height="480"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_2_di" bpmnElement="Lane_2" isHorizontal="true">
+        <dc:Bounds x="77" y="96" width="931" height="240"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_3_di" bpmnElement="Lane_3" isHorizontal="true">
+        <dc:Bounds x="77" y="336" width="931" height="240"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_10_di" bpmnElement="StartEvent_10">
+        <dc:Bounds x="125" y="197" width="38" height="38"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_11_di" bpmnElement="Activity_11">
+        <dc:Bounds x="230" y="178" width="115" height="77"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_12_di" bpmnElement="Gateway_12" isMarkerVisible="true">
+        <dc:Bounds x="432" y="187" width="58" height="58"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_13_di" bpmnElement="Activity_13">
+        <dc:Bounds x="403" y="418" width="115" height="77"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_15_di" bpmnElement="Activity_15">
+        <dc:Bounds x="576" y="178" width="115" height="77"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_16_di" bpmnElement="EndEvent_16">
+        <dc:Bounds x="749" y="197" width="38" height="38"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_17_di" bpmnElement="EndEvent_17">
+        <dc:Bounds x="653" y="509" width="38" height="38"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_18_di" bpmnElement="DataObjectReference_18">
+        <dc:Bounds x="269" y="406" width="38" height="53"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_19_di" bpmnElement="TextAnnotation_19">
+        <dc:Bounds x="77" y="106" width="134" height="38"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_14_di" bpmnElement="Event_14">
+        <dc:Bounds x="482" y="478" width="34" height="34"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_30_di" bpmnElement="Flow_30">
+        <di:waypoint x="163" y="216"/>
+        <di:waypoint x="230" y="216"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_31_di" bpmnElement="Flow_31">
+        <di:waypoint x="346" y="216"/>
+        <di:waypoint x="432" y="216"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_32_di" bpmnElement="Flow_32">
+        <di:waypoint x="461" y="245"/>
+        <di:waypoint x="461" y="418"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_33_di" bpmnElement="Flow_33">
+        <di:waypoint x="490" y="216"/>
+        <di:waypoint x="576" y="216"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_34_di" bpmnElement="Flow_34">
+        <di:waypoint x="518" y="456"/>
+        <di:waypoint x="547" y="456"/>
+        <di:waypoint x="547" y="216"/>
+        <di:waypoint x="576" y="216"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_35_di" bpmnElement="Flow_35">
+        <di:waypoint x="691" y="216"/>
+        <di:waypoint x="749" y="216"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_36_di" bpmnElement="Flow_36">
+        <di:waypoint x="516" y="494"/>
+        <di:waypoint x="584" y="494"/>
+        <di:waypoint x="584" y="528"/>
+        <di:waypoint x="653" y="528"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_37_di" bpmnElement="DataOutputAssociation_37">
+        <di:waypoint x="288" y="254"/>
+        <di:waypoint x="288" y="406"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_38_di" bpmnElement="Association_38">
+        <di:waypoint x="144" y="144"/>
+        <di:waypoint x="144" y="197"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>]]></field>
+    </record>
+    <record id="demo_process_sales_draft" model="business.process">
+        <field name="name">Sales Order Handling (imported from draw.io)</field>
+        <field name="code">SAL-01</field>
+        <field name="category">core</field>
+        <field name="level">2</field>
+        <field name="tag_ids" eval="[(6, 0, [ref('demo_tag_customer')])]"/>
+        <field name="state">draft</field>
+        <field name="description"><![CDATA[<p>Imported from a draw.io swimlane diagram: lanes still need a department.</p>]]></field>
+        <field name="bpmn_xml"><![CDATA[<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:odoo="http://gecbusiness.com/schema/bpmn/odoo/1.0" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Odoo BPMN Process Management" exporterVersion="1.0">
+  <bpmn:collaboration id="Collaboration_1">
+    <bpmn:participant id="Participant_pool_1" processRef="Process_pool_1" name="Page-1"/>
+  </bpmn:collaboration>
+  <bpmn:process id="Process_pool_1" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_pool_1">
+      <bpmn:lane id="Lane_170" name="Inside Sales Rep">
+        <bpmn:extensionElements>
+          <odoo:review status="pending" reason="responsible_missing" source="drawio"/>
+        </bpmn:extensionElements>
+        <bpmn:flowNodeRef>Activity_171</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_172</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_173</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_183" name="Sales Admin">
+        <bpmn:extensionElements>
+          <odoo:review status="pending" reason="responsible_missing" source="drawio"/>
+        </bpmn:extensionElements>
+        <bpmn:flowNodeRef>Activity_184</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_187" name="Sales Representative">
+        <bpmn:extensionElements>
+          <odoo:review status="pending" reason="responsible_missing" source="drawio"/>
+        </bpmn:extensionElements>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_193" name="Sales Manager">
+        <bpmn:extensionElements>
+          <odoo:review status="pending" reason="responsible_missing" source="drawio"/>
+        </bpmn:extensionElements>
+        <bpmn:flowNodeRef>Activity_194</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_195</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_180" name="VP Sales">
+        <bpmn:extensionElements>
+          <odoo:review status="pending" reason="responsible_missing" source="drawio"/>
+        </bpmn:extensionElements>
+        <bpmn:flowNodeRef>Activity_181</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_182</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_176" name="Inside Sales Manager">
+        <bpmn:extensionElements>
+          <odoo:review status="pending" reason="responsible_missing" source="drawio"/>
+        </bpmn:extensionElements>
+        <bpmn:flowNodeRef>Activity_179</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_196" name="Director">
+        <bpmn:extensionElements>
+          <odoo:review status="pending" reason="responsible_missing" source="drawio"/>
+        </bpmn:extensionElements>
+        <bpmn:flowNodeRef>Activity_198</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_199</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:task id="Activity_171" name="Customer Management">
+      <bpmn:outgoing>Flow_175</bpmn:outgoing>
+      <bpmn:outgoing>Flow_202</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_204">
+        <bpmn:targetRef>DataObjectReference_188</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:task>
+    <bpmn:task id="Activity_172" name="Credit Management">
+      <bpmn:incoming>Flow_175</bpmn:incoming>
+      <bpmn:outgoing>Flow_174</bpmn:outgoing>
+      <bpmn:property id="Property_172" name="__targetRef_placeholder"/>
+      <bpmn:dataInputAssociation id="DataInputAssociation_203">
+        <bpmn:sourceRef>DataObjectReference_185</bpmn:sourceRef>
+        <bpmn:targetRef>Property_172</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:task>
+    <bpmn:task id="Activity_173" name="Price Management">
+      <bpmn:incoming>Flow_174</bpmn:incoming>
+    </bpmn:task>
+    <bpmn:task id="Activity_184" name="Material Requirements Planning Operation">
+      <bpmn:incoming>Flow_202</bpmn:incoming>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_186">
+        <bpmn:targetRef>DataObjectReference_185</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_207">
+        <bpmn:targetRef>DataObjectReference_189</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:task>
+    <bpmn:dataObjectReference id="DataObjectReference_185" name="Facilities Procurement&#10;Application" dataObjectRef="DataObject_185">
+      <bpmn:extensionElements>
+        <odoo:review status="pending" reason="type_guessed" source="drawio"/>
+      </bpmn:extensionElements>
+    </bpmn:dataObjectReference>
+    <bpmn:dataObject id="DataObject_185"/>
+    <bpmn:dataObjectReference id="DataObjectReference_188" name="Product Quotations" dataObjectRef="DataObject_188">
+      <bpmn:extensionElements>
+        <odoo:review status="pending" reason="type_guessed" source="drawio"/>
+      </bpmn:extensionElements>
+    </bpmn:dataObjectReference>
+    <bpmn:dataObject id="DataObject_188"/>
+    <bpmn:dataObjectReference id="DataObjectReference_189" name="Orders" dataObjectRef="DataObject_189">
+      <bpmn:extensionElements>
+        <odoo:review status="pending" reason="type_guessed" source="drawio"/>
+      </bpmn:extensionElements>
+    </bpmn:dataObjectReference>
+    <bpmn:dataObject id="DataObject_189"/>
+    <bpmn:dataObjectReference id="DataObjectReference_190" name="Product Delivery Notification" dataObjectRef="DataObject_190">
+      <bpmn:extensionElements>
+        <odoo:review status="pending" reason="type_guessed" source="drawio"/>
+      </bpmn:extensionElements>
+    </bpmn:dataObjectReference>
+    <bpmn:dataObject id="DataObject_190"/>
+    <bpmn:dataObjectReference id="DataObjectReference_191" name="Invoice" dataObjectRef="DataObject_191">
+      <bpmn:extensionElements>
+        <odoo:review status="pending" reason="type_guessed" source="drawio"/>
+      </bpmn:extensionElements>
+    </bpmn:dataObjectReference>
+    <bpmn:dataObject id="DataObject_191"/>
+    <bpmn:task id="Activity_194" name="Inventory Control">
+      <bpmn:outgoing>Flow_209</bpmn:outgoing>
+      <bpmn:property id="Property_194" name="__targetRef_placeholder"/>
+      <bpmn:dataInputAssociation id="DataInputAssociation_208">
+        <bpmn:sourceRef>DataObjectReference_188</bpmn:sourceRef>
+        <bpmn:targetRef>Property_194</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:task>
+    <bpmn:task id="Activity_195" name="Product Delivery">
+      <bpmn:outgoing>Flow_211</bpmn:outgoing>
+      <bpmn:outgoing>Flow_212</bpmn:outgoing>
+      <bpmn:property id="Property_195" name="__targetRef_placeholder"/>
+      <bpmn:dataInputAssociation id="DataInputAssociation_210">
+        <bpmn:sourceRef>DataObjectReference_189</bpmn:sourceRef>
+        <bpmn:targetRef>Property_195</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:task>
+    <bpmn:task id="Activity_181" name="Outbound Accounting">
+      <bpmn:incoming>Flow_209</bpmn:incoming>
+      <bpmn:incoming>Flow_211</bpmn:incoming>
+      <bpmn:outgoing>Flow_214</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_213">
+        <bpmn:targetRef>DataObjectReference_177</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:task>
+    <bpmn:task id="Activity_182" name="Account Processing">
+      <bpmn:incoming>Flow_212</bpmn:incoming>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_215">
+        <bpmn:targetRef>DataObjectReference_178</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:task>
+    <bpmn:task id="Activity_179" name="Cost Allocation">
+      <bpmn:incoming>Flow_214</bpmn:incoming>
+      <bpmn:outgoing>Flow_216</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:dataObjectReference id="DataObjectReference_177" name="Sales Contract" dataObjectRef="DataObject_177">
+      <bpmn:extensionElements>
+        <odoo:review status="pending" reason="type_guessed" source="drawio"/>
+      </bpmn:extensionElements>
+    </bpmn:dataObjectReference>
+    <bpmn:dataObject id="DataObject_177"/>
+    <bpmn:dataObjectReference id="DataObjectReference_178" name="Bills" dataObjectRef="DataObject_178">
+      <bpmn:extensionElements>
+        <odoo:review status="pending" reason="type_guessed" source="drawio"/>
+      </bpmn:extensionElements>
+    </bpmn:dataObjectReference>
+    <bpmn:dataObject id="DataObject_178"/>
+    <bpmn:task id="Activity_198" name="Resources Allocation">
+      <bpmn:outgoing>Flow_200</bpmn:outgoing>
+      <bpmn:property id="Property_198" name="__targetRef_placeholder"/>
+      <bpmn:dataInputAssociation id="DataInputAssociation_201">
+        <bpmn:sourceRef>DataObjectReference_197</bpmn:sourceRef>
+        <bpmn:targetRef>Property_198</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:task>
+    <bpmn:task id="Activity_199" name="Long Term Strategy">
+      <bpmn:incoming>Flow_200</bpmn:incoming>
+      <bpmn:incoming>Flow_216</bpmn:incoming>
+    </bpmn:task>
+    <bpmn:dataObjectReference id="DataObjectReference_197" name="Outbounding Management" dataObjectRef="DataObject_197">
+      <bpmn:extensionElements>
+        <odoo:review status="pending" reason="type_guessed" source="drawio"/>
+      </bpmn:extensionElements>
+    </bpmn:dataObjectReference>
+    <bpmn:dataObject id="DataObject_197"/>
+    <bpmn:sequenceFlow id="Flow_174" sourceRef="Activity_172" targetRef="Activity_173"/>
+    <bpmn:sequenceFlow id="Flow_175" sourceRef="Activity_171" targetRef="Activity_172"/>
+    <bpmn:sequenceFlow id="Flow_200" sourceRef="Activity_198" targetRef="Activity_199"/>
+    <bpmn:sequenceFlow id="Flow_202" sourceRef="Activity_171" targetRef="Activity_184"/>
+    <bpmn:sequenceFlow id="Flow_209" sourceRef="Activity_194" targetRef="Activity_181"/>
+    <bpmn:sequenceFlow id="Flow_211" sourceRef="Activity_195" targetRef="Activity_181"/>
+    <bpmn:sequenceFlow id="Flow_212" sourceRef="Activity_195" targetRef="Activity_182"/>
+    <bpmn:sequenceFlow id="Flow_214" sourceRef="Activity_181" targetRef="Activity_179"/>
+    <bpmn:sequenceFlow id="Flow_216" sourceRef="Activity_179" targetRef="Activity_199"/>
+    <bpmn:association id="Association_192" sourceRef="DataObjectReference_190" targetRef="DataObjectReference_191"/>
+    <bpmn:association id="Association_205" sourceRef="DataObjectReference_185" targetRef="DataObjectReference_190"/>
+    <bpmn:association id="Association_206" sourceRef="DataObjectReference_191" targetRef="DataObjectReference_178"/>
+    <bpmn:association id="Association_217" sourceRef="DataObjectReference_177" targetRef="DataObjectReference_197"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1">
+      <bpmndi:BPMNShape id="Participant_pool_1_di" bpmnElement="Participant_pool_1" isHorizontal="false">
+        <dc:Bounds x="24" y="58" width="1120" height="680"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_170_di" bpmnElement="Lane_170" isHorizontal="false">
+        <dc:Bounds x="24" y="88" width="160" height="650"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_183_di" bpmnElement="Lane_183" isHorizontal="false">
+        <dc:Bounds x="184" y="88" width="160" height="650"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_187_di" bpmnElement="Lane_187" isHorizontal="false">
+        <dc:Bounds x="344" y="88" width="160" height="650"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_193_di" bpmnElement="Lane_193" isHorizontal="false">
+        <dc:Bounds x="504" y="88" width="160" height="650"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_180_di" bpmnElement="Lane_180" isHorizontal="false">
+        <dc:Bounds x="664" y="88" width="160" height="650"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_176_di" bpmnElement="Lane_176" isHorizontal="false">
+        <dc:Bounds x="824" y="88" width="160" height="650"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_196_di" bpmnElement="Lane_196" isHorizontal="false">
+        <dc:Bounds x="984" y="88" width="160" height="650"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_171_di" bpmnElement="Activity_171">
+        <dc:Bounds x="44" y="148" width="120" height="60"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_172_di" bpmnElement="Activity_172">
+        <dc:Bounds x="44" y="464" width="120" height="60"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_173_di" bpmnElement="Activity_173">
+        <dc:Bounds x="44" y="574" width="120" height="60"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_177_di" bpmnElement="DataObjectReference_177">
+        <dc:Bounds x="886" y="154" width="36" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_178_di" bpmnElement="DataObjectReference_178">
+        <dc:Bounds x="886" y="634" width="36" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_179_di" bpmnElement="Activity_179">
+        <dc:Bounds x="844" y="394" width="120" height="60"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_181_di" bpmnElement="Activity_181">
+        <dc:Bounds x="684" y="248" width="120" height="60"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_182_di" bpmnElement="Activity_182">
+        <dc:Bounds x="684" y="508" width="120" height="60"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_184_di" bpmnElement="Activity_184">
+        <dc:Bounds x="204" y="254" width="120" height="60"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_185_di" bpmnElement="DataObjectReference_185">
+        <dc:Bounds x="246" y="368" width="36" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_188_di" bpmnElement="DataObjectReference_188">
+        <dc:Bounds x="406" y="154" width="36" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_189_di" bpmnElement="DataObjectReference_189">
+        <dc:Bounds x="406" y="328" width="36" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_190_di" bpmnElement="DataObjectReference_190">
+        <dc:Bounds x="406" y="504" width="36" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_191_di" bpmnElement="DataObjectReference_191">
+        <dc:Bounds x="406" y="624" width="36" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_194_di" bpmnElement="Activity_194">
+        <dc:Bounds x="524" y="248" width="120" height="60"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_195_di" bpmnElement="Activity_195">
+        <dc:Bounds x="524" y="404" width="120" height="60"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_197_di" bpmnElement="DataObjectReference_197">
+        <dc:Bounds x="1046" y="234" width="36" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_198_di" bpmnElement="Activity_198">
+        <dc:Bounds x="1004" y="344" width="120" height="60"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_199_di" bpmnElement="Activity_199">
+        <dc:Bounds x="1004" y="488" width="120" height="60"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_174_di" bpmnElement="Flow_174">
+        <di:waypoint x="104" y="524"/>
+        <di:waypoint x="104" y="574"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_175_di" bpmnElement="Flow_175">
+        <di:waypoint x="104" y="208"/>
+        <di:waypoint x="104" y="464"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_186_di" bpmnElement="DataOutputAssociation_186">
+        <di:waypoint x="264" y="314"/>
+        <di:waypoint x="264" y="368"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_192_di" bpmnElement="Association_192">
+        <di:waypoint x="413" y="554"/>
+        <di:waypoint x="398" y="590"/>
+        <di:waypoint x="413" y="624"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_200_di" bpmnElement="Flow_200">
+        <di:waypoint x="1064" y="404"/>
+        <di:waypoint x="1064" y="488"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataInputAssociation_201_di" bpmnElement="DataInputAssociation_201">
+        <di:waypoint x="1064" y="284"/>
+        <di:waypoint x="1064" y="344"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_202_di" bpmnElement="Flow_202">
+        <di:waypoint x="150" y="208"/>
+        <di:waypoint x="219" y="254"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataInputAssociation_203_di" bpmnElement="DataInputAssociation_203">
+        <di:waypoint x="257" y="418"/>
+        <di:waypoint x="234" y="494"/>
+        <di:waypoint x="164" y="494"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_204_di" bpmnElement="DataOutputAssociation_204">
+        <di:waypoint x="164" y="178"/>
+        <di:waypoint x="406" y="178"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_205_di" bpmnElement="Association_205">
+        <di:waypoint x="259" y="418"/>
+        <di:waypoint x="234" y="528"/>
+        <di:waypoint x="406" y="528"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_206_di" bpmnElement="Association_206">
+        <di:waypoint x="442" y="648"/>
+        <di:waypoint x="886" y="648"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_207_di" bpmnElement="DataOutputAssociation_207">
+        <di:waypoint x="324" y="310"/>
+        <di:waypoint x="406" y="346"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataInputAssociation_208_di" bpmnElement="DataInputAssociation_208">
+        <di:waypoint x="442" y="190"/>
+        <di:waypoint x="536" y="248"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_209_di" bpmnElement="Flow_209">
+        <di:waypoint x="644" y="278"/>
+        <di:waypoint x="684" y="278"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataInputAssociation_210_di" bpmnElement="DataInputAssociation_210">
+        <di:waypoint x="419" y="378"/>
+        <di:waypoint x="404" y="438"/>
+        <di:waypoint x="524" y="435"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_211_di" bpmnElement="Flow_211">
+        <di:waypoint x="615" y="404"/>
+        <di:waypoint x="714" y="308"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_212_di" bpmnElement="Flow_212">
+        <di:waypoint x="630" y="464"/>
+        <di:waypoint x="699" y="508"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_213_di" bpmnElement="DataOutputAssociation_213">
+        <di:waypoint x="744" y="248"/>
+        <di:waypoint x="744" y="178"/>
+        <di:waypoint x="886" y="178"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_214_di" bpmnElement="Flow_214">
+        <di:waypoint x="778" y="308"/>
+        <di:waypoint x="871" y="394"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_215_di" bpmnElement="DataOutputAssociation_215">
+        <di:waypoint x="784" y="568"/>
+        <di:waypoint x="886" y="645"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_216_di" bpmnElement="Flow_216">
+        <di:waypoint x="955" y="454"/>
+        <di:waypoint x="1014" y="488"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_217_di" bpmnElement="Association_217">
+        <di:waypoint x="922" y="188"/>
+        <di:waypoint x="1046" y="250"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
+]]></field>
+    </record>
+    <record id="demo_kpi_returns_time" model="business.process.kpi">
+        <field name="process_id" ref="demo_process_returns"/>
+        <field name="name">Returns refunded within 5 working days</field>
+        <field name="target">&gt;= 95 %</field>
+        <field name="frequency">monthly</field>
+        <field name="source">Accounting: credit notes report</field>
+    </record>
+    <record id="demo_kpi_returns_rate" model="business.process.kpi">
+        <field name="process_id" ref="demo_process_returns"/>
+        <field name="name">Return rate</field>
+        <field name="target">&lt; 2 % of deliveries</field>
+        <field name="frequency">quarterly</field>
+    </record>
+</odoo>

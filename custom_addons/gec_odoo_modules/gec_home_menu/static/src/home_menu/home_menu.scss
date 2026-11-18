@@ -1,0 +1,281 @@
+.o_gec_home_menu {
+    .o_gec_hm_header {
+        display: grid;
+        grid-template-columns: 1fr minmax(0, 36rem) 1fr;
+        align-items: center;
+        background-color: rgba($o-webclient-background-color, .85);
+        -webkit-backdrop-filter: blur(.5rem);
+        backdrop-filter: blur(.5rem);
+
+        @include media-breakpoint-down(md) {
+            grid-template-columns: 1fr auto;
+        }
+    }
+
+    .o_gec_hm_search {
+        grid-column: 2;
+
+        @include media-breakpoint-down(md) {
+            grid-column: 1;
+        }
+    }
+
+    .o_gec_hm_actions {
+        grid-column: 3;
+        justify-self: end;
+
+        @include media-breakpoint-down(md) {
+            grid-column: 2;
+        }
+    }
+
+    .o_gec_hm_search_icon {
+        inset-inline-start: map-get($spacers, 3);
+        color: $o-gray-600;
+        pointer-events: none;
+    }
+
+    .o_gec_hm_search_input {
+        padding-inline-start: 2.75rem;
+        background-color: $o-view-background-color;
+        border: $border-width solid $o-gray-300;
+        box-shadow: 0 .25rem 1rem rgba(0, 0, 0, .06);
+    }
+
+    .o_gec_hm_control {
+        color: $o-main-text-color;
+    }
+
+    .o_gec_hm_container {
+        width: 100%;
+        max-width: 72rem;
+        margin-inline: auto;
+    }
+
+    .o_gec_hm_card {
+        background-color: rgba($o-view-background-color, .6);
+        border: $border-width solid $o-gray-300;
+        border-radius: $border-radius-lg;
+        padding: map-get($spacers, 2) * 1.5;
+        margin-bottom: map-get($spacers, 2) * 1.5;
+
+        .o_app .o_caption {
+            text-shadow: none;
+        }
+    }
+
+    .o_gec_hm_card_pinned {
+        max-width: 100%;
+    }
+
+    .o_gec_hm_masonry {
+        display: flex;
+        gap: map-get($spacers, 2) * 1.5;
+        align-items: flex-start;
+    }
+
+    .o_gec_hm_masonry_col {
+        flex: 1 1 0;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: map-get($spacers, 2) * 1.5;
+
+        > .o_gec_hm_card {
+            margin-bottom: 0;
+        }
+    }
+
+    .o_gec_hm_customizing .o_gec_hm_masonry_col {
+        min-height: 6rem;
+    }
+
+    .o_gec_hm_title {
+        font-size: $font-size-sm;
+        font-weight: $font-weight-bold;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: $o-gray-600;
+        margin-bottom: map-get($spacers, 2);
+    }
+
+    .o_gec_hm_group_card {
+        transition: box-shadow .2s ease, transform .2s ease;
+
+        .o_gec_hm_title {
+            display: flex;
+            align-items: center;
+            gap: map-get($spacers, 1);
+        }
+
+        &.o_dragged {
+            background-color: $o-view-background-color;
+            box-shadow: $box-shadow-lg;
+            transform: rotate(1deg) scale(1.02);
+        }
+
+        &.o_gec_hm_placeholder {
+            position: relative;
+
+            &::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                visibility: visible; // sortable hides the placeholder with an inline style
+                border: 2px dashed rgba($o-action, .35);
+                border-radius: $border-radius-lg;
+                background-color: rgba($o-action, .06);
+            }
+        }
+    }
+
+    &:has(.o_gec_hm_group_card.o_dragged) * {
+        cursor: inherit;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .o_gec_hm_group_card {
+            transition: none;
+        }
+    }
+
+    .o_gec_hm_drag_icon {
+        color: $o-gray-500;
+    }
+
+    &:not(:has(.o_gec_hm_group_card.o_dragged)) .o_gec_hm_customizing .o_gec_hm_group_card .o_gec_hm_title {
+        cursor: grab;
+    }
+
+    .o_gec_hm_tile {
+        width: 7.25rem;
+
+        .o_app:focus-visible {
+            outline: 1px solid $o-action;
+        }
+
+        .o_app .o_app_icon {
+            width: 3.5rem;
+            padding: map-get($spacers, 2);
+
+            .oi {
+                font-size: 1.75rem;
+            }
+        }
+    }
+
+    .o_gec_hm_caption {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        overflow: hidden;
+        white-space: normal;
+        overflow-wrap: break-word;
+        font-size: $font-size-sm;
+        line-height: 1.25;
+    }
+
+    .o_gec_hm_pin {
+        color: $o-gray-500;
+
+        &:hover,
+        &:focus-visible,
+        &.o_gec_hm_pinned {
+            color: $o-warning;
+        }
+    }
+
+    .o_gec_hm_badge {
+        min-width: 1.25rem;
+        height: 1.25rem;
+        padding-inline: map-get($spacers, 1);
+        margin: map-get($spacers, 1);
+        justify-content: center;
+        gap: map-get($spacers, 1);
+        background-color: $o-gray-300;
+        color: $o-main-text-color;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-bold;
+        line-height: 1;
+    }
+
+    .o_gec_hm_badge_dot {
+        width: .5rem;
+        height: .5rem;
+        background-color: $o-danger;
+    }
+
+    .o_gec_hm_results {
+        max-width: 48rem;
+        margin-inline: auto;
+    }
+
+    .o_gec_hm_result {
+        color: $o-main-text-color;
+
+        &:focus-visible {
+            outline: 1px solid $o-action;
+        }
+
+        &:hover,
+        &.o_focused {
+            background-color: rgba($o-action, .08);
+        }
+    }
+
+    .o_gec_hm_result_group .o_gec_hm_result {
+        padding-inline-start: map-get($spacers, 5);
+    }
+
+    .o_gec_hm_result_icon {
+        width: 1.5rem;
+        height: 1.5rem;
+        flex: 0 0 auto;
+
+        .oi {
+            font-size: 1rem;
+        }
+    }
+}
+
+html:has(.o_gec_home_menu .o_gec_hm_group_card.o_dragged) {
+    cursor: grabbing;
+}
+
+.o_touch_device .o_gec_home_menu .o_gec_hm_container {
+    min-height: 100vh;
+}
+
+.o_home_menu_background_custom .o_gec_home_menu {
+    .o_gec_hm_header {
+        background-color: transparent;
+    }
+
+    .o_gec_hm_card,
+    .o_gec_hm_results,
+    .o_gec_hm_all,
+    .o_gec_hm_customize_hint,
+    .o_gec_hm_header .o_gec_hm_actions {
+        background-color: rgba($o-view-background-color, .9);
+        border-radius: $border-radius-lg;
+    }
+
+    .o_gec_hm_results,
+    .o_gec_hm_all {
+        padding: map-get($spacers, 3);
+    }
+
+    .o_gec_hm_customize_hint {
+        width: fit-content;
+        margin-inline: auto;
+        padding: map-get($spacers, 2) map-get($spacers, 3);
+    }
+
+    .o_gec_hm_card .o_app .o_caption,
+    .o_gec_hm_all .o_app .o_caption,
+    .o_gec_hm_results .o_app .o_caption {
+        color: $o-main-text-color;
+        text-shadow: none;
+    }
+}

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="rule_parameter_gec_ge_pit_rate" model="hr.rule.parameter">
+            <field name="name">GE: Income Tax Rate (%)</field>
+            <field name="code">gec_ge_pit_rate</field>
+            <field name="description">Rate of the income tax withheld on salaries (Tax Code, art. 81).</field>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_parameter_gec_ge_pit_rate_2019_01" model="hr.rule.parameter.value">
+            <field name="parameter_value">20</field>
+            <field name="rule_parameter_id" ref="rule_parameter_gec_ge_pit_rate"/>
+            <field name="date_from" eval="datetime(2019, 1, 1).date()"/>
+        </record>
+
+        <record id="rule_parameter_gec_ge_pension_rates" model="hr.rule.parameter">
+            <field name="name">GE: Funded Pension Rates (%)</field>
+            <field name="code">gec_ge_pension_rates</field>
+            <field name="description">Shares of the funded pension contribution withheld from the employee and paid by the employer (Law on Funded Pensions).</field>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_parameter_gec_ge_pension_rates_2019_01" model="hr.rule.parameter.value">
+            <field name="parameter_value">{'employee': 2, 'employer': 2}</field>
+            <field name="rule_parameter_id" ref="rule_parameter_gec_ge_pension_rates"/>
+            <field name="date_from" eval="datetime(2019, 1, 1).date()"/>
+        </record>
+    </data>
+</odoo>

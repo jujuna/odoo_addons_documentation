@@ -1,0 +1,16 @@
+.o_rms_waterfall {
+    display: grid;
+    grid-template-columns: minmax(4rem, 11rem) 1fr auto;
+    align-items: center;
+    gap: 4px 8px;
+    font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
+    .o_rms_wf_label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .o_rms_wf_track { position: relative; height: 8px; border-radius: 4px; background: var(--rms-subtle); }
+    .o_rms_wf_bar { position: absolute; top: 0; bottom: 0; min-width: 3px; border-radius: 4px; }
+    .o_rms_wf_base { background: var(--rms-muted); }
+    .o_rms_wf_total { background: var(--rms-accent); }
+    .o_rms_wf_up { background: var(--rms-success); }
+    .o_rms_wf_down { background: var(--rms-danger); }
+    .o_rms_wf_amount { text-align: end; }
+}

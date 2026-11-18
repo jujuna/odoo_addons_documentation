@@ -1,0 +1,649 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-name="bsc_strategy.StrategyMap">
+    <div class="o_bsc_map o_action">
+        <div class="o_bsc_map_bar">
+            <div class="o_bsc_map_bar_left">
+                <select class="form-select form-select-sm o_bsc_map_select"
+                        t-on-change="this.onScorecardChange">
+                    <t t-foreach="this.state.scorecards" t-as="card" t-key="card.id">
+                        <option t-att-value="card.id"
+                                t-att-selected="card.id === this.state.scorecardId">
+                            <t t-out="card.name"/>
+                            <t t-if="card.state !== 'active'"> (<t t-out="card.state_label"/>)</t>
+                        </option>
+                    </t>
+                </select>
+                <t t-if="this.state.data">
+                    <span class="o_bsc_map_index">
+                        <t t-out="this.fmt(this.state.data.scorecard.score)"/>%
+                    </span>
+                    <span t-attf-class="badge o_bsc_badge_{{this.state.data.scorecard.status}}">
+                        <t t-out="this.state.data.scorecard.status_label"/>
+                    </span>
+                    <span class="text-muted ms-2" t-if="this.state.data.scorecard.period">
+                        <t t-out="this.state.data.scorecard.period"/> ·
+                        <t t-out="this.fmt(this.state.data.scorecard.completion)"/>% reported
+                    </span>
+                </t>
+            </div>
+            <div class="o_bsc_map_bar_right">
+                <t t-if="this.counts">
+                    <span class="text-muted me-3">
+                        <t t-out="this.counts.objectives"/> objectives ·
+                        <t t-out="this.counts.links"/> links ·
+                        <strong t-if="this.counts.unvalidated"
+                                class="text-warning"><t t-out="this.counts.unvalidated"/> unproven</strong>
+                        <strong t-if="!this.counts.unvalidated and this.counts.links"
+                                class="text-success">all validated</strong>
+                    </span>
+                    <button class="btn btn-sm me-2" t-on-click="this.toggleDim"
+                            t-att-class="this.state.dimUnvalidated ? 'btn-primary' : 'btn-secondary'">
+                        Highlight proven links
+                    </button>
+                    <button class="btn btn-sm btn-secondary me-2" t-on-click="this.togglePanel"
+                            t-att-title="this.panelToggleTitle">
+                        <t t-if="this.state.panelCollapsed">Show details ‹</t>
+                        <t t-else="">Hide details ›</t>
+                    </button>
+                </t>
+                <button class="btn btn-sm btn-secondary" t-on-click="this.openScorecard"
+                        t-if="this.state.scorecardId">
+                    Open scorecard
+                </button>
+            </div>
+        </div>
+
+        <t t-if="this.state.loading">
+            <div class="o_bsc_map_empty"><span class="text-muted">Loading the map…</span></div>
+        </t>
+
+        <t t-elif="this.state.error">
+            <div class="o_bsc_map_empty">
+                <div class="alert alert-danger" role="alert"><t t-out="this.state.error"/></div>
+            </div>
+        </t>
+
+        <t t-elif="!this.state.scorecardId">
+            <div class="o_bsc_map_empty">
+                <h4>No scorecard to draw yet</h4>
+                <p class="text-muted">
+                    A map needs objectives. Create a scorecard, add a few objectives per
+                    perspective, and come back.
+                </p>
+            </div>
+        </t>
+
+        <t t-elif="!this.layout">
+            <div class="o_bsc_map_empty">
+                <h4>This scorecard has no objectives</h4>
+                <p class="text-muted">
+                    Add objectives to each perspective first. The measures come after -
+                    that order is the whole method.
+                </p>
+            </div>
+        </t>
+
+        <t t-else="">
+          <div class="o_bsc_map_body">
+            <div class="o_bsc_map_main">
+            <div class="o_bsc_map_canvas">
+                <svg t-att-width="this.layout.width" t-att-height="this.layout.height"
+                     t-attf-viewBox="0 0 {{this.layout.width}} {{this.layout.height}}"
+                     class="o_bsc_map_svg">
+                    <t t-foreach="this.layout.bands" t-as="band" t-key="band.id">
+                        <rect class="o_bsc_band" x="0" t-att-y="band.y"
+                              t-att-width="this.layout.width" t-att-height="band.h" rx="6"/>
+                        <text class="o_bsc_band_name" x="18"
+                              t-att-y="band.y + band.h / 2 - 4">
+                            <t t-out="band.name"/>
+                        </text>
+                        <text class="o_bsc_band_meta" x="18"
+                              t-att-y="band.y + band.h / 2 + 14">
+                            <t t-if="band.has_data"><t t-out="this.fmt(band.score)"/>% ·</t>
+                            weight <t t-out="this.fmt(band.weight)"/>%
+                        </text>
+                    </t>
+
+                    <g class="o_bsc_links">
+                        <t t-foreach="this.layout.arrows" t-as="arrow" t-key="arrow.id">
+                            <g t-att-class="this.arrowClass(arrow)"
+                               t-on-click="() => this.selectLink(arrow.id)">
+                                <title><t t-out="this.arrowTitle(arrow)"/></title>
+                                <path t-att-d="arrow.path" class="o_bsc_link_hit"/>
+                                <path t-att-d="arrow.path" class="o_bsc_link_line"
+                                      t-att-stroke-width="arrow.width"/>
+                                <path t-att-d="arrow.head" class="o_bsc_link_head"/>
+                            </g>
+                        </t>
+                    </g>
+
+                    <t t-foreach="this.layout.cards" t-as="card" t-key="card.id">
+                        <g t-att-class="this.cardClass(card)"
+                           t-on-click="() => this.selectObjective(card.id)">
+                            <title><t t-out="this.cardTitle(card)"/></title>
+                            <rect class="o_bsc_card_body"
+                                  t-att-x="card.x" t-att-y="card.y"
+                                  t-att-width="card.w" t-att-height="card.h" rx="6"/>
+                            <rect class="o_bsc_card_flag"
+                                  t-att-x="card.x" t-att-y="card.y"
+                                  width="5" t-att-height="card.h"/>
+                            <text class="o_bsc_card_code" t-att-x="card.x + 16"
+                                  t-att-y="card.y + 22">
+                                <t t-out="card.code"/>
+                            </text>
+                            <text class="o_bsc_card_score" t-att-x="card.x + card.w - 16"
+                                  t-att-y="card.y + 22" text-anchor="end">
+                                <t t-if="card.status !== 'no_data'"><t t-out="this.fmt(card.score)"/>%</t>
+                                <t t-else="">no data</t>
+                            </text>
+                            <text class="o_bsc_card_name" t-att-x="card.x + 16"
+                                  t-att-y="card.y + 46">
+                                <t t-out="card.name.length > 26 ? card.name.slice(0, 25) + '…' : card.name"/>
+                            </text>
+                            <text class="o_bsc_card_meta" t-att-x="card.x + 16"
+                                  t-att-y="card.y + 70">
+                                <t t-if="card.qualitative">qualitative</t>
+                                <t t-else=""><t t-out="card.kpi_count"/> KPI(s)</t>
+                                <t t-if="card.initiative_count">
+                                    · <t t-out="card.initiative_count"/> initiative(s)
+                                </t>
+                            </text>
+                        </g>
+                    </t>
+                </svg>
+            </div>
+
+            <div class="o_bsc_map_legend">
+                <span><span class="o_bsc_swatch o_bsc_swatch_green"/> On track</span>
+                <span><span class="o_bsc_swatch o_bsc_swatch_amber"/> At risk</span>
+                <span><span class="o_bsc_swatch o_bsc_swatch_red"/> Off track</span>
+                <span><span class="o_bsc_swatch o_bsc_swatch_no_data"/> No data</span>
+                <span class="o_bsc_legend_sep"/>
+                <span><svg width="34" height="10"><g class="o_bsc_link o_bsc_link_validated"><line x1="0" y1="5" x2="34" y2="5"
+                     class="o_bsc_link_line" stroke-width="2.4"/></g></svg>
+                     validated with data</span>
+                <span><svg width="34" height="10"><g class="o_bsc_link o_bsc_link_assumed"><line x1="0" y1="5" x2="34" y2="5"
+                     class="o_bsc_link_line" stroke-width="2.4"/></g></svg>
+                     assumed, never checked</span>
+                <span class="text-muted">thickness = how strongly it is believed</span>
+            </div>
+
+            <div class="o_bsc_map_hypotheses" t-if="this.state.data.links.length">
+                <h5>
+                    The claims this map is making
+                    <small class="text-muted ms-2" t-if="this.counts.unvalidated">
+                        <t t-out="this.counts.unvalidated"/> of <t t-out="this.counts.links"/>
+                        have never been checked against data
+                    </small>
+                </h5>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Cause</th><th>Effect</th><th>Hypothesis</th>
+                            <th>Belief</th><th>Validated</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="this.layout.arrows" t-as="arrow" t-key="arrow.id">
+                            <tr t-att-class="this.state.selectedLinkId === arrow.id ? 'table-active' : ''"
+                                t-on-click="() => this.selectLink(arrow.id)">
+                                <td><t t-out="arrow.sourceName"/></td>
+                                <td><t t-out="arrow.targetName"/></td>
+                                <td class="text-muted"><t t-out="arrow.hypothesis"/></td>
+                                <td><t t-out="arrow.strength_label"/></td>
+                                <td>
+                                    <button t-if="this.state.data.can_manage" class="btn btn-sm"
+                                            t-att-class="arrow.validated ? 'btn-success' : 'btn-outline-secondary'"
+                                            t-on-click.stop="() => this.toggleValidated(arrow.id, !arrow.validated)">
+                                        <t t-if="arrow.validated">yes</t>
+                                        <t t-else="">not yet</t>
+                                    </button>
+                                    <t t-else="">
+                                        <t t-if="arrow.validated">yes</t>
+                                        <t t-else="">not yet</t>
+                                    </t>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="o_bsc_map_hint" t-if="this.counts and this.counts.unlinked">
+                <t t-out="this.counts.unlinked"/> objective(s) are not connected to anything.
+                An objective that neither drives nor is driven by another is not part of
+                a strategy yet — it is a standalone intention.
+            </div>
+            </div>
+
+            <aside class="o_bsc_map_panel" t-if="!this.state.panelCollapsed">
+                <div class="alert alert-danger m-2" role="alert" t-if="this.state.panelError">
+                    <t t-out="this.state.panelError"/>
+                </div>
+                <t t-if="this.state.panelLoading">
+                    <div class="o_bsc_panel_empty text-muted">Loading…</div>
+                </t>
+                <t t-elif="this.state.selection and this.state.selection.data">
+                    <t t-if="this.state.selection.type === 'objective'"
+                       t-call="bsc_strategy.ObjectivePanel"/>
+                    <t t-else="" t-call="bsc_strategy.LinkPanel"/>
+                </t>
+                <t t-else="" t-call="bsc_strategy.BriefingPanel"/>
+            </aside>
+          </div>
+        </t>
+    </div>
+</t>
+
+<t t-name="bsc_strategy.ObjectivePanel">
+    <t t-set="o" t-value="this.state.selection.data"/>
+    <div class="o_bsc_panel_head">
+        <div>
+            <span class="o_bsc_panel_code" t-if="o.code"><t t-out="o.code"/></span>
+            <span class="o_bsc_panel_perspective"><t t-out="o.perspective"/></span>
+        </div>
+        <button class="btn btn-link btn-sm o_bsc_panel_close"
+                t-on-click="this.clearSelection" title="Close">×</button>
+    </div>
+
+    <h4 class="o_bsc_panel_title"><t t-out="o.name"/></h4>
+
+    <div class="o_bsc_panel_score">
+        <span t-attf-class="o_bsc_panel_big o_bsc_text_{{o.status}}">
+            <t t-if="o.status !== 'no_data'"><t t-out="this.fmt(o.score)"/>%</t>
+            <t t-else="">—</t>
+        </span>
+        <span t-attf-class="badge o_bsc_badge_{{o.status}}"><t t-out="o.status_label"/></span>
+    </div>
+    <div class="o_bsc_panel_meta">
+        Owner <t t-out="o.owner"/>
+        <t t-if="o.weight"> · weight <t t-out="this.fmt(o.weight)"/>%</t>
+        <t t-if="o.period"> · <t t-out="o.period"/></t>
+    </div>
+
+    <div class="o_bsc_panel_tabs" role="tablist">
+        <button class="o_bsc_panel_tab" t-att-class="{active: this.isPanelTab('overview')}"
+                t-on-click="() => this.setPanelTab('overview')">Overview</button>
+        <button class="o_bsc_panel_tab" t-att-class="{active: this.isPanelTab('measures')}"
+                t-on-click="() => this.setPanelTab('measures')">
+            <t t-if="o.qualitative">Rating</t><t t-else="">Measures</t>
+            <span class="o_bsc_tab_count" t-if="!o.qualitative and o.kpis.length">
+                <t t-out="o.kpis.length"/>
+            </span>
+        </button>
+        <button class="o_bsc_panel_tab" t-att-class="{active: this.isPanelTab('links')}"
+                t-on-click="() => this.setPanelTab('links')">
+            Links
+            <span class="o_bsc_tab_count"
+                  t-if="o.driven_by.length + o.drives.length">
+                <t t-out="o.driven_by.length + o.drives.length"/>
+            </span>
+        </button>
+        <button class="o_bsc_panel_tab" t-att-class="{active: this.isPanelTab('initiatives')}"
+                t-on-click="() => this.setPanelTab('initiatives')">
+            Initiatives
+            <span class="o_bsc_tab_count o_bsc_tab_count_warn"
+                  t-if="!o.initiatives.length and o.status === 'red'">!</span>
+            <span class="o_bsc_tab_count" t-elif="o.initiatives.length">
+                <t t-out="o.initiatives.length"/>
+            </span>
+        </button>
+    </div>
+
+    <t t-if="this.isPanelTab('overview')">
+        <p class="o_bsc_panel_note" t-if="o.description"><t t-out="o.description"/></p>
+        <p class="o_bsc_panel_note text-muted" t-else="">
+            No description. What this objective means in practice is worth writing
+            down - next year nobody will remember.
+        </p>
+        <h6 class="o_bsc_panel_section">At a glance</h6>
+        <div class="o_bsc_glance">
+            <div><span class="o_bsc_glance_n"><t t-out="o.kpis.length"/></span> measure(s)</div>
+            <div><span class="o_bsc_glance_n"><t t-out="o.initiatives.length"/></span> initiative(s)</div>
+            <div><span class="o_bsc_glance_n"><t t-out="o.driven_by.length"/></span> driver(s)</div>
+            <div><span class="o_bsc_glance_n"><t t-out="o.drives.length"/></span> effect(s)</div>
+        </div>
+    </t>
+
+    <t t-if="this.isPanelTab('measures')">
+    <t t-if="o.qualitative">
+        <h6 class="o_bsc_panel_section">Qualitative assessment</h6>
+        <p class="o_bsc_panel_note">
+            <t t-if="o.qualitative_note"><t t-out="o.qualitative_note"/></t>
+            <t t-else="">Rated by its owner each period. No KPI, by design.</t>
+        </p>
+    </t>
+
+    <t t-else="">
+        <h6 class="o_bsc_panel_section">
+            Measures <span class="text-muted" t-if="o.period">· <t t-out="o.period"/></span>
+        </h6>
+        <p class="text-muted small" t-if="!o.kpis.length">No KPI on this objective.</p>
+        <div class="o_bsc_kpi" t-foreach="o.kpis" t-as="kpi" t-key="kpi.id">
+            <div class="o_bsc_kpi_top">
+                <span class="o_bsc_kpi_name"><t t-out="kpi.name"/></span>
+                <span t-attf-class="o_bsc_kpi_pct o_bsc_text_{{kpi.status}}">
+                    <t t-if="kpi.reported"><t t-out="this.fmt(kpi.achievement)"/>%</t>
+                    <t t-else="">not reported</t>
+                </span>
+            </div>
+            <div class="o_bsc_kpi_figures">
+                <t t-if="kpi.reported">
+                    actual <strong><t t-out="this.fmt(kpi.actual, 2)"/></strong>
+                    <t t-if="kpi.target"> / target <t t-out="this.fmt(kpi.target, 2)"/></t>
+                    <t t-out="kpi.uom"/>
+                    <span class="o_bsc_trend" t-if="kpi.trend !== 'flat'">
+                        <t t-if="kpi.trend === 'up'">▲</t><t t-else="">▼</t>
+                        <t t-out="kpi.trend_label"/>
+                    </span>
+                </t>
+                <t t-else="">
+                    target <t t-out="this.fmt(kpi.target, 2)"/> <t t-out="kpi.uom"/> · waiting on
+                    <t t-out="kpi.owner"/>
+                </t>
+            </div>
+            <div class="o_bsc_kpi_flags">
+                <span class="badge text-bg-light" t-if="kpi.is_automated">automated</span>
+                <span class="badge text-bg-warning"
+                      t-if="kpi.auto_state === 'deviation'">held for confirmation</span>
+                <span class="badge text-bg-danger"
+                      t-if="kpi.auto_state === 'no_data' or kpi.auto_state === 'error'">
+                    source problem
+                </span>
+            </div>
+            <p class="o_bsc_kpi_comment" t-if="kpi.comment"><t t-out="kpi.comment"/></p>
+            <p class="o_bsc_kpi_comment text-danger" t-if="kpi.auto_message">
+                <t t-out="kpi.auto_message"/>
+            </p>
+            <div class="o_bsc_kpi_actions">
+                <button class="btn btn-link btn-sm p-0 me-3" t-on-click="() => this.openKpiFigure(kpi.id)">
+                    <i class="oi me-1" data-icon="keyboard"/>Enter / change figure
+                </button>
+                <button class="btn btn-link btn-sm p-0" t-on-click="() => this.openRecord('bsc.kpi', kpi.id)">
+                    <i class="oi me-1" data-icon="edit"/>Edit KPI
+                </button>
+            </div>
+        </div>
+    </t>
+
+    </t>
+
+    <t t-if="this.isPanelTab('links')">
+    <t t-if="o.driven_by.length">
+        <h6 class="o_bsc_panel_section">Driven by</h6>
+        <div class="o_bsc_linkrow" t-foreach="o.driven_by" t-as="row" t-key="row.id"
+             t-on-click="() => this.selectLink(row.id)">
+            <span t-attf-class="o_bsc_dot o_bsc_dot_{{row.other_status}}"/>
+            <span class="o_bsc_linkrow_name">
+                <t t-if="row.other_code"><t t-out="row.other_code"/> </t>
+                <t t-out="row.other_name"/>
+            </span>
+            <span t-attf-class="o_bsc_proof o_bsc_proof_{{row.validated ? 'yes' : 'no'}}">
+                <t t-if="row.validated">proven</t><t t-else="">assumed</t>
+            </span>
+        </div>
+    </t>
+
+    <t t-if="o.drives.length">
+        <h6 class="o_bsc_panel_section">This objective drives</h6>
+        <div class="o_bsc_linkrow" t-foreach="o.drives" t-as="row" t-key="row.id"
+             t-on-click="() => this.selectLink(row.id)">
+            <span t-attf-class="o_bsc_dot o_bsc_dot_{{row.other_status}}"/>
+            <span class="o_bsc_linkrow_name">
+                <t t-if="row.other_code"><t t-out="row.other_code"/> </t>
+                <t t-out="row.other_name"/>
+            </span>
+            <span t-attf-class="o_bsc_proof o_bsc_proof_{{row.validated ? 'yes' : 'no'}}">
+                <t t-if="row.validated">proven</t><t t-else="">assumed</t>
+            </span>
+        </div>
+    </t>
+
+    <t t-if="!o.driven_by.length and !o.drives.length">
+        <h6 class="o_bsc_panel_section">Not connected</h6>
+        <p class="o_bsc_panel_note">
+            This objective neither drives nor is driven by another. It is an
+            intention, not yet part of a strategy.
+        </p>
+    </t>
+    </t>
+
+    <t t-if="this.isPanelTab('initiatives')">
+        <t t-set="sum" t-value="o.initiative_summary"/>
+
+        <t t-if="sum.count">
+            <div class="o_bsc_initsum">
+                <div>
+                    <span class="o_bsc_glance_n"><t t-out="sum.live"/></span> running
+                    <t t-if="sum.proposed"> · <t t-out="sum.proposed"/> proposed</t>
+                    <t t-if="sum.done"> · <t t-out="sum.done"/> done</t>
+                </div>
+                <div class="text-muted small" t-if="sum.budget_planned">
+                    budget <t t-out="this.fmt(sum.budget_planned, 0)"/> <t t-out="o.currency"/>
+                    · spent <t t-out="this.fmt(sum.budget_actual, 0)"/>
+                </div>
+                <div class="o_bsc_initsum_warn" t-if="sum.overdue">
+                    <t t-out="sum.overdue"/> past its end date
+                </div>
+            </div>
+
+            <div class="o_bsc_initiative o_bsc_initiative_row"
+                 t-foreach="o.initiatives" t-as="i" t-key="i.id"
+                 t-on-click="() => this.openInitiative(i.id)">
+                <div class="o_bsc_initiative_top">
+                    <span class="o_bsc_init_name">
+                        <span class="o_bsc_init_flag"
+                              t-if="i.priority === '3' or i.priority === '2'"
+                              t-att-title="i.priority_label">★</span>
+                        <t t-out="i.name"/>
+                    </span>
+                    <span class="text-muted"><t t-out="i.progress"/>%</span>
+                </div>
+                <div class="o_bsc_progress"><span t-attf-style="width: {{i.progress}}%"/></div>
+                <div class="o_bsc_init_meta">
+                    <span class="o_bsc_init_stage"><t t-out="i.stage"/></span>
+                    <span t-if="i.owner"> · <t t-out="i.owner"/></span>
+                    <span t-if="i.date_end" t-att-class="i.overdue ? 'o_bsc_init_late' : ''">
+                        · due <t t-out="i.date_end"/>
+                    </span>
+                </div>
+                <div class="o_bsc_init_meta" t-if="i.budget_planned">
+                    budget <t t-out="this.fmt(i.budget_planned, 0)"/> <t t-out="o.currency"/>
+                    · spent <span t-att-class="i.budget_over ? 'o_bsc_init_late' : ''">
+                        <t t-out="this.fmt(i.budget_actual, 0)"/>
+                    </span>
+                </div>
+                <!-- Execution: what carries the work; "approved with a budget" is not "somebody is doing it". -->
+                <div class="o_bsc_exec" t-if="i.project_id or i.task_id or i.needs_execution">
+                    <t t-if="i.project_id">
+                        <div class="o_bsc_exec_row">
+                            <span class="o_bsc_exec_label">Project</span>
+                            <a href="#" class="o_bsc_exec_link"
+                               t-on-click.stop.prevent="() => this.openProject(i.project_id)">
+                                <t t-out="i.project"/>
+                            </a>
+                        </div>
+                        <div class="o_bsc_exec_row" t-if="i.task_count">
+                            <span class="o_bsc_exec_label">Tasks</span>
+                            <span>
+                                <strong><t t-out="i.task_done_count"/></strong>
+                                of <t t-out="i.task_count"/> done
+                                (<t t-out="i.project_progress"/>%)
+                                <a href="#" class="o_bsc_exec_link ms-1"
+                                   t-on-click.stop.prevent="() => this.openProjectTasks(i.project_id, i.project)">
+                                    open board
+                                </a>
+                            </span>
+                        </div>
+                        <div class="o_bsc_exec_row" t-else="">
+                            <span class="o_bsc_exec_label">Tasks</span>
+                            <span class="o_bsc_init_late">
+                                none yet - the project is empty
+                            </span>
+                        </div>
+                    </t>
+
+                    <div class="o_bsc_exec_row" t-if="i.task_id">
+                        <span class="o_bsc_exec_label">Task</span>
+                        <span>
+                            <a href="#" class="o_bsc_exec_link"
+                               t-on-click.stop.prevent="() => this.openTask(i.task_id)">
+                                <t t-out="i.task"/>
+                            </a>
+                            <t t-if="i.task_state"> · <t t-out="i.task_state"/></t>
+                        </span>
+                    </div>
+
+                    <div class="o_bsc_exec_note" t-if="i.tracks_project">
+                        Progress follows the closed tasks, not a typed figure.
+                    </div>
+
+                    <div class="o_bsc_exec_note o_bsc_init_late" t-if="i.needs_execution">
+                        In progress with no project or task behind it. Nothing is
+                        tracking the work.
+                    </div>
+                </div>
+                <p class="o_bsc_kpi_comment" t-if="i.expected_impact">
+                    <t t-out="i.expected_impact"/>
+                </p>
+            </div>
+
+            <button class="btn btn-sm btn-link w-100 p-0 mt-2"
+                    t-on-click="() => this.openObjectiveInitiatives(o.id, o.name)">
+                Open all in the initiatives view
+            </button>
+        </t>
+
+        <t t-else="">
+            <p class="o_bsc_panel_note">
+                Nothing is being done about this objective. An objective with no
+                initiative behind it will not move on its own.
+            </p>
+            <button class="btn btn-sm btn-primary w-100 mt-2"
+                    t-on-click="() => this.createInitiative(o.id)">
+                Propose an initiative
+            </button>
+        </t>
+    </t>
+
+    <button class="btn btn-sm btn-secondary w-100 mt-3"
+            t-on-click="() => this.openObjective(o.id)">
+        Open objective
+    </button>
+</t>
+
+<t t-name="bsc_strategy.LinkPanel">
+    <t t-set="l" t-value="this.state.selection.data"/>
+    <div class="o_bsc_panel_head">
+        <div><span class="o_bsc_panel_perspective">Cause and effect</span></div>
+        <button class="btn btn-link btn-sm o_bsc_panel_close"
+                t-on-click="this.clearSelection" title="Close">×</button>
+    </div>
+
+    <div class="o_bsc_chain">
+        <div class="o_bsc_chain_end" t-on-click="() => this.selectObjective(l.source.id)">
+            <span t-attf-class="o_bsc_dot o_bsc_dot_{{l.source.status}}"/>
+            <span><t t-if="l.source.code"><t t-out="l.source.code"/> </t><t t-out="l.source.name"/></span>
+            <span class="text-muted small"><t t-out="l.source.perspective"/></span>
+        </div>
+        <div class="o_bsc_chain_arrow">↓ is believed to drive ↓</div>
+        <div class="o_bsc_chain_end" t-on-click="() => this.selectObjective(l.target.id)">
+            <span t-attf-class="o_bsc_dot o_bsc_dot_{{l.target.status}}"/>
+            <span><t t-if="l.target.code"><t t-out="l.target.code"/> </t><t t-out="l.target.name"/></span>
+            <span class="text-muted small"><t t-out="l.target.perspective"/></span>
+        </div>
+    </div>
+
+    <h6 class="o_bsc_panel_section">The hypothesis</h6>
+    <p class="o_bsc_panel_note"><t t-out="l.hypothesis"/></p>
+
+    <h6 class="o_bsc_panel_section">Belief</h6>
+    <p class="o_bsc_panel_note">
+        Held to be a <strong><t t-out="l.strength_label"/></strong> link — a
+        judgement, not a measurement.
+    </p>
+
+    <div t-attf-class="o_bsc_proofbox o_bsc_proofbox_{{l.validated ? 'yes' : 'no'}}">
+        <t t-if="l.validated">
+            <strong>Validated with data.</strong>
+            <t t-if="l.validation_note"><br/><t t-out="l.validation_note"/></t>
+        </t>
+        <t t-else="">
+            <strong>Never checked.</strong>
+            This arrow is a claim the strategy makes and nobody has tested.
+        </t>
+    </div>
+
+    <button t-if="this.state.data.can_manage" class="btn btn-sm w-100 mt-3"
+            t-att-class="l.validated ? 'btn-outline-secondary' : 'btn-primary'"
+            t-on-click="() => this.toggleValidated(l.id, !l.validated)">
+        <t t-if="l.validated">Mark as not yet proven</t>
+        <t t-else="">Mark as validated with data</t>
+    </button>
+    <button t-if="this.state.data.can_manage" class="btn btn-sm btn-secondary w-100 mt-2"
+            t-on-click="() => this.openRecord('bsc.objective.link', l.id)">
+        <i class="oi me-1" data-icon="edit"/>Edit the link (hypothesis, strength, evidence)
+    </button>
+</t>
+
+<t t-name="bsc_strategy.BriefingPanel">
+    <div class="o_bsc_panel_head">
+        <div><span class="o_bsc_panel_perspective">Where the strategy stands</span></div>
+    </div>
+
+    <p class="o_bsc_panel_note">
+        Click any card to read the numbers behind it, or any arrow to read the
+        claim it makes.
+    </p>
+
+    <h6 class="o_bsc_panel_section">Perspectives</h6>
+    <div class="o_bsc_pscore" t-foreach="this.state.data.perspectives" t-as="p" t-key="p.id">
+        <div class="o_bsc_pscore_top">
+            <span><t t-out="p.name"/></span>
+            <strong><t t-if="p.has_data"><t t-out="this.fmt(p.score)"/>%</t><t t-else="">no data</t></strong>
+        </div>
+        <div class="o_bsc_progress">
+            <span t-attf-style="width: {{p.bar}}%"/>
+        </div>
+    </div>
+
+    <t t-set="reds" t-value="this.offTrackObjectives"/>
+    <h6 class="o_bsc_panel_section">Off track</h6>
+    <p class="o_bsc_panel_note" t-if="!reds.length">Nothing is off track this period.</p>
+    <div class="o_bsc_linkrow" t-foreach="reds" t-as="o" t-key="o.id"
+         t-on-click="() => this.selectObjective(o.id)">
+        <span class="o_bsc_dot o_bsc_dot_red"/>
+        <span class="o_bsc_linkrow_name">
+            <t t-if="o.code"><t t-out="o.code"/> </t><t t-out="o.name"/>
+        </span>
+        <span class="text-muted small"><t t-out="this.fmt(o.score)"/>%</span>
+    </div>
+
+    <h6 class="o_bsc_panel_section">How much of this is proven</h6>
+    <div class="o_bsc_proofbox"
+         t-att-class="this.counts.unvalidated ? 'o_bsc_proofbox_no' : 'o_bsc_proofbox_yes'">
+        <t t-if="this.counts.links">
+            <strong><t t-out="this.counts.validated"/> of <t t-out="this.counts.links"/></strong>
+            cause-effect links have been checked against data.
+            <t t-if="this.counts.unvalidated">
+                The other <t t-out="this.counts.unvalidated"/> are assumptions this
+                strategy is running on.
+            </t>
+        </t>
+        <t t-else="">
+            No cause-effect links yet. Without them the perspectives are four
+            separate lists, not a strategy.
+        </t>
+    </div>
+
+    <t t-if="this.counts.unlinked">
+        <h6 class="o_bsc_panel_section">Unconnected</h6>
+        <p class="o_bsc_panel_note">
+            <t t-out="this.counts.unlinked"/> objective(s) sit outside the chain entirely.
+        </p>
+    </t>
+</t>
+
+</templates>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="pos_platform_order_glovo.GlovoOrderInfo">
+        <div t-if="order.isGlovoOrder" class="glovo-order-info small mt-1">
+            <span class="badge text-bg-warning me-1">Glovo</span>
+            <span t-if="order.platform_order_pin" class="me-1">Pickup code: <t t-out="order.platform_order_pin"/></span>
+            <span t-if="order.platform_order_rider_name" class="me-1">Courier: <t t-out="order.platform_order_rider_name"/></span>
+            <span t-if="order.glovo_payment_method === 'CASH'" class="glovo-payment-method fw-bold">Courier pays cash: <t t-out="this.getTotal(order)"/></span>
+            <span t-elif="order.glovo_payment_method === 'DELAYED'" class="glovo-payment-method">Paid by Glovo invoice</span>
+        </div>
+    </t>
+
+    <t t-name="pos_platform_order_glovo.TicketScreen" t-inherit="point_of_sale.TicketScreen" t-inherit-mode="extension">
+        <xpath expr="//td[hasclass('platform-order-name')]//div[@t-out='order.platformOrderStatus']" position="after">
+            <t t-call="pos_platform_order_glovo.GlovoOrderInfo"/>
+        </xpath>
+        <xpath expr="//div[hasclass('platform-order-name')]//div[@t-out='order.platformOrderStatus']" position="after">
+            <t t-call="pos_platform_order_glovo.GlovoOrderInfo"/>
+        </xpath>
+        <xpath expr="//button[hasclass('button', 'validation', 'set-food-ready-button')]" position="after">
+            <button class="button validation customer-picked-up-button w-100 btn btn-lg btn-primary py-3"
+                t-if="_selectedSyncedOrder.canMarkCustomerPickedUp"
+                t-on-click="() => this.onCustomerPickedUpClicked(_selectedSyncedOrder)">
+                <span class="d-block">Customer Picked Up</span>
+            </button>
+        </xpath>
+        <xpath expr="//button[hasclass('btn-switchpane', 'set-food-ready-button')]" position="after">
+            <button class="btn-switchpane customer-picked-up-button primary btn btn-primary btn-lg lh-lg w-50 py-3"
+                t-if="_selectedSyncedOrder.canMarkCustomerPickedUp"
+                t-on-click="() => this.onCustomerPickedUpClicked(_selectedSyncedOrder)">
+                <span class="d-block">Customer Picked Up</span>
+            </button>
+        </xpath>
+    </t>
+</templates>

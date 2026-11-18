@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <record id="view_move_form_gec_sold_asset" model="ir.ui.view">
+    <field name="name">account.move.form.gec.sold.asset</field>
+    <field name="model">account.move</field>
+    <field name="inherit_id" ref="account.view_move_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='invoice_line_ids']/list/column[@name='product_and_description']" position="after">
+        <field name="gec_sold_asset_id" optional="hide"
+               column_invisible="parent.move_type != 'out_invoice'"/>
+        <field name="gec_rc_service" optional="hide"
+               column_invisible="parent.move_type not in ('in_invoice', 'in_refund')"/>
+      </xpath>
+    </field>
+  </record>
+
+</odoo>

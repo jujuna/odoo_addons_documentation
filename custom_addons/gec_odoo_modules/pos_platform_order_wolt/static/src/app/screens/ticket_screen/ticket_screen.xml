@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="pos_platform_order_wolt.TicketScreen" t-inherit="point_of_sale.TicketScreen" t-inherit-mode="extension">
+        <xpath expr="//button[hasclass('validation', 'set-food-ready-button')]" position="after">
+            <button class="button validation wolt-delivered-button w-100 btn btn-lg btn-primary py-3"
+                t-if="_selectedSyncedOrder.canMarkWoltDelivered"
+                t-on-click="() => this.onMarkWoltDeliveredClicked(_selectedSyncedOrder)">
+                <span class="d-block">Mark Delivered</span>
+            </button>
+        </xpath>
+        <xpath expr="//button[hasclass('btn-switchpane', 'set-food-ready-button')]" position="after">
+            <button class="btn-switchpane wolt-delivered-button primary btn btn-primary btn-lg lh-lg w-50 py-3"
+                t-if="_selectedSyncedOrder.canMarkWoltDelivered"
+                t-on-click="() => this.onMarkWoltDeliveredClicked(_selectedSyncedOrder)">
+                <span class="d-block">Mark Delivered</span>
+            </button>
+        </xpath>
+    </t>
+</templates>

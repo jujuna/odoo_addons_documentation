@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_platform_order_entity_form_inherit" model="ir.ui.view">
+        <field name="name">platform.order.entity.form.inherit.pos_platform_order_wolt</field>
+        <field name="model">platform.order.entity</field>
+        <field name="inherit_id" ref="pos_platform_order.view_platform_order_entity_form"/>
+        <field name="arch" type="xml">
+            <field name="menu_sync_state" position="before">
+                <button name="action_wolt_connect" type="object" string="Connect to Wolt"
+                    class="oe_highlight" invisible="provider_code != 'wolt' or wolt_connected"/>
+                <button name="action_wolt_connect" type="object" string="Reconnect to Wolt"
+                    invisible="provider_code != 'wolt' or not wolt_connected"/>
+            </field>
+            <page name="general" position="after">
+                <page name="wolt" string="Wolt" invisible="provider_code != 'wolt'">
+                    <group>
+                        <group string="Connection">
+                            <field name="wolt_connected"/>
+                            <field name="wolt_token_expiry" string="Access Token Valid Until"/>
+                        </group>
+                        <group string="Venue">
+                            <field name="wolt_venue_online"/>
+                            <field name="wolt_venue_open"/>
+                            <field name="wolt_venue_status_date"/>
+                        </group>
+                    </group>
+                    <div class="d-flex flex-wrap gap-2" invisible="not wolt_connected">
+                        <button name="action_wolt_refresh_status" type="object" string="Check Status" icon="refresh" class="btn-secondary"/>
+                        <button name="action_wolt_go_online" type="object" string="Go Online" class="btn-secondary"/>
+                        <button name="action_wolt_go_offline" type="object" string="Go Offline" class="btn-secondary"
+                            confirm="Stop Wolt orders for this venue until you go online again?"/>
+                        <button name="action_wolt_push_opening_hours" type="object" string="Push Opening Hours" class="btn-secondary"
+                            confirm="Replace Wolt's weekly opening hours with this store's Service Hours?"/>
+                    </div>
+                    <group string="Orders">
+                        <field name="wolt_fallback_product_id"/>
+                        <field name="wolt_pending_order_refs" widget="json" string="Orders waiting for import"
+                            invisible="not wolt_pending_order_refs"/>
+                    </group>
+                    <group string="Menu Updates">
+                        <field name="wolt_items_pushed_at"/>
+                        <field name="wolt_pending_product_tmpl_ids" widget="many2many_tags"/>
+                    </group>
+                </page>
+            </page>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,611 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="gec_analytic_margin.DashboardChart">
+        <div class="o_gec_chart">
+            <canvas t-ref="this.chart.ref"/>
+        </div>
+    </t>
+
+    <!-- One KPI this.props.card. `card`: label, text, sub, icon, tone, delta, gauge, title, action. -->
+    <t t-name="gec_analytic_margin.DashboardKpi">
+        <div t-att-class="'o_gec_kpi o_gec_tone_' + (this.props.card.tone or (this.props.card.gauge and this.props.card.gauge.tone) or 'neutral') + (this.props.card.action ? ' o_gec_clickable' : '')"
+             t-att-title="this.props.card.title or ''"
+             t-on-click="() => this.props.card.action and this.props.card.action()">
+            <div class="o_gec_kpi_head">
+                <i t-if="this.props.card.icon" class="oi" t-att-data-icon="this.props.card.icon"/>
+                <span class="text-truncate" t-out="this.props.card.label"/>
+            </div>
+            <div class="o_gec_kpi_value text-nowrap" t-att-class="this.props.card.css or ''" t-out="this.props.card.text"/>
+            <div class="o_gec_kpi_foot">
+                <span class="o_gec_clamp" t-att-title="this.props.card.sub or ''" t-out="this.props.card.sub or ''"/>
+                <span t-if="this.props.card.delta" t-att-class="'o_gec_pill ' + (this.props.card.delta.good ? 'o_gec_pill_good' : 'o_gec_pill_bad')"
+                      t-out="this.props.card.delta.text"/>
+            </div>
+            <svg t-if="this.spark" class="o_gec_spark" viewBox="0 0 100 24" preserveAspectRatio="none">
+                <path t-att-d="this.spark.line" fill="none" vector-effect="non-scaling-stroke"/>
+                <circle t-att-cx="this.spark.last[0]" t-att-cy="this.spark.last[1]" r="2.2"/>
+            </svg>
+            <t t-if="this.props.card.gauge">
+                <div class="o_gec_gauge">
+                    <t t-foreach="this.props.card.gauge.bands" t-as="band" t-key="band_index">
+                        <span t-att-class="'o_gec_band o_gec_band_' + band.tone"
+                              t-attf-style="left: {{ band.left }}%; width: {{ band.width }}%"/>
+                    </t>
+                    <span class="o_gec_marker" t-attf-style="left: {{ this.props.card.gauge.marker }}%"/>
+                </div>
+                <div class="o_gec_gauge_hint text-truncate" t-out="this.props.card.gauge.hint"/>
+            </t>
+        </div>
+    </t>
+
+    <t t-name="gec_analytic_margin.Dashboard">
+        <div class="o_action o_gec_dashboard">
+            <div class="o_gec_dashboard_scroll">
+                <div class="o_gec_header">
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <div class="me-auto">
+                            <h2 class="mb-0">Activity-Based Costing</h2>
+                            <div t-if="this.state.data" class="text-muted small">
+                                <t t-out="this.state.data.companies.join(', ')"/> ·
+                                <t t-out="this.previousLabel"/>
+                            </div>
+                        </div>
+                        <select class="form-select form-select-sm w-auto" t-on-change="(ev) => this.onPresetChange(ev)">
+                            <t t-foreach="this.presets" t-as="preset" t-key="preset.key">
+                                <option t-att-value="preset.key" t-att-selected="preset.key === this.state.preset"
+                                        t-out="preset.label"/>
+                            </t>
+                        </select>
+                        <input type="date" class="form-control form-control-sm w-auto" t-att-value="this.state.dateFrom"
+                               t-on-change="(ev) => this.onDateChange('dateFrom', ev)"/>
+                        <span class="text-muted">–</span>
+                        <input type="date" class="form-control form-control-sm w-auto" t-att-value="this.state.dateTo"
+                               t-on-change="(ev) => this.onDateChange('dateTo', ev)"/>
+                        <t t-if="this.state.data">
+                            <select class="form-select form-select-sm w-auto" title="Analytic plan the cost objects come from"
+                                    t-on-change="(ev) => this.onPlanChange(ev)">
+                                <t t-foreach="this.state.data.plans" t-as="plan" t-key="plan.id">
+                                    <option t-att-value="plan.id" t-att-selected="plan.id === this.state.planId"
+                                            t-out="plan.name"/>
+                                </t>
+                                <option t-att-value="this.companyWide" t-att-selected="this.state.planId === this.companyWide">
+                                    Whole company (each amount once)
+                                </option>
+                            </select>
+                        </t>
+                        <button class="btn btn-sm btn-secondary" t-on-click="() => this.openStatement()">
+                            <i class="oi me-1" data-icon="article"/>Margin Statement
+                        </button>
+                        <button class="btn btn-sm btn-secondary" t-on-click="() => this.print()"
+                                title="All tabs, then the browser's print dialog: choose Save as PDF">
+                            <i class="oi me-1" data-icon="print"/>Print / PDF
+                        </button>
+                    </div>
+                    <ul class="nav nav-tabs o_gec_tabs mt-3">
+                        <t t-foreach="this.tabs" t-as="tab" t-key="tab.key">
+                            <li class="nav-item">
+                                <a href="#" t-att-class="'nav-link' + (this.state.tab === tab.key ? ' active' : '')"
+                                   t-on-click.prevent="() => this.selectTab(tab.key)">
+                                    <i class="oi me-1" t-att-data-icon="tab.icon"/><t t-out="tab.label"/>
+                                </a>
+                            </li>
+                        </t>
+                    </ul>
+                </div>
+
+                <div t-if="!this.state.data" class="text-center text-muted py-5">
+                    <span class="spinner-border spinner-border-sm me-2"/>Loading…
+                </div>
+
+                <div t-else="" class="o_gec_body" t-att-class="this.state.loading ? 'o_gec_loading' : ''">
+                    <t t-set="p" t-value="this.profitability"/>
+
+                    <t t-if="this.showTab('overview')">
+                        <h3 t-if="this.state.printAll" class="o_gec_print_title">Overview</h3>
+                        <div class="o_gec_headline mb-3">
+                            <t t-foreach="this.headline" t-as="card" t-key="card.key">
+                                <GecDashboardKpi card="this.proofed(card)"/>
+                            </t>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-xl-5">
+                                <div class="o_gec_panel h-100">
+                                    <div class="o_gec_panel_title">P&amp;L ladder
+                                        <small class="text-muted">· % of revenue</small></div>
+                                    <div class="o_gec_ladder">
+                                        <t t-foreach="p.ladder" t-as="row" t-key="row.key">
+                                            <div t-att-class="'o_gec_ladder_row o_gec_ladder_' + row.kind">
+                                                <span class="o_gec_ladder_label text-truncate" t-out="row.label"/>
+                                                <span class="o_gec_ladder_bar">
+                                                    <span t-attf-style="width: {{ this.barWidth(row.amount, this.ladderMax) }}"
+                                                          t-att-class="row.amount &lt; 0 ? 'o_gec_neg' : ''"/>
+                                                </span>
+                                                <span class="o_gec_ladder_amount" t-out="this.money(row.amount, true)"/>
+                                                <span class="o_gec_ladder_pct" t-out="this.pct(row.pct)"/>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-7">
+                                <div class="o_gec_panel h-100">
+                                    <div class="o_gec_panel_title">Last 12 months</div>
+                                    <div class="o_gec_chart_box">
+                                        <GecDashboardChart t-key="'trend' + this.state.version"
+                                                           config="() => this.trendConfig()"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div t-if="this.alerts.length" class="o_gec_panel mb-3">
+                            <div class="o_gec_panel_title">Needs attention</div>
+                            <t t-foreach="this.alerts" t-as="alert" t-key="alert_index">
+                                <div t-att-class="'o_gec_alert o_gec_alert_' + alert.tone">
+                                    <i class="oi me-2" t-att-data-icon="alert.tone === 'danger' ? 'error' : alert.tone === 'info' ? 'info' : 'warning'"/>
+                                    <span class="me-auto" t-out="alert.text"/>
+                                    <a t-if="alert.tab" href="#" t-on-click.prevent="() => this.selectTab(alert.tab)">Details</a>
+                                    <a t-if="alert.kind" href="#" t-on-click.prevent="() => this.open(alert.kind)">Show</a>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+
+                    <t t-if="this.showTab('revenue')">
+                        <h3 t-if="this.state.printAll" class="o_gec_print_title">Revenue &amp; Customers</h3>
+                        <div class="o_gec_cards mb-3">
+                            <t t-foreach="this.budgetCards" t-as="card" t-key="card.key">
+                                <GecDashboardKpi card="this.proofed(card)"/>
+                            </t>
+                            <t t-if="this.standardCard">
+                                <GecDashboardKpi card="this.proofed(this.standardCard)"/>
+                            </t>
+                            <t t-if="this.outlookCard">
+                                <GecDashboardKpi card="this.proofed(this.outlookCard)"/>
+                            </t>
+                        </div>
+
+                        <div t-if="this.outlookCard" class="o_gec_panel mb-3">
+                            <div class="o_gec_panel_title">Revenue outlook, next four quarters
+                                <small class="text-muted">· budget vs the last three months' run rate</small></div>
+                            <div class="o_gec_chart_box">
+                                <GecDashboardChart t-key="'outlook' + this.state.version" config="() => this.outlookConfig()"/>
+                            </div>
+                        </div>
+
+                        <t t-set="ret" t-value="p.retention"/>
+                        <div t-if="ret and ret.start" class="row g-3 mb-3">
+                            <div class="col-xl-4 d-flex flex-column gap-3">
+                                <t t-foreach="this.retentionCards" t-as="card" t-key="card.key">
+                                    <GecDashboardKpi card="this.proofed(card)"/>
+                                </t>
+                            </div>
+                            <div class="col-xl-8">
+                                <div class="o_gec_panel h-100">
+                                    <div class="o_gec_panel_title">Revenue retention bridge
+                                        <small class="text-muted">· last year's customers, same dates a year apart</small></div>
+                                    <div class="o_gec_chart_box">
+                                        <GecDashboardChart t-key="'retention' + this.state.version"
+                                                           config="() => this.retentionConfig()"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div t-if="this.mix" class="row g-3 mb-3">
+                            <div class="col-xl-4">
+                                <div class="o_gec_panel h-100">
+                                    <div class="o_gec_panel_title">Revenue mix</div>
+                                    <div class="o_gec_chart_box">
+                                        <GecDashboardChart t-key="'mix' + this.state.version" config="() => this.mixConfig()"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-8">
+                                <div class="o_gec_panel h-100">
+                                    <div class="o_gec_panel_title">Revenue and margin by stream</div>
+                                    <table class="table table-sm table-hover o_gec_table mb-0">
+                                        <thead><tr>
+                                            <th>Stream</th><th class="text-end">Revenue</th><th style="width: 22%">Share</th>
+                                            <th class="text-end">Gross margin</th><th class="text-end">GM %</th>
+                                        </tr></thead>
+                                        <tbody>
+                                            <tr t-foreach="this.mix.streams" t-as="s" t-key="s.id" role="button"
+                                                t-on-click="() => this.open('stream', s.id)">
+                                                <td><t t-out="s.name"/>
+                                                    <span t-if="s.recurring" class="o_gec_pill o_gec_pill_good ms-1">recurring</span>
+                                                    <span t-if="s.standard" class="o_gec_pill o_gec_pill_info ms-1">product</span></td>
+                                                <td class="text-end" t-out="this.money(s.amount, true)"/>
+                                                <td><div class="o_gec_share"><span t-attf-style="width: {{ this.barWidth(s.pct, 1) }}"/>
+                                                    <em t-out="this.pct(s.pct)"/></div></td>
+                                                <td class="text-end" t-out="s.gross === null ? '' : this.money(s.gross, true)"/>
+                                                <td class="text-end" t-out="this.pct(s.gross_pct)"/>
+                                            </tr>
+                                            <tr t-if="this.mix.unassigned" role="button" class="text-muted"
+                                                t-on-click="() => this.open('stream', false)">
+                                                <td>No stream</td>
+                                                <td class="text-end" t-out="this.money(this.mix.unassigned, true)"/>
+                                                <td><div class="o_gec_share"><span t-attf-style="width: {{ this.barWidth(this.unassignedShare, 1) }}"/>
+                                                    <em t-out="this.pct(this.unassignedShare)"/></div></td>
+                                                <td/><td/>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <t t-set="conc" t-value="p.concentration"/>
+                        <div t-if="conc and conc.customers" class="row g-3 mb-3">
+                            <div class="col-xl-4 d-flex flex-column gap-3">
+                                <t t-foreach="this.concentrationKpis" t-as="card" t-key="card.key">
+                                    <GecDashboardKpi card="this.proofed(card)"/>
+                                </t>
+                            </div>
+                            <div class="col-xl-8">
+                                <div class="o_gec_panel h-100">
+                                    <div class="o_gec_panel_title d-flex">
+                                        <span class="me-auto">Largest customers</span>
+                                        <small class="text-muted">company-wide · <t t-out="conc.customer_count"/> customers</small>
+                                    </div>
+                                    <table class="table table-sm table-hover o_gec_table mb-0">
+                                        <thead><tr>
+                                            <th>Customer</th><th class="text-end">Revenue</th><th style="width: 30%">Share</th>
+                                            <th class="text-end">Cumulative</th>
+                                        </tr></thead>
+                                        <tbody>
+                                            <tr t-foreach="conc.customers" t-as="c" t-key="c.id" role="button"
+                                                t-on-click="() => this.open('customer', c.id)">
+                                                <td class="text-truncate" t-out="c.name"/>
+                                                <td class="text-end" t-out="this.money(c.amount, true)"/>
+                                                <td><div t-att-class="'o_gec_share' + (c.pct &gt; 0.2 ? ' o_gec_share_bad' : '')">
+                                                    <span t-attf-style="width: {{ this.barWidth(c.pct, 1) }}"/>
+                                                    <em t-out="this.pct(c.pct)"/></div></td>
+                                                <td class="text-end text-muted" t-out="this.pct(c.cumulative_pct)"/>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-xl-5">
+                                <div class="o_gec_panel h-100">
+                                    <div class="o_gec_panel_title">Net by cost object</div>
+                                    <div class="o_gec_chart_box">
+                                        <GecDashboardChart t-if="p.objects.count" t-key="'objects' + this.state.version"
+                                                           config="() => this.objectsConfig()"/>
+                                        <div t-else="" class="text-muted text-center py-5">No amounts in this period.</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <t t-foreach="this.objectBlocks" t-as="block" t-key="block.key">
+                                <div class="col-xl">
+                                    <div class="o_gec_panel h-100">
+                                        <div class="o_gec_panel_title" t-out="block.title"/>
+                                        <table class="table table-sm table-hover o_gec_table mb-0">
+                                            <thead><tr>
+                                                <th>Cost object</th><th class="text-end">Revenue</th>
+                                                <th class="text-end">Net</th><th class="text-end">Margin</th>
+                                            </tr></thead>
+                                            <tbody>
+                                                <tr t-foreach="block.objects" t-as="o" t-key="o.id" role="button"
+                                                    t-on-click="() => this.open('object', o.id)">
+                                                    <td class="text-truncate" t-att-title="o.name" t-out="o.name"/>
+                                                    <td class="text-end" t-out="this.money(o.revenue, true)"/>
+                                                    <td class="text-end fw-bold" t-att-class="o.net &lt; 0 ? 'text-danger' : ''"
+                                                        t-out="this.money(o.net, true)"/>
+                                                    <td class="text-end" t-out="this.pct(o.pct)"/>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+
+                    <t t-if="this.showTab('people')">
+                        <h3 t-if="this.state.printAll" class="o_gec_print_title">People</h3>
+                        <t t-set="prod" t-value="p.productivity"/>
+                        <t t-if="prod and prod.fte">
+                            <div class="o_gec_section_title">Productivity <small>· company-wide, annualised</small></div>
+                            <div class="o_gec_cards mb-3">
+                                <t t-foreach="this.productivityKpis" t-as="card" t-key="card.key">
+                                    <GecDashboardKpi card="this.proofed(card)"/>
+                                </t>
+                            </div>
+                            <div t-if="prod.by_function.length" class="o_gec_panel mb-3">
+                                <div class="o_gec_panel_title">Headcount by function
+                                    <small class="text-muted">· shaded: benchmark strong-tier range</small></div>
+                                <t t-foreach="prod.by_function" t-as="row" t-key="row.label">
+                                    <div class="o_gec_headcount">
+                                        <span class="text-truncate" t-out="row.label"/>
+                                        <span class="o_gec_headcount_track">
+                                            <span t-if="row.target" class="o_gec_headcount_target"
+                                                  t-attf-style="left: {{ row.target[0] * 100 }}%; width: {{ (row.target[1] - row.target[0]) * 100 }}%"/>
+                                            <span t-att-class="'o_gec_headcount_fill' + (this.outsideTarget(row) ? ' o_gec_off' : '')"
+                                                  t-attf-style="width: {{ this.barWidth(row.pct, 1) }}"/>
+                                        </span>
+                                        <span class="text-end" t-out="this.pct(row.pct)"/>
+                                        <span class="text-end text-muted" t-out="row.fte.toFixed(1) + ' FTE'"/>
+                                    </div>
+                                </t>
+                            </div>
+                        </t>
+
+                        <div t-if="prod and prod.stream_per_fte and prod.stream_per_fte.length" class="o_gec_panel mb-3">
+                            <div class="o_gec_panel_title">Revenue per FTE by stream <small class="text-muted">· annualised</small></div>
+                            <div class="o_gec_cards">
+                                <t t-foreach="prod.stream_per_fte" t-as="st" t-key="st.id">
+                                    <div class="o_gec_stat">
+                                        <span class="text-muted small" t-out="st.name"/>
+                                        <strong t-out="this.money(st.per_fte, true)"/>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+
+                    </t>
+
+                    <t t-if="this.showTab('projects')">
+                        <h3 t-if="this.state.printAll" class="o_gec_print_title">Projects &amp; Cash</h3>
+                        <div t-if="this.deliveryCards.length" class="o_gec_section_title">Delivery
+                            <small>· customer projects, due in the period</small></div>
+                        <div t-if="this.deliveryCards.length" class="o_gec_cards mb-3">
+                            <t t-foreach="this.deliveryCards" t-as="card" t-key="card.key">
+                                <GecDashboardKpi card="this.proofed(card)"/>
+                            </t>
+                        </div>
+                        <t t-set="fc" t-value="p.forecast"/>
+                        <div t-if="fc and fc.projects" class="o_gec_panel mb-3">
+                            <div class="o_gec_panel_title d-flex flex-wrap gap-2">
+                                <span class="me-auto">Projects at completion <small class="text-muted">· project to date</small></span>
+                                <span t-if="fc.counts.loss" class="o_gec_pill o_gec_pill_bad"><t t-out="fc.counts.loss"/> loss</span>
+                                <span t-if="fc.counts.eroding" class="o_gec_pill o_gec_pill_warn"><t t-out="fc.counts.eroding"/> eroding</span>
+                                <span class="o_gec_pill o_gec_pill_good"><t t-out="fc.counts.on_track"/> on track</span>
+                            </div>
+                            <table class="table table-sm table-hover o_gec_table mb-0">
+                                <thead><tr>
+                                    <th>Project</th><th class="text-end">Contract</th><th class="text-end">Cost to date</th>
+                                    <th class="text-end">To complete</th><th class="text-end">Forecast margin</th>
+                                    <th class="text-end">Forecast %</th><th class="text-end">Budget %</th>
+                                </tr></thead>
+                                <tbody>
+                                    <tr t-foreach="fc.projects" t-as="pr" t-key="pr.id" role="button"
+                                        t-on-click="() => this.open('project', pr.id)">
+                                        <td class="text-truncate"><i class="oi me-1" t-att-data-icon="this.forecastIcon(pr.status)[0]" t-att-class="this.forecastIcon(pr.status)[1]"/><t t-out="pr.name"/></td>
+                                        <td class="text-end" t-out="this.money(pr.contract, true)"/>
+                                        <td class="text-end" t-out="this.money(pr.cost_to_date, true)"/>
+                                        <td class="text-end" t-att-title="pr.hours_to_go.toFixed(0) + ' h to go'"
+                                            t-out="this.money(pr.to_complete, true)"/>
+                                        <td class="text-end fw-bold" t-att-class="pr.margin &lt; 0 ? 'text-danger' : ''"
+                                            t-out="this.money(pr.margin, true)"/>
+                                        <td class="text-end" t-out="this.pct(pr.margin_pct)"/>
+                                        <td class="text-end text-muted" t-out="pr.budget_pct ? this.pct(pr.budget_pct) : '—'"/>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <t t-set="done" t-value="this.delivery.completion"/>
+                        <div t-if="done and done.rows.length" class="o_gec_panel mb-3">
+                            <div class="o_gec_panel_title">Forecast end dates
+                                <small class="text-muted">· hours to go at the pace of the last 8 weeks</small></div>
+                            <table class="table table-sm table-hover o_gec_table mb-0">
+                                <thead><tr>
+                                    <th>Project</th><th class="text-end">Hours to go</th><th class="text-end">Hours / week</th>
+                                    <th class="text-end">Planned end</th><th class="text-end">Forecast end</th>
+                                    <th class="text-end">Days late</th>
+                                </tr></thead>
+                                <tbody>
+                                    <tr t-foreach="done.rows" t-as="row" t-key="row.id" role="button"
+                                        t-on-click="() => this.open('project', row.id)">
+                                        <td class="text-truncate" t-out="row.name"/>
+                                        <td class="text-end" t-out="row.hours_to_go.toFixed(0)"/>
+                                        <td class="text-end" t-out="row.burn.toFixed(1)"/>
+                                        <td class="text-end" t-out="this.formatDate(row.planned_end)"/>
+                                        <td class="text-end" t-out="this.formatDate(row.forecast_end)"/>
+                                        <td class="text-end fw-bold" t-att-class="row.delay &gt; 0 ? 'text-danger' : 'text-success'"
+                                            t-out="row.delay"/>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <t t-if="fc and fc.projects">
+                            <div class="o_gec_cards mb-3">
+                                <t t-foreach="this.cashCards" t-as="card" t-key="card.key">
+                                    <GecDashboardKpi card="this.proofed(card)"/>
+                                </t>
+                            </div>
+                            <div class="o_gec_panel mb-3">
+                                <div class="o_gec_panel_title">Backlog, billing and cash <small class="text-muted">· per project</small></div>
+                                <table class="table table-sm table-hover o_gec_table mb-0">
+                                    <thead><tr>
+                                        <th>Project</th><th class="text-end">Backlog</th><th style="width: 16%">Complete</th>
+                                        <th class="text-end">Unbilled</th><th class="text-end">Collected</th>
+                                        <th class="text-end">Cash margin</th>
+                                    </tr></thead>
+                                    <tbody>
+                                        <tr t-foreach="fc.projects" t-as="pr" t-key="pr.id" role="button"
+                                            t-on-click="() => this.open('project', pr.id)">
+                                            <td class="text-truncate" t-out="pr.name"/>
+                                            <td class="text-end" t-out="this.money(pr.backlog, true)"/>
+                                            <td><div class="o_gec_share"><span t-attf-style="width: {{ this.barWidth(pr.complete, 1) }}"/>
+                                                <em t-out="this.pct(pr.complete)"/></div></td>
+                                            <td class="text-end" t-att-class="pr.unbilled &lt; 0 ? 'text-muted' : ''"
+                                                t-att-title="pr.unbilled &lt; 0 ? 'Invoiced ahead of the work' : 'Work done, not yet invoiced'"
+                                                t-out="this.money(pr.unbilled, true)"/>
+                                            <td class="text-end" t-out="this.money(pr.collected, true)"/>
+                                            <td class="text-end fw-bold" t-att-class="pr.cash_margin &lt; 0 ? 'text-danger' : ''"
+                                                t-out="this.money(pr.cash_margin, true)"/>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+
+                        <div t-if="this.financeCards.length" class="o_gec_section_title">Cash
+                            <small>· company-wide</small></div>
+                        <div t-if="this.financeCards.length" class="o_gec_cards mb-3">
+                            <t t-foreach="this.financeCards" t-as="card" t-key="card.key">
+                                <GecDashboardKpi card="this.proofed(card)"/>
+                            </t>
+                        </div>
+                        <div t-if="this.cash.forecast" class="o_gec_panel mb-3">
+                            <div class="o_gec_panel_title">Cash forecast, next 13 weeks
+                                <small class="text-muted">· invoices and bills on their due dates, other costs at their weekly average</small></div>
+                            <div class="o_gec_chart_box">
+                                <GecDashboardChart t-key="'cashforecast' + this.state.version" config="() => this.cashForecastConfig()"/>
+                            </div>
+                        </div>
+
+                        <div t-if="p.objects.internal.length" class="o_gec_panel mb-3">
+                            <div class="o_gec_panel_title">Internal projects <small class="text-muted">· spend, not profit</small></div>
+                            <table class="table table-sm table-hover o_gec_table mb-0">
+                                <thead><tr><th>Project</th><th>Function</th><th class="text-end">Cost</th><th class="text-end">% of revenue</th></tr></thead>
+                                <tbody>
+                                    <tr t-foreach="p.objects.internal" t-as="o" t-key="o.id" role="button"
+                                        t-on-click="() => this.open('object', o.id)">
+                                        <td class="text-truncate" t-out="o.name"/>
+                                        <td t-out="o.function"/>
+                                        <td class="text-end" t-out="this.money(o.expense, true)"/>
+                                        <td class="text-end" t-out="this.pct(this.internalShare(o))"/>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+
+                    <t t-if="this.showTab('activity')">
+                        <h3 t-if="this.state.printAll" class="o_gec_print_title">Activity Costing</h3>
+                        <t t-set="totals" t-value="this.activity.totals"/>
+                        <div class="o_gec_cards mb-3">
+                            <t t-foreach="this.activityKpis" t-as="card" t-key="card.key">
+                                <GecDashboardKpi card="this.proofed(card)"/>
+                            </t>
+                        </div>
+                        <t t-if="this.activity.activities.length">
+                            <div class="row g-3 mb-3">
+                                <div class="col-xl-8">
+                                    <div class="o_gec_panel h-100">
+                                        <div class="o_gec_panel_title">Charged vs not charged, by activity</div>
+                                        <div class="o_gec_chart_box">
+                                            <GecDashboardChart t-key="'activity' + this.state.version" config="() => this.activityConfig()"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-4">
+                                    <div class="o_gec_panel h-100">
+                                        <div class="o_gec_panel_title">Cost pool by value</div>
+                                        <div class="o_gec_chart_box">
+                                            <GecDashboardChart t-key="'value' + this.state.version" config="() => this.valueConfig()"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_gec_panel mb-3">
+                                <div class="o_gec_panel_title">Activities</div>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-hover o_gec_table mb-0">
+                                        <thead><tr>
+                                            <th>Activity</th><th class="text-end">Cost per unit</th><th class="text-end">Units</th>
+                                            <th class="text-end">Pool</th><th class="text-end">Charged</th><th class="text-end">Not charged</th>
+                                            <th class="text-end">Idle capacity</th><th class="text-end">Rate variance</th>
+                                            <th style="width: 14%">Capacity used</th>
+                                        </tr></thead>
+                                        <tbody>
+                                            <tr t-foreach="this.activity.activities" t-as="a" t-key="a.id" role="button"
+                                                t-on-click="() => this.open('activity', a.id)">
+                                                <td t-out="a.name"/>
+                                                <td class="text-end text-nowrap"><t t-out="this.money(a.rate)"/>
+                                                    <span t-if="a.unit" class="text-muted" t-out="' / ' + a.unit"/></td>
+                                                <td class="text-end" t-out="a.quantity.toLocaleString()"/>
+                                                <td class="text-end" t-out="this.money(a.pool, true)"/>
+                                                <td class="text-end" t-out="this.money(a.charged, true)"/>
+                                                <td class="text-end" t-out="this.money(a.not_charged, true)"/>
+                                                <td class="text-end" t-out="this.money(a.idle, true)"/>
+                                                <td class="text-end" t-out="this.money(a.rate_variance, true)"/>
+                                                <td><div t-if="a.capacity_used !== false" class="o_gec_share">
+                                                    <span t-attf-style="width: {{ this.barWidth(a.capacity_used, 1) }}"/>
+                                                    <em t-out="this.pct(a.capacity_used)"/></div></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </t>
+                        <div t-else="" class="o_gec_panel text-muted text-center py-4">
+                            No allocation run covers this period yet, so there are no activity rates to show.
+                        </div>
+                    </t>
+                </div>
+            </div>
+
+            <t t-if="this.state.proof">
+                <div class="o_gec_proof_backdrop" t-on-click="() => this.closeProof()"/>
+                <aside class="o_gec_proof" role="dialog" aria-label="How this figure is calculated">
+                    <div class="o_gec_proof_head">
+                        <div>
+                            <div class="o_gec_proof_kicker">How this is calculated</div>
+                            <h3 t-out="this.state.proof.title or ''"/>
+                        </div>
+                        <button class="btn btn-link o_gec_proof_close" title="Close" t-on-click="() => this.closeProof()">
+                            <i class="oi" data-icon="close"/>
+                        </button>
+                    </div>
+                    <div t-if="this.state.proof.loading" class="text-muted py-4">
+                        <span class="spinner-border spinner-border-sm me-2"/>Working it out…
+                    </div>
+                    <t t-else="">
+                        <div class="o_gec_proof_value" t-out="this.state.proof.value"/>
+                        <section>
+                            <h4>Formula</h4>
+                            <p t-out="this.state.proof.formula"/>
+                        </section>
+                        <section>
+                            <h4>With this period's numbers</h4>
+                            <p class="o_gec_proof_math" t-out="this.state.proof.computation"/>
+                        </section>
+                        <section t-if="this.state.proof.parts and this.state.proof.parts.length">
+                            <h4>Where the numbers come from</h4>
+                            <t t-foreach="this.state.proof.parts" t-as="part" t-key="part_index">
+                                <div class="o_gec_proof_part">
+                                    <div class="o_gec_proof_part_label">
+                                        <span t-out="part.label"/>
+                                        <small t-if="part.count !== undefined" class="text-muted">
+                                            <t t-out="part.count.toLocaleString()"/> rows</small>
+                                    </div>
+                                    <strong class="text-nowrap" t-out="part.value"/>
+                                    <button t-if="part.action" class="btn btn-sm btn-secondary"
+                                            t-on-click="() => this.openRows(part.action)">
+                                        <i class="oi me-1" data-icon="arrow_forward"/>Rows
+                                    </button>
+                                    <span t-else=""/>
+                                </div>
+                            </t>
+                            <p class="o_gec_proof_hint">Rows open as a pivot or list; use its Download button for Excel.</p>
+                        </section>
+                        <section t-if="this.state.proof.benchmark">
+                            <h4>Benchmark</h4>
+                            <p t-out="this.state.proof.benchmark"/>
+                        </section>
+                        <section t-if="this.state.proof.notes and this.state.proof.notes.length">
+                            <h4>Good to know</h4>
+                            <ul>
+                                <t t-foreach="this.state.proof.notes" t-as="note" t-key="note_index">
+                                    <li t-out="note"/>
+                                </t>
+                            </ul>
+                        </section>
+                    </t>
+                </aside>
+            </t>
+        </div>
+    </t>
+
+</templates>

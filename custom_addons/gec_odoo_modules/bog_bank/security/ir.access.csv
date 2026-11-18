@@ -1,0 +1,14 @@
+id,name,model_id,group_id/id,operation,domain
+access_bog_connection_user,bog.connection.user,bog.connection,bog_bank.group_bog_user,r,
+access_bog_connection_manager,bog.connection.manager,bog.connection,bog_bank.group_bog_manager,crud,
+rule_bog_connection_company,Bank of Georgia Connection: Multi-Company,bog.connection,,crud,"[('company_id', 'in', company_ids)]"
+access_bog_approval_user,bog.approval.user,bog.approval,bog_bank.group_bog_user,r,
+access_bog_approval_manager,bog.approval.manager,bog.approval,bog_bank.group_bog_manager,crud,
+rule_bog_approval_company,Bank of Georgia Approval: Multi-Company,bog.approval,,crud,"[('company_id', 'in', company_ids)]"
+access_bog_api_log_manager,bog.api.log.manager,bog.api.log,bog_bank.group_bog_manager,r,
+access_bog_api_log_system,bog.api.log.system,bog.api.log,base.group_system,crud,
+rule_bog_api_log_company,Bank of Georgia API Log: Multi-Company,bog.api.log,,crud,"[('company_id', 'in', company_ids)]"
+access_bog_statement_user,bog.statement.user,bog.statement,bog_bank.group_bog_user,r,
+access_bog_statement_manager,bog.statement.manager,bog.statement,bog_bank.group_bog_manager,crud,
+rule_bog_statement_company,Bank of Georgia Statement: Multi-Company,bog.statement,,crud,"[('company_id', 'in', company_ids)]"
+access_bog_statement_import_wizard,bog.statement.import.wizard.user,bog.statement.import.wizard,bog_bank.group_bog_user,crud,"[('create_uid', '=', user.id)]"

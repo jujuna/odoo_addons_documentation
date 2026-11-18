@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="brand_kit" model="gec.brand.kit"/>
+
+    <!-- Inactive until Apply. Kept as module data so uninstalling the module removes them: a row whose
+         target file is gone would break every page. Sequence 16 = after the manifests, so the targets exist. -->
+    <record id="asset_light" model="ir.asset">
+        <field name="name">gec_brand_kit: light brand variables</field>
+        <field name="bundle">web._assets_primary_variables</field>
+        <field name="directive">after</field>
+        <field name="target">gec_brand_kit/static/src/scss/brand_variables.scss</field>
+        <field name="path">/_custom/gec_brand_kit/brand_variables.scss</field>
+        <field name="sequence">16</field>
+        <field name="active" eval="False"/>
+    </record>
+    <record id="asset_dark" model="ir.asset">
+        <field name="name">gec_brand_kit: dark brand variables</field>
+        <field name="bundle">web.dark_mode_variables</field>
+        <field name="directive">replace</field>
+        <field name="target">gec_brand_kit/static/src/scss/brand_variables.dark.scss</field>
+        <field name="path">/_custom/gec_brand_kit/brand_variables.dark.scss</field>
+        <field name="sequence">16</field>
+        <field name="active" eval="False"/>
+    </record>
+</odoo>

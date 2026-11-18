@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="gec_access_manager.MenuTreeField">
+        <div class="o_gec_menu_tree_layout">
+            <div class="o_gec_menu_tree">
+                <div class="o_gec_menu_tree_toolbar">
+                    <div class="o_gec_menu_tree_searchbox">
+                        <i class="oi oi-fw" data-icon="search"/>
+                        <input type="search" class="form-control o_gec_menu_tree_search"
+                               placeholder="Search a menu or a report..." t-att-value="this.state.search"
+                               t-on-input="this.onSearch"/>
+                    </div>
+                    <CheckBox value="this.state.onlyRestricted" className="'form-switch o_gec_only_restricted'"
+                              onChange="(value) => this.toggleOnlyRestricted(value)">
+                        Only what is restricted
+                    </CheckBox>
+                </div>
+                <div class="o_gec_menu_tree_list">
+                <t t-foreach="this.rows" t-as="row" t-key="row.id">
+                <div t-if="row.kind === 'print'" class="d-flex align-items-center o_gec_menu_tree_row o_gec_tree_print"
+                     t-att-style="'padding-left: ' + (0.5 + row.depth * 1.5) + 'rem'" t-att-data-print="row.key">
+                    <span class="oi oi-fw me-1"/>
+                    <CheckBox value="!row.hidden" disabled="this.props.readonly or this.state.busy"
+                              onChange="(shown) => this.togglePrint(row.entry, shown)"/>
+                    <i class="oi me-1 text-muted" t-att-data-icon="row.icon"/>
+                    <span class="small" t-att-class="{'text-muted text-decoration-line-through': row.hidden}"
+                          t-out="row.name"/>
+                    <span t-if="row.entry.kind === 'action'" class="text-muted small ms-2">Action menu</span>
+                </div>
+                <div t-else="" class="d-flex align-items-center o_gec_menu_tree_row"
+                     t-att-class="{'o_gec_menu_tree_app': row.depth === 0, 'o_gec_menu_tree_selected': row.selected}"
+                     t-att-style="'padding-left: ' + (0.5 + row.depth * 1.5) + 'rem'"
+                     t-att-data-menu-id="row.id">
+                    <button t-if="row.hasChildren and !this.state.search and !this.state.onlyRestricted" type="button"
+                            class="btn btn-link p-0 me-1 o_gec_menu_tree_caret"
+                            t-on-click="() => this.toggleExpand(row.id)">
+                        <i class="oi oi-fw" t-att-data-icon="row.expanded ? 'expand_more' : 'chevron_right'"/>
+                    </button>
+                    <span t-else="" class="oi oi-fw me-1"/>
+                    <CheckBox value="!row.hidden and !row.notGiven" indeterminate="row.partial and !row.notGiven"
+                              disabled="this.props.readonly or row.parentHidden or this.state.busy"
+                              onChange="(shown) => this.toggle(row.id, shown)"/>
+                    <t t-set="icon" t-value="row.depth === 0 ? this.iconOf(row.id) : null"/>
+                    <img t-if="icon and icon.src" class="o_gec_menu_tree_icon" t-att-src="icon.src" alt=""/>
+                    <i t-elif="icon" class="oi o_gec_menu_tree_icon" t-att-data-icon="icon.name"
+                       t-att-style="icon.style"/>
+                    <button type="button" class="btn btn-link p-0 text-start text-reset o_gec_menu_tree_name"
+                            t-on-click="() => this.select(row.id)">
+                        <span t-att-class="{'fw-bold': row.depth === 0, 'text-muted text-decoration-line-through': row.hidden, 'text-muted': row.notGiven}"
+                              t-out="row.name"/>
+                    </button>
+                    <span t-if="row.notGiven" class="o_gec_tag o_gec_tag_warning o_gec_not_given"
+                          t-att-title="'Its users cannot open this app. Tick it to give them ' + row.grant.name + '.'">
+                        Not given
+                    </span>
+                    <span class="o_gec_menu_tree_meta">
+                        <span t-if="row.model" class="o_gec_menu_tree_model" t-out="row.model"/>
+                        <span t-if="row.shared" class="o_gec_tag"
+                              title="Other apps also use these records">shared</span>
+                        <i t-foreach="row.marks" t-as="mark" t-key="mark_index" class="oi o_gec_mark"
+                           t-att-data-icon="mark.icon" t-att-title="mark.title"/>
+                        <span t-if="row.depth === 0 and !row.hidden and row.hiddenCount"
+                              class="o_gec_tag o_gec_tag_warning" t-out="this.hiddenLabel(row.hiddenCount)"/>
+                    </span>
+                </div>
+                </t>
+                </div>
+            </div>
+            <div class="o_gec_menu_tree_panel" t-att-class="{'o_gec_busy': this.state.busy}">
+                <MenuPanel t-if="this.state.panel" t-key="this.state.panel.menu.id"
+                           panel="this.state.panel" readonly="!!(this.props.readonly)"
+                           apply="(change) => this.apply(change)" openRule="() => this.openRule()"
+                           openGrants="(id) => this.openGrants(id)" openRow="(id) => this.openRow(id)"
+                           resultUser="this.state.resultUser" setResultUser="(id) => this.setResultUser(id)"
+                           profileId="this.record.resId"
+                           callProfile="(method, args) => this.callProfile(method, args)"/>
+            </div>
+        </div>
+    </t>
+
+</templates>

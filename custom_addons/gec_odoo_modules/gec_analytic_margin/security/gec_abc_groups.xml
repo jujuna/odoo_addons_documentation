@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- The switch behind Settings > Analytics > Activity-Based Costing: everything beyond the report hangs off it.
+         Implies Analytic Accounting, which ABC needs to allocate to. -->
+
+    <record id="group_gec_abc" model="res.groups">
+        <field name="name">Activity-Based Costing</field>
+        <field name="implied_ids"
+               eval="[(4, ref('analytic.group_analytic_accounting'))]"/>
+    </record>
+
+</odoo>

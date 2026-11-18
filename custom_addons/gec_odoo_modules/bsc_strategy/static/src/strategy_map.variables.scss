@@ -1,0 +1,62 @@
+// GEC brand palette for the strategy map (source: the gec-brand-style skill).
+// Dark mode recompiles the bundle, and strategy_map.variables.dark.scss comes first, hence !default.
+
+$gec-navy:        #153749 !default;
+$gec-teal-dark:   #226263 !default;
+$gec-teal-bright: #049978 !default;
+$gec-orange:      #F05324 !default;
+$gec-yellow:      #F0B91C !default;
+$gec-off-white:   #F5F5F0 !default;
+
+// No red in the palette: teal -> yellow -> orange. At Risk and Off Track also differ by weight and border.
+$bsc-green:  $gec-teal-bright !default;
+$bsc-amber:  $gec-yellow      !default;
+$bsc-red:    $gec-orange      !default;
+// No neutral in the palette, so it is mixed from navy.
+$bsc-grey:   mix($gec-navy, #ffffff, 42%) !default;
+
+// Brand rule: on a light ground, body and headings are NAVY.
+$bsc-name-color:          $gec-navy !default;
+$bsc-name-color-critical: $gec-navy !default;
+
+// Text needs more contrast than a 5px stripe, so these hues are darkened (yellow is unreadable as text at full value).
+$bsc-green-text: darken($gec-teal-bright, 6%)  !default;
+$bsc-amber-text: darken($gec-yellow, 19%)      !default;
+$bsc-red-text:   darken($gec-orange, 9%)       !default;
+$bsc-grey-text:  mix($gec-navy, #ffffff, 52%)  !default;
+
+// TEAL_DARK in both themes: the card is always dark, so its text is light-on-dark and the dark theme keeps it.
+$bsc-card-fill:          #226263                        !default;
+// A warm wash is invisible on teal (1.01:1), so an off-track card gets a
+// genuinely warm ground: orange mixed into navy, 1.50:1 away from the teal.
+$bsc-card-fill-critical: mix($gec-orange, $gec-navy, 22%) !default;
+$bsc-card-border:        mix(#ffffff, #226263, 32%)     !default;
+// Odoo's grey-500 lands at 1.4:1 on teal - unreadable either way round.
+$bsc-card-muted:         mix(#ffffff, #226263, 62%)     !default;
+
+// Card text. Brand rule for a dark ground: text is WHITE.
+$bsc-card-name:          #FFFFFF                        !default;
+$bsc-card-name-critical: #FFFFFF                        !default;
+
+// Card scores, lifted to clear the teal ground.
+$bsc-card-score-green: lighten($gec-teal-bright, 22%)   !default;
+$bsc-card-score-amber: $gec-yellow                      !default;
+$bsc-card-score-red:   lighten($gec-orange, 20%)        !default;
+$bsc-card-score-grey:  mix($gec-navy, #ffffff, 38%)     !default;
+
+// Status stripes, likewise - full-strength teal sinks into a teal card.
+$bsc-card-flag-green: lighten($gec-teal-bright, 10%)    !default;
+$bsc-card-flag-amber: $gec-yellow                       !default;
+$bsc-card-flag-red:   $gec-orange                       !default;
+$bsc-card-flag-grey:  mix($gec-navy, #ffffff, 34%)      !default;
+
+// Brand rule: ORANGE is the primary accent, TEAL_BRIGHT the sub-accent.
+$bsc-accent:      $gec-orange      !default;
+// TEAL_DARK on white is 6.4:1, safe for small uppercase labels; TEAL_BRIGHT is 3.4:1, so never text here.
+$bsc-panel-heading: $gec-teal-dark                   !default;
+$bsc-panel-body:    mix($gec-navy, #ffffff, 88%)     !default;
+$bsc-panel-muted:   mix($gec-navy, #ffffff, 62%)     !default;
+$bsc-panel-tint:    rgba($gec-teal-bright, .09)      !default;
+$bsc-panel-rule:    rgba($gec-teal-dark, .24)        !default;
+
+$bsc-accent-soft: $gec-teal-bright !default;   // connected arrows, progress bars

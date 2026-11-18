@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_bsc_scorecard_list" model="ir.ui.view">
+        <field name="name">bsc.scorecard.list</field>
+        <field name="model">bsc.scorecard</field>
+        <field name="arch" type="xml">
+            <list string="Scorecards" decoration-muted="state == 'closed'">
+                <field name="name"/>
+                <field name="responsible_id" widget="many2one_avatar_user" options="{'no_create': True}" />
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="frequency"/>
+                <field name="objective_count" string="Objectives"/>
+                <field name="kpi_count" string="KPIs"/>
+                <field name="score" digits="[16,1]" optional="show"/>
+                <field name="status" widget="badge"
+                       decoration-success="status == 'green'"
+                       decoration-warning="status == 'amber'"
+                       decoration-danger="status == 'red'"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'active'"
+                       decoration-info="state == 'draft'"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bsc_scorecard_kanban" model="ir.ui.view">
+        <field name="name">bsc.scorecard.kanban</field>
+        <field name="model">bsc.scorecard</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="status"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between">
+                            <strong><field name="name"/></strong>
+                            <field name="state" widget="badge"/>
+                        </div>
+                        <div class="text-muted">
+                            <field name="date_from"/> - <field name="date_to"/>
+                        </div>
+                        <div class="mt-2">
+                            <span>Score: </span>
+                            <strong><field name="score" digits="[16,1]"/>%</strong>
+                            <field name="status" widget="badge" class="ms-2"
+                                   decoration-success="status == 'green'"
+                                   decoration-warning="status == 'amber'"
+                                   decoration-danger="status == 'red'"/>
+                        </div>
+                        <div class="mt-1 text-muted">
+                            <field name="objective_count"/> objectives,
+                            <field name="kpi_count"/> KPIs
+                        </div>
+                        <footer>
+                            <field name="responsible_id" widget="many2one_avatar_user" options="{'no_create': True}" />
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_bsc_scorecard_form" model="ir.ui.view">
+        <field name="name">bsc.scorecard.form</field>
+        <field name="model">bsc.scorecard</field>
+        <field name="arch" type="xml">
+            <form string="Scorecard">
+                <header>
+                    <button name="action_activate" type="object" string="Activate"
+                            class="btn-primary" invisible="state != 'draft'"
+                            help="Checks the design, generates the periods and opens the first one."/>
+                    <button name="action_open_data_entry" type="object" string="Enter Figures"
+                            class="btn-primary" invisible="state != 'active'"
+                            help="Every figure of the open period, editable in one table."/>
+                    <button name="action_open_dashboard" type="object" string="Dashboard"
+                            invisible="state == 'draft'"
+                            groups="bsc_strategy.group_bsc_manager"/>
+                    <button name="action_close" type="object" string="Close Cycle"
+                            invisible="state != 'active'"
+                            confirm="This closes every open period and freezes the figures. Continue?"/>
+                    <button name="action_back_to_draft" type="object" string="Back to Draft"
+                            invisible="state != 'active'"
+                            confirm="The periods are deleted and created again on the next activation. Targets typed on them are lost. Continue?"/>
+                    <button name="action_duplicate_to_new_cycle" type="object"
+                            string="Copy to New Cycle" invisible="state == 'draft'"
+                            help="Copies the design - objectives, KPIs, weights and the strategy map - into a new draft cycle. Measurements, periods and initiatives stay with this cycle."/>
+                    <button name="%(bsc_strategy.action_report_bsc_board)d" type="action"
+                            string="Board Pack" invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,active,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_objectives" type="object"
+                                class="oe_stat_button" icon="flag">
+                            <field name="objective_count" widget="statinfo" string="Objectives"/>
+                        </button>
+                        <button name="action_open_kpis" type="object"
+                                class="oe_stat_button" icon="speed">
+                            <field name="kpi_count" widget="statinfo" string="KPIs"/>
+                        </button>
+                        <button name="action_open_initiatives" type="object"
+                                class="oe_stat_button" icon="rocket_launch">
+                            <field name="initiative_count" widget="statinfo" string="Initiatives"/>
+                        </button>
+                        <button name="action_open_links" type="object"
+                                class="oe_stat_button" icon="account_tree">
+                            <field name="link_count" widget="statinfo" string="Links"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Demo" bg_color="text-bg-info"
+                            invisible="not is_demo"/>
+                    <field name="is_demo" invisible="1"/>
+                    <field name="setup_done" invisible="1"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Strategy 2026-2028"/></h1>
+                    </div>
+                    <div class="card mb-3" invisible="state != 'draft' and setup_done">
+                        <div class="card-header py-2">
+                            <strong>Setup checklist</strong>
+                            <span class="text-muted ms-2 small">Work through it top to bottom.
+                                Save the form to refresh it.</span>
+                        </div>
+                        <field name="setup_checklist" nolabel="1" readonly="1"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="responsible_id" widget="many2one_avatar_user" options="{'no_create': True}" />
+                            <field name="parent_id"
+                                   help="Set this when the scorecard cascades from a higher level."/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="date_from" readonly="state != 'draft'"/>
+                            <field name="date_to" readonly="state != 'draft'"/>
+                            <field name="frequency" readonly="state != 'draft'"/>
+                            <field name="auto_create_review"/>
+                            <field name="current_period_id" invisible="state == 'draft'"/>
+                        </group>
+                    </group>
+                    <group invisible="state == 'draft'">
+                        <group>
+                            <label for="score"/>
+                            <div class="o_row">
+                                <field name="score" digits="[16,1]" class="oe_inline"/>
+                                <span class="oe_inline">%</span>
+                                <field name="status" widget="badge" class="ms-2"
+                                       decoration-success="status == 'green'"
+                                       decoration-warning="status == 'amber'"
+                                       decoration-danger="status == 'red'"/>
+                            </div>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Objectives" name="objectives">
+                            <p class="text-muted mb-2">
+                                Type the objectives straight into the table - one line each.
+                                Use the arrow at the end of a line to open the full form, where
+                                its KPIs and cause-effect links are added.
+                            </p>
+                            <field name="objective_ids" context="{'default_scorecard_id': id}">
+                                <list editable="bottom" open_form_view="True">
+                                    <field name="perspective_sequence" column_invisible="1"/>
+                                    <field name="code" optional="show" placeholder="F1"/>
+                                    <field name="perspective_id" options="{'no_create': True}" />
+                                    <field name="name"/>
+                                    <field name="assessment_mode" optional="hide"/>
+                                    <field name="owner_id" widget="many2one_avatar_user" options="{'no_create': True}" />
+                                    <field name="weight" sum="Total weight" optional="show"/>
+                                    <field name="kpi_count" string="KPIs"/>
+                                    <field name="score" digits="[16,1]" optional="show"/>
+                                    <field name="status" widget="badge" optional="show"
+                                           decoration-success="status == 'green'"
+                                           decoration-warning="status == 'amber'"
+                                           decoration-danger="status == 'red'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="KPIs" name="kpis">
+                            <p class="text-muted mb-2">
+                                Every measure of this scorecard. To add or change several at
+                                once, use <b>Edit KPIs in a table</b>.
+                            </p>
+                            <button name="action_open_kpis" type="object"
+                                    string="Edit KPIs in a table" icon="table"
+                                    class="btn-secondary mb-2"/>
+                            <field name="kpi_ids">
+                                <list>
+                                    <field name="objective_id"/>
+                                    <field name="name"/>
+                                    <field name="uom_name" string="Unit"/>
+                                    <field name="direction"/>
+                                    <field name="default_target"/>
+                                    <field name="owner_id" widget="many2one_avatar_user"/>
+                                    <field name="current_actual" string="Actual" optional="show"/>
+                                    <field name="current_status" widget="badge" optional="show"
+                                           decoration-success="current_status == 'green'"
+                                           decoration-warning="current_status == 'amber'"
+                                           decoration-danger="current_status == 'red'"/>
+                                    <button name="action_open_current_measurement" type="object"
+                                            string="Figure" icon="keyboard"
+                                            title="Enter or change this period's figure"/>
+                                    <button name="action_open_form" type="object" string="Edit" icon="edit" title="Open it where it can be changed"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Perspective Weights" name="weights">
+                            <p class="text-muted">
+                                Optional. Without an entry here a perspective uses its own
+                                default weight. Leave the whole tab empty if you do not
+                                want to weight anything - equal treatment is a valid choice.
+                            </p>
+                            <field name="weight_ids">
+                                <list editable="bottom">
+                                    <field name="perspective_id" options="{'no_create': True}" />
+                                    <field name="weight" sum="Total"/>
+                                    <field name="objective_count" string="Objectives"/>
+                                    <field name="score" digits="[16,1]"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Initiatives" name="initiatives">
+                            <field name="initiative_ids" context="{'default_scorecard_id': id}">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="stage_id" options="{'no_create': True}" />
+                                    <field name="owner_id" widget="many2one_avatar_user" options="{'no_create': True}" />
+                                    <field name="date_start"/>
+                                    <field name="date_end"/>
+                                    <field name="budget_planned" sum="Planned"/>
+                                    <field name="budget_actual" sum="Actual"/>
+                                    <field name="progress" widget="progressbar"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Periods" name="periods" invisible="state == 'draft'">
+                            <field name="period_ids">
+                                <list decoration-bf="is_current == True">
+                                    <field name="name"/>
+                                    <field name="date_from"/>
+                                    <field name="date_to"/>
+                                    <field name="filled_count" string="Reported"/>
+                                    <field name="measurement_count" string="Expected"/>
+                                    <field name="completion_rate" widget="progressbar"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'open'"/>
+                                    <field name="is_current" column_invisible="1"/>
+                                    <button name="action_open_measurements" type="object"
+                                            string="Figures" icon="table"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Reviews" name="reviews" invisible="state == 'draft'">
+                            <field name="review_ids">
+                                <list>
+                                    <field name="review_date"/>
+                                    <field name="period_id" options="{'no_create': True}" />
+                                    <field name="score_snapshot" digits="[16,1]"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Vision and Mission" name="vision">
+                            <group>
+                                <field name="vision" placeholder="Where the organisation intends to be."/>
+                                <field name="mission" placeholder="Why the organisation exists."/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bsc_scorecard_search" model="ir.ui.view">
+        <field name="name">bsc.scorecard.search</field>
+        <field name="model">bsc.scorecard</field>
+        <field name="arch" type="xml">
+            <search string="Scorecards">
+                <field name="name"/>
+                <field name="responsible_id"/>
+                <filter name="filter_active" string="Active" domain="[('state', '=', 'active')]"/>
+                <filter name="filter_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_mine" string="My Scorecards"
+                        domain="[('responsible_id', '=', uid)]"/>
+                <group>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_responsible" string="Strategy Owner"
+                            context="{'group_by': 'responsible_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bsc_scorecard" model="ir.actions.act_window">
+        <field name="name">Scorecards</field>
+        <field name="res_model">bsc.scorecard</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_bsc_scorecard_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Set up your first scorecard</p>
+            <p>Start with the objectives, not the measures. Put a handful of
+               objectives in each perspective, say out loud which one is supposed
+               to drive which, and only then decide what to measure.</p>
+        </field>
+    </record>
+
+</odoo>

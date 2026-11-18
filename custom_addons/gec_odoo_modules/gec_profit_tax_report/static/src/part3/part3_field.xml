@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="gec_profit_tax_report.RsCitPart3Field">
+        <table class="o_rs_cit_part3">
+            <colgroup>
+                <col class="o_rs_cit_code_col"/>
+                <col class="o_rs_cit_code_col"/>
+                <col class="o_rs_cit_code_col"/>
+                <col/>
+                <col class="o_rs_cit_amount_col"/>
+                <col class="o_rs_cit_amount_col"/>
+                <col class="o_rs_cit_items_col"/>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th colspan="4">მოგების გადასახადის გაანგარიშება (ლარი)</th>
+                    <th colspan="2" class="text-center">თანხა</th>
+                    <th/>
+                </tr>
+            </thead>
+            <tbody>
+                <tr t-foreach="this.rows" t-as="row" t-key="row.rec.id"
+                    t-att-class="(row.bold ? 'o_rs_cit_bold' : '') + (row.groupStart ? ' o_rs_cit_group_start' : '')">
+                    <td t-foreach="row.indent" t-as="depth" t-key="depth" class="o_rs_cit_code o_rs_cit_indent"/>
+                    <td t-att-class="'o_rs_cit_code o_rs_cit_code_' + row.level" t-out="row.code"/>
+                    <td t-att-colspan="row.textColspan" class="o_rs_cit_text" t-out="row.rec.data.name"/>
+                    <td t-foreach="this.columnKeys" t-as="column" t-key="column" class="o_rs_cit_amount">
+                        <t t-if="this.showColumn(row, column)">
+                            <div t-if="this.isTyped(row, column)" class="o_rs_cit_box o_rs_cit_box_typed">
+                                <input type="text" class="o_rs_cit_input" inputmode="decimal"
+                                       t-att-value="this.format(row.rec.data[this.fields(column).total])"
+                                       t-on-change="(ev) => this.onChange(row, column, ev)"/>
+                                <i t-if="this.isAdjusted(row, column)" class="oi o_rs_cit_adjusted" data-icon="edit"
+                                   t-att-title="this.adjustTitle(row, column)"/>
+                            </div>
+                            <div t-else="" class="o_rs_cit_box o_rs_cit_box_locked"
+                                 t-att-title="this.isAdjusted(row, column) ? this.adjustTitle(row, column) : ''">
+                                <span t-out="this.format(row.rec.data[this.fields(column).total])"/>
+                                <i class="oi o_rs_cit_lock" data-icon="lock"/>
+                            </div>
+                        </t>
+                    </td>
+                    <td class="o_rs_cit_items">
+                        <button t-if="row.rec.data.move_line_count" class="btn btn-link p-0" type="button"
+                                title="Journal Items" t-on-click="() => this.openItems(row)">
+                            <i class="oi" data-icon="list"/>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </t>
+
+</templates>
