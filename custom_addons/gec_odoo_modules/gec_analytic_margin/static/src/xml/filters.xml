@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates>
+    <t t-name="gec_analytic_margin.MarginStatementFilters"
+       t-inherit="account_reports.AccountReportFiltersCustomizable">
+        <xpath expr="//div[@id='filter_extra_options']" position="before">
+            <t t-if="this.gecSectionChoices.length">
+                <div id="gec_filter_section" class="me-1">
+                    <Dropdown>
+                        <button class="btn btn-secondary">
+                            <i class="oi me-1" data-icon="format_list_bulleted"/>
+                            <t t-out="this.gecSectionName"/>
+                        </button>
+                        <t t-set-slot="content">
+                            <t t-foreach="this.gecSectionChoices" t-as="choice" t-key="choice.id">
+                                <DropdownItem
+                                    class="{ 'selected': choice.id === this.controller.cachedFilterOptions().gec_section_by }"
+                                    onSelected="() => this.gecSelectSection(choice.id)"
+                                >
+                                    <t t-out="choice.name"/>
+                                </DropdownItem>
+                            </t>
+                        </t>
+                    </Dropdown>
+                </div>
+            </t>
+            <t t-if="this.gecSectionRecords.length">
+                <div id="gec_filter_section_pick" class="me-1">
+                    <Dropdown>
+                        <button class="btn btn-secondary">
+                            <i class="oi me-1" data-icon="search"/>
+                            <t t-out="this.gecPickerName"/>
+                        </button>
+                        <t t-set-slot="content">
+                            <DropdownItem
+                                class="{ 'selected': !this.gecSectionFilter.length }"
+                                onSelected="() => this.gecClearPick()"
+                                closingMode="'none'"
+                            >
+                                All
+                            </DropdownItem>
+                            <div class="dropdown-divider"/>
+                            <t t-foreach="this.gecSectionRecords" t-as="record" t-key="record.id">
+                                <DropdownItem
+                                    class="{ 'selected': this.gecIsPicked(record.id) }"
+                                    onSelected="() => this.gecTogglePick(record.id)"
+                                    closingMode="'none'"
+                                >
+                                    <t t-out="record.name"/>
+                                </DropdownItem>
+                            </t>
+                        </t>
+                    </Dropdown>
+                </div>
+            </t>
+        </xpath>
+    </t>
+</templates>

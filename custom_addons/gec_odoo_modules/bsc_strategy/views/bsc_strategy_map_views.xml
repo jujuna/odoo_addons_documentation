@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_bsc_strategy_map" model="ir.actions.client">
+        <field name="name">Strategy Map</field>
+        <field name="tag">bsc_strategy_map</field>
+    </record>
+
+    <menuitem id="menu_bsc_strategy_map"
+              name="Strategy Map"
+              parent="bsc_strategy.menu_bsc_strategy"
+              action="action_bsc_strategy_map"
+              sequence="15"/>
+
+    <record id="view_bsc_scorecard_form_map" model="ir.ui.view">
+        <field name="name">bsc.scorecard.form.map</field>
+        <field name="model">bsc.scorecard</field>
+        <field name="inherit_id" ref="bsc_strategy.view_bsc_scorecard_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_open_strategy_map" type="object"
+                        class="oe_stat_button" icon="account_tree"
+                        invisible="objective_count == 0">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Strategy</span>
+                        <span class="o_stat_text">Map</span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

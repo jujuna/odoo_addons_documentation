@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="payroll_hr_employee_view_form_geo" model="ir.ui.view">
+        <field name="name">hr.employee.form.geo.payroll</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr_payroll.payroll_hr_employee_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='wage_type']" position="after">
+                <field name="pay_scheme"/>
+                <field name="pension_fund_member"/>
+            </xpath>
+            <xpath expr="//field[@name='wage_type']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//div[@name='hourly_wage']" position="after">
+                <label for="daily_wage" invisible="wage_type != 'daily' and not worklog_daily_enabled"/>
+                <div class="o_row" name="daily_wage" invisible="wage_type != 'daily' and not worklog_daily_enabled">
+                    <field name="daily_wage" class="o_hr_narrow_field"/>
+                    <span>/ day</span>
+                </div>
+                <field name="worklog_ot_enabled"
+                       invisible="pay_scheme == 'hourly' and hourly_source == 'timesheet'"/>
+                <field name="overtime_pay_mode" invisible="not worklog_ot_enabled"/>
+                <field name="worklog_daily_enabled" readonly="1" invisible="1"/>
+                <field name="timesheet_extra_enabled" readonly="1" invisible="1"/>
+                <field name="hourly_source" invisible="pay_scheme != 'hourly'"/>
+                <field name="timesheet_pay_project_ids" widget="many2many_tags"
+                       invisible="not timesheet_extra_enabled and (pay_scheme != 'hourly' or hourly_source != 'timesheet')"/>
+                <field name="timesheet_pay_start_date"
+                       invisible="not timesheet_extra_enabled and (pay_scheme != 'hourly' or hourly_source != 'timesheet')"/>
+                <label for="hourly_wage"
+                       invisible="wage_type == 'hourly' or (not worklog_ot_enabled and not timesheet_extra_enabled)"/>
+                <div class="o_row" name="worklog_hourly_rate"
+                     invisible="wage_type == 'hourly' or (not worklog_ot_enabled and not timesheet_extra_enabled)">
+                    <field name="hourly_wage" class="o_hr_narrow_field"/>
+                    <span>/ hour</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_contract_template_view_form_geo" model="ir.ui.view">
+        <field name="name">hr.contract.template.form.geo.payroll</field>
+        <field name="model">hr.version</field>
+        <field name="inherit_id" ref="hr_payroll.hr_contract_template_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='wage_type']" position="after">
+                <field name="pay_scheme"/>
+            </xpath>
+            <xpath expr="//field[@name='wage_type']" position="attributes">
+                <attribute name="readonly">pay_scheme</attribute>
+            </xpath>
+            <xpath expr="//div[@name='hourly_wage']" position="after">
+                <label for="daily_wage" invisible="wage_type != 'daily' and not worklog_daily_enabled"/>
+                <div class="o_row" name="daily_wage" invisible="wage_type != 'daily' and not worklog_daily_enabled">
+                    <field name="daily_wage" class="o_hr_narrow_field"/>
+                    <span>/ day</span>
+                </div>
+                <field name="worklog_ot_enabled"
+                       invisible="pay_scheme == 'hourly' and hourly_source == 'timesheet'"/>
+                <field name="overtime_pay_mode" invisible="not worklog_ot_enabled"/>
+                <field name="worklog_daily_enabled" readonly="1"/>
+                <field name="timesheet_extra_enabled" readonly="1"/>
+                <field name="hourly_source" invisible="pay_scheme != 'hourly'"/>
+                <!-- the project domain reads it -->
+                <field name="company_id" invisible="1"/>
+                <field name="timesheet_pay_project_ids" widget="many2many_tags"
+                       invisible="not timesheet_extra_enabled and (pay_scheme != 'hourly' or hourly_source != 'timesheet')"/>
+                <field name="timesheet_pay_start_date"
+                       invisible="not timesheet_extra_enabled and (pay_scheme != 'hourly' or hourly_source != 'timesheet')"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

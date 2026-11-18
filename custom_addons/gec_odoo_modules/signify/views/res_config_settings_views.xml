@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.signify</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='integration']" position="inside">
+                <setting id="signify_settings" string="Signify"
+                         help="Send documents for e-signature with Signify">
+                    <div>
+                        <label for="signify_client_id" string="Client ID" class="me-3"/>
+                        <field name="signify_client_id"/>
+                    </div>
+                    <div>
+                        <label for="signify_client_secret" string="Client Secret" class="me-3"/>
+                        <field name="signify_client_secret" password="True"/>
+                    </div>
+                    <div>
+                        <label for="signify_redirect_url" string="Redirect URL" class="me-3"/>
+                        <field name="signify_redirect_url" widget="CopyClipboardURL"/>
+                    </div>
+                </setting>
+                <setting id="signify_reminder_settings" string="Signify Reminders" company_dependent="1"
+                         help="Signify reminds signers and approvers who have not acted yet">
+                    <div>
+                        <label for="signify_reminder_frequency" class="me-3"/>
+                        <field name="signify_reminder_frequency"/>
+                    </div>
+                    <div invisible="signify_reminder_frequency == 'never'">
+                        <label for="signify_reminder_max_count" class="me-3"/>
+                        <field name="signify_reminder_max_count"/>
+                    </div>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>

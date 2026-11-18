@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_hotel_rms_import_new" model="ir.actions.act_window">
+        <field name="name">Import</field>
+        <field name="res_model">hotel.rms.import</field>
+        <field name="view_mode">form</field>
+        <field name="context">{'default_kind': 'reservations'}</field>
+    </record>
+
+    <record id="hotel_rms_import_view_list" model="ir.ui.view">
+        <field name="name">hotel.rms.import.list</field>
+        <field name="model">hotel.rms.import</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="date"/>
+                <field name="property_id"/>
+                <field name="kind"/>
+                <field name="filename"/>
+                <field name="state" widget="badge" decoration-success="state == 'done'"
+                       decoration-danger="state == 'failed'" decoration-muted="state == 'draft'"/>
+                <field name="created"/>
+                <field name="updated"/>
+                <field name="kept" optional="hide"/>
+                <field name="user_id" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hotel_rms_import_view_form" model="ir.ui.view">
+        <field name="name">hotel.rms.import.form</field>
+        <field name="model">hotel.rms.import</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_check" type="object" string="Check file" icon="checklist"
+                            class="btn-secondary" invisible="not file or state == 'done'"/>
+                    <button name="action_import" type="object" string="Import" icon="upload" class="btn-primary"
+                            invisible="not file or state == 'done'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Import your data</h1>
+                    </div>
+                    <div class="o_rms_step">
+                        <h3><span class="o_rms_step_no">1</span>Choose the hotel and the file</h3>
+                        <group>
+                            <group>
+                                <field name="property_id" readonly="state == 'done'"/>
+                                <field name="kind" readonly="state == 'done'"/>
+                                <field name="file" filename="filename" readonly="state == 'done'"/>
+                                <field name="filename" invisible="1"/>
+                            </group>
+                            <group invisible="state == 'done'">
+                                <div colspan="2" class="d-flex flex-column gap-1">
+                                    <span class="text-muted">A CSV or Excel (.xlsx) file with one row per line.</span>
+                                    <a href="/hotel_rms/static/templates/reservations_template.csv"
+                                       download="reservations_template.csv" invisible="kind != 'reservations'">Download template</a>
+                                    <a href="/hotel_rms/static/templates/rates_template.csv"
+                                       download="rates_template.csv" invisible="kind != 'rates'">Download template</a>
+                                    <a href="/hotel_rms/static/sample/sample_reservations.csv"
+                                       download="sample_reservations.csv" invisible="kind != 'reservations'">Download sample data</a>
+                                </div>
+                            </group>
+                        </group>
+                    </div>
+                    <div class="o_rms_step" invisible="not file">
+                        <h3><span class="o_rms_step_no">2</span>Check the file</h3>
+                        <p class="text-muted" invisible="preview_html or errors or state == 'done'">
+                            Press Check file to see the first rows as they will be imported and every problem, before anything is saved.
+                        </p>
+                        <div class="alert alert-danger" role="alert" invisible="not errors">
+                            <strong><field name="error_count" class="oe_inline"/> problems found. Nothing was imported.</strong>
+                            Fix the file and choose it again.
+                            <field name="errors" class="o_rms_errors d-block mt-2"/>
+                        </div>
+                        <div class="alert alert-success" role="status" invisible="errors or not preview_html or state == 'done'">
+                            No problem found: the file is ready to import.
+                        </div>
+                        <field name="preview_html" invisible="not preview_html"/>
+                    </div>
+                    <div class="o_rms_step" invisible="not file or state == 'draft'">
+                        <h3><span class="o_rms_step_no">3</span>Result</h3>
+                        <div class="o_rms_result" invisible="state != 'done'">
+                            <div class="o_rms_tile"><field name="created" class="o_rms_value"/><span>Created</span></div>
+                            <div class="o_rms_tile"><field name="updated" class="o_rms_value"/><span>Updated</span></div>
+                            <div class="o_rms_tile" invisible="kind != 'rates'">
+                                <field name="kept" class="o_rms_value"/><span>Kept, waiting for publish</span>
+                            </div>
+                            <div class="o_rms_tile"><field name="error_count" class="o_rms_value"/><span>Errors</span></div>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2 mt-3" invisible="state != 'done'">
+                            <button name="%(hotel_rms.action_pricing_calendar)d" type="action" class="btn btn-primary"
+                                    string="Open calendar" icon="event_available"
+                                    context="{'property_id': property_id}"/>
+                            <button name="%(hotel_rms.action_hotel_rms_import_new)d" type="action"
+                                    class="btn btn-secondary" string="Import another" icon="upload"
+                                    context="{'default_property_id': property_id, 'default_kind': kind}"/>
+                        </div>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="hotel_rms_import_view_search" model="ir.ui.view">
+        <field name="name">hotel.rms.import.search</field>
+        <field name="model">hotel.rms.import</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="property_id"/>
+                <field name="filename"/>
+                <filter name="done" string="Done" domain="[('state', '=', 'done')]"/>
+                <filter name="failed" string="Failed" domain="[('state', '=', 'failed')]"/>
+                <group>
+                    <filter name="group_property" string="Hotel" context="{'group_by': 'property_id'}"/>
+                    <filter name="group_kind" string="Type" context="{'group_by': 'kind'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hotel_rms_import" model="ir.actions.act_window">
+        <field name="name">Imports</field>
+        <field name="res_model">hotel.rms.import</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Nothing was imported yet</p>
+            <p>Import your bookings from a CSV or Excel file: the engine learns from them how your nights fill up.</p>
+        </field>
+    </record>
+</odoo>

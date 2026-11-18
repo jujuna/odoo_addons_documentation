@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_payment_form_basisbank" model="ir.ui.view">
+        <field name="name">account.payment.form.basisbank</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_basisbank_submit_for_approval" type="object"
+                        string="Submit for Approval" class="oe_highlight"
+                        invisible="not is_basisbank or payment_type != 'outbound' or basisbank_state != 'pending' or not basisbank_approval_id"/>
+                <button name="action_basisbank_approve" type="object"
+                        string="Approve" class="oe_highlight"
+                        invisible="not is_basisbank or basisbank_state != 'awaiting_approval' or not basisbank_can_approve"/>
+                <button name="action_basisbank_send" type="object" groups="basis_bank.group_basisbank_user"
+                        string="Send to Basis Bank" class="oe_highlight"
+                        invisible="not is_basisbank or payment_type != 'outbound' or state not in ('draft', 'paid') or not (basisbank_state == 'awaiting_otp' or (basisbank_state == 'pending' and not basisbank_approval_id))"/>
+                <button name="action_basisbank_resync" type="object" groups="basis_bank.group_basisbank_user"
+                        string="Resync from Bank"
+                        invisible="not is_basisbank or basisbank_state not in ('sending', 'unknown', 'not_in_report')"/>
+                <button name="action_basisbank_reset_to_pending" type="object" groups="basis_bank.group_basisbank_user"
+                        string="Reset to Pending"
+                        confirm="Resending creates a new transfer at the bank. Only continue if Resync from Bank confirmed the original transfer is not in the report. Reset this payment to pending?"
+                        invisible="not is_basisbank or basisbank_state not in ('not_in_report', 'failed')"/>
+            </xpath>
+            <xpath expr="//header" position="after">
+                <div class="alert alert-danger" role="alert"
+                     invisible="not is_basisbank or basisbank_state != 'not_in_report'">
+                    The bank report did not show this payment within 48 hours. Its journal entry was left as it is, because the bank may still book the transfer.
+                    Use <b>Resync from Bank</b> to re-check; if it is still missing, <b>Reset to Pending</b> to resend, or investigate with the bank.
+                </div>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <field name="is_basisbank" invisible="1"/>
+                <group string="Basis Bank" invisible="not is_basisbank">
+                    <group>
+                        <field name="basisbank_transfer_type"/>
+                        <field name="basisbank_state" readonly="1"/>
+                        <field name="basisbank_can_approve" invisible="1"/>
+                        <field name="basisbank_approval_id" readonly="1"
+                               invisible="not basisbank_approval_id"/>
+                        <field name="basisbank_approved_by" readonly="1"
+                               invisible="not basisbank_approved_by"/>
+                        <field name="basisbank_approved_date" readonly="1"
+                               invisible="not basisbank_approved_date"/>
+                        <field name="basisbank_sent_date" readonly="1"
+                               invisible="not basisbank_sent_date"/>
+                        <field name="basisbank_bank_internal_id" readonly="1"/>
+                        <field name="basisbank_error_code" readonly="1"
+                               invisible="not basisbank_error_code"/>
+                        <field name="basisbank_error_message" readonly="1"
+                               invisible="not basisbank_error_message"/>
+                    </group>
+                    <group>
+                        <field name="basisbank_treasury_code"
+                               invisible="basisbank_transfer_type != 'treasury'"
+                               required="basisbank_transfer_type == 'treasury'"/>
+                        <field name="basisbank_purpose_code"
+                               invisible="basisbank_transfer_type != 'foreign'"/>
+                        <field name="basisbank_detail_of_charges"
+                               invisible="basisbank_transfer_type != 'foreign'"
+                               required="basisbank_transfer_type == 'foreign'"/>
+                        <field name="basisbank_receiver_country"
+                               invisible="basisbank_transfer_type != 'foreign'"
+                               required="basisbank_transfer_type == 'foreign'"/>
+                        <field name="basisbank_receiver_city"
+                               invisible="basisbank_transfer_type != 'foreign'"
+                               required="basisbank_transfer_type == 'foreign'"/>
+                        <field name="basisbank_receiver_address"
+                               invisible="basisbank_transfer_type != 'foreign'"
+                               required="basisbank_transfer_type == 'foreign'"/>
+                        <field name="basisbank_intermediate_bank_code"
+                               invisible="basisbank_transfer_type != 'foreign'"/>
+                        <field name="basisbank_intermediate_bank_name"
+                               invisible="basisbank_transfer_type != 'foreign'"/>
+                    </group>
+                    <group colspan="2">
+                        <field name="basisbank_bank_response" readonly="1"
+                               invisible="not basisbank_bank_response"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_account_payment_list_basisbank" model="ir.ui.view">
+        <field name="name">account.payment.list.basisbank</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_tree"/>
+        <field name="arch" type="xml">
+            <field name="state" position="after">
+                <field name="basisbank_state" optional="hide" widget="badge"
+                       decoration-success="basisbank_state == 'confirmed'"
+                       decoration-info="basisbank_state == 'sent'"
+                       decoration-warning="basisbank_state == 'unknown'"
+                       decoration-danger="basisbank_state in ('failed', 'not_in_report')"/>
+                <field name="basisbank_bank_internal_id" optional="hide"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="action_basisbank_payment" model="ir.actions.act_window">
+        <field name="name">Payments</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('journal_id.is_basisbank', '=', True)]</field>
+    </record>
+
+    <record id="action_server_basisbank_reset_to_pending" model="ir.actions.server">
+        <field name="name">Basis Bank: Reset to Pending</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="binding_model_id" ref="account.model_account_payment"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">action = records.action_basisbank_reset_to_pending()</field>
+        <field name="group_ids" eval="[(4, ref('basis_bank.group_basisbank_user'))]"/>
+    </record>
+</odoo>

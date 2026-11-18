@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.gosms</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='integration']" position="inside">
+                <setting id="gosms_settings" string="GoSMS"
+                         help="Send Odoo SMS and confirmation codes through GoSMS.ge. For codes, the sender name and how long a code is valid are set in the OTP settings on app.gosms.ge.">
+                    <div>
+                        <label for="gosms_api_key" string="API Key" class="me-3"/>
+                        <field name="gosms_api_key" password="True"/>
+                    </div>
+                    <button name="action_gosms_check_connection" type="object" string="Check Connection" class="btn-link" icon="arrow_forward"/>
+                    <div class="mt-3">
+                        <field name="gosms_sms_enabled"/>
+                        <label for="gosms_sms_enabled" class="ms-2"/>
+                    </div>
+                    <div class="mt-2" invisible="not gosms_sms_enabled">
+                        <label for="gosms_sender" class="me-3"/>
+                        <field name="gosms_sender"/>
+                        <button name="action_gosms_register_sender" type="object" string="Register Sender Name" class="btn-link" icon="arrow_forward"
+                                invisible="not gosms_sender"/>
+                    </div>
+                    <div class="mt-2" invisible="not gosms_sms_enabled">
+                        <label for="gosms_nosms_number" class="me-3"/>
+                        <field name="gosms_nosms_number"/>
+                    </div>
+                    <div class="mt-2" invisible="not gosms_sms_enabled">
+                        <label for="gosms_webhook_secret" class="me-3"/>
+                        <field name="gosms_webhook_secret" password="True"/>
+                    </div>
+                    <div class="mt-2" invisible="not gosms_sms_enabled">
+                        <label for="gosms_webhook_token" class="me-3"/>
+                        <field name="gosms_webhook_token" password="True"/>
+                    </div>
+                    <div class="mt-2" invisible="not gosms_sms_enabled">
+                        <label for="gosms_webhook_url" class="me-3"/>
+                        <field name="gosms_webhook_url" widget="CopyClipboardChar"/>
+                        <div class="text-muted">Paste this address into Webhook URL and DLR URL on app.gosms.ge.</div>
+                    </div>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>

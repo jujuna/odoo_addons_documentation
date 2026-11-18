@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="gec_brand_kit_import_view_form" model="ir.ui.view">
+        <field name="name">gec.brand.kit.import.form</field>
+        <field name="model">gec.brand.kit.import</field>
+        <field name="arch" type="xml">
+            <form string="Import Brand Kit">
+                <div class="alert alert-warning" role="alert">
+                    Applying a kit overwrites the logo, report colors and font of <strong>every company</strong>
+                    in this database. No copy of the previous values is kept.
+                </div>
+                <group>
+                    <field name="file" filename="filename" options="{'accepted_file_extensions': '.zip'}"/>
+                    <field name="filename" invisible="1"/>
+                    <field name="apply_now"/>
+                </group>
+                <footer>
+                    <button name="action_import" type="object" string="Import" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

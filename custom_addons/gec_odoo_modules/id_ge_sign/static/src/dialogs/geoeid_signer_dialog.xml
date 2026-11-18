@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="id_ge_sign.GeoeidSignerDialog">
+        <Dialog t-props="this.dialogProps">
+            <t t-if="this.state.phase === 'launching'">
+                <div class="text-center py-4">
+                    <i class="oi oi-spin oi-2x text-primary" data-icon="progress_activity"/>
+                    <p class="mt-3">Preparing the document for signing...</p>
+                </div>
+            </t>
+            <t t-elif="this.state.phase === 'waiting'">
+                <div class="py-2">
+                    <p>
+                        The <b>Georgian ID Card</b> application should now open.
+                        Enter your <b>PIN3</b> in the application to sign the document.
+                    </p>
+                    <p class="text-muted form-text">
+                        Your browser may ask for permission to open the Georgian ID Card application.
+                        Choose <i>Open</i> (or <i>Always allow</i>). This requires a desktop computer
+                        with a card reader and the Georgian ID Card application installed.
+                    </p>
+                    <div class="text-center mt-3">
+                        <i class="oi oi-spin text-primary" data-icon="progress_activity"/>
+                        <span class="ms-2">Waiting for the signature...</span>
+                    </div>
+                </div>
+            </t>
+            <t t-else="">
+                <div class="py-2">
+                    <div class="alert alert-danger" role="alert">
+                        <i class="oi me-1" data-icon="warning"/>
+                        <t t-out="this.state.error"/>
+                    </div>
+                </div>
+            </t>
+
+            <t t-set-slot="footer">
+                <button t-if="this.state.phase === 'waiting'" class="btn btn-secondary" t-on-click="() => this.openApp()">
+                    Open the application again
+                </button>
+                <button t-if="this.state.phase === 'error'" class="btn btn-primary" t-on-click="() => this.launch()">
+                    Try again
+                </button>
+                <button class="btn btn-secondary" t-on-click="() => this.cancel()">Cancel</button>
+            </t>
+        </Dialog>
+    </t>
+</templates>

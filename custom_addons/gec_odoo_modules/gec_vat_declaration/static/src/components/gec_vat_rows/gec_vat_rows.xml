@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="gec_vat_declaration.GecVatRows">
+        <section class="o_gec_vat_grid o_gec_vat_rows" t-ref="this.root">
+            <header t-if="this.layout.title" class="o_gvg_title" t-out="this.layout.title"/>
+
+            <div class="o_gvg_table_wrap">
+                <table class="o_gvr_table">
+                    <colgroup>
+                        <t t-foreach="this.layout.columns" t-as="column" t-key="column.field">
+                            <col t-att-style="'width: ' + column.width + '%'"/>
+                        </t>
+                        <col class="o_gvr_icon_col"/>
+                        <col class="o_gvr_icon_col"/>
+                    </colgroup>
+                    <thead>
+                        <t t-if="this.layout.header">
+                            <t t-foreach="this.layout.header" t-as="row" t-key="row_index">
+                                <tr>
+                                    <t t-foreach="row" t-as="head" t-key="head_index">
+                                        <th t-att-rowspan="head.rowspan" t-att-colspan="head.colspan"
+                                            t-att-class="{ 'o_gvr_group_head': head.colspan > 1 }" t-out="head.label"/>
+                                    </t>
+                                    <t t-if="row_index === 0">
+                                        <th class="o_gvr_icon" t-att-rowspan="this.layout.header.length"/>
+                                        <th class="o_gvr_icon" t-att-rowspan="this.layout.header.length">
+                                            <i t-if="this.layout.info" class="oi o_gvg_help" data-icon="help" role="img" tabindex="0"
+                                               t-att-title="this.layout.info" t-att-aria-label="this.layout.info"/>
+                                        </th>
+                                    </t>
+                                </tr>
+                            </t>
+                        </t>
+                        <t t-else="">
+                            <tr>
+                                <t t-foreach="this.headTop" t-as="head" t-key="head_index">
+                                    <th t-att-rowspan="head.rowspan" t-att-colspan="head.colspan"
+                                        t-att-class="{ 'o_gvr_group_head': head.group }" t-out="head.label"/>
+                                </t>
+                                <th class="o_gvr_icon" t-att-rowspan="this.grouped ? 2 : 1"/>
+                                <th class="o_gvr_icon" t-att-rowspan="this.grouped ? 2 : 1">
+                                    <i t-if="this.layout.info" class="oi o_gvg_help" data-icon="help" role="img" tabindex="0"
+                                       t-att-title="this.layout.info" t-att-aria-label="this.layout.info"/>
+                                </th>
+                            </tr>
+                            <tr t-if="this.grouped">
+                                <t t-foreach="this.headSub" t-as="column" t-key="column.field">
+                                    <th t-out="column.label"/>
+                                </t>
+                            </tr>
+                        </t>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="this.list.records" t-as="record" t-key="record.id">
+                            <tr t-att-data-record-id="record.id" t-att-class="{ 'o_gvr_typed': !this.isOdooRow(record), 'o_gvr_editing': record.isInEdition }">
+                                <t t-foreach="this.layout.columns" t-as="column" t-key="column.field">
+                                    <td t-att-data-field="column.field"
+                                        t-att-class="{ 'o_gvr_number': column.total, 'o_gvr_editable': this.isEditable(record) }"
+                                        t-on-click="() => this.onCellClick(record, column)">
+                                        <t t-if="column.month and !this.isEditable(record)" t-out="this.monthText(record, column)"/>
+                                        <Field t-else="" name="column.field" record="record"
+                                               fieldInfo="this.fieldInfos[column.field]"
+                                               readonly="!this.isEditable(record)"/>
+                                    </td>
+                                </t>
+                                <td class="o_gvr_icon">
+                                    <button t-if="this.isOdooRow(record)" type="button" class="btn btn-link p-0"
+                                            title="Open in Odoo" t-on-click.stop="() => this.openOdooRecord(record)">
+                                        <i class="oi" data-icon="open_in_new" aria-hidden="true"/>
+                                    </button>
+                                    <button t-elif="this.isEditable(record)" type="button" class="btn btn-link p-0 text-danger"
+                                            title="Delete row" t-on-click.stop="() => this.onDeleteRow(record)">
+                                        <i class="oi" data-icon="delete" aria-hidden="true"/>
+                                    </button>
+                                </td>
+                                <td class="o_gvr_icon">
+                                    <a t-if="this.layout.fileField and record.data[this.layout.fileField]"
+                                       t-att-href="'/web/content/' + record.data[this.layout.fileField].id"
+                                       target="_blank" rel="noopener" title="Open the PDF">
+                                        <i class="oi" data-icon="picture_as_pdf" aria-hidden="true"/>
+                                    </a>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                    <tfoot t-if="this.hasTotals">
+                        <tr>
+                            <t t-foreach="this.layout.columns" t-as="column" t-key="column.field">
+                                <td t-att-class="{ 'o_gvr_number': column.total }"
+                                    t-out="column.total ? this.totalText(column) : ''"/>
+                            </t>
+                            <td/>
+                            <td/>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <footer class="o_gvr_footer">
+                <span class="o_gvr_count" t-out="this.countText"/>
+                <FileUploader t-if="this.layout.upload and !this.props.readonly" multiUpload="true"
+                              acceptedFileExtensions="'.pdf'" onClick.bind="this.onUploadClick"
+                              onUploaded.bind="this.onFileUploaded" onUploadComplete.bind="this.onUploadComplete">
+                    <t t-set-slot="toggler">
+                        <button type="button" class="btn btn-secondary btn-sm">
+                            <i class="oi" data-icon="upload" aria-hidden="true"/> Upload PDFs
+                        </button>
+                    </t>
+                </FileUploader>
+                <button t-if="!this.props.readonly" type="button" class="btn btn-secondary btn-sm"
+                        t-on-click="() => this.onAddRow()">
+                    <i class="oi" data-icon="add" aria-hidden="true"/> Add a row
+                </button>
+                <Pager t-if="this.list.count > this.list.limit" t-props="this.pagerProps"/>
+            </footer>
+        </section>
+    </t>
+
+</templates>

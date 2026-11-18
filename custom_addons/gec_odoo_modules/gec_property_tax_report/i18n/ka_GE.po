@@ -1,0 +1,2854 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* gec_property_tax_report
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-07 07:39+0000\n"
+"PO-Revision-Date: 2026-10-07 07:39+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: gec_property_tax_report
+#: model:ir.module.module,description:base.module_gec_property_tax_report
+msgid ""
+"\n"
+"Builds parts III (property other than land) and IV (land) of the annual enterprise property tax\n"
+"declaration, annex V-01, from fixed assets and a land plot register, validates them against the\n"
+"rs.ge classifiers and exports the SpreadsheetML files the portal imports.\n"
+msgstr ""
+"\n"
+"აგებს საწარმოს ქონების გადასახადის წლიური დეკლარაციის (დანართი V-01) III ნაწილს (ქონება, გარდა მიწისა)\n"
+"და IV ნაწილს (მიწა) ძირითადი საშუალებებისა და მიწის ნაკვეთების რეესტრიდან, ამოწმებს მათ rs.ge-ის\n"
+"კლასიფიკატორებთან და ქმნის პორტალზე ასატვირთ SpreadsheetML ფაილებს.\n"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "%(area)s x %(unit)s = %(tax)s"
+msgstr "%(area)s x %(unit)s = %(tax)s"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "%(chargeable)s - %(advance)s = %(difference)s"
+msgstr "%(chargeable)s - %(advance)s = %(difference)s"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "%(label)s: %(name)s is not valid in %(year)s"
+msgstr "%(label)s: %(name)s არ მოქმედებს %(year)s წელს"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "%(label)s: rate %(got)s does not match the rs.ge table value %(want)s"
+msgstr ""
+"%(label)s: განაკვეთი %(got)s არ ემთხვევა rs.ge-ის ცხრილის მნიშვნელობას "
+"%(want)s"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "%(name)s: the rate must be between 0 and %(cap)s percent."
+msgstr "%(name)s: განაკვეთი უნდა იყოს 0-დან %(cap)s პროცენტამდე."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "%(tax)s / 12 x %(months)s = %(prorated)s"
+msgstr "%(tax)s / 12 x %(months)s = %(prorated)s"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_land_plot.py:0
+msgid "%s cannot be sold before it was acquired."
+msgstr "%s: გასხვისების თარიღი შეძენის თარიღზე ადრე ვერ იქნება."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/account_asset.py:0
+msgid ""
+"%(asset)s is attached to the land plot %(plot)s. Land is not depreciated, so "
+"this asset must keep a \"No depreciation\" model.\n"
+"\n"
+"To depreciate it, create a new asset, or first detach this asset from the "
+"land plot (Accounting > Configuration > Land Plots, clear its Asset)."
+msgstr ""
+"%(asset)s მიბმულია მიწის ნაკვეთზე %(plot)s. მიწას ცვეთა არ ერიცხება, ამიტომ "
+"ამ აქტივს უნდა ჰქონდეს ცვეთის მოდელი „ცვეთის გარეშე“.\n"
+"\n"
+"ცვეთის დასარიცხად შექმენით ახალი აქტივი ან ჯერ გააუქმეთ ამ აქტივის კავშირი "
+"მიწის ნაკვეთთან (ბუღალტერია > კონფიგურაცია > მიწის ნაკვეთები, გაასუფთავეთ "
+"ველი „აქტივი“)."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_land_plot.py:0
+msgid ""
+"%s has a taxable area but no exemption basis. The portal fills column 5 only"
+" when an exemption applies."
+msgstr ""
+"%s: დასაბეგრი ფართობი შევსებულია, მაგრამ შეღავათის საფუძველი მითითებული არ "
+"არის. პორტალი მე-5 სვეტს მხოლოდ შეღავათის შემთხვევაში ავსებს."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "%s is declared twice in this declaration."
+msgstr "%s ამ დეკლარაციაში ორჯერ არის დეკლარირებული."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid ""
+"%s is movable property: the acquisition year and the revaluation coefficient"
+" must stay empty (columns 5 and 7)."
+msgstr ""
+"%s მოძრავი ქონებაა: მიღების წელი და აფასების კოეფიციენტი ცარიელი უნდა დარჩეს"
+" (მე-5 და მე-7 სვეტები)."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid ""
+"%s is not a named type: it is declared per territorial unit, without an "
+"asset."
+msgstr ""
+"%s დასახელებული სახეობა არ არის: ის ტერიტორიული ერთეულის მიხედვით, აქტივის "
+"მითითების გარეშე დეკლარირდება."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "%s: a named type needs the object's name (column 2)"
+msgstr "%s: დასახელებულ სახეობას ობიექტის დასახელება სჭირდება (მე-2 სვეტი)"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "%s: an exemption amount needs an exemption basis (column 9)"
+msgstr "%s: შეღავათის თანხას შეღავათის საფუძველი სჭირდება (მე-9 სვეტი)"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "%s: column 5 is filled but no exemption basis is set"
+msgstr ""
+"%s: მე-5 სვეტი შევსებულია, მაგრამ შეღავათის საფუძველი მითითებული არ არის"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "%s: immovable property needs a revaluation coefficient (column 7)."
+msgstr "%s: უძრავ ქონებას აფასების კოეფიციენტი სჭირდება (მე-7 სვეტი)."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "%s: immovable property needs an acquisition year (column 5)."
+msgstr "%s: უძრავ ქონებას მიღების წელი სჭირდება (მე-5 სვეტი)."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "%s: missing land type"
+msgstr "%s: მიწის სახეობა მითითებული არ არის"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "%s: missing property type"
+msgstr "%s: ქონების სახეობა მითითებული არ არის"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "%s: missing territorial unit"
+msgstr "%s: ტერიტორიული ერთეული მითითებული არ არის"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "%s: no rs.ge rate for this territorial unit and land type"
+msgstr ""
+"%s: ამ ტერიტორიული ერთეულისა და მიწის სახეობისთვის rs.ge-ის განაკვეთი არ "
+"არსებობს"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid ""
+"%s: pick either the asset or the asset group this row declares (column 2)."
+msgstr ""
+"%s: აირჩიეთ ან აქტივი, ან აქტივების ჯგუფი, რომელსაც ეს სტრიქონი დეკლარირებს "
+"(მე-2 სვეტი)."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "%s: the area must be positive"
+msgstr "%s: ფართობი დადებითი უნდა იყოს"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "%s: the average annual value (column 6) is required."
+msgstr "%s: საშუალო წლიური ღირებულება (მე-6 სვეტი) სავალდებულოა."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid ""
+"%s: the taxable area after exemption cannot be negative or more than the "
+"area."
+msgstr ""
+"%s: დასაბეგრი ფართობი შეღავათის გათვალისწინებით არ შეიძლება იყოს უარყოფითი "
+"ან ფართობზე მეტი."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "(%(average)s x %(coefficient)s - %(exemption)s) x %(rate)s%% = %(tax)s"
+msgstr ""
+"(%(average)s x %(coefficient)s - %(exemption)s) x %(rate)s%% = %(tax)s"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_part3_line__average_value
+msgid ""
+"(value at 1 January + value at 31 December) / 2, from the posted "
+"depreciation entries."
+msgstr ""
+"(1 იანვრის ღირებულება + 31 დეკემბრის ღირებულება) / 2, გატარებული ცვეთის "
+"ჩანაწერების მიხედვით."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid ""
+"(value at 1 January + value at 31 December) / 2, summed over %s asset(s) "
+"from the posted depreciation entries."
+msgstr ""
+"(1 იანვრის ღირებულება + 31 დეკემბრის ღირებულება) / 2, %s აქტივის ჯამი, "
+"გატარებული ცვეთის ჩანაწერების მიხედვით."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_revaluation_coefficient__year_from
+msgid "0 means no lower bound."
+msgstr "0 ნიშნავს, რომ ქვედა ზღვარი არ არის."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_revaluation_coefficient__year_to
+msgid "0 means open."
+msgstr "0 ნიშნავს ღია ზღვარს."
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_rate_field/rs_form15_rate_field.xml:0
+msgid "0.xxx"
+msgstr ""
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.row_explanation
+msgid "1 January"
+msgstr "1 იანვარი"
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.row_explanation
+msgid "31 December"
+msgstr "31 დეკემბერი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_plot__date_acquired
+msgid "Acquired On"
+msgstr "შეძენის თარიღი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__acquisition_year_id
+msgid "Acquisition Year (5)"
+msgstr "მიღების წელი (5)"
+
+#. module: gec_property_tax_report
+#: model:ir.actions.act_window,name:gec_property_tax_report.action_rs_form15_year_acquire
+#: model:ir.ui.menu,name:gec_property_tax_report.menu_rs_form15_year
+msgid "Acquisition Years"
+msgstr "მიღების წლები"
+
+#. module: gec_property_tax_report
+#: model:ir.model.constraint,message:gec_property_tax_report.constraint_rs_form15_year_code_uniq
+msgid "Acquisition year must be unique."
+msgstr "მიღების წელი უნიკალური უნდა იყოს."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_classifier_mixin__active
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_exemption_basis__active
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_plot__active
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_territory__active
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_type__active
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_property_type__active
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_territory__active
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_year__active
+msgid "Active"
+msgstr "აქტიური"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "Add a Line"
+msgstr "სტრიქონის დამატება"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "Add a row"
+msgstr "სტრიქონის დამატება"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_plot__name
+msgid "Address / Description"
+msgstr "მისამართი / აღწერილობა"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "Advance (12)"
+msgstr "მიმდინარე გადასახდელი (12)"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__next_advance_date
+msgid "Advance Due"
+msgstr "მიმდინარე გადასახდელის ვადა"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_land_plot__unit
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_land_type__unit
+msgid ""
+"Agricultural land is declared in hectares, non-agricultural in square "
+"metres."
+msgstr ""
+"სასოფლო-სამეურნეო მიწა დეკლარირდება ჰექტარში, არასასოფლო-სამეურნეო — "
+"კვადრატულ მეტრში."
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "All"
+msgstr "ყველა"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part3_grid/rs_form15_part3_grid.js:0
+msgid "Amount"
+msgstr "თანხა"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "Amount per square metre"
+msgstr "თანხა კვადრატულ მეტრზე"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "An exemption applies, so column 5 carries the reduced area."
+msgstr "შეღავათი ვრცელდება, ამიტომ მე-5 სვეტში შემცირებული ფართობია."
+
+#. module: gec_property_tax_report
+#: model:ir.module.module,summary:base.module_gec_property_tax_report
+msgid ""
+"Annual enterprise property tax declaration (annex V-01) for eservices.rs.ge"
+msgstr ""
+"საწარმოს ქონების გადასახადის წლიური დეკლარაცია (დანართი V-01) "
+"eservices.rs.ge-ისთვის"
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_land_plot_form
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_land_plot_search
+msgid "Archived"
+msgstr "დაარქივებული"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_plot__area
+msgid "Area"
+msgstr "ფართობი"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part4_line__area
+msgid "Area (4)"
+msgstr "ფართობი (4)"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part4_grid/rs_form15_part4_grid.js:0
+msgid "Area (ha, m²)"
+msgstr "ფართობი (ჰა, კვ. მ.)"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_plot__asset_id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__asset_id
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.row_explanation
+msgid "Asset"
+msgstr "აქტივი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__asset_group_id
+msgid "Asset Group"
+msgstr "აქტივების ჯგუფი"
+
+#. module: gec_property_tax_report
+#: model:ir.model,name:gec_property_tax_report.model_account_asset
+msgid "Asset/Revenue Recognition"
+msgstr "აქტივის/შემოსავლის აღიარება"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__asset_ids
+msgid "Assets"
+msgstr "აქტივები"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "Automatically fit column widths"
+msgstr "სვეტების სიგანის ავტომატური მორგება"
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.row_explanation
+msgid "Average"
+msgstr "საშუალო"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__average_value
+msgid "Average Annual NBV (6)"
+msgstr "საშუალო წლიური საბალანსო ნარჩენი ღირებულება (6)"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "Average NBV (6)"
+msgstr "საშუალო წლიური საბალანსო ნარჩენი ღირებულება (6)"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part3_grid/rs_form15_part3_grid.js:0
+msgid "Average annual NBV"
+msgstr "საშუალო წლიური ნარჩენი ღირებულება"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "Average annual net book value"
+msgstr "საშუალო წლიური საბალანსო ნარჩენი ღირებულება"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_type__base_rate
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part4_line__base_rate
+msgid "Base Rate"
+msgstr "საბაზისო განაკვეთი"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part3_grid/rs_form15_part3_grid.js:0
+msgid "Basis"
+msgstr "საფუძველი"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "Basis (6)"
+msgstr "შეღავათის საფუძველი (6)"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "Basis (9)"
+msgstr "შეღავათის საფუძველი (9)"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_land_territory_field/rs_form15_land_territory_field.xml:0
+msgid "Browse by region and municipality"
+msgstr "დათვალიერება რეგიონისა და მუნიციპალიტეტის მიხედვით"
+
+#. module: gec_property_tax_report
+#: model:ir.actions.act_window,name:gec_property_tax_report.action_rs_form15_building_rate
+#: model:ir.ui.menu,name:gec_property_tax_report.menu_rs_form15_building_rate
+msgid "Building Tax Rates"
+msgstr "შენობის გადასახადის განაკვეთები"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "Clear Filters"
+msgstr "ფილტრების გასუფთავება"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "Clear filters"
+msgstr "ფილტრების გასუფთავება"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_land_territory_field/rs_form15_land_territory_field.xml:0
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_explain_form
+msgid "Close"
+msgstr "დახურვა"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_classifier_mixin__code
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_exemption_basis__code
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_territory__code
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_type__code
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_property_type__code
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_revaluation_coefficient__code
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_territory__code
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_year__code
+msgid "Code"
+msgstr "კოდი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_revaluation_coefficient__coefficient
+msgid "Coefficient"
+msgstr "კოეფიციენტი"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__revaluation_coefficient_id
+msgid "Coefficient (7)"
+msgstr "უძრავი ქონების აფასების კოეფიციენტი (7)"
+
+#. module: gec_property_tax_report
+#: model:ir.model.constraint,message:gec_property_tax_report.constraint_rs_form15_revaluation_coefficient_code_uniq
+msgid "Coefficient code must be unique."
+msgstr "კოეფიციენტის კოდი უნიკალური უნდა იყოს."
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.row_explanation
+msgid "Col."
+msgstr "სვ."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid ""
+"Column 14 is filled only for an incomplete year: 1 to 11 months, or 0 for a "
+"full year."
+msgstr ""
+"მე-14 სვეტი მხოლოდ არასრული წლისთვის ივსება: 1-დან 11 თვემდე, ან 0 — სრული "
+"წლისთვის."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_part3_line__name
+msgid ""
+"Column 2: the object's own name, asked by the portal for named types only. "
+"Copied from the asset or asset group when the row is built and kept as "
+"filed, so renaming the asset later does not change a submitted declaration."
+msgstr ""
+"მე-2 სვეტი: ობიექტის საკუთარი დასახელება, რომელსაც პორტალი მხოლოდ "
+"დასახელებული სახეობებისთვის ითხოვს. სტრიქონის აგებისას აქტივიდან ან "
+"აქტივების ჯგუფიდან კოპირდება და წარდგენილი სახით ინახება, ამიტომ აქტივის "
+"შემდგომი გადარქმევა წარდგენილ დეკლარაციას არ ცვლის."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid ""
+"Column 7 is a municipal coefficient, not an amount: %(base)s GEL/m² x "
+"%(coefficient)s = %(unit)s GEL/m²."
+msgstr ""
+"მე-7 სვეტი მუნიციპალური კოეფიციენტია და არა თანხა: %(base)s ლარი/მ² x "
+"%(coefficient)s = %(unit)s ლარი/მ²."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+#: model:ir.model,name:gec_property_tax_report.model_res_company
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__company_id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_plot__company_id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__company_id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part4_line__company_id
+msgid "Company"
+msgstr "კომპანიები"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_explain__content
+msgid "Content"
+msgstr "შიგთავსი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_building_rate__create_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__create_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_exemption_basis__create_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_explain__create_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_plot__create_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_rate__create_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_territory__create_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_type__create_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__create_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part4_line__create_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_property_type__create_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_revaluation_coefficient__create_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_territory__create_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_year__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_building_rate__create_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__create_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_exemption_basis__create_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_explain__create_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_plot__create_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_rate__create_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_territory__create_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_type__create_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__create_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part4_line__create_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_property_type__create_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_revaluation_coefficient__create_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_territory__create_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_year__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__currency_id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__currency_id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part4_line__currency_id
+msgid "Currency"
+msgstr "ვალუტა"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__advance_amount
+msgid "Current Payment (12)"
+msgstr "მიმდინარე გადასახდელი (12)"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part3_grid/rs_form15_part3_grid.js:0
+msgid "Current payment"
+msgstr "მიმდინარე გადასახდელი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__date_to
+msgid "Date To"
+msgstr "თარიღამდე"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_explain__declaration_id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__declaration_id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part4_line__declaration_id
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_account_asset_form_rs_form15
+msgid "Declaration"
+msgstr "დეკლარაცია"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_declaration__months_of_existence
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_part3_line__months_of_existence
+msgid ""
+"Declaration column 14. Filled only when the company existed an incomplete "
+"calendar year. A month counts in full when registration falls on or before "
+"the 15th, or deregistration after the 15th (Order 996 art. 88)."
+msgstr ""
+"დეკლარაციის მე-14 სვეტი. ივსება მხოლოდ მაშინ, როცა საწარმო არასრული "
+"კალენდარული წლის განმავლობაში არსებობდა. თვე სრულად ითვლება, თუ რეგისტრაცია "
+"თვის 15 რიცხვამდე (ჩათვლით) მოხდა, ან რეგისტრაციის გაუქმება — 15 რიცხვის "
+"შემდეგ (ბრძანება №996, მუხ. 88)."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_land_plot__land_territory_id
+msgid "Declaration column 2. Drives the rate."
+msgstr "დეკლარაციის მე-2 სვეტი. განსაზღვრავს განაკვეთს."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_land_plot__land_type_id
+msgid "Declaration column 3. Drives the rate and the unit of area."
+msgstr "დეკლარაციის მე-3 სვეტი. განსაზღვრავს განაკვეთსა და ფართობის ერთეულს."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_account_asset__rs_form15_property_type_id
+msgid ""
+"Declaration column 3. The portal offers this as a dropdown, so an untagged "
+"asset cannot be declared."
+msgstr ""
+"დეკლარაციის მე-3 სვეტი. პორტალი მას ჩამოსაშლელი სიის სახით გვთავაზობს, "
+"ამიტომ მოუნიშნავი აქტივის დეკლარირება შეუძლებელია."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_land_plot__area
+msgid ""
+"Declaration column 4. Hectares for agricultural land, square metres "
+"otherwise."
+msgstr ""
+"დეკლარაციის მე-4 სვეტი. სასოფლო-სამეურნეო მიწისთვის — ჰექტარი, სხვა "
+"შემთხვევაში — კვადრატული მეტრი."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_account_asset__rs_form15_territory_id
+msgid ""
+"Declaration column 4. The local self-government unit the object is "
+"registered in; it drives the rate."
+msgstr ""
+"დეკლარაციის მე-4 სვეტი. ადგილობრივი თვითმმართველი ერთეული, სადაც ობიექტია "
+"რეგისტრირებული; განსაზღვრავს განაკვეთს."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_land_plot__taxable_area
+msgid ""
+"Declaration column 5. The portal fills it only when an exemption applies; "
+"leave it at 0 and the whole area is taxed."
+msgstr ""
+"დეკლარაციის მე-5 სვეტი. პორტალი მას მხოლოდ შეღავათის შემთხვევაში ავსებს; "
+"დატოვეთ 0 და დაიბეგრება მთელი ფართობი."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_land_plot__exemption_basis_id
+msgid ""
+"Declaration column 6. Leave empty for the portal's “შეღავათით არ "
+"ვსარგებლობ”."
+msgstr ""
+"დეკლარაციის მე-6 სვეტი. პორტალის ვარიანტისთვის „შეღავათით არ ვსარგებლობ“ "
+"დატოვეთ ცარიელი."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_account_asset__rs_form15_exemption_amount
+msgid ""
+"Declaration column 8. Leave at 0 and let the international-company months "
+"derive it, or type the amount directly."
+msgstr ""
+"დეკლარაციის მე-8 სვეტი. დატოვეთ 0, რომ თანხა საერთაშორისო კომპანიის სტატუსის"
+" თვეებიდან გამოითვალოს, ან პირდაპირ შეიყვანეთ თანხა."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_account_asset__rs_form15_exemption_basis_id
+msgid "Declaration column 9."
+msgstr "დეკლარაციის მე-9 სვეტი."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "Declaration type"
+msgstr "დეკლარაციის ტიპი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_account_depreciation_model__rs_form15_property_type_id
+msgid ""
+"Default property tax type for new assets on this model, for example 3 "
+"construction in progress on a no-depreciation model. Set on the asset when "
+"it is created; an asset that already has a type keeps it."
+msgstr ""
+"ქონების გადასახადის ნაგულისხმევი სახეობა ამ მოდელის ახალი აქტივებისთვის, "
+"მაგალითად, 3 დაუმთავრებელი მშენებლობა ცვეთის გარეშე მოდელზე. აქტივს "
+"შექმნისას ენიჭება; თუ აქტივს სახეობა უკვე აქვს, ის უცვლელი რჩება."
+
+#. module: gec_property_tax_report
+#: model:ir.model,name:gec_property_tax_report.model_account_depreciation_model
+msgid "Depreciation Models for Assets"
+msgstr "აქტივების ცვეთის მოდელები"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "Derived by rs.ge"
+msgstr "გამოითვლის rs.ge"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__difference
+msgid "Difference (13)"
+msgstr "ექვემდებარება დამატებით დარიცხვას (+); შემცირებას (-) (13)"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_account_asset__display_name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_account_depreciation_model__display_name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_asset_modify__display_name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_res_company__display_name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_building_rate__display_name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_classifier_mixin__display_name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__display_name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_exemption_basis__display_name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_explain__display_name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_plot__display_name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_rate__display_name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_territory__display_name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_type__display_name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__display_name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part4_line__display_name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_property_type__display_name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_revaluation_coefficient__display_name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_territory__display_name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_year__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "Done editing this row"
+msgstr "ამ სტრიქონის რედაქტირების დასრულება"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields.selection,name:gec_property_tax_report.selection__rs_form15_declaration__state__draft
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_declaration_search
+msgid "Draft"
+msgstr "პროექტი"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "Drag to resize the column"
+msgstr "გადაათრიეთ სვეტის ზომის შესაცვლელად"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "Edit this row"
+msgstr "ამ სტრიქონის რედაქტირება"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_account_asset__rs_form15_excluded
+msgid "Exempt from Property Tax"
+msgstr "ქონების გადასახადს არ ექვემდებარება"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.row_explanation
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_account_asset_form_rs_form15
+msgid "Exemption"
+msgstr "შეღავათი"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__exemption_amount
+msgid "Exemption (8)"
+msgstr "შეღავათის თანხა (8)"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_account_asset__rs_form15_exemption_amount
+msgid "Exemption Amount"
+msgstr "შეღავათის თანხა"
+
+#. module: gec_property_tax_report
+#: model:ir.actions.act_window,name:gec_property_tax_report.action_rs_form15_exemption_basis
+#: model:ir.ui.menu,name:gec_property_tax_report.menu_rs_form15_exemption_basis
+msgid "Exemption Bases"
+msgstr "შეღავათის საფუძვლები"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_account_asset__rs_form15_exemption_basis_id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_plot__exemption_basis_id
+msgid "Exemption Basis"
+msgstr "შეღავათის საფუძველი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part4_line__exemption_basis_id
+msgid "Exemption Basis (6)"
+msgstr "შეღავათის საფუძველი (6)"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__exemption_basis_id
+msgid "Exemption Basis (9)"
+msgstr "შეღავათის საფუძველი (9)"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part4_grid/rs_form15_part4_grid.js:0
+msgid "Exemption basis"
+msgstr "შეღავათის საფუძველი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.constraint,message:gec_property_tax_report.constraint_rs_form15_exemption_basis_code_uniq
+msgid "Exemption basis code must be unique."
+msgstr "შეღავათის საფუძვლის კოდი უნიკალური უნდა იყოს."
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "Explain how this row was built"
+msgstr "როგორ აიგო ეს სტრიქონი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__explanation_filename
+msgid "Explanation Filename"
+msgstr "განმარტებითი ფაილის სახელი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__explanation_file
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_declaration_form
+msgid "Explanation Workbook"
+msgstr "განმარტებითი ფაილი"
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_declaration_form
+msgid "Export"
+msgstr "ექსპორტი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__export_filename_3
+msgid "Export Filename 3"
+msgstr "ექსპორტის ფაილის სახელი 3"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__export_filename_4
+msgid "Export Filename 4"
+msgstr "ექსპორტის ფაილის სახელი 4"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields.selection,name:gec_property_tax_report.selection__rs_form15_declaration__state__exported
+msgid "Exported"
+msgstr "ექსპორტირებული"
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_declaration_form
+msgid "Files"
+msgstr "ფაილები"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_part3_line__acquisition_year_id
+msgid ""
+"Filled for immovable property only; the portal hides the column otherwise."
+msgstr ""
+"ივსება მხოლოდ უძრავი ქონებისთვის; სხვა შემთხვევაში პორტალი სვეტს მალავს."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid ""
+"Filled only for an incomplete calendar year. A month counts in full when "
+"registration falls on or before the 15th."
+msgstr ""
+"ივსება მხოლოდ არასრული კალენდარული წლისთვის. თვე სრულად ითვლება, თუ "
+"რეგისტრაცია თვის 15 რიცხვამდე (ჩათვლით) მოხდა."
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "Filter"
+msgstr "ფილტრი"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "Filters and footer totals apply to this page."
+msgstr "ფილტრები და ქვედა ჯამები მხოლოდ ამ გვერდს ეხება."
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "Filters and totals cover this page only."
+msgstr "ფილტრები და ჯამები მხოლოდ ამ გვერდს ეხება."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_declaration__date_from
+msgid "First day of the reporting year. Part III reports the year that ended."
+msgstr "საანგარიშო წლის პირველი დღე. III ნაწილი დასრულებულ წელს ასახავს."
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "Fit Columns"
+msgstr "სვეტების მორგება"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields.selection,name:gec_property_tax_report.selection__rs_form15_part3_line__source__asset
+msgid "Fixed Assets"
+msgstr "ძირითადი საშუალებები"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "For the period (15)"
+msgstr "გადასახადის თანხა არსებობის პერიოდის გათვალისწინებით (15)"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part3_grid/rs_form15_part3_grid.js:0
+msgid "Form V-01 — Part III"
+msgstr "ფორმა V-01 — III ნაწილი"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part4_grid/rs_form15_part4_grid.js:0
+msgid "Form V-01 — Part IV"
+msgstr "ფორმა V-01 — IV ნაწილი"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "From the building tax rate table for %(unit)s in %(year)s."
+msgstr "შენობის გადასახადის განაკვეთების ცხრილიდან: %(unit)s, %(year)s წელი."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_land_plot__date_sold
+msgid ""
+"From this date the plot is no longer declared. Empty means still owned."
+msgstr ""
+"ამ თარიღიდან ნაკვეთი აღარ დეკლარირდება. ცარიელი ველი ნიშნავს, რომ ნაკვეთი "
+"ისევ საკუთრებაშია."
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_declaration_form
+msgid "Generate"
+msgstr "გენერაცია"
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_declaration_form
+msgid "Generate Part III"
+msgstr "III ნაწილის გენერაცია"
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_declaration_form
+msgid "Generate Part IV"
+msgstr "IV ნაწილის გენერაცია"
+
+#. module: gec_property_tax_report
+#: model:ir.module.module,shortdesc:base.module_gec_property_tax_report
+msgid "Georgia - Property Tax Declaration (rs.ge Form 15)"
+msgstr "საქართველო - ქონების გადასახადის დეკლარაცია (rs.ge ფორმა 15)"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_property_type__is_leasing
+msgid ""
+"Group 5 of the rs.ge list. A leasing company declaring these rows is capped "
+"at 0.6% instead of 1% (Order 996 art. 88). ASSUMPTION of 2026-09-21, "
+"inferred from the group 1 label, not verified on the portal."
+msgstr ""
+"rs.ge-ის სიის მე-5 ჯგუფი. სალიზინგო კომპანიისთვის ამ სტრიქონების განაკვეთი "
+"შეზღუდულია 0.6%-ით 1%-ის ნაცვლად (ბრძანება №996, მუხ. 88). დაშვება "
+"(2026-09-21): გამოტანილია პირველი ჯგუფის დასახელებიდან, პორტალზე "
+"გადამოწმებული არ არის."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields.selection,name:gec_property_tax_report.selection__rs_form15_land_type__unit__ha
+msgid "Hectare"
+msgstr "ჰექტარი"
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.row_explanation
+msgid "How"
+msgstr "როგორ"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.js:0
+msgid "How this row was built"
+msgstr "როგორ აიგო ეს სტრიქონი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_account_asset__id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_account_depreciation_model__id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_asset_modify__id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_res_company__id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_building_rate__id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_classifier_mixin__id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_exemption_basis__id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_explain__id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_plot__id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_rate__id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_territory__id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_type__id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part4_line__id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_property_type__id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_revaluation_coefficient__id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_territory__id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_year__id
+msgid "ID"
+msgstr "ID"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_account_asset__rs_form15_revaluation_model_applied
+msgid "IFRS Revaluation Model"
+msgstr "IFRS გადაფასების მოდელი"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid ""
+"IFRS revaluation is set on only some assets of this object; the revaluation "
+"coefficient was applied."
+msgstr ""
+"ფასს-ის გადაფასება ამ ობიექტის მხოლოდ ნაწილ აქტივზეა მითითებული; "
+"გამოყენებულია აფასების კოეფიციენტი."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "Immovable property only; it selects column 7."
+msgstr "მხოლოდ უძრავი ქონებისთვის; განსაზღვრავს მე-7 სვეტს."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_part3_line__is_immovable
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_property_type__is_immovable
+msgid ""
+"Immovable property: column 5 (acquisition year) is filled and the art. "
+"202(1) revaluation coefficient applies. The portal hides both columns for "
+"movable types."
+msgstr ""
+"უძრავი ქონება: ივსება მე-5 სვეტი (მიღების წელი) და გამოიყენება 202-ე მუხლის "
+"პირველი ნაწილით გათვალისწინებული აფასების კოეფიციენტი. მოძრავი ქონების "
+"სახეობებისთვის პორტალი ორივე სვეტს მალავს."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_account_asset__rs_form15_international_company_months
+msgid "International Company Months"
+msgstr "საერთაშორისო კომპანიის სტატუსის თვეები"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/account_asset.py:0
+msgid "International company months must be between 0 and 12."
+msgstr "საერთაშორისო კომპანიის სტატუსის თვეები უნდა იყოს 0-დან 12-მდე."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__is_immovable
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_property_type__is_immovable
+msgid "Is Immovable"
+msgstr "უძრავი ქონებაა"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_account_asset__rs_form15_excluded
+msgid ""
+"Keep the asset out of the declaration altogether, for example land, which "
+"belongs in part IV."
+msgstr ""
+"აქტივი საერთოდ არ შევა დეკლარაციაში; მაგალითად, მიწა, რომელიც IV ნაწილში "
+"დეკლარირდება."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__kind
+msgid "Kind"
+msgstr "სახეობა"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "Kind (3)"
+msgstr "სახეობა და აღწერილობა (3)"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part4_grid/rs_form15_part4_grid.js:0
+msgid "Kind and description"
+msgstr "სახეობა და აღწერილობა"
+
+#. module: gec_property_tax_report
+#: model:ir.actions.act_window,name:gec_property_tax_report.action_rs_form15_land_plot
+#: model:ir.ui.menu,name:gec_property_tax_report.menu_rs_form15_land_plot
+msgid "Land Plots"
+msgstr "მიწის ნაკვეთები"
+
+#. module: gec_property_tax_report
+#: model:ir.actions.act_window,name:gec_property_tax_report.action_rs_form15_land_rate
+#: model:ir.ui.menu,name:gec_property_tax_report.menu_rs_form15_land_rate
+msgid "Land Rates"
+msgstr "მიწის განაკვეთები"
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_declaration_list
+msgid "Land Rows"
+msgstr "მიწის სტრიქონები"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__part4_total
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_declaration_list
+msgid "Land Tax"
+msgstr "მიწის გადასახადი"
+
+#. module: gec_property_tax_report
+#: model:ir.actions.act_window,name:gec_property_tax_report.action_rs_form15_land_territory
+#: model:ir.ui.menu,name:gec_property_tax_report.menu_rs_form15_land_territory
+msgid "Land Territorial Units (Part IV)"
+msgstr "მიწის ტერიტორიული ერთეულები (IV ნაწილი)"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_rate__land_territory_id
+msgid "Land Territory"
+msgstr "მიწის ტერიტორიული ერთეული"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_plot__land_type_id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_rate__land_type_id
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_land_plot_search
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_land_rate_search
+msgid "Land Type"
+msgstr "მიწის სახეობა"
+
+#. module: gec_property_tax_report
+#: model:ir.actions.act_window,name:gec_property_tax_report.action_rs_form15_land_type
+#: model:ir.ui.menu,name:gec_property_tax_report.menu_rs_form15_land_type
+msgid "Land Types"
+msgstr "მიწის სახეობები"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__land_year
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part4_line__land_year
+msgid "Land Year"
+msgstr "მიწის წელი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__land_reference_date
+msgid "Land as at"
+msgstr "მიწა, მდგომარეობით"
+
+#. module: gec_property_tax_report
+#: model:ir.model.constraint,message:gec_property_tax_report.constraint_rs_form15_land_territory_code_uniq
+msgid "Land territorial unit code must be unique."
+msgstr "მიწის ტერიტორიული ერთეულის კოდი უნიკალური უნდა იყოს."
+
+#. module: gec_property_tax_report
+#: model:ir.model.constraint,message:gec_property_tax_report.constraint_rs_form15_land_type_code_uniq
+msgid "Land type code must be unique."
+msgstr "მიწის სახეობის კოდი უნიკალური უნდა იყოს."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_account_asset__rs_form15_last_audit_date
+msgid "Last Audit Date"
+msgstr "ბოლო აუდიტის თარიღი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_building_rate__write_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__write_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_exemption_basis__write_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_explain__write_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_plot__write_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_rate__write_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_territory__write_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_type__write_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__write_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part4_line__write_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_property_type__write_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_revaluation_coefficient__write_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_territory__write_uid
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_year__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_building_rate__write_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__write_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_exemption_basis__write_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_explain__write_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_plot__write_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_rate__write_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_territory__write_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_type__write_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__write_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part4_line__write_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_property_type__write_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_revaluation_coefficient__write_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_territory__write_date
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_year__write_date
+msgid "Last Updated on"
+msgstr "ბოლოს განახლდა"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid ""
+"Last year's column 11 for the same property type and territorial unit. Order"
+" 996 art. 88: the advance is always the full-year figure."
+msgstr ""
+"გასული წლის მე-11 სვეტი იმავე ქონების სახეობისა და ტერიტორიული ერთეულისთვის."
+" ბრძანება №996, მუხ. 88: ავანსი ყოველთვის სრული წლის თანხაა."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_part3_line__advance_amount
+msgid ""
+"Last year's column 11. Order 996 art. 88: the next year's current payment is"
+" always the full-year figure, never column 15."
+msgstr ""
+"გასული წლის მე-11 სვეტი. ბრძანება №996, მუხ. 88: მომდევნო წლის მიმდინარე "
+"გადასახდელი ყოველთვის სრული წლის თანხაა და არასოდეს — მე-15 სვეტი."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_account_asset__rs_form15_leased_out
+msgid "Leased Out"
+msgstr "გაცემულია ლიზინგით"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_property_type__is_leasing
+msgid "Leased-Out Property"
+msgstr "ლიზინგით გაცემული ქონება"
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_account_asset_form_rs_form15
+msgid "Leasing"
+msgstr "ლიზინგი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_res_company__rs_form15_is_leasing_company
+msgid "Leasing Company"
+msgstr "სალიზინგო კომპანია"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_explain__line_part
+msgid "Line Part"
+msgstr "სტრიქონის ნაწილი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_explain__line_ref
+msgid "Line Ref"
+msgstr "სტრიქონის მითითება"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields.selection,name:gec_property_tax_report.selection__rs_form15_part3_line__source__manual
+#: model:ir.model.fields.selection,name:gec_property_tax_report.selection__rs_form15_part4_line__source__manual
+msgid "Manual"
+msgstr "ხელით"
+
+#. module: gec_property_tax_report
+#: model:ir.model,name:gec_property_tax_report.model_asset_modify
+msgid "Modify Asset"
+msgstr "აქტივის შეცვლა"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "Months (14)"
+msgstr "არსებობის თვეები (14)"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__months_of_existence
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__months_of_existence
+msgid "Months Of Existence"
+msgstr "არსებობის თვეები"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part3_grid/rs_form15_part3_grid.js:0
+msgid "Months existing"
+msgstr "არსებობის თვეები"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "Months the company existed"
+msgstr "კომპანიის არსებობის თვეები"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_territory__municipality
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_land_territory_search
+msgid "Municipality"
+msgstr "მუნიციპალიტეტი"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part3_grid/rs_form15_part3_grid.js:0
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_classifier_mixin__name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_exemption_basis__name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_territory__name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_type__name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_property_type__name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_revaluation_coefficient__name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_territory__name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_year__name
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_declaration_form
+msgid "Name"
+msgstr "დასახელება"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "Name (2)"
+msgstr "დასახელება (2)"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__has_name
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_property_type__has_name
+msgid "Named Object"
+msgstr "დასახელებული ობიექტი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_part3_line__asset_group_id
+msgid ""
+"Named types only: the asset group this row declares, when the object was "
+"booked as several assets."
+msgstr ""
+"მხოლოდ დასახელებული სახეობებისთვის: აქტივების ჯგუფი, რომელსაც ეს სტრიქონი "
+"დეკლარირებს, როცა ობიექტი რამდენიმე აქტივად არის აღრიცხული."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_part3_line__asset_id
+msgid "Named types only: the asset this row declares."
+msgstr ""
+"მხოლოდ დასახელებული სახეობებისთვის: აქტივი, რომელსაც ეს სტრიქონი "
+"დეკლარირებს."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__next_advance_amount
+msgid "Next Year Advance"
+msgstr "მომავალი წლის მიმდინარე გადასახდელი"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "No"
+msgstr "არა"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid ""
+"No building tax rate is configured for this territorial unit; the 1% cap of "
+"Tax Code art. 202(1) was used."
+msgstr ""
+"ამ ტერიტორიული ერთეულისთვის ქონების გადასახადის განაკვეთი არ არის "
+"მითითებული; გამოყენებულია საგადასახადო კოდექსის 202-ე მუხლის პირველი ნაწილის"
+" ზღვრული განაკვეთი, 1%."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "No coefficient: art. 202(2) audited revaluation model."
+msgstr ""
+"კოეფიციენტის გარეშე: 202-ე მუხლის მე-2 ნაწილის აუდირებული გადაფასების "
+"მოდელი."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid ""
+"No exemption, so the portal leaves column 5 empty and taxes the whole area."
+msgstr ""
+"შეღავათი არ არის, ამიტომ პორტალი მე-5 სვეტს ცარიელს ტოვებს და მთელ ფართობს "
+"ბეგრავს."
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "No rows match the filters"
+msgstr "ფილტრებს შესაბამისი სტრიქონი არ მოიძებნა"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "No rows yet"
+msgstr "სტრიქონები ჯერ არ არის"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "No rs.ge rate covers this pair."
+msgstr "ამ წყვილისთვის rs.ge-ის განაკვეთი არ არსებობს."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "No rs.ge rate covers this territorial unit and land type."
+msgstr ""
+"ამ ტერიტორიული ერთეულისა და მიწის სახეობისთვის rs.ge-ის განაკვეთი არ "
+"არსებობს."
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_land_territory_field/rs_form15_land_territory_field.xml:0
+msgid "No territorial unit matches."
+msgstr "შესაბამისი ტერიტორიული ერთეული ვერ მოიძებნა."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_building_rate__note
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_exemption_basis__note
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_plot__note
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_rate__note
+msgid "Note"
+msgstr "შენიშვნა"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_property_type__display_code
+msgid "Number shown on the portal, e.g. 1.1"
+msgstr "პორტალზე ნაჩვენები ნომერი, მაგ. 1.1"
+
+#. module: gec_property_tax_report
+#: model:ir.model.constraint,message:gec_property_tax_report.constraint_rs_form15_building_rate_territory_year_uniq
+msgid "One building tax rate per territorial unit and year."
+msgstr "შენობის გადასახადის ერთი განაკვეთი თითო ტერიტორიულ ერთეულსა და წელზე."
+
+#. module: gec_property_tax_report
+#: model:ir.model.constraint,message:gec_property_tax_report.constraint_rs_form15_declaration_company_period_uniq
+msgid "One declaration per company and year."
+msgstr "ერთი დეკლარაცია თითო კომპანიასა და წელზე."
+
+#. module: gec_property_tax_report
+#: model:ir.model.constraint,message:gec_property_tax_report.constraint_rs_form15_land_rate_pair_uniq
+msgid "One rate per land territorial unit, land type and validity start."
+msgstr ""
+"ერთი განაკვეთი თითო მიწის ტერიტორიულ ერთეულზე, მიწის სახეობასა და მოქმედების"
+" დაწყების წელზე."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid ""
+"One row per land plot. Column 7 is the rs.ge table value; for non-"
+"agricultural land it is a municipal coefficient on the statutory 0.24 "
+"GEL/m², not an amount per square metre."
+msgstr ""
+"ერთი სტრიქონი თითო მიწის ნაკვეთზე. მე-7 სვეტი rs.ge-ის ცხრილის მნიშვნელობაა;"
+" არასასოფლო-სამეურნეო მიწისთვის ეს არის კანონით დადგენილ 0.24 ლარზე (1 კვ. "
+"მ.) გასამრავლებელი ტერიტორიული კოეფიციენტი და არა თანხა ერთ კვადრატულ "
+"მეტრზე."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid ""
+"One row per property type and territorial unit; named types (1.13, 2, 3, 4, "
+"5.1, 5.2) get one row per asset, carrying the asset name in column 2. Column"
+" 6 is (value at 1 January + value at 31 December) / 2, read from the posted "
+"depreciation entries."
+msgstr ""
+"ერთი სტრიქონი თითო ქონების სახეობასა და ტერიტორიულ ერთეულზე; დასახელებულ "
+"სახეობებს (1.13, 2, 3, 4, 5.1, 5.2) თითო აქტივზე ცალკე სტრიქონი აქვს, "
+"აქტივის დასახელებით მე-2 სვეტში. მე-6 სვეტი = (ღირებულება 1 იანვარს + "
+"ღირებულება 31 დეკემბერს) / 2, დაკავშირებული ცვეთის გატარებების მიხედვით."
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "Open the source record"
+msgstr "საწყისი ჩანაწერის გახსნა"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_account_asset__rs_form15_leased_out
+msgid ""
+"Order 996 art. 88. For an ordinary company Odoo already carries the value "
+"the asset would have had if not leased out, so nothing changes; for a "
+"leasing company the value freezes at the first lease-out and the rate is "
+"capped."
+msgstr ""
+"ბრძანება №996, მუხ. 88. ჩვეულებრივი კომპანიისთვის Odoo უკვე ასახავს "
+"ღირებულებას, რომელიც აქტივს ლიზინგით გაუცემლობის შემთხვევაში ექნებოდა, "
+"ამიტომ არაფერი იცვლება; სალიზინგო კომპანიისთვის ღირებულება ლიზინგით პირველი "
+"გაცემის მომენტში ფიქსირდება და განაკვეთი შეზღუდულია."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_res_company__rs_form15_is_leasing_company
+msgid ""
+"Order 996 art. 88: a leasing company values property it leases out at the "
+"book value it had when first leased out, and its rate is capped at 0.6% "
+"instead of 1% for the whole lease period."
+msgstr ""
+"ბრძანება №996, მუხ. 88: სალიზინგო კომპანია ლიზინგით გაცემულ ქონებას აფასებს "
+"იმ საბალანსო ღირებულებით, რომელიც მას ლიზინგით პირველი გაცემისას ჰქონდა, "
+"ხოლო მისი განაკვეთი ლიზინგის მთელი პერიოდის განმავლობაში 1%-ის ნაცვლად "
+"0.6%-ით არის შეზღუდული."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_account_asset__rs_form15_international_company_months
+msgid ""
+"Order 996 art. 88: for an international company the exemption is the average"
+" annual value pro-rated over the months the status was held. Status granted "
+"on 5 May counts from 1 May, so that year has 8 months."
+msgstr ""
+"ბრძანება №996, მუხ. 88: საერთაშორისო კომპანიისთვის შეღავათი არის საშუალო "
+"წლიური ღირებულება, პროპორციულად გადანაწილებული სტატუსის ფლობის თვეებზე. 5 "
+"მაისს მინიჭებული სტატუსი 1 მაისიდან ითვლება, ამიტომ იმ წელს 8 თვე გამოდის."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_declaration__kind
+msgid ""
+"Part I of the form. A correction is this same record, re-generated and re-"
+"flagged."
+msgstr ""
+"ფორმის I ნაწილი. შესწორება იგივე ჩანაწერია, ხელახლა გენერირებული და ხელახლა "
+"მონიშნული."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+#: model:ir.model.fields.selection,name:gec_property_tax_report.selection__rs_form15_explain__line_part__part3
+msgid "Part III"
+msgstr "III ნაწილი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__export_file_3
+msgid "Part III File"
+msgstr "III ნაწილის ფაილი"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid ""
+"Part III columns 11, 13 and 15 and part IV columns 7 and 8 are recomputed by"
+" the portal on import. The values here are a cross-check."
+msgstr ""
+"III ნაწილის მე-11, მე-13 და მე-15 სვეტებს და IV ნაწილის მე-7 და მე-8 სვეტებს"
+" პორტალი იმპორტისას თავიდან ითვლის. აქ მოცემული მნიშვნელობები შესამოწმებლად "
+"არის."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "Part III rows / tax"
+msgstr "III ნაწილი: სტრიქონები / გადასახადი"
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_declaration_form
+msgid "Part III — Property"
+msgstr "III ნაწილი — ქონება"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+#: model:ir.model.fields.selection,name:gec_property_tax_report.selection__rs_form15_explain__line_part__part4
+msgid "Part IV"
+msgstr "IV ნაწილი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__export_file_4
+msgid "Part IV File"
+msgstr "IV ნაწილის ფაილი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_land_plot__date_acquired
+msgid ""
+"Part IV declares the plot only if it was owned on the declaration's “Land as"
+" at” date. Empty means owned since before any declaration."
+msgstr ""
+"IV ნაწილში ნაკვეთი მხოლოდ მაშინ დეკლარირდება, თუ დეკლარაციის „მიწა, "
+"მდგომარეობით“ თარიღისთვის საკუთრებაში იყო. ცარიელი ველი ნიშნავს, რომ ნაკვეთი"
+" ნებისმიერ დეკლარაციამდე იყო შეძენილი."
+
+#. module: gec_property_tax_report
+#: model_terms:ir.actions.act_window,help:gec_property_tax_report.action_rs_form15_land_plot
+msgid ""
+"Part IV of the declaration is built from this register: one row per plot owned\n"
+"               on the declaration's \"Land as at\" date. If the land is also booked in Fixed\n"
+"               Assets, link the asset: its dates are used and it is kept out of part III."
+msgstr ""
+"დეკლარაციის IV ნაწილი ამ რეესტრიდან იგება: თითო სტრიქონი თითო ნაკვეთზე, რომელიც\n"
+"               დეკლარაციის „მიწა, მდგომარეობით“ თარიღისთვის საკუთრებაშია. თუ მიწა ძირითად\n"
+"               საშუალებებშიც არის აღრიცხული, მიუთითეთ აქტივი: გამოიყენება მისი თარიღები და ის III ნაწილში აღარ მოხვდება."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "Part IV rows / tax"
+msgstr "IV ნაწილი: სტრიქონები / გადასახადი"
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_declaration_form
+msgid "Part IV — Land"
+msgstr "IV ნაწილი — მიწა"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__part3_count
+msgid "Part3 Count"
+msgstr "III ნაწილის სტრიქონების რაოდენობა"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__part3_line_ids
+msgid "Part3 Line"
+msgstr "III ნაწილის სტრიქონი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__part4_count
+msgid "Part4 Count"
+msgstr "IV ნაწილის სტრიქონების რაოდენობა"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__part4_line_ids
+msgid "Part4 Line"
+msgstr "IV ნაწილის სტრიქონი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_building_rate__rate
+msgid ""
+"Percent, as written into column 10. Tax Code art. 202(1) caps it at 1%."
+msgstr ""
+"პროცენტი, როგორც მე-10 სვეტში იწერება. საგადასახადო კოდექსის 202-ე მუხლის "
+"პირველი ნაწილით ზღვარია 1%."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_part3_line__tax_rate
+msgid ""
+"Percent. Capped at 1% by Tax Code art. 202(1), or 0.6% for a leasing "
+"company's leased-out property."
+msgstr ""
+"პროცენტი. საგადასახადო კოდექსის 202-ე მუხლის პირველი ნაწილით ზღვარია 1%, "
+"ხოლო სალიზინგო კომპანიის ლიზინგით გაცემული ქონებისთვის — 0.6%."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__date_from
+msgid "Period"
+msgstr "საანგარიშო პერიოდი"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part4_line__plot_id
+msgid "Plot"
+msgstr "ნაკვეთი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields.selection,name:gec_property_tax_report.selection__rs_form15_part4_line__source__plot
+msgid "Plot Register"
+msgstr "ნაკვეთების რეესტრი"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.js:0
+msgid "Press Generate to build the rows."
+msgstr "სტრიქონების ასაგებად დააჭირეთ „გენერაციას“."
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part3_grid/rs_form15_part3_grid.js:0
+msgid "Property"
+msgstr "ქონების დასახელება"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__property_type_id
+msgid "Property (3)"
+msgstr "ქონების დასახელება (3)"
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_declaration_list
+msgid "Property Rows"
+msgstr "ქონების სტრიქონები"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__part3_total
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_account_asset_form_rs_form15
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_declaration_list
+msgid "Property Tax"
+msgstr "ქონების გადასახადი"
+
+#. module: gec_property_tax_report
+#: model:ir.actions.act_window,name:gec_property_tax_report.action_rs_form15_declaration
+#: model:ir.ui.menu,name:gec_property_tax_report.menu_rs_form15_declaration
+msgid "Property Tax Declaration (Form V-01)"
+msgstr "ქონების გადასახადის დეკლარაცია (ფორმა V-01)"
+
+#. module: gec_property_tax_report
+#: model:ir.model,name:gec_property_tax_report.model_rs_form15_land_plot
+msgid "Property Tax Land Plot"
+msgstr "ქონების გადასახადით დასაბეგრი მიწის ნაკვეთი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_account_asset__rs_form15_territory_id
+msgid "Property Tax Territorial Unit"
+msgstr "ტერიტორიული ერთეული"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_account_asset__rs_form15_property_type_id
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_account_depreciation_model__rs_form15_property_type_id
+msgid "Property Tax Type"
+msgstr "ქონების სახეობა"
+
+#. module: gec_property_tax_report
+#: model:ir.actions.act_window,name:gec_property_tax_report.action_rs_form15_property_type
+#: model:ir.ui.menu,name:gec_property_tax_report.menu_rs_form15_property_type
+msgid "Property Types"
+msgstr "ქონების სახეობები"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "Property tax"
+msgstr "ქონების გადასახადი"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part4_grid/rs_form15_part4_grid.js:0
+msgid "Property tax (GEL)"
+msgstr "ქონების გადასახადი (ლარი)"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "Property tax declaration, annex V-01"
+msgstr "ქონების გადასახადის დეკლარაცია, დანართი V-01"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part4_grid/rs_form15_part4_grid.js:0
+msgid "Property tax on land, as at 1 April"
+msgstr "მიწაზე ქონების გადასახადი, 1 აპრილის მდგომარეობით"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part3_grid/rs_form15_part3_grid.js:0
+msgid "Property tax other than land"
+msgstr "ქონების გადასახადი (გარდა მიწისა)"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/account_asset.py:0
+msgid ""
+"Property tax: %(origin)s was %(type)s, which ends when depreciation starts. "
+"Set this asset's property tax type, or give its depreciation model a "
+"default."
+msgstr ""
+"ქონების გადასახადი: %(origin)s იყო „%(type)s“, რაც ცვეთის დაწყებისას "
+"სრულდება. მიუთითეთ ამ აქტივის ქონების სახეობა ან მის ცვეთის მოდელს მიანიჭეთ "
+"ნაგულისხმევი სახეობა."
+
+#. module: gec_property_tax_report
+#: model:ir.model.constraint,message:gec_property_tax_report.constraint_rs_form15_property_type_code_uniq
+msgid "Property type code must be unique."
+msgstr "ქონების სახეობის კოდი უნიკალური უნდა იყოს."
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "RS"
+msgstr "RS"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_property_type__display_code
+msgid "RS Number"
+msgstr "RS-ის ნომერი"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part3_grid/rs_form15_part3_grid.js:0
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part4_grid/rs_form15_part4_grid.js:0
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_building_rate__rate
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_rate__rate
+msgid "Rate"
+msgstr "განაკვეთი"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__tax_rate
+msgid "Rate (10)"
+msgstr "გადასახადის განაკვეთი (10)"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part4_line__rate
+msgid "Rate (7)"
+msgstr "გადასახადის განაკვეთი (7)"
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_land_rate_search
+msgid "Rate Set"
+msgstr "განაკვეთი მითითებულია"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_type__uses_base_rate
+msgid "Rate is a Coefficient"
+msgstr "განაკვეთი კოეფიციენტია"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "Read me"
+msgstr "წაიკითხეთ"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_territory__region
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_land_territory_search
+msgid "Region"
+msgstr "რეგიონი"
+
+#. module: gec_property_tax_report
+#: model_terms:ir.actions.act_window,help:gec_property_tax_report.action_rs_form15_land_plot
+msgid "Register a taxable land plot"
+msgstr "დასაბეგრი მიწის ნაკვეთის რეგისტრაცია"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part4_grid/rs_form15_part4_grid.js:0
+msgid "Register your land plots under Configuration, then press Generate."
+msgstr ""
+"დაარეგისტრირეთ მიწის ნაკვეთები კონფიგურაციაში, შემდეგ დააჭირეთ „გენერაციას“."
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.js:0
+msgid "Remove"
+msgstr "წაშლა"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.js:0
+msgid "Remove Row"
+msgstr "სტრიქონის წაშლა"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "Remove this row"
+msgstr "ამ სტრიქონის წაშლა"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.js:0
+msgid "Remove this row from the declaration?"
+msgstr "წავშალოთ ეს სტრიქონი დეკლარაციიდან?"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid ""
+"Reset the declaration to draft before changing the months of existence: the "
+"exported file would no longer match the rows."
+msgstr ""
+"არსებობის თვეების შესაცვლელად დეკლარაცია ჯერ პროექტში დააბრუნეთ: წინააღმდეგ "
+"შემთხვევაში ექსპორტირებული ფაილი სტრიქონებს აღარ დაემთხვევა."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "Reset the declaration to draft before regenerating it."
+msgstr "ხელახლა გენერაციამდე დეკლარაცია პროექტში დააბრუნეთ."
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_declaration_form
+msgid "Reset to Draft"
+msgstr "პროექტში დაბრუნება"
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_account_asset_form_rs_form15
+msgid "Revaluation Coefficient"
+msgstr "აფასების კოეფიციენტი"
+
+#. module: gec_property_tax_report
+#: model:ir.actions.act_window,name:gec_property_tax_report.action_rs_form15_revaluation
+#: model:ir.ui.menu,name:gec_property_tax_report.menu_rs_form15_revaluation
+msgid "Revaluation Coefficients"
+msgstr "აფასების კოეფიციენტები"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part3_grid/rs_form15_part3_grid.js:0
+msgid "Revaluation coefficient"
+msgstr "აფასების კოეფიციენტი"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "Row details"
+msgstr "სტრიქონების დეტალები"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part3_grid/rs_form15_part3_grid.js:0
+msgid ""
+"Rows are built from Fixed Assets and grouped by property type and "
+"territorial unit; named types such as pipelines and buildings get one row "
+"per asset or asset group. Locked columns are recomputed by rs.ge; a yellow "
+"row needs review."
+msgstr ""
+"სტრიქონები იგება ძირითადი საშუალებებიდან და ჯგუფდება ქონების სახეობისა და "
+"ტერიტორიული ერთეულის მიხედვით; დასახელებული სახეობები, მაგალითად, "
+"მილსადენები და შენობები, თითო აქტივზე ან აქტივების ჯგუფზე ცალკე სტრიქონს "
+"იღებს. ჩაკეტილ სვეტებს rs.ge ხელახლა ითვლის; ყვითელი სტრიქონი შემოწმებას "
+"საჭიროებს."
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part4_grid/rs_form15_part4_grid.js:0
+msgid ""
+"Rows are built from the land plot register. The rate is the rs.ge table "
+"value: for non-agricultural land it is a municipal coefficient on 0.24 "
+"GEL/m², not an amount. Locked columns are recomputed by rs.ge."
+msgstr ""
+"სტრიქონები იგება მიწის ნაკვეთების რეესტრიდან. განაკვეთი rs.ge-ის ცხრილის "
+"მნიშვნელობაა: არასასოფლო-სამეურნეო მიწისთვის ეს არის მუნიციპალური "
+"კოეფიციენტი 0.24 ლარი/მ²-ზე და არა თანხა. ჩაკეტილ სვეტებს rs.ge ხელახლა "
+"ითვლის."
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_land_territory_field/rs_form15_land_territory_field.xml:0
+msgid "Search a region, municipality or zone"
+msgstr "რეგიონის, მუნიციპალიტეტის ან ზონის ძიება"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_classifier_mixin__sequence
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_exemption_basis__sequence
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_territory__sequence
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_type__sequence
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_property_type__sequence
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_territory__sequence
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_year__sequence
+msgid "Sequence"
+msgstr "მიმდევრობა"
+
+#. module: gec_property_tax_report
+#: model_terms:ir.actions.act_window,help:gec_property_tax_report.action_rs_form15_building_rate
+msgid "Set the building tax rate per territorial unit"
+msgstr ""
+"შენობის გადასახადის განაკვეთის მითითება ტერიტორიული ერთეულების მიხედვით"
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_land_plot_search
+msgid "Sold"
+msgstr "გასხვისებული"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_plot__date_sold
+msgid "Sold On"
+msgstr "გასხვისების თარიღი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__source
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part4_line__source
+msgid "Source"
+msgstr "წყარო"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields.selection,name:gec_property_tax_report.selection__rs_form15_land_type__unit__sqm
+msgid "Square Metre"
+msgstr "კვადრატული მეტრი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__state
+msgid "State"
+msgstr "მდგომარეობა"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_land_type__base_rate
+msgid ""
+"Statutory base rate per unit of area, used only when the rate is a "
+"coefficient."
+msgstr ""
+"კანონით დადგენილი საბაზისო განაკვეთი ფართობის ერთეულზე; გამოიყენება მხოლოდ "
+"მაშინ, როცა განაკვეთი კოეფიციენტია."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_plot__supporting_document
+msgid "Supporting Document"
+msgstr "დამადასტურებელი დოკუმენტი"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part3_grid/rs_form15_part3_grid.js:0
+msgid ""
+"Tag your assets with a property type and a territorial unit, then press "
+"Generate."
+msgstr ""
+"მონიშნეთ აქტივები ქონების სახეობითა და ტერიტორიული ერთეულით, შემდეგ დააჭირეთ"
+" „გენერაციას“."
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part3_grid/rs_form15_part3_grid.js:0
+msgid "Tax"
+msgstr "გადასახადის თანხა"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__tax_amount
+msgid "Tax (11)"
+msgstr "გადასახადის თანხა (11)"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part4_line__tax_amount
+msgid "Tax (8)"
+msgstr "ქონების გადასახადი (8)"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_account_asset__rs_form15_revaluation_model_applied
+msgid ""
+"Tax Code art. 202(2): with audited statements the revaluation coefficient of"
+" art. 202(1) does not apply, for at most four calendar years after the "
+"audit."
+msgstr ""
+"საგადასახადო კოდექსის 202-ე მუხლის მე-2 ნაწილი: აუდირებული ანგარიშგების "
+"შემთხვევაში 202-ე მუხლის პირველი ნაწილის აფასების კოეფიციენტი არ გამოიყენება"
+" აუდიტიდან არაუმეტეს ოთხი კალენდარული წლის განმავლობაში."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_declaration__land_reference_date
+msgid ""
+"Tax Code art. 205(2): the declaration reports property for the past year and"
+" land for the current (filing) year, as at 1 April (art. 203). So it "
+"defaults to 1 April of the year after the period. Its year drives the part "
+"IV rate lookup."
+msgstr ""
+"საგადასახადო კოდექსის 205-ე მუხლის მე-2 ნაწილი: დეკლარაციაში ქონების "
+"მონაცემები გასული წლის მიხედვით შეიტანება, მიწისა კი მიმდინარე (წარდგენის) "
+"წლის მიხედვით, 1 აპრილის მდგომარეობით (203-ე მუხლი). ამიტომ ნაგულისხმევად ეს"
+" არის პერიოდის მომდევნო წლის 1 აპრილი. მისი წლის მიხედვით შეირჩევა IV "
+"ნაწილის განაკვეთები."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_declaration__next_advance_amount
+msgid ""
+"Tax Code art. 205(3): next year's current payment is this year's full annual"
+" property tax (column 11, even for an incomplete year, art. 205(9)), paid "
+"once by 15 June. It may be reduced if the tax is expected to fall by at "
+"least 50% and the tax office is told by 1 June (art. 205(4))."
+msgstr ""
+"საგადასახადო კოდექსის 205-ე მუხლის მე-3 ნაწილი: მომავალი წლის მიმდინარე "
+"გადასახდელი ამ წლის სრული წლიური ქონების გადასახადია (მე-11 სვეტი, არასრული "
+"წლის შემთხვევაშიც, 205-ე მუხლის მე-9 ნაწილი) და ერთიანად გადაიხდება არა "
+"უგვიანეს 15 ივნისისა. მისი შემცირება შეიძლება, თუ მოსალოდნელი გადასახადი "
+"არანაკლებ 50 პროცენტით მცირდება და საგადასახადო ორგანოს ამის შესახებ 1 "
+"ივნისამდე ეცნობება (205-ე მუხლის მე-4 ნაწილი)."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_building_rate__tax_year
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__tax_year
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__tax_year
+msgid "Tax Year"
+msgstr "საგადასახადო წელი"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part3_grid/rs_form15_part3_grid.js:0
+msgid "Tax exemption"
+msgstr "საგადასახადო შეღავათი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__prorated_amount
+msgid "Tax for the Period (15)"
+msgstr "გადასახადის თანხა არსებობის პერიოდის გათვალისწინებით (15)"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part3_grid/rs_form15_part3_grid.js:0
+msgid "Tax for the period"
+msgstr "გადასახადი პერიოდის მიხედვით"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "Tax year"
+msgstr "საგადასახადო წელი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_plot__taxable_area
+msgid "Taxable Area"
+msgstr "დასაბეგრი ფართობი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part4_line__taxable_area
+msgid "Taxable Area (5)"
+msgstr "დაბეგვრის ობიექტის ფართობი შეღავათის გათვალისწინებით (5)"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "Taxable area"
+msgstr "დასაბეგრი ფართობი"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "Taxable area (5)"
+msgstr "დაბეგვრის ობიექტის ფართობი შეღავათის გათვალისწინებით (5)"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part4_grid/rs_form15_part4_grid.js:0
+msgid "Taxable area after exemption"
+msgstr "დაბეგვრის ობიექტის ფართობი შეღავათის გათვალისწინებით"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_plot__land_territory_id
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_land_plot_search
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_land_rate_search
+msgid "Territorial Unit"
+msgstr "ტერიტორიული ერთეული"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part4_line__land_territory_id
+msgid "Territorial Unit (2)"
+msgstr "ტერიტორიული ერთეული, მდებარეობა (2)"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__territory_id
+msgid "Territorial Unit (4)"
+msgstr "ტერიტორიული ერთეული (4)"
+
+#. module: gec_property_tax_report
+#: model:ir.actions.act_window,name:gec_property_tax_report.action_rs_form15_territory
+#: model:ir.ui.menu,name:gec_property_tax_report.menu_rs_form15_territory
+msgid "Territorial Units (Part III)"
+msgstr "ტერიტორიული ერთეულები (III ნაწილი)"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part3_grid/rs_form15_part3_grid.js:0
+msgid "Territorial unit"
+msgstr "ტერიტორიული ერთეული"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "Territorial unit (2)"
+msgstr "ტერიტორიული ერთეული, მდებარეობა (2)"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "Territorial unit (4)"
+msgstr "ტერიტორიული ერთეული (4)"
+
+#. module: gec_property_tax_report
+#: model:ir.model.constraint,message:gec_property_tax_report.constraint_rs_form15_territory_code_uniq
+msgid "Territorial unit code must be unique."
+msgstr "ტერიტორიული ერთეულის კოდი უნიკალური უნდა იყოს."
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_land_territory_field/rs_form15_land_territory_field.js:0
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part4_grid/rs_form15_part4_grid.js:0
+msgid "Territorial unit, location"
+msgstr "ტერიტორიული ერთეული, მდებარეობა"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_building_rate__territory_id
+msgid "Territory"
+msgstr "ტერიტორია"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid ""
+"The acquisition year of these assets is missing from Acquisition Years, and the portal offers the year only as a dropdown:\n"
+"%s"
+msgstr ""
+"ამ აქტივების მიღების წელი „მიღების წლებში“ არ არის, პორტალი კი წელს მხოლოდ ჩამოსაშლელი სიიდან გვთავაზობს:\n"
+"%s"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid ""
+"The acquisition year option %s was added automatically; check that the "
+"portal offers it."
+msgstr ""
+"მიღების წლის ვარიანტი %s ავტომატურად დაემატა; შეამოწმეთ, არის თუ არა ის "
+"პორტალზე."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_land_plot.py:0
+msgid "The area of %s must be positive."
+msgstr "%s: ფართობი დადებითი უნდა იყოს."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_part3_line__asset_ids
+msgid ""
+"The assets summed into this row, for tracing column 6 back to the ledger."
+msgstr ""
+"ამ სტრიქონში შეჯამებული აქტივები, რომ მე-6 სვეტი ბუღალტრულ ჩანაწერებამდე "
+"მიიკვლიოთ."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_account_asset__rs_form15_leased_out_base_value
+msgid ""
+"The book value at the moment the asset was first leased out. A leasing "
+"company declares it instead of the average annual value, for the part of the"
+" year the asset existed."
+msgstr ""
+"საბალანსო ღირებულება აქტივის ლიზინგით პირველი გაცემის მომენტში. სალიზინგო "
+"კომპანია მას საშუალო წლიური ღირებულების ნაცვლად დეკლარირებს, წლის იმ "
+"ნაწილისთვის, როცა აქტივი არსებობდა."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_classifier.py:0
+msgid ""
+"The building tax rate must be between 0 and 1 percent (Tax Code art. "
+"202(1))."
+msgstr ""
+"შენობის გადასახადის განაკვეთი უნდა იყოს 0-დან 1 პროცენტამდე (საგადასახადო "
+"კოდექსის 202-ე მუხლის პირველი ნაწილი)."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_classifier_mixin__name
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_exemption_basis__name
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_land_territory__name
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_land_type__name
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_property_type__name
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_territory__name
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_year__name
+msgid ""
+"The label exactly as rs.ge spells it; the import file carries it next to the"
+" code."
+msgstr ""
+"დასახელება ზუსტად ისე, როგორც rs.ge წერს; იმპორტის ფაილში ის კოდის გვერდით "
+"იწერება."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_land_plot__asset_id
+msgid ""
+"The land as booked in Fixed Assets. Its dates are used, and it is kept out "
+"of part III, which taxes property by value; land is taxed here by area."
+msgstr ""
+"მიწა, როგორც ის ძირითად საშუალებებშია აღრიცხული. გამოიყენება მისი თარიღები, "
+"ხოლო აქტივი III ნაწილში აღარ მოხვდება: III ნაწილი ქონებას ღირებულებით "
+"ბეგრავს, მიწა კი აქ ფართობით იბეგრება."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_classifier.py:0
+msgid "The land rate cannot be negative."
+msgstr "მიწის განაკვეთი არ შეიძლება იყოს უარყოფითი."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid ""
+"The part III rows are not ready to export:\n"
+"%s"
+msgstr ""
+"III ნაწილის სტრიქონები ექსპორტისთვის მზად არ არის:\n"
+"%s"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid ""
+"The part IV rows are not ready to export:\n"
+"%s"
+msgstr ""
+"IV ნაწილის სტრიქონები ექსპორტისთვის მზად არ არის:\n"
+"%s"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_part3_line__has_name
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_property_type__has_name
+msgid ""
+"The portal asks for the object's own name in column 2 (a pipeline, a "
+"building), so each asset is declared on its own row. Other types are "
+"declared per type, territorial unit and acquisition year."
+msgstr ""
+"პორტალი მე-2 სვეტში ობიექტის საკუთარ დასახელებას ითხოვს (მილსადენი, შენობა),"
+" ამიტომ თითოეული აქტივი ცალკე სტრიქონით დეკლარირდება. სხვა სახეობები "
+"დეკლარირდება სახეობის, ტერიტორიული ერთეულისა და მიღების წლის მიხედვით."
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "The portal computes this column; the value here is a cross-check."
+msgstr "ამ სვეტს პორტალი ითვლის; აქ მოცემული მნიშვნელობა შესამოწმებელია."
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "The portal hides this cell for this row."
+msgstr "ამ სტრიქონისთვის პორტალი ამ უჯრას მალავს."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid ""
+"The reporting period must start on 1 January: the declaration is annual and "
+"the form carries a single year."
+msgstr ""
+"საანგარიშო პერიოდი 1 იანვრით უნდა იწყებოდეს: დეკლარაცია წლიურია და ფორმა ერთ"
+" წელს მოიცავს."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_classifier_mixin__code
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_exemption_basis__code
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_land_territory__code
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_land_type__code
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_property_type__code
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_territory__code
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_year__code
+msgid "The rs.ge ID written into the import file."
+msgstr "rs.ge-ის ID, რომელიც იმპორტის ფაილში იწერება."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "The rs.ge rate for this territorial unit and land type is zero."
+msgstr ""
+"ამ ტერიტორიული ერთეულისა და მიწის სახეობისთვის rs.ge-ის განაკვეთი ნულია."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_part4_line__rate
+msgid ""
+"The rs.ge table value. For non-agricultural land it is a municipal "
+"coefficient on the statutory base rate, not an amount per square metre."
+msgstr ""
+"rs.ge-ის ცხრილის მნიშვნელობა. არასასოფლო-სამეურნეო მიწისთვის ეს არის "
+"მუნიციპალური კოეფიციენტი კანონით დადგენილ საბაზისო განაკვეთზე და არა თანხა "
+"კვადრატულ მეტრზე."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_classifier.py:0
+msgid "The tax year must be a YYYY year."
+msgstr "საგადასახადო წელი უნდა იყოს ოთხნიშნა წელი (YYYY)."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_land_plot.py:0
+msgid "The taxable area of %s cannot be negative or larger than the area."
+msgstr "%s: დასაბეგრი ფართობი არ შეიძლება იყოს უარყოფითი ან ფართობზე მეტი."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_exemption_basis__note
+msgid "The validity remark as rs.ge publishes it."
+msgstr "მოქმედების შენიშვნა ისე, როგორც rs.ge აქვეყნებს."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "There is nothing to export."
+msgstr "საექსპორტო არაფერია."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid ""
+"These assets have no property tax type or territorial unit, and the portal offers both only as dropdowns:\n"
+"%s"
+msgstr ""
+"ამ აქტივებს არ აქვს ქონების სახეობა ან ტერიტორიული ერთეული, პორტალი კი ორივეს მხოლოდ ჩამოსაშლელი სიიდან გვთავაზობს:\n"
+"%s"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid ""
+"These land rows do not match the rs.ge rate table:\n"
+"%s"
+msgstr ""
+"მიწის ეს სტრიქონები rs.ge-ის განაკვეთების ცხრილს არ ემთხვევა:\n"
+"%s"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part3_grid/rs_form15_part3_grid.js:0
+msgid "To add (+) / reduce (-)"
+msgstr "დამატებით დარიცხვა (+) / შემცირება (-)"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part4_line__land_type_id
+msgid "Type (3)"
+msgstr "სახეობა და აღწერილობა (3)"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_plot__unit
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_type__unit
+msgid "Unit"
+msgstr "ერთეული"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "Unit rate"
+msgstr "განაკვეთი ერთეულზე"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "Unverified assumptions"
+msgstr "გადაუმოწმებელი დაშვებები"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_classifier_mixin__valid_from
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_exemption_basis__valid_from
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_rate__valid_from
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_territory__valid_from
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_type__valid_from
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_property_type__valid_from
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_territory__valid_from
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_year__valid_from
+msgid "Valid From (Year)"
+msgstr "მოქმედებს წლიდან"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_classifier_mixin__valid_to
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_exemption_basis__valid_to
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_rate__valid_to
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_territory__valid_to
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_land_type__valid_to
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_property_type__valid_to
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_territory__valid_to
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_year__valid_to
+msgid "Valid To (Year)"
+msgstr "მოქმედებს წლამდე"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_classifier.py:0
+msgid "Valid To must be on or after Valid From."
+msgstr "მოქმედების დასრულების წელი არ შეიძლება იყოს დაწყების წელზე ადრე."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_classifier.py:0
+msgid "Validity must be a YYYY year, or empty for an open boundary."
+msgstr ""
+"მოქმედების წელი უნდა იყოს ოთხნიშნა წელი (YYYY) ან ცარიელი ღია ზღვრისთვის."
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.row_explanation
+msgid "Value"
+msgstr "მნიშვნელობა"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_account_asset__rs_form15_leased_out_base_value
+msgid "Value at Lease-Out"
+msgstr "ლიზინგით გაცემის მომენტის ღირებულება"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid ""
+"Value at lease-out for %(frozen)s of %(count)s asset(s), for the part of the"
+" year each existed (leasing company, Order 996 art. 88); any other asset at "
+"(value at 1 January + value at 31 December) / 2."
+msgstr ""
+"ლიზინგით გაცემის მომენტის ღირებულება %(count)s აქტივიდან %(frozen)s-ზე, წლის"
+" იმ ნაწილისთვის, როცა თითოეული არსებობდა (სალიზინგო კომპანია, ბრძანება №996,"
+" მუხ. 88); დანარჩენ აქტივზე — (ღირებულება 1 იანვარს + ღირებულება 31 "
+"დეკემბერს) / 2."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part3_line__warning
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_part4_line__warning
+msgid "Warning"
+msgstr "გაფრთხილება"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_declaration__warning_count
+msgid "Warning Count"
+msgstr "გაფრთხილებების რაოდენობა"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_declaration_list
+msgid "Warnings"
+msgstr "გაფრთხილებები"
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.row_explanation
+msgid "What"
+msgstr "რა"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_land_type__uses_base_rate
+msgid ""
+"When set, the rate table holds a municipal coefficient applied to the "
+"statutory base rate, not an absolute amount per unit of area."
+msgstr ""
+"თუ მონიშნულია, განაკვეთების ცხრილში მუნიციპალური კოეფიციენტია, რომელიც "
+"კანონით დადგენილ საბაზისო განაკვეთს ემრავლება, და არა აბსოლუტური თანხა "
+"ფართობის ერთეულზე."
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.row_explanation
+msgid "Where column 6 comes from"
+msgstr "საიდან მოდის მე-6 სვეტი"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid ""
+"Whether column 13 follows column 15 or column 11 when the year is "
+"incomplete; whether property type group 5 is leased-out property."
+msgstr ""
+"არასრული წლის შემთხვევაში მე-13 სვეტი მე-15 სვეტით ითვლება თუ მე-11-ით; არის"
+" თუ არა ქონების სახეობების მე-5 ჯგუფი ლიზინგით გაცემული ქონება."
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_land_plot_search
+msgid "With Exemption"
+msgstr "შეღავათით"
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_declaration_search
+msgid "With Warnings"
+msgstr "გაფრთხილებებით"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_revaluation_coefficient__code
+msgid "Written into column 7 verbatim, including '-'."
+msgstr "მე-7 სვეტში იწერება უცვლელად, „-“-ის ჩათვლით."
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_declaration__tax_year
+#: model:ir.model.fields,help:gec_property_tax_report.field_rs_form15_part3_line__tax_year
+msgid "YYYY, used for classifier validity and for the part III columns."
+msgstr ""
+"YYYY; გამოიყენება კლასიფიკატორების მოქმედების შესამოწმებლად და III ნაწილის "
+"სვეტებისთვის."
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_building_rate_search
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_declaration_search
+msgid "Year"
+msgstr "წელი"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "Year (5)"
+msgstr "მიღების წელი (5)"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_revaluation_coefficient__year_from
+msgid "Year From"
+msgstr "წლიდან"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields,field_description:gec_property_tax_report.field_rs_form15_revaluation_coefficient__year_to
+msgid "Year To"
+msgstr "წლამდე"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_part3_grid/rs_form15_part3_grid.js:0
+msgid "Year acquired"
+msgstr "მიღების წელი"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "Yes"
+msgstr "დიახ"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "You cannot change the company of a declaration that has lines."
+msgstr "სტრიქონების მქონე დეკლარაციის კომპანიის შეცვლა შეუძლებელია."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "column 11"
+msgstr "მე-11 სვეტი"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid ""
+"column 11 = (column 6 x column 7 - column 8) x column 10, and column 13 = %s"
+" - column 12"
+msgstr ""
+"მე-11 სვეტი = (მე-6 სვეტი x მე-7 სვეტი - მე-8 სვეტი) x მე-10 სვეტი, ხოლო "
+"მე-13 სვეტი = %s - მე-12 სვეტი"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "column 15 when the year is incomplete, otherwise column 11"
+msgstr "მე-15 სვეტი, თუ წელი არასრულია, სხვა შემთხვევაში — მე-11 სვეტი"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid ""
+"column 8 = (column 5, or column 4 when there is no exemption) x column 7, "
+"and for non-agricultural land column 7 is multiplied by the statutory 0.24 "
+"GEL/m²"
+msgstr ""
+"მე-8 სვეტი = (მე-5 სვეტი, ან მე-4 სვეტი, თუ შეღავათი არ არის) x მე-7 სვეტი; "
+"არასასოფლო-სამეურნეო მიწისთვის მე-7 სვეტი მრავლდება კანონით დადგენილ 0.24 "
+"ლარი/მ²-ზე"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration_xlsx.py:0
+msgid "full year"
+msgstr "სრული წელი"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "rows"
+msgstr "სტრიქონი"
+
+#. module: gec_property_tax_report
+#: model:ir.model,name:gec_property_tax_report.model_rs_form15_declaration
+msgid "rs.ge Form 15 Annual Property Tax Declaration"
+msgstr "rs.ge ფორმა 15 — ქონების გადასახადის წლიური დეკლარაცია"
+
+#. module: gec_property_tax_report
+#: model:ir.model,name:gec_property_tax_report.model_rs_form15_building_rate
+msgid "rs.ge Form 15 Building Tax Rate"
+msgstr "rs.ge ფორმა 15 — შენობის გადასახადის განაკვეთი"
+
+#. module: gec_property_tax_report
+#: model:ir.model,name:gec_property_tax_report.model_rs_form15_classifier_mixin
+msgid "rs.ge Form 15 Classifier"
+msgstr "rs.ge ფორმა 15 — კლასიფიკატორი"
+
+#. module: gec_property_tax_report
+#: model:ir.model,name:gec_property_tax_report.model_rs_form15_exemption_basis
+msgid "rs.ge Form 15 Exemption Basis"
+msgstr "rs.ge ფორმა 15 — შეღავათის საფუძველი"
+
+#. module: gec_property_tax_report
+#: model:ir.model,name:gec_property_tax_report.model_rs_form15_land_rate
+msgid "rs.ge Form 15 Land Rate"
+msgstr "rs.ge ფორმა 15 — მიწის განაკვეთი"
+
+#. module: gec_property_tax_report
+#: model:ir.model,name:gec_property_tax_report.model_rs_form15_land_territory
+msgid "rs.ge Form 15 Land Territorial Unit"
+msgstr "rs.ge ფორმა 15 — მიწის ტერიტორიული ერთეული"
+
+#. module: gec_property_tax_report
+#: model:ir.model,name:gec_property_tax_report.model_rs_form15_land_type
+msgid "rs.ge Form 15 Land Type"
+msgstr "rs.ge ფორმა 15 — მიწის სახეობა"
+
+#. module: gec_property_tax_report
+#: model:ir.model,name:gec_property_tax_report.model_rs_form15_part3_line
+msgid "rs.ge Form 15 Part III Line (Property other than Land)"
+msgstr "rs.ge ფორმა 15 — III ნაწილის სტრიქონი (ქონება, გარდა მიწისა)"
+
+#. module: gec_property_tax_report
+#: model:ir.model,name:gec_property_tax_report.model_rs_form15_part4_line
+msgid "rs.ge Form 15 Part IV Line (Land)"
+msgstr "rs.ge ფორმა 15 — IV ნაწილის სტრიქონი (მიწა)"
+
+#. module: gec_property_tax_report
+#: model:ir.model,name:gec_property_tax_report.model_rs_form15_property_type
+msgid "rs.ge Form 15 Property Type"
+msgstr "rs.ge ფორმა 15 — ქონების სახეობა"
+
+#. module: gec_property_tax_report
+#: model:ir.model,name:gec_property_tax_report.model_rs_form15_revaluation_coefficient
+msgid "rs.ge Form 15 Revaluation Coefficient"
+msgstr "rs.ge ფორმა 15 — აფასების კოეფიციენტი"
+
+#. module: gec_property_tax_report
+#: model:ir.model,name:gec_property_tax_report.model_rs_form15_explain
+msgid "rs.ge Form 15 Row Explanation"
+msgstr "rs.ge ფორმა 15 — სტრიქონის განმარტება"
+
+#. module: gec_property_tax_report
+#: model:ir.model,name:gec_property_tax_report.model_rs_form15_territory
+msgid "rs.ge Form 15 Territorial Unit"
+msgstr "rs.ge ფორმა 15 — ტერიტორიული ერთეული"
+
+#. module: gec_property_tax_report
+#: model:ir.model,name:gec_property_tax_report.model_rs_form15_year
+msgid "rs.ge Form 15 Year Acquired"
+msgstr "rs.ge ფორმა 15 — მიღების წელი"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "rs.ge ID %(code)s, declared in %(unit)s"
+msgstr "rs.ge ID %(code)s, დეკლარირებულია: %(unit)s"
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "rs.ge ID %s"
+msgstr "rs.ge ID %s"
+
+#. module: gec_property_tax_report
+#: model:ir.ui.menu,name:gec_property_tax_report.menu_rs_form15_config
+msgid "rs.ge Property Tax (Advanced)"
+msgstr "rs.ge ქონების გადასახადი (დამატებითი)"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_rate_field/rs_form15_rate_field.js:0
+msgid "rs.ge Rate"
+msgstr "rs.ge-ის განაკვეთი"
+
+#. module: gec_property_tax_report
+#: model_terms:ir.actions.act_window,help:gec_property_tax_report.action_rs_form15_building_rate
+msgid ""
+"rs.ge publishes no rate table for part III. A territorial unit with no row\n"
+"               falls back to the 1% cap of Tax Code art. 202(1), and the declaration line says so."
+msgstr ""
+"rs.ge III ნაწილისთვის განაკვეთების ცხრილს არ აქვეყნებს. ტერიტორიული ერთეული, რომელსაც\n"
+"               სტრიქონი არ აქვს, საგადასახადო კოდექსის 202-ე მუხლის პირველი ნაწილის 1%-იან ზღვარს იყენებს და დეკლარაციის სტრიქონი ამას მიუთითებს."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "rs.ge table value for this territorial unit and land type (%s)."
+msgstr ""
+"rs.ge-ის ცხრილის მნიშვნელობა ამ ტერიტორიული ერთეულისა და მიწის სახეობისთვის "
+"(%s)."
+
+#. module: gec_property_tax_report
+#. odoo-python
+#: code:addons/gec_property_tax_report/models/rs_form15_declaration.py:0
+msgid "typed by hand"
+msgstr "ხელით შეყვანილი"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "warnings"
+msgstr "გაფრთხილება"
+
+#. module: gec_property_tax_report
+#. odoo-javascript
+#: code:addons/gec_property_tax_report/static/src/components/rs_form15_grid/rs_form15_grid.xml:0
+msgid "Σ"
+msgstr "Σ"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields.selection,name:gec_property_tax_report.selection__rs_form15_declaration__kind__primary
+msgid "პირველადი"
+msgstr "პირველადი"
+
+#. module: gec_property_tax_report
+#: model:ir.model.fields.selection,name:gec_property_tax_report.selection__rs_form15_declaration__kind__corrected
+msgid "შესწორებული"
+msgstr "შესწორებული"
+
+#. module: gec_property_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_account_asset_form_rs_form15
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_declaration_form
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_land_plot_form
+#: model_terms:ir.ui.view,arch_db:gec_property_tax_report.view_rs_form15_land_plot_list
+msgid "შეღავათით არ ვსარგებლობ"
+msgstr "შეღავათით არ ვსარგებლობ"

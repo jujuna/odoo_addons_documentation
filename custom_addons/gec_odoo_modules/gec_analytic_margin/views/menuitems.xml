@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Gated on analytic accounting, not the ABC switch or the accounting reader group: the figures are read from
+         analytic records, and the ABC switch implies this group. -->
+    <menuitem id="menu_gec_abc_reports"
+              name="Activity-Based Costing"
+              parent="account.menu_finance_reports"
+              action=""
+              groups="analytic.group_analytic_accounting"
+              sequence="45"/>
+
+    <!-- Margin Statement is declared in data/gec_margin_statement_report.xml under this same parent. -->
+
+    <menuitem id="menu_gec_margin_report"
+              name="Margin Analysis"
+              parent="menu_gec_abc_reports"
+              action="action_gec_margin_report"
+              sequence="20"/>
+
+    <menuitem id="menu_gec_abc_rates"
+              name="Activity Rates"
+              parent="menu_gec_abc_reports"
+              action="action_gec_activity_rate"
+              sequence="25"/>
+
+    <menuitem id="menu_gec_abc_plans"
+              name="Planned vs Actual"
+              parent="menu_gec_abc_reports"
+              action="action_gec_activity_plan"
+              sequence="27"/>
+
+    <menuitem id="menu_gec_abc_runs"
+              name="Allocation Runs"
+              parent="menu_gec_abc_reports"
+              action="action_gec_allocation_run"
+              groups="gec_analytic_margin.group_gec_abc"
+              sequence="30"/>
+
+    <menuitem id="menu_gec_abc_config"
+              name="Activity-Based Costing"
+              parent="account.menu_finance_configuration"
+              groups="gec_analytic_margin.group_gec_abc"
+              sequence="90"/>
+
+    <menuitem id="menu_gec_abc_health"
+              name="Setup Health Check"
+              parent="menu_gec_abc_config"
+              action="action_gec_abc_health"
+              sequence="5"/>
+
+    <menuitem id="menu_gec_abc_activities"
+              name="Activities"
+              parent="menu_gec_abc_config"
+              action="action_gec_activity"
+              sequence="10"/>
+
+    <menuitem id="menu_gec_abc_rules"
+              name="Allocation Rules"
+              parent="menu_gec_abc_config"
+              action="action_gec_allocation_rule"
+              sequence="20"/>
+
+    <menuitem id="menu_gec_abc_components"
+              name="Margin Components"
+              parent="menu_gec_abc_config"
+              action="action_gec_margin_component"
+              sequence="30"/>
+
+    <menuitem id="menu_gec_abc_revenue_streams"
+              name="Revenue Streams"
+              parent="menu_gec_abc_config"
+              action="action_gec_revenue_stream"
+              sequence="35"/>
+
+    <menuitem id="menu_gec_abc_levels"
+              name="Margin Levels"
+              parent="menu_gec_abc_config"
+              action="action_gec_margin_level"
+              sequence="40"/>
+
+    <!-- A menuitem groups= attribute adds to group_ids, and menu groups are OR'ed, so upgraded databases would keep a
+         leftover group and stay visible with the switch off. Set both lists explicitly. -->
+
+    <record id="menu_gec_abc_reports" model="ir.ui.menu">
+        <field name="group_ids" eval="[(6, 0, [ref('analytic.group_analytic_accounting')])]"/>
+    </record>
+
+    <record id="menu_gec_abc_config" model="ir.ui.menu">
+        <field name="group_ids" eval="[(6, 0, [ref('group_gec_abc')])]"/>
+    </record>
+
+    <record id="menu_gec_abc_runs" model="ir.ui.menu">
+        <field name="group_ids" eval="[(6, 0, [ref('group_gec_abc')])]"/>
+    </record>
+
+</odoo>

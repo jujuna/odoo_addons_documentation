@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_create_rs_invoice_from_waybill" model="ir.actions.server">
+        <field name="name">Create RS Invoice</field>
+        <field name="model_id" ref="rs_waybill.model_rs_waybill"/>
+        <field name="binding_model_id" ref="rs_waybill.model_rs_waybill"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">action = records.action_open_invoice_from_waybill_wizard()</field>
+    </record>
+
+    <!-- Invoice from the waybill form too: an Odoo invoice that rs_einvoice sends to RS.GE as an e-invoice. -->
+    <record id="view_rs_waybill_form_invoice" model="ir.ui.view">
+        <field name="name">rs.waybill.form.invoice</field>
+        <field name="model">rs.waybill</field>
+        <field name="inherit_id" ref="rs_waybill.view_rs_waybill_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_confirm_waybill']" position="before">
+                <field name="is_locked_by_invoice" invisible="1"/>
+                <button name="action_open_invoice_from_waybill_wizard" type="object" class="btn-light border"
+                        icon="description"
+                        invisible="is_template or waybill_direction != 'seller' or waybill_status not in ('1', '2') or not rs_waybill_number or is_locked_by_invoice or context.get('edit_mode')">
+                    <span class="oe_stat_text">Create Invoice</span>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

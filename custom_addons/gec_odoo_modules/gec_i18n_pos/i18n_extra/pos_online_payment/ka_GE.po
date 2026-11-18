@@ -1,0 +1,610 @@
+# Georgian translation of the Odoo addon pos_online_payment, kept in gec_i18n_pos.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-04 17:45+0000\n"
+"PO-Revision-Date: 2026-09-30 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian (ka_GE)\n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pos_payment_status
+msgid "<i class=\"oi me-2\" data-icon=\"lock\"/>Payment secured · Don't close this window"
+msgstr "<i class=\"oi me-2\" data-icon=\"lock\"/>გადახდა დაცულია · არ დახუროთ ეს ფანჯარა"
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pos_payment_status
+msgid "<span class=\"text-500\">Order</span>"
+msgstr "<span class=\"text-500\">შეკვეთა</span>"
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pos_payment_status
+msgid "<span class=\"text-500\">Total</span>"
+msgstr "<span class=\"text-500\">ჯამი</span>"
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pay
+msgid "<strong>Error:</strong> The currency is missing or invalid."
+msgstr "<strong>შეცდომა:</strong> ვალუტა აკლია ან არასწორია."
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/models/pos_config.py:0
+msgid "A POS config cannot have more than one online payment method."
+msgstr "POS კონფიგურაციას ერთზე მეტი ონლაინ გადახდის მეთოდი ვერ ექნება."
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/controllers/payment_portal.py:0
+msgid "A payment option must be specified."
+msgstr "გადახდის ვარიანტი უნდა მიეთითოს."
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/controllers/payment_portal.py:0
+msgid "A validation payment cannot be used for a Point of Sale online payment."
+msgstr "დამოწმების გადახდა გაყიდვის წერტილის ონლაინ გადახდისთვის ვერ გამოიყენება."
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pos_payment_method_view_form_inherit_pos_online_payment
+msgid "All available providers"
+msgstr "ყველა ხელმისაწვდომი პროვაიდერი"
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/models/pos_payment_method.py:0
+msgid "All payment providers configured for an online payment method must use the same currency as the Sales Journal, or the company currency if that is not set, of the POS config."
+msgstr "ონლაინ გადახდის მეთოდისთვის კონფიგურირებული ყველა გადახდის პროვაიდერი უნდა იყოს იმავე ვალუტაში, როგორც გაყიდვების ჟურნალი, ან კომპანიის ვალუტაში, თუ ის მითითებული არ არის."
+
+#. module: pos_online_payment
+#: model:ir.model.fields,field_description:pos_online_payment.field_pos_payment_method__online_payment_provider_ids
+msgid "Allowed Providers"
+msgstr "დაშვებული პროვაიდერები"
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pos_payment_status
+msgid "Almost there!"
+msgstr "თითქმის მზადაა!"
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pay_confirmation
+msgid "Amount"
+msgstr "თანხა"
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pay
+msgid "Cancel payment"
+msgstr "გადახდის გაუქმება"
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/models/pos_payment.py:0
+msgid "Cannot create a POS online payment without an accounting payment."
+msgstr "POS ონლაინ გადახდის შექმნა საბუღალტრო გადახდის გარეშე შეუძლებელია."
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/models/pos_payment.py:0
+msgid "Cannot create a POS payment with a not online payment method and an online accounting payment."
+msgstr "POS გადახდის შექმნა არაონლაინ გადახდის მეთოდითა და ონლაინ საბუღალტრო გადახდით შეუძლებელია."
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/models/pos_payment.py:0
+msgid "Cannot edit a POS online payment essential data."
+msgstr "POS ონლაინ გადახდის არსებითი მონაცემების რედაქტირება შეუძლებელია."
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/models/pos_payment_method.py:0
+msgid "Could not create an online payment method (company_id=%(company_id)d, pos_config_id=%(pos_config_id)d)"
+msgstr "ონლაინ გადახდის მეთოდი ვერ შეიქმნა (company_id=%(company_id)d, pos_config_id=%(pos_config_id)d)"
+
+#. module: pos_online_payment
+#: model:ir.model.fields,field_description:pos_online_payment.field_account_payment__display_name model:ir.model.fields,field_description:pos_online_payment.field_payment_transaction__display_name model:ir.model.fields,field_description:pos_online_payment.field_pos_config__display_name model:ir.model.fields,field_description:pos_online_payment.field_pos_order__display_name model:ir.model.fields,field_description:pos_online_payment.field_pos_payment__display_name model:ir.model.fields,field_description:pos_online_payment.field_pos_payment_method__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: pos_online_payment
+#: model:ir.model.fields,field_description:pos_online_payment.field_pos_payment_method__has_an_online_payment_provider
+msgid "Has An Online Payment Provider"
+msgstr "აქვს ონლაინ გადახდის პროვაიდერი"
+
+#. module: pos_online_payment
+#: model:ir.model.fields,field_description:pos_online_payment.field_account_payment__id model:ir.model.fields,field_description:pos_online_payment.field_payment_transaction__id model:ir.model.fields,field_description:pos_online_payment.field_pos_config__id model:ir.model.fields,field_description:pos_online_payment.field_pos_order__id model:ir.model.fields,field_description:pos_online_payment.field_pos_payment__id model:ir.model.fields,field_description:pos_online_payment.field_pos_payment_method__id
+msgid "ID"
+msgstr "ID"
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/utils/order_payment_validation.js:0
+msgid "Invalid online payment"
+msgstr "არასწორი ონლაინ გადახდა"
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/utils/order_payment_validation.js:0
+msgid "Invalid online payments"
+msgstr "არასწორი ონლაინ გადახდები"
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/utils/order_payment_validation.js:0
+msgid "Invoice could not be generated"
+msgstr "ინვოისი ვერ დაგენერირდა"
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/controllers/payment_portal.py:0
+msgid "It looks like a payment for this order is already being processed — maybe from this device, maybe from another. If you continue, you risk to pay the order twice. Only continue if you're sure the earlier attempt was abandoned."
+msgstr "როგორც ჩანს, ამ შეკვეთის გადახდა უკვე მუშავდება — შესაძლოა ამ მოწყობილობიდან, შესაძლოა სხვიდან. თუ გააგრძელებთ, შეკვეთის ორჯერ გადახდის რისკი გაქვთ. გააგრძელეთ მხოლოდ მაშინ, თუ დარწმუნებული ხართ, რომ წინა მცდელობა მიტოვებულია."
+
+#. module: pos_online_payment
+#: model:ir.model.fields,field_description:pos_online_payment.field_pos_order__next_online_payment_amount
+msgid "Next online payment amount to pay"
+msgstr "შემდეგი ონლაინ გადასახდელი თანხა"
+
+#. module: pos_online_payment
+#: model:ir.model.fields.selection,name:pos_online_payment.selection__pos_payment_method__type__online
+msgid "Online"
+msgstr "ონლაინ"
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/models/pos_payment_method.py:0
+msgid "Online Payment"
+msgstr "ონლაინ გადახდა"
+
+#. module: pos_online_payment
+#: model:ir.model.fields,field_description:pos_online_payment.field_pos_order__online_payment_method_id
+msgid "Online Payment Method"
+msgstr "ონლაინ გადახდის მეთოდი"
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/models/pos_payment_method.py:0
+msgid "Online Payment Transfer"
+msgstr "ონლაინ გადახდის გადარიცხვა"
+
+#. module: pos_online_payment
+#: model:ir.model.fields,field_description:pos_online_payment.field_pos_payment__online_account_payment_id
+msgid "Online accounting payment"
+msgstr "ონლაინ საბუღალტრო გადახდა"
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/utils/order_payment_validation.js:0
+msgid "Online payment unavailable"
+msgstr "ონლაინ გადახდა მიუწვდომელია"
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/utils/order_payment_validation.js:0
+msgid "Online payments cannot have a negative amount (%s: %s)."
+msgstr "ონლაინ გადახდებს უარყოფითი თანხა ვერ ექნება (%s: %s)."
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pay_confirmation
+msgid "Order ID"
+msgstr "შეკვეთის ID"
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pay
+msgid "Order ID:"
+msgstr "შეკვეთის ID:"
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pay_confirmation
+msgid "Order Reference"
+msgstr "შეკვეთის მითითება"
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/utils/order_payment_validation.js:0
+msgid "Order saving issue"
+msgstr "შეკვეთის შენახვის პრობლემა"
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/models/account_payment.py:0 code:addons/pos_online_payment/models/payment_transaction.py:0 model:ir.model.fields,field_description:pos_online_payment.field_account_payment__pos_order_id model:ir.model.fields,field_description:pos_online_payment.field_payment_transaction__pos_order_id model_terms:ir.ui.view,arch_db:pos_online_payment.payment_transaction_form model_terms:ir.ui.view,arch_db:pos_online_payment.view_account_payment_form_inherit_pos_online_payment
+msgid "POS Order"
+msgstr "POS შეკვეთა"
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/models/pos_payment_method.py:0
+msgid "POS Receivable Transfer"
+msgstr "POS მისაღების გადარიცხვა"
+
+#. module: pos_online_payment
+#: model:ir.model,name:pos_online_payment.model_account_payment model_terms:ir.ui.view,arch_db:pos_online_payment.pay
+msgid "Payment"
+msgstr "გადახდა"
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pos_payment_method_view_form_inherit_pos_online_payment
+msgid "Payment Providers"
+msgstr "გადახდის პროვაიდერები"
+
+#. module: pos_online_payment
+#: model:ir.model,name:pos_online_payment.model_payment_transaction
+msgid "Payment Transaction"
+msgstr "გადახდის ტრანზაქცია"
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/utils/order_payment_validation.js:0
+msgid "Payment provider requirement"
+msgstr "გადახდის მიმწოდებლის მოთხოვნა"
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/utils/order_payment_validation.js:0
+msgid "Please ensure you have a customer with an email address on this order."
+msgstr "გთხოვთ, დარწმუნდეთ, რომ ამ შეკვეთაში მითითებულია კლიენტი ელფოსტის მისამართით."
+
+#. module: pos_online_payment
+#: model:ir.model,name:pos_online_payment.model_pos_config
+msgid "Point of Sale Configuration"
+msgstr "გაყიდვის წერტილის კონფიგურაცია"
+
+#. module: pos_online_payment
+#: model:ir.model,name:pos_online_payment.model_pos_order
+msgid "Point of Sale Order"
+msgstr "გაყიდვის წერტილის შეკვეთა"
+
+#. module: pos_online_payment
+#: model:ir.model,name:pos_online_payment.model_pos_payment
+msgid "Point of Sale Payment"
+msgstr "გაყიდვის წერტილის გადახდა"
+
+#. module: pos_online_payment
+#: model:ir.model,name:pos_online_payment.model_pos_payment_method
+msgid "Point of Sale Payment Method"
+msgstr "გაყიდვის წერტილის გადახდის მეთოდი"
+
+#. module: pos_online_payment
+#: model:ir.module.module,shortdesc:base.module_pos_online_payment
+msgid "Point of Sale online payment"
+msgstr "გაყიდვის წერტილის ონლაინ გადახდა"
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pay_confirmation
+msgid "Processed by"
+msgstr "დამუშავებულია"
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/utils/order_payment_validation.js:0
+msgid "Server error"
+msgstr "სერვერის შეცდომა"
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pos_payment_status
+msgid "Skip <i class=\"oi ms-1\" data-icon=\"east\"/>"
+msgstr "გამოტოვება <i class=\"oi ms-1\" data-icon=\"east\"/>"
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/models/pos_payment_method.py:0
+msgid "The %s already has one online payment."
+msgstr "%s-ს უკვე აქვს ერთი ონლაინ გადახდა."
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/models/payment_transaction.py:0
+msgid "The POS online payment (tx.id=%d) could not be saved correctly"
+msgstr "POS ონლაინ გადახდა (tx.id=%d) სწორად ვერ შეინახა"
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/models/payment_transaction.py:0
+msgid "The POS online payment (tx.id=%d) could not be saved correctly because the online payment method could not be found"
+msgstr "POS ონლაინ გადახდა (tx.id=%d) სწორად ვერ შეინახა, რადგან ონლაინ გადახდის მეთოდი ვერ მოიძებნა"
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/controllers/payment_portal.py:0
+msgid "The POS session is not opened."
+msgstr "POS სესია ღია არ არის."
+
+#. module: pos_online_payment
+#: model:ir.model.fields,help:pos_online_payment.field_payment_transaction__pos_order_id
+msgid "The Point of Sale order linked to the payment transaction"
+msgstr "გადახდის ტრანზაქციასთან დაკავშირებული გაყიდვის წერტილის შეკვეთა"
+
+#. module: pos_online_payment
+#: model:ir.model.fields,help:pos_online_payment.field_account_payment__pos_order_id
+msgid "The Point of Sale order linked to this payment"
+msgstr "ამ გადახდასთან დაკავშირებული გაყიდვის წერტილის შეკვეთა"
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/utils/order_payment_validation.js:0
+msgid "The QR code payment could not be generated."
+msgstr "QR კოდით გადახდა ვერ დაგენერირდა."
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/controllers/payment_portal.py:0
+msgid "The amount to pay has changed. Please refresh the page."
+msgstr "გადასახდელი თანხა შეიცვალა. გთხოვთ, განაახლოთ გვერდი."
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/controllers/payment_portal.py:0
+msgid "The currency is invalid."
+msgstr "ვალუტა არასწორია."
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/utils/order_payment_validation.js:0
+msgid "The invoice could not be generated."
+msgstr "ინვოისი ვერ დაგენერირდა."
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/controllers/payment_portal.py:0
+msgid "The order has been cancelled."
+msgstr "შეკვეთა გაუქმდა."
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/utils/order_payment_validation.js:0
+msgid "The order has not been saved correctly on the server."
+msgstr "შეკვეთა სერვერზე სწორად არ შეინახა."
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/controllers/payment_portal.py:0
+msgid "The payment provider is invalid."
+msgstr "გადახდის პროვაიდერი არასწორია."
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/controllers/payment_portal.py:0
+msgid "The payment should either be direct, with redirection, or made by a token."
+msgstr "გადახდა უნდა იყოს პირდაპირი, გადამისამართებით, ან ტოკენით."
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/controllers/payment_portal.py:0
+msgid "The payment token is invalid."
+msgstr "გადახდის ტოკენი არასწორია."
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/models/payment_transaction.py:0
+msgid "The payment transaction (%d) has a negative amount."
+msgstr "გადახდის ტრანზაქციას (%d) უარყოფითი თანხა აქვს."
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/controllers/payment_portal.py:0
+msgid "The provided order or access token is invalid."
+msgstr "მითითებული შეკვეთა ან წვდომის ტოკენი არასწორია."
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/controllers/payment_portal.py:0
+msgid "The provided partner_id is different than expected."
+msgstr "მითითებული partner_id მოსალოდნელისგან განსხვავდება."
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/utils/order_payment_validation.js:0
+msgid "The saved order could not be retrieved."
+msgstr "შენახული შეკვეთა ვერ მოიძებნა."
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/utils/order_payment_validation.js:0
+msgid "The total amount of remaining online payments to execute (%s) doesn't correspond to the remaining unpaid amount of the order (%s)."
+msgstr "დარჩენილი შესასრულებელი ონლაინ გადახდების საერთო თანხა (%s) შეკვეთის დარჩენილ გადაუხდელ თანხას (%s) არ შეესაბამება."
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/utils/order_payment_validation.js:0
+msgid "There are online payments that were missing in your view."
+msgstr "არსებობს ონლაინ გადახდები, რომლებიც თქვენს ხედში არ იყო."
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/utils/order_payment_validation.js:0
+msgid "There is a problem with the server. The order online payment status cannot be retrieved."
+msgstr "სერვერთან პრობლემაა. შეკვეთის ონლაინ გადახდის სტატუსი ვერ მოიძებნა."
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/utils/order_payment_validation.js:0
+msgid "There is a problem with the server. The order online payment status cannot be retrieved. Are you sure there is no online payment for this order ?"
+msgstr "სერვერთან პრობლემაა. შეკვეთის ონლაინ გადახდის სტატუსი ვერ მოიძებნა. დარწმუნებული ხართ, რომ ამ შეკვეთაზე ონლაინ გადახდა არ არის?"
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/controllers/payment_portal.py:0
+msgid "There is no online payment method configured for this Point of Sale order."
+msgstr "ამ გაყიდვის წერტილის შეკვეთისთვის ონლაინ გადახდის მეთოდი კონფიგურირებული არ არის."
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/controllers/payment_portal.py:0
+msgid "There is nothing to pay for this order."
+msgstr "ამ შეკვეთაზე გადასახდელი არაფერია."
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pay
+msgid "There is nothing to pay."
+msgstr "გადასახდელი არაფერია."
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pay
+msgid "To Pay"
+msgstr "გადასახდელი"
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/models/pos_config.py:0
+msgid "To use an online payment method in a POS config, it must have at least one published payment provider supporting the currency of that POS config."
+msgstr "POS კონფიგურაციაში ონლაინ გადახდის მეთოდის გამოსაყენებლად მას მინიმუმ ერთი გამოქვეყნებული გადახდის პროვაიდერი უნდა ჰქონდეს, რომელიც ამ POS-ის ვალუტას უჭერს მხარს."
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/controllers/payment_portal.py:0
+msgid "Tokenization is not available for logged out customers."
+msgstr "ტოკენიზაცია გამოსული კლიენტებისთვის მიუწვდომელია."
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pay_confirmation
+msgid "Transaction Reference"
+msgstr "ტრანზაქციის ნომერი"
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/models/pos_payment_method.py:0
+msgid "Transfer Online payment %(account_name)s => %(pos_receivable_name)s"
+msgstr "ონლაინ გადახდის გადარიცხვა %(account_name)s => %(pos_receivable_name)s"
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pay_confirmation
+msgid "Try again"
+msgstr "სცადეთ ხელახლა"
+
+#. module: pos_online_payment
+#: model:ir.model.fields,field_description:pos_online_payment.field_pos_payment_method__type
+msgid "Type"
+msgstr "ტიპი"
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/utils/order_payment_validation.js:0
+msgid "Updated online payments"
+msgstr "განახლებული ონლაინ გადახდები"
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pos_payment_status
+msgid "We're confirming your payment."
+msgstr "თქვენს გადახდას ვადასტურებთ."
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/utils/order_payment_validation.js:0
+msgid "Yes"
+msgstr "დიახ"
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pos_payment_method_view_form_inherit_pos_online_payment
+msgid "You have not activated any"
+msgstr "არ გაგიაქტიურებიათ არცერთი"
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pos_payment_status
+msgid ""
+"You should receive an email confirming your payment within a few minutes.<br/>\n"
+"                        Don't hesitate to contact us if you don't receive it."
+msgstr ""
+"რამდენიმე წუთში უნდა მიიღოთ წერილი თქვენი გადახდის დადასტურებით.<br/>\n"
+"                        თუ წერილს ვერ მიიღებთ, ნუ მოგერიდებათ, დაგვიკავშირდეთ."
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pos_payment_status
+msgid "Your payment is on its way!"
+msgstr "თქვენი გადახდა გზაშია!"
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pos_payment_method_view_form_inherit_pos_online_payment
+msgid "payment provider"
+msgstr "გადახდის პროვაიდერი"
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pos_payment_method_view_form_inherit_pos_online_payment
+msgid "to allow online payments."
+msgstr "ონლაინ გადახდების დასაშვებად."
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pay_confirmation
+msgid "<strong>Error:</strong> There was a problem during the payment process."
+msgstr "<strong>შეცდომა:</strong> გადახდის პროცესში პრობლემა წარმოიშვა."
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/components/popups/online_payment_popup/online_payment_popup.xml:0
+msgid "Amount:"
+msgstr "თანხა:"
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/components/popups/online_payment_popup/online_payment_popup.xml:0
+msgid "Order reference:"
+msgstr "შეკვეთის ნომერი:"
+
+#. module: pos_online_payment
+#: model_terms:ir.ui.view,arch_db:pos_online_payment.pay_confirmation
+msgid "Payment Confirmation"
+msgstr "გადახდის დადასტურება"
+
+#. module: pos_online_payment
+#: model:ir.model,name:pos_online_payment.model_account_payment
+msgid "Payments"
+msgstr "გადახდები"
+
+#. module: pos_online_payment
+#: model:ir.model,name:pos_online_payment.model_pos_order
+msgid "Point of Sale Orders"
+msgstr "გაყიდვის წერტილის შეკვეთები"
+
+#. module: pos_online_payment
+#: model:ir.model,name:pos_online_payment.model_pos_payment_method
+msgid "Point of Sale Payment Methods"
+msgstr "გაყიდვის წერტილის გადახდის მეთოდები"
+
+#. module: pos_online_payment
+#: model:ir.model,name:pos_online_payment.model_pos_payment
+msgid "Point of Sale Payments"
+msgstr "გაყიდვის წერტილის გადახდები"
+
+#. module: pos_online_payment
+#: model:ir.model,name:pos_online_payment.model_pos_session
+msgid "Point of Sale Session"
+msgstr "გაყიდვის წერტილის სესია"
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/components/popups/online_payment_popup/online_payment_popup.xml:0
+msgid "QR Code to pay"
+msgstr "QR კოდი გადასახდელად"
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/components/popups/online_payment_popup/online_payment_popup.xml:0
+msgid "Scan the QR code to pay"
+msgstr "დაასკანირეთ QR კოდი გადასახდელად"
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/components/popups/online_payment_popup/online_payment_popup.xml:0
+msgid "Scan to pay"
+msgstr "დაასკანირეთ გადასახდელად"
+
+#. module: pos_online_payment
+#. odoo-javascript
+#: code:addons/pos_online_payment/static/src/app/utils/order_payment_validation.js:0
+msgid "The QR Code for paying could not be generated."
+msgstr "გადასახდელი QR კოდი ვერ დაგენერირდა."
+
+#. module: pos_online_payment
+#. odoo-python
+#: code:addons/pos_online_payment/models/pos_session.py:0
+msgid "The partner of the POS online payment (id=%d) could not be found"
+msgstr "POS ონლაინ გადახდის (id=%d) პარტნიორი ვერ მოიძებნა"
+
+#. module: pos_online_payment
+#: model:ir.model.fields,help:pos_online_payment.field_pos_payment_method__is_online_payment
+msgid "Use this payment method for online payments (payments made on a web page with online payment providers)"
+msgstr "გამოიყენეთ ეს გადახდის მეთოდი ონლაინ გადახდებისთვის (ვებგვერდზე ონლაინ გადახდის პროვაიდერებით განხორციელებული გადახდები)"

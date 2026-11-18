@@ -1,0 +1,324 @@
+// The rs.ge e-form look: orange title bar, green section bars, white boxes to type in, grey locked boxes.
+// Colours measured from rs.ge e-form screenshots.
+$rs-cit-orange: #eab137;
+$rs-cit-green: #43b746;
+$rs-cit-row: #f7f7f7;
+$rs-cit-row-line: #ffffff;
+$rs-cit-box-border: #cbcbcb;
+$rs-cit-locked: #f3f3f5;
+$rs-cit-locked-border: #cbcbcb;
+$rs-cit-red: #fe2629;
+$rs-cit-text: #1f2328;
+
+.o_rs_cit_form {
+    .o_form_sheet_bg > .o_form_sheet,
+    .o_form_sheet {
+        max-width: 1400px;
+    }
+
+    .o_rs_cit_titlebar {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        background: $rs-cit-orange;
+        color: #fff;
+        padding: 0.65rem 1.25rem;
+        font-size: 0.95rem;
+        border-radius: 2px;
+    }
+
+    .o_rs_cit_period {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+        padding: 0.6rem 1.25rem 0.9rem;
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: $rs-cit-text;
+
+        .o_field_widget {
+            width: auto;
+        }
+    }
+
+    .o_rs_cit_bar {
+        background: $rs-cit-green;
+        color: #fff;
+        padding: 0.8rem 1.25rem;
+        font-size: 1.05rem;
+        margin-top: 1.25rem;
+
+        &.o_rs_cit_bar_annex {
+            text-align: right;
+        }
+    }
+
+    .o_rs_cit_subbar {
+        background: $rs-cit-green;
+        color: #fff;
+        padding: 0.4rem 1.25rem;
+        margin-top: 2px;
+        font-size: 1rem;
+        text-align: center;
+        line-height: 1.35;
+    }
+
+    .o_rs_cit_note {
+        padding: 0.5rem 1.25rem;
+        font-size: 0.8rem;
+        color: $rs-cit-text;
+        background: $rs-cit-row;
+    }
+
+    // Annex lists: wrap the long rs.ge column titles instead of cutting them.
+    .o_list_renderer thead th span.text-truncate {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        line-height: 1.25;
+    }
+
+    // Tables of the annexes and of part I: N │ text │ amount.
+    table.o_rs_cit_table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 2px;
+        font-size: 0.82rem;
+        color: $rs-cit-text;
+
+        th {
+            font-weight: 600;
+            padding: 0.7rem 0.75rem;
+            background: $rs-cit-row;
+        }
+
+        td {
+            background: $rs-cit-row;
+            padding: 0.35rem 0.75rem;
+            vertical-align: middle;
+        }
+
+        td.o_rs_cit_n {
+            width: 50px;
+            text-align: center;
+        }
+
+        td.o_rs_cit_amount,
+        th.o_rs_cit_amount {
+            width: 180px;
+        }
+    }
+
+    // Field boxes outside the part III table: typed fields white, read-only fields grey with a lock.
+    .o_rs_cit_table,
+    .o_rs_cit_fields {
+        .o_field_widget:not(.o_field_radio):not(.o_field_boolean) {
+            width: 100%;
+
+            input {
+                background: #fff;
+                border: 1px solid $rs-cit-box-border;
+                border-radius: 2px;
+                padding: 0.2rem 0.4rem;
+                height: 26px;
+            }
+        }
+
+        .o_field_widget.o_readonly_modifier:not(.o_field_radio):not(.o_field_boolean):not(.o_field_selection) {
+            position: relative;
+            display: block;
+            background: $rs-cit-locked;
+            border: 1px solid $rs-cit-locked-border;
+            border-radius: 2px;
+            padding: 0.2rem 1.6rem 0.2rem 0.4rem;
+            min-height: 26px;
+
+            &::after {
+                content: "lock";
+                font-family: var(--icon-font-family, Material Symbols Outlined);
+                position: absolute;
+                right: 0.45rem;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #a3a9b0;
+                font-size: 0.85rem;
+            }
+        }
+    }
+
+    // Annex 3, drawn by the rs_cit_annex3 widget.
+    table.o_rs_cit_annex3 {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 0.8rem;
+        color: $rs-cit-text;
+        background: $rs-cit-row;
+
+        th {
+            font-weight: 400;
+            padding: 0.6rem 0.75rem 0.3rem;
+            vertical-align: bottom;
+            background: $rs-cit-row;
+        }
+
+        td {
+            padding: 0.35rem 0.75rem;
+            vertical-align: middle;
+            width: 14%;
+        }
+
+        td.o_rs_cit_annex3_name {
+            width: auto;
+        }
+    }
+
+    .o_rs_cit_help {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 18px;
+        width: 18px;
+        height: 18px;
+        background: #61b568;
+        color: #fff;
+        font-size: 0.75rem;
+        border-radius: 2px;
+        cursor: help;
+    }
+
+    .o_rs_cit_annex3_none {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem 0.8rem;
+        background: $rs-cit-row;
+
+        .o_rs_cit_annex3_none_text {
+            color: $rs-cit-red;
+            font-weight: 400;
+            margin: 0;
+        }
+    }
+
+    // Part III, drawn by the rs_cit_part3 widget.
+    table.o_rs_cit_part3 {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 0.8rem;
+        color: $rs-cit-text;
+
+        col.o_rs_cit_code_col {
+            width: 58px;
+        }
+
+        col.o_rs_cit_amount_col {
+            width: 170px;
+        }
+
+        col.o_rs_cit_items_col {
+            width: 32px;
+        }
+
+        th {
+            font-weight: 600;
+            padding: 0.8rem 0.75rem;
+            background: $rs-cit-row;
+        }
+
+        td {
+            background: $rs-cit-row;
+            border-top: 2px solid #fff;
+            padding: 0.3rem 0.6rem;
+            vertical-align: middle;
+            line-height: 1.3;
+        }
+
+        td.o_rs_cit_code {
+            white-space: nowrap;
+        }
+
+        td.o_rs_cit_code_0 {
+            font-weight: 600;
+        }
+
+        tr.o_rs_cit_group_start td {
+            border-top: 6px solid #fff;
+        }
+
+        tr.o_rs_cit_bold td.o_rs_cit_text {
+            font-weight: 600;
+        }
+
+        td.o_rs_cit_items {
+            text-align: center;
+            padding: 0;
+        }
+    }
+
+    .o_rs_cit_box {
+        position: relative;
+        display: flex;
+        align-items: center;
+        height: 26px;
+        border-radius: 2px;
+        padding: 0 0.4rem;
+
+        &.o_rs_cit_box_typed {
+            background: #fff;
+            border: 1px solid $rs-cit-box-border;
+
+            &:focus-within {
+                border-color: $rs-cit-green;
+                box-shadow: 0 0 0 1px $rs-cit-green;
+            }
+        }
+
+        &.o_rs_cit_box_locked {
+            background: $rs-cit-locked;
+            border: 1px solid $rs-cit-locked-border;
+            justify-content: space-between;
+
+            .o_rs_cit_lock {
+                color: #a3a9b0;
+                font-size: 0.85rem;
+            }
+        }
+
+        .o_rs_cit_input {
+            border: 0;
+            outline: 0;
+            width: 100%;
+            background: transparent;
+            padding: 0;
+            font-size: 0.8rem;
+        }
+
+        .o_rs_cit_adjusted {
+            color: #1f6fd1;
+            font-size: 0.7rem;
+            margin-left: 0.3rem;
+        }
+    }
+}
+
+// rs.ge Entry list: amount on the left, a large copy button at the right edge of the cell; a small toggle.
+.o_rs_cit_entry {
+    .o_clipboard_button {
+        font-size: 1.15rem;
+        padding: 0.4rem 0.9rem;
+        margin-left: 0.5rem;
+    }
+    .o_field_CopyClipboardChar {
+        font-size: 1.1rem;
+        font-weight: 600;
+        > div {
+            align-items: center;
+            justify-content: space-between;
+        }
+    }
+    .o_boolean_toggle.form-switch .form-check-input {
+        transform: scale(0.8);
+    }
+}

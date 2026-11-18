@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_rs_spec_invoice" model="ir.ui.view">
+        <field name="name">account.move.form.rs.spec.invoice</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="rs_einvoice.view_move_form_rs_einvoice"/>
+        <field name="priority">110</field>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('rse-status-card')]" position="after">
+                <div invisible="not rs_einv_is_spec">
+                    <field name="rs_spec_seller_un_id" invisible="1"/>
+                    <field name="rs_spec_buyer_un_id" invisible="1"/>
+                    <div class="alert alert-info mb-2" role="alert">
+                        Filed on rs.ge as a petroleum invoice (ნსაფ), not as an e-invoice.
+                    </div>
+                    <div class="rse-actions">
+                        <button name="action_rs_spec_save" string="Save on rs.ge" type="object"
+                                class="btn btn-primary" icon="cloud_upload"
+                                invisible="(state != 'posted' and not (state == 'draft' and rs_einv_replacement_mode == 'correction' and rs_einv_replaces_id)) or move_type != 'out_invoice' or rs_einv_status not in (False, '0', '4') or (rs_einv_pending_action and not rs_einv_id)"/>
+                        <button name="action_rs_spec_send" string="Send to buyer" type="object"
+                                class="btn btn-primary" icon="send"
+                                invisible="(state != 'posted' and not (state == 'draft' and rs_einv_replacement_mode == 'correction' and rs_einv_replaces_id)) or move_type != 'out_invoice' or rs_einv_status not in (False, '0', '4') or (rs_einv_pending_action and not rs_einv_id)"/>
+                        <button name="action_rs_spec_delete" string="Delete on rs.ge" type="object"
+                                class="btn btn-danger" icon="delete"
+                                confirm="Delete this petroleum invoice on rs.ge?"
+                                invisible="move_type != 'out_invoice' or rs_einv_status not in ('0', '4')"/>
+                        <button name="action_rs_refresh_status" string="Check Status" type="object"
+                                class="btn btn-secondary" icon="refresh"
+                                invisible="not rs_einv_id or (state != 'posted' and not (state == 'draft' and rs_einv_replacement_mode == 'correction' and rs_einv_replaces_id)) or move_type != 'out_invoice'"/>
+                        <button name="action_rs_resolve_orphan" string="Resolve Orphan" type="object"
+                                class="btn btn-danger" icon="support"
+                                invisible="not rs_einv_pending_action or rs_einv_id"/>
+                        <button name="action_rs_clear_pending" string="Dismiss Pending" type="object"
+                                class="btn btn-secondary" icon="close"
+                                confirm="Dismiss the pending RS action marker without linking? Only do this if you have verified separately that no rs.ge record was created."
+                                invisible="not rs_einv_pending_action"/>
+                        <button name="action_rs_spec_load_sites" string="Load sites" type="object"
+                                class="btn btn-secondary" icon="location_on"
+                                invisible="move_type != 'out_invoice' or rs_einv_status not in (False, '0', '4')"/>
+                    </div>
+                    <group>
+                        <group name="rs_spec_document" string="Petroleum Invoice">
+                            <field name="rs_spec_k_type" invisible="rs_einv_replacement_mode != 'correction'" readonly="1"/>
+                            <field name="rs_spec_invoice_type" readonly="rs_einv_status not in (False, '0', '4') or rs_einv_replacement_mode == 'correction'"/>
+                            <field name="rs_spec_unit" readonly="rs_einv_status not in (False, '0', '4')"/>
+                            <field name="rs_spec_quantity_l" readonly="rs_einv_status not in (False, '0', '4')"/>
+                            <field name="rs_spec_quantity_kg" readonly="rs_einv_status not in (False, '0', '4')"/>
+                        </group>
+                        <group name="rs_spec_route" string="Route">
+                            <field name="rs_spec_start_site_id" readonly="rs_einv_status not in (False, '0', '4') or rs_einv_replacement_mode == 'correction'"
+                                   domain="[('rs_un_id', '=', rs_spec_seller_un_id)]"/>
+                            <field name="rs_spec_end_site_id" readonly="rs_einv_status not in (False, '0', '4') or rs_einv_replacement_mode == 'correction'"
+                                   domain="[('rs_un_id', '=', rs_spec_buyer_un_id)]"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group name="rs_spec_transport" string="Transport">
+                            <field name="rs_spec_transport_type" readonly="rs_einv_status not in (False, '0', '4') or rs_einv_replacement_mode == 'correction'"/>
+                            <field name="rs_spec_vehicle_id" groups="fleet.fleet_group_user"
+                                   readonly="rs_einv_status not in (False, '0', '4') or rs_einv_replacement_mode == 'correction'"
+                                   invisible="rs_spec_transport_type != 'საავტომობილო'"/>
+                            <field name="rs_spec_car_brand" readonly="rs_einv_status not in (False, '0', '4') or rs_einv_replacement_mode == 'correction'"
+                                   invisible="rs_spec_transport_type != 'საავტომობილო'"/>
+                            <field name="rs_spec_car_number" readonly="rs_einv_status not in (False, '0', '4') or rs_einv_replacement_mode == 'correction'"/>
+                            <field name="rs_spec_driver_partner_id" readonly="rs_einv_status not in (False, '0', '4') or rs_einv_replacement_mode == 'correction'"
+                                   invisible="rs_spec_transport_type != 'საავტომობილო'"/>
+                            <field name="rs_spec_driver_tin" readonly="rs_einv_status not in (False, '0', '4') or rs_einv_replacement_mode == 'correction'"
+                                   invisible="rs_spec_transport_type != 'საავტომობილო'"/>
+                            <field name="rs_spec_driver_name" readonly="rs_einv_status not in (False, '0', '4') or rs_einv_replacement_mode == 'correction'"
+                                   invisible="rs_spec_transport_type != 'საავტომობილო'"/>
+                            <field name="rs_spec_driver_is_foreigner" readonly="rs_einv_status not in (False, '0', '4') or rs_einv_replacement_mode == 'correction'"
+                                   invisible="rs_spec_transport_type != 'საავტომობილო'"/>
+                        </group>
+                        <group name="rs_spec_carrier" string="Carrier">
+                            <field name="rs_spec_carrier_name" readonly="rs_einv_status not in (False, '0', '4') or rs_einv_replacement_mode == 'correction'"/>
+                            <field name="rs_spec_carrier_tin" readonly="rs_einv_status not in (False, '0', '4') or rs_einv_replacement_mode == 'correction'"/>
+                            <field name="rs_spec_transport_started_at" invisible="not rs_spec_transport_started_at"/>
+                        </group>
+                    </group>
+                    <group name="rs_spec_purchase_documents" string="Purchase Documents">
+                        <group>
+                            <field name="rs_spec_ssaf_number" readonly="rs_einv_status not in (False, '0', '4') or rs_einv_replacement_mode == 'correction'"/>
+                            <field name="rs_spec_ssaf_date" readonly="rs_einv_status not in (False, '0', '4') or rs_einv_replacement_mode == 'correction'"/>
+                            <field name="rs_spec_ssaf_alt_type" readonly="rs_einv_status not in (False, '0', '4') or rs_einv_replacement_mode == 'correction'"/>
+                            <field name="rs_spec_ssaf_alt_number" readonly="rs_einv_status not in (False, '0', '4') or rs_einv_replacement_mode == 'correction'"/>
+                        </group>
+                        <group>
+                            <field name="rs_spec_ssd_number" readonly="rs_einv_status not in (False, '0', '4') or rs_einv_replacement_mode == 'correction'"/>
+                            <field name="rs_spec_ssd_date" readonly="rs_einv_status not in (False, '0', '4') or rs_einv_replacement_mode == 'correction'"/>
+                        </group>
+                    </group>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='rs_einv_k_type']/../.." position="attributes">
+                <attribute name="invisible" add="rs_einv_is_spec" separator="or"/>
+            </xpath>
+            <xpath expr="//page[@name='rs_einvoice_waybills_tab']" position="attributes">
+                <attribute name="invisible">move_type not in ('out_invoice', 'in_invoice') or rs_einv_is_spec</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_account_invoice_filter_rs_spec_invoice" model="ir.ui.view">
+        <field name="name">account.move.filter.rs.spec.invoice</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <filter name="cancel" position="after">
+                <separator/>
+                <filter name="rs_einv_is_spec" string="Petroleum (rs.ge)" domain="[('rs_einv_is_spec', '=', True)]"/>
+            </filter>
+        </field>
+    </record>
+
+    <record id="action_rs_spec_invoice" model="ir.actions.act_window">
+        <field name="name">Petroleum Invoices</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="account.view_out_invoice_tree"/>
+        <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+        <field name="domain">[('rs_einv_is_spec', '=', True)]</field>
+        <field name="context">{'default_move_type': 'out_invoice'}</field>
+    </record>
+</odoo>

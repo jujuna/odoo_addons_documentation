@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Title and favicon fall back to the applied kit; a page that sets its own (website, scoped apps) keeps it. -->
+    <template id="layout" inherit_id="web.layout">
+        <xpath expr="//title" position="before">
+            <t t-set="gec_brand_kit" t-value="request and request.env['gec.brand.kit']._get_applied()"/>
+        </xpath>
+        <xpath expr="//title" position="attributes">
+            <attribute name="t-out">title or (gec_brand_kit and gec_brand_kit.name) or 'Odoo'</attribute>
+        </xpath>
+        <xpath expr="//link[@rel='shortcut icon']" position="attributes">
+            <attribute name="t-att-href">x_icon or (gec_brand_kit and gec_brand_kit.favicon and '/gec_brand_kit/favicon') or '/web/static/img/favicon.ico'</attribute>
+        </xpath>
+    </template>
+
+    <!-- Login page: the kit's login (or home) background instead of the enterprise pattern (body class o_home_menu_background). -->
+    <template id="login_layout" inherit_id="web.login_layout">
+        <xpath expr="//t[@t-set='head']" position="inside">
+            <t t-set="gec_brand_kit" t-value="request.env['gec.brand.kit']._get_applied()"/>
+            <style t-if="gec_brand_kit and (gec_brand_kit.login_background or gec_brand_kit.home_background)">
+                html body.o_home_menu_background {
+                    background-image: url('/gec_brand_kit/login_background?unique=<t t-out="int(gec_brand_kit.write_date.timestamp())"/>');
+                    background-size: cover;
+                    background-position: center;
+                    background-repeat: no-repeat;
+                }
+            </style>
+        </xpath>
+    </template>
+
+    <template id="webclient_bootstrap" inherit_id="web_enterprise.webclient_bootstrap">
+        <xpath expr="//meta[@name='theme-color']" position="before">
+            <t t-set="gec_brand_kit" t-value="request.env['gec.brand.kit']._get_applied()"/>
+        </xpath>
+        <xpath expr="//meta[@name='theme-color']" position="attributes">
+            <attribute name="t-att-content">((gec_brand_kit.dark_primary or gec_brand_kit.color_primary) if color_scheme == 'dark' else gec_brand_kit.color_primary) if gec_brand_kit else ('#242733' if color_scheme == 'dark' else '#714B67')</attribute>
+        </xpath>
+    </template>
+</odoo>

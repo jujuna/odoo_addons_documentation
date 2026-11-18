@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_bsc_kpi_source_list" model="ir.ui.view">
+        <field name="name">bsc.kpi.source.list</field>
+        <field name="model">bsc.kpi.source</field>
+        <field name="arch" type="xml">
+            <list string="KPI Data Sources">
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="aggregate"/>
+                <field name="value_field_id" optional="show"/>
+                <field name="date_field_id"/>
+                <field name="uom_hint" string="Unit"/>
+                <field name="kpi_count" string="Used by"/>
+                <field name="last_test_note" string="Last Test" optional="show"/>
+                <button name="action_test" type="object" string="Test" icon="experiment"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bsc_kpi_source_form" model="ir.ui.view">
+        <field name="name">bsc.kpi.source.form</field>
+        <field name="model">bsc.kpi.source</field>
+        <field name="arch" type="xml">
+            <form string="KPI Data Source">
+                <header>
+                    <button name="action_test" type="object" string="Test Source"
+                            class="btn-primary"
+                            help="Runs the query over the last 30 days. Check the record count, not the number."/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_kpis" type="object"
+                                class="oe_stat_button" icon="speed"
+                                invisible="kpi_count == 0">
+                            <field name="kpi_count" widget="statinfo" string="KPIs"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Invoiced revenue"/></h1>
+                    </div>
+                    <div class="alert alert-secondary" role="alert">
+                        <b>Most KPIs do not need a source built here.</b> On a KPI, press
+                        <b>Connect to Odoo data</b> and pick a ready-made measure (sales,
+                        invoices, won deals, deliveries, completed tasks...). Build a source
+                        here only for a figure that list does not have.
+                    </div>
+                    <div class="alert alert-info" role="alert">
+                        A source is defined once, tested, and then picked from a dropdown
+                        by whoever designs a KPI. The lists below only offer fields that
+                        exist on the chosen model and are stored in the database - but
+                        they cannot tell you <b>which</b> date is the right one. Several
+                        will always look plausible, and picking the wrong one is the
+                        single most common cause of a figure that looks fine and is not.
+                        Press <b>Test Source</b> and check the record count, not the number.
+                    </div>
+                    <group>
+                        <group string="What is counted">
+                            <field name="model_id"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   required="1"/>
+                            <field name="model_name" invisible="1"/>
+                            <field name="aggregate"/>
+                            <field name="value_field_id"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   invisible="aggregate in ('count', 'ratio')"
+                                   required="aggregate not in ('count', 'ratio')"
+                                   readonly="not model_id"/>
+                            <field name="include_archived"/>
+                            <field name="recipe_key" invisible="not recipe_key"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group string="How it is bounded">
+                            <field name="date_field_id"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   required="1" readonly="not model_id"/>
+                            <field name="company_field_id"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   readonly="not model_id"/>
+                            <field name="multiply_by"/>
+                            <field name="uom_hint" placeholder="GEL, units, days"
+                                   help="Free text on purpose. Units are open-ended - %, GEL, days, tCO2e, complaints - and a fixed list would be missing the one you need."/>
+                        </group>
+                    </group>
+                    <group string="Which records to skip">
+                        <div class="text-muted" colspan="2" invisible="model_id">
+                            Choose a model first; the filter is built against it.
+                        </div>
+                        <field name="domain" nolabel="1" colspan="2"
+                               widget="domain"
+                               options="{'model': 'model_name'}"
+                               invisible="not model_id"/>
+                    </group>
+                    <group string="Which of them count as a hit" invisible="aggregate != 'ratio'">
+                        <div class="text-muted" colspan="2">
+                            The result is the share (%) of the records above that also
+                            match this condition.
+                        </div>
+                        <field name="ratio_domain" nolabel="1" colspan="2"
+                               widget="domain" options="{'model': 'model_name'}"
+                               invisible="not model_id"/>
+                    </group>
+                    <group string="Last Test" invisible="not last_test_note">
+                        <field name="last_test_note" nolabel="1" readonly="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Definition" name="description">
+                            <field name="description" nolabel="1"
+                                   placeholder="What this counts and what it deliberately excludes. Write it for the person who will have to defend the number in a board meeting."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bsc_kpi_source" model="ir.actions.act_window">
+        <field name="name">KPI Data Sources</field>
+        <field name="res_model">bsc.kpi.source</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define a data source</p>
+            <p>Automate only the measures with an unambiguous source - revenue,
+               record counts, closed tasks, headcount. Anything judgement-based
+               should stay manual, and that is the right answer, not a gap.</p>
+        </field>
+    </record>
+
+</odoo>

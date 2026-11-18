@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="employee_registry_rs_log_view_list" model="ir.ui.view">
+        <field name="name">employee.registry.rs.log.list</field>
+        <field name="model">employee.registry.rs.log</field>
+        <field name="arch" type="xml">
+            <list string="RS Sync Log" create="false" edit="false" decoration-danger="not success" decoration-success="success">
+                <field name="create_date"/>
+                <field name="endpoint"/>
+                <field name="employee_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="status_id"/>
+                <field name="status_text"/>
+                <field name="success"/>
+                <field name="create_uid"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="employee_registry_rs_log_view_form" model="ir.ui.view">
+        <field name="name">employee.registry.rs.log.form</field>
+        <field name="model">employee.registry.rs.log</field>
+        <field name="arch" type="xml">
+            <form string="RS Sync Log Entry" create="false" edit="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="endpoint"/>
+                            <field name="employee_id"/>
+                            <field name="create_date"/>
+                            <field name="create_uid"/>
+                        </group>
+                        <group>
+                            <field name="status_id"/>
+                            <field name="status_text"/>
+                            <field name="success"/>
+                        </group>
+                    </group>
+                    <group string="Error" invisible="not error_message">
+                        <field name="error_message" nolabel="1" readonly="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Request Payload">
+                            <field name="request_payload" nolabel="1" readonly="1" widget="text"/>
+                        </page>
+                        <page string="Response Payload">
+                            <field name="response_payload" nolabel="1" readonly="1" widget="text"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="employee_registry_rs_log_view_search" model="ir.ui.view">
+        <field name="name">employee.registry.rs.log.search</field>
+        <field name="model">employee.registry.rs.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="endpoint"/>
+                <field name="employee_id"/>
+                <field name="status_text"/>
+                <filter name="success" string="Success" domain="[('success', '=', True)]"/>
+                <filter name="failed" string="Failed" domain="[('success', '=', False)]"/>
+                <separator/>
+                <group>
+                    <filter name="group_endpoint" string="Endpoint" domain="[]" context="{'group_by': 'endpoint'}"/>
+                    <filter name="group_employee" string="Employee" domain="[]" context="{'group_by': 'employee_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="employee_registry_rs_log_action" model="ir.actions.act_window">
+        <field name="name">RS Sync Log</field>
+        <field name="res_model">employee.registry.rs.log</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_employee_registry_rs_log"
+              name="RS Sync Log"
+              parent="hr.menu_human_resources_configuration"
+              action="employee_registry_rs_log_action"
+              sequence="90"
+              groups="hr.group_hr_manager"/>
+</odoo>

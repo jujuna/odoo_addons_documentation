@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Account-type defaults only, first match in sequence wins; no code-prefix rules (a prefix differs per chart).
+         Personnel, Finance Costs and Income Tax have no type default: need a prefix rule or a hand-set account. -->
+
+    <record id="classification_depreciation" model="gec.margin.classification.rule">
+        <field name="sequence">10</field>
+        <field name="account_type">expense_depreciation</field>
+        <field name="component_id" ref="component_depreciation"/>
+    </record>
+
+    <record id="classification_direct_cost" model="gec.margin.classification.rule">
+        <field name="sequence">20</field>
+        <field name="account_type">expense_direct_cost</field>
+        <field name="component_id" ref="component_direct_cost"/>
+    </record>
+
+    <record id="classification_other_expense" model="gec.margin.classification.rule">
+        <field name="sequence">30</field>
+        <field name="account_type">expense_other</field>
+        <field name="component_id" ref="component_overhead"/>
+    </record>
+
+    <record id="classification_expense" model="gec.margin.classification.rule">
+        <field name="sequence">40</field>
+        <field name="account_type">expense</field>
+        <!-- Overhead, not Direct Cost: the generic Expenses type holds ordinary operating costs;
+             cost of sales has its own type, expense_direct_cost. -->
+        <field name="component_id" ref="component_overhead"/>
+    </record>
+
+    <record id="classification_income" model="gec.margin.classification.rule">
+        <field name="sequence">50</field>
+        <field name="account_type">income</field>
+        <field name="component_id" ref="component_revenue"/>
+    </record>
+
+    <record id="classification_income_other" model="gec.margin.classification.rule">
+        <field name="sequence">60</field>
+        <field name="account_type">income_other</field>
+        <field name="component_id" ref="component_other_income"/>
+    </record>
+</odoo>

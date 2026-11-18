@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_rs_form30_account_rule_list" model="ir.ui.view">
+        <field name="name">rs.form30.account.rule.list</field>
+        <field name="model">rs.form30.account.rule</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" decoration-warning="liability_not_payable">
+                <field name="sequence" widget="handle"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="income_type_id" options="{'no_create': True}"/>
+                <field name="expense_account_ids" widget="many2many_tags"/>
+                <field name="liability_account_ids" widget="many2many_tags"/>
+                <field name="tax_account_ids" widget="many2many_tags"/>
+                <field name="note"/>
+                <field name="active" widget="boolean_toggle" optional="hide"/>
+                <field name="liability_not_payable" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rs_form30_account_rule_search" model="ir.ui.view">
+        <field name="name">rs.form30.account.rule.search</field>
+        <field name="model">rs.form30.account.rule</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="income_type_id"/>
+                <field name="expense_account_ids"/>
+                <field name="liability_account_ids"/>
+                <field name="tax_account_ids"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_rs_form30_account_rule" model="ir.actions.act_window">
+        <field name="name">Account Rules</field>
+        <field name="res_model">rs.form30.account.rule</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No account rules</p>
+            <p>
+                Rows are proposals only: they suggest the Withholding Tax on a journal entry from
+                its accounts. Edit or archive a row; do not delete them all, because an empty
+                table is filled with the defaults again at the next upgrade.
+            </p>
+        </field>
+    </record>
+</odoo>

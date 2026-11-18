@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- The conventional management P&L components; nothing depends on them, so a company may edit or delete them. -->
+
+    <record id="component_revenue" model="gec.margin.component">
+        <field name="name">Revenue</field>
+        <field name="code">revenue</field>
+        <field name="sequence">10</field>
+        <field name="nature">revenue</field>
+    </record>
+
+    <record id="component_other_income" model="gec.margin.component">
+        <field name="name">Other Income</field>
+        <field name="code">other_income</field>
+        <field name="sequence">20</field>
+        <field name="nature">revenue</field>
+    </record>
+
+    <record id="component_direct_cost" model="gec.margin.component">
+        <field name="name">Direct Cost</field>
+        <field name="code">direct_cost</field>
+        <field name="sequence">30</field>
+        <field name="nature">cost</field>
+    </record>
+
+    <record id="component_personnel" model="gec.margin.component">
+        <field name="name">Personnel</field>
+        <field name="code">personnel</field>
+        <field name="sequence">40</field>
+        <field name="nature">cost</field>
+        <field name="allocatable" eval="True"/>
+        <field name="function_reclassify" eval="True"/>
+    </record>
+
+    <record id="component_overhead" model="gec.margin.component">
+        <field name="name">Overhead / G&amp;A</field>
+        <field name="code">overhead</field>
+        <field name="sequence">50</field>
+        <field name="nature">cost</field>
+        <field name="allocatable" eval="True"/>
+        <field name="function_reclassify" eval="True"/>
+    </record>
+
+    <!-- P&L by function: no account is classified; cost comes from the activity's or cost centre's Function. -->
+    <record id="component_function_cogs" model="gec.margin.component">
+        <field name="name">Cost of Sales</field>
+        <field name="code">function_cogs</field>
+        <field name="sequence">35</field>
+        <field name="nature">cost</field>
+        <field name="is_function" eval="True"/>
+    </record>
+
+    <record id="component_function_rnd" model="gec.margin.component">
+        <field name="name">Research &amp; Development</field>
+        <field name="code">function_rnd</field>
+        <field name="sequence">52</field>
+        <field name="nature">cost</field>
+        <field name="is_function" eval="True"/>
+    </record>
+
+    <record id="component_function_sm" model="gec.margin.component">
+        <field name="name">Sales &amp; Marketing</field>
+        <field name="code">function_sm</field>
+        <field name="sequence">54</field>
+        <field name="nature">cost</field>
+        <field name="is_function" eval="True"/>
+    </record>
+
+    <record id="component_function_ga" model="gec.margin.component">
+        <field name="name">General &amp; Administrative</field>
+        <field name="code">function_ga</field>
+        <field name="sequence">56</field>
+        <field name="nature">cost</field>
+        <field name="is_function" eval="True"/>
+    </record>
+
+    <record id="component_depreciation" model="gec.margin.component">
+        <field name="name">Depreciation &amp; Amortisation</field>
+        <field name="code">depreciation</field>
+        <field name="sequence">60</field>
+        <field name="nature">cost</field>
+        <field name="allocatable" eval="True"/>
+    </record>
+
+    <record id="component_finance" model="gec.margin.component">
+        <field name="name">Finance Costs / Income</field>
+        <field name="code">finance</field>
+        <field name="sequence">70</field>
+        <field name="nature">cost</field>
+    </record>
+
+    <record id="component_tax" model="gec.margin.component">
+        <field name="name">Income Tax</field>
+        <field name="code">tax</field>
+        <field name="sequence">80</field>
+        <field name="nature">cost</field>
+    </record>
+
+    <record id="component_excluded" model="gec.margin.component">
+        <field name="name">Excluded from margin</field>
+        <field name="code">excluded</field>
+        <field name="sequence">90</field>
+        <field name="nature">excluded</field>
+    </record>
+</odoo>

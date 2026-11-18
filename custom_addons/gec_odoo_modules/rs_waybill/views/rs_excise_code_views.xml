@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_rs_excise_code_picker_list" model="ir.ui.view">
+        <field name="name">rs.excise.code.picker.list</field>
+        <field name="model">rs.excise.code</field>
+        <field name="arch" type="xml">
+            <list string="Pick Excise Code" decoration-muted="not is_currently_active">
+                <field name="rs_id" string="Excise Code"/>
+                <field name="name" string="Product Name"/>
+                <field name="active_from"/>
+                <field name="active_until"/>
+                <field name="is_currently_active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+
+    <record id="view_rs_excise_code_form" model="ir.ui.view">
+        <field name="name">rs.excise.code.form</field>
+        <field name="model">rs.excise.code</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="rs_id"/>
+                        <field name="name"/>
+                        <field name="active_from"/>
+                        <field name="active_until"/>
+                        <field name="is_currently_active" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_rs_excise_code" model="ir.actions.act_window">
+        <field name="name">Excise (Akciz) Code</field>
+        <field name="res_model">rs.excise.code</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_rs_excise_code_picker_list"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_gec_activity_list" model="ir.ui.view">
+        <field name="name">gec.activity.list</field>
+        <field name="model">gec.activity</field>
+        <field name="arch" type="xml">
+            <list string="Activities">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code" optional="hide"/>
+                <field name="driver_label" string="Driver"/>
+                <field name="source_model_id" string="Counted Records"/>
+                <field name="measure" optional="hide"/>
+                <field name="rate_mode" optional="hide"/>
+                <field name="standard_rate" optional="hide"/>
+                <field name="practical_capacity" optional="show"/>
+                <field name="value_added" optional="show"/>
+                <field name="planned_quantity" optional="hide"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="planned_cost" optional="hide" sum="Planned"/>
+                <field name="rule_count" string="Rules"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <button name="action_preview_quantities" type="object" icon="search"
+                        string="Preview" title="Show what this activity measures year to date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_gec_activity_form" model="ir.ui.view">
+        <field name="name">gec.activity.form</field>
+        <field name="model">gec.activity</field>
+        <field name="arch" type="xml">
+            <form string="Activity">
+                <header>
+                    <button name="action_preview_quantities" type="object"
+                            string="Preview Quantities" class="btn-primary"/>
+                    <button name="action_plan_from_actuals" type="object"
+                            string="Plan from Actuals" class="btn-secondary"
+                            invisible="not id"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_plans" type="object"
+                                class="oe_stat_button" icon="my_location"
+                                invisible="plan_count == 0">
+                            <field name="plan_count" widget="statinfo"
+                                   string="Planned"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Deployment"/></h1>
+                    </div>
+                    <group>
+                        <group string="Identity">
+                            <field name="active" invisible="1"/>
+                            <field name="code" placeholder="DEPLOY"/>
+                            <field name="driver_label" placeholder="deployment"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   options="{'no_create': True}"/>
+                        </group>
+                        <group string="Rate &amp; capacity">
+                            <field name="rate_mode"/>
+                            <field name="standard_rate"
+                                   invisible="rate_mode != 'standard'"
+                                   required="rate_mode == 'standard'"/>
+                            <field name="practical_capacity"/>
+                            <field name="currency_id" invisible="1"/>
+                            <label for="planned_quantity" string="Planned Quantity"/>
+                            <div class="o_row">
+                                <field name="planned_quantity" class="oe_inline"/>
+                                <span class="text-muted ms-2"
+                                      invisible="not planned_cost">
+                                    → <field name="planned_cost" class="oe_inline"
+                                             readonly="1"/> planned
+                                </span>
+                            </div>
+                            <div class="alert alert-warning mb-0" role="alert" colspan="2"
+                                 invisible="planned_capacity_gap &lt;= 0">
+                                The plan needs
+                                <field name="planned_capacity_gap" class="oe_inline"
+                                       readonly="1"/>
+                                more than this activity can deliver. Add capacity, or
+                                the work will not fit.
+                            </div>
+                            <field name="value_added"/>
+                            <field name="gec_function_component_id"
+                                   options="{'no_create': True}"/>
+                            <div class="text-muted" colspan="2"
+                                 invisible="practical_capacity == 0">
+                                Only the consumed share of the pool is charged out.
+                                The cost of unused capacity stays on the source, so a
+                                quiet month shows idle capacity instead of making
+                                every product look expensive.
+                            </div>
+                        </group>
+                    </group>
+                    <group string="Where the quantities are counted">
+                        <field name="template_key" colspan="2"
+                               placeholder="Pick a shape, or fill the fields yourself"/>
+                        <group>
+                            <field name="source_model_id" options="{'no_create': True}"/>
+                            <!-- Readable rather than hidden: the filter builder reads the model from here. -->
+                            <field name="source_model_name" readonly="1"
+                                   string="Technical Model"/>
+                            <field name="source_date_field_id"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   invisible="not source_model_id"/>
+                            <field name="source_analytic_model" invisible="1"/>
+                            <field name="source_analytic_via_id"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   invisible="not source_model_id"
+                                   placeholder="leave empty if the record has its own"/>
+                            <field name="source_analytic_field_id"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   invisible="not source_model_id"/>
+                            <field name="source_date_field" readonly="1" force_save="1"
+                                   string="Technical Date Field"
+                                   groups="base.group_no_one"/>
+                            <field name="source_analytic_path" readonly="1" force_save="1"
+                                   string="Technical Path"/>
+                        </group>
+                        <group>
+                            <field name="source_domain" widget="domain"
+                                   options="{'model': 'source_model_name'}"/>
+                            <field name="measure"/>
+                            <field name="measure_field" placeholder="unit_amount"
+                                   invisible="measure != 'field'"
+                                   required="measure == 'field'"/>
+                            <field name="match_own_activity"/>
+                            <field name="weight_by_employee_cost"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-danger" role="alert" invisible="not setup_warning">
+                        <field name="setup_warning" readonly="1" nolabel="1"/>
+                    </div>
+                    <div class="alert alert-info" role="alert">
+                        <strong>Press Preview Quantities before using this activity in a rule.</strong>
+                        It shows what the configuration actually measures year to date, so a
+                        wrong path or filter is obvious in seconds rather than after money
+                        has moved. Common paths:
+                        <span class="font-monospace">account.analytic.line → x_planN_id</span>,
+                        <span class="font-monospace">project.task → project_id.account_id</span>.
+                    </div>
+                    <notebook>
+                        <page string="Rules Using This Activity" name="rules">
+                            <field name="rule_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="source_plan_id"/>
+                                    <field name="target_plan_id"/>
+                                    <field name="resource_share" string="Share of Pool (%)"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_gec_activity_search" model="ir.ui.view">
+        <field name="name">gec.activity.search</field>
+        <field name="model">gec.activity</field>
+        <field name="arch" type="xml">
+            <search string="Activities">
+                <field name="name"/>
+                <field name="source_model_id"/>
+                <filter name="filter_capacity" string="Has Practical Capacity"
+                        domain="[('practical_capacity', '&gt;', 0)]"/>
+                <filter name="filter_inactive" string="Archived" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter name="group_model" string="Counted Records"
+                            context="{'group_by': 'source_model_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_gec_activity" model="ir.actions.act_window">
+        <field name="name">Costing Activities</field>
+        <field name="res_model">gec.activity</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define an activity</p>
+            <p>
+                An activity is something the company does that consumes money —
+                development, deployment, support, onboarding. Each one points at
+                the Odoo records that mean it happened, so its quantities are
+                counted as work is registered rather than gathered by hand.
+            </p>
+            <p>
+                Activities are the second stage of Activity-Based Costing. Use them
+                by setting an allocation rule's driver to <b>Activity (ABC)</b>.
+            </p>
+        </field>
+    </record>
+
+    <!-- Extends the analytic view rather than the timesheet one, so the module need not depend on hr_timesheet. -->
+    <record id="view_account_analytic_line_tree_activity" model="ir.ui.view">
+        <field name="name">account.analytic.line.list.activity</field>
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="analytic.view_account_analytic_line_tree"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="gec_activity_id" optional="show"
+                       options="{'no_create': True}"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_account_analytic_line_form_activity" model="ir.ui.view">
+        <field name="name">account.analytic.line.form.activity</field>
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="analytic.view_account_analytic_line_form"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="gec_activity_id" options="{'no_create': True}"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Extends the Accounting search view, not the analytic base: hr_timesheet builds its Timesheets Analysis
+         search view from the base on a SQL-view model without gec_activity_id: a field added there would crash it. -->
+    <record id="view_account_analytic_line_filter_activity" model="ir.ui.view">
+        <field name="name">account.analytic.line.search.activity</field>
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="account.view_account_analytic_line_filter_inherit_account"/>
+        <field name="arch" type="xml">
+            <search position="inside">
+                <field name="gec_activity_id"/>
+                <filter name="group_gec_activity" string="Activity"
+                        context="{'group_by': 'gec_activity_id'}"/>
+            </search>
+        </field>
+    </record>
+
+</odoo>

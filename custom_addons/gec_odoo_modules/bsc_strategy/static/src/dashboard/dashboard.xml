@@ -1,0 +1,489 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-name="bsc_strategy.Dashboard">
+    <div class="o_bsc_dashboard o_action h-100 overflow-auto">
+
+        <div class="o_bsc_dash_toolbar d-flex flex-wrap align-items-center gap-2 px-3 py-2 border-bottom">
+            <h4 class="mb-0 me-3">Dashboard</h4>
+            <t t-if="this.state.data and this.state.data.scorecards.length">
+                <select class="form-select form-select-sm w-auto" t-on-change="this.onScorecardChange"
+                        aria-label="Scorecard">
+                    <t t-foreach="this.state.data.scorecards" t-as="card" t-key="card.id">
+                        <option t-att-value="card.id" t-att-selected="card.id === this.state.scorecardId">
+                            <t t-out="card.name"/>
+                        </option>
+                    </t>
+                </select>
+                <select t-if="this.state.data.periods and this.state.data.periods.length"
+                        class="form-select form-select-sm w-auto" t-on-change="this.onPeriodChange"
+                        aria-label="Period">
+                    <t t-foreach="this.state.data.periods" t-as="period" t-key="period.id">
+                        <option t-att-value="period.id" t-att-selected="period.id === this.state.periodId">
+                            <t t-out="period.name"/>
+                            <t t-if="period.state === 'closed'"> ✓</t>
+                            <t t-if="period.is_current"> ●</t>
+                        </option>
+                    </t>
+                </select>
+            </t>
+            <div class="ms-auto d-flex flex-wrap gap-2" t-if="this.state.data and this.state.data.scorecard">
+                <button class="btn btn-sm btn-secondary" t-on-click="() => this.openFigures()"
+                        t-if="this.state.data.period">
+                    <i class="oi me-1" data-icon="table"/>Figures
+                </button>
+                <button class="btn btn-sm btn-secondary" t-on-click="this.openMap"
+                        t-if="this.state.data.objectives.length">
+                    <i class="oi me-1" data-icon="account_tree"/>Strategy Map
+                </button>
+                <button class="btn btn-sm btn-secondary" t-on-click="this.printBoardPack">
+                    <i class="oi me-1" data-icon="print"/>Board Pack
+                </button>
+                <button class="btn btn-sm btn-secondary" t-on-click="this.openScorecard">
+                    <i class="oi me-1" data-icon="open_in_new"/>Scorecard
+                </button>
+                <button class="btn btn-sm btn-light" t-on-click="this.load" title="Refresh">
+                    <i class="oi" data-icon="refresh"/>
+                </button>
+            </div>
+        </div>
+
+        <div t-if="this.state.loading and !this.state.data" class="p-5 text-center text-muted">
+            <i class="oi me-2" data-icon="progress_activity"/>Loading…
+        </div>
+        <div t-elif="this.state.error" class="p-3">
+            <div class="alert alert-danger" role="alert"><t t-out="this.state.error"/></div>
+        </div>
+        <div t-elif="!this.state.data or !this.state.data.scorecard" class="p-5 text-center">
+            <h4>No scorecard yet</h4>
+            <p class="text-muted">Create one under Strategy → Scorecards, or load the demo data
+                from Configuration → Demo Data to see what this page looks like when it is full.</p>
+        </div>
+        <t t-else="">
+            <t t-set="d" t-value="this.state.data"/>
+            <div class="container-fluid py-3 o_bsc_dash_body">
+
+                <div class="alert alert-info py-2" role="status" t-if="d.scorecard.is_demo">
+                    <i class="oi me-1" data-icon="info"/>This is demo data. Remove it under
+                    Configuration → Demo Data when you are done exploring.
+                </div>
+                <div class="alert alert-secondary py-2" role="status" t-if="d.scorecard.state === 'draft'">
+                    <i class="oi me-1" data-icon="edit"/>This scorecard is still a draft. Finish its setup
+                    checklist and press Activate - figures and scores appear after that.
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-12 col-md-6 col-xl">
+                        <div class="card h-100 o_bsc_dash_kpi">
+                            <div class="card-body">
+                                <div class="text-muted small">Scorecard index
+                                    <t t-if="d.period"> · <t t-out="d.period.name"/></t></div>
+                                <div class="d-flex align-items-baseline gap-2">
+                                    <span class="o_bsc_dash_big"><t t-out="this.fmt(d.scorecard.score)"/>%</span>
+                                    <span t-att-class="this.statusClass(d.scorecard.status)">
+                                        <t t-out="d.scorecard.status_label"/>
+                                    </span>
+                                </div>
+                                <div class="small text-muted mt-1">
+                                    <t t-out="d.scorecard.owner"/> · <t t-out="d.scorecard.state_label"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl" t-if="d.period">
+                        <div class="card h-100 o_bsc_dash_kpi o_bsc_dash_clickable"
+                             t-on-click="() => this.openFigures(true)" title="Open the figures still missing">
+                            <div class="card-body">
+                                <div class="text-muted small">Figures reported</div>
+                                <div class="o_bsc_dash_big">
+                                    <t t-out="d.period.filled"/>
+                                    <span class="fs-5 text-muted">/ <t t-out="d.period.expected"/></span>
+                                </div>
+                                <div class="progress mt-1" style="height: 6px;">
+                                    <div class="progress-bar" role="progressbar"
+                                         t-att-style="this.barWidth(d.period.completion)"/>
+                                </div>
+                                <div class="small text-muted mt-1">
+                                    <t t-if="d.period.state === 'closed'">Period closed</t>
+                                    <t t-elif="!d.period.started">The period has not started yet</t>
+                                    <t t-elif="d.period.days_left !== null and d.period.days_left &gt;= 0">
+                                        <t t-out="d.period.days_left"/> day(s) left in the period
+                                    </t>
+                                    <t t-else="">The period has ended - close it when complete</t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl">
+                        <div class="card h-100 o_bsc_dash_kpi">
+                            <div class="card-body">
+                                <div class="text-muted small">KPI status</div>
+                                <div class="d-flex flex-wrap gap-2 mt-2">
+                                    <button class="btn btn-sm o_bsc_dash_chip o_bsc_dash_green"
+                                            t-on-click="() => this.setKpiFilter('green')">
+                                        <t t-out="d.kpi_counts.green"/> on track</button>
+                                    <button class="btn btn-sm o_bsc_dash_chip o_bsc_dash_amber"
+                                            t-on-click="() => this.setKpiFilter('amber')">
+                                        <t t-out="d.kpi_counts.amber"/> at risk</button>
+                                    <button class="btn btn-sm o_bsc_dash_chip o_bsc_dash_red"
+                                            t-on-click="() => this.setKpiFilter('red')">
+                                        <t t-out="d.kpi_counts.red"/> off track</button>
+                                    <button class="btn btn-sm o_bsc_dash_chip o_bsc_dash_no_data"
+                                            t-on-click="() => this.setKpiFilter('no_data')">
+                                        <t t-out="d.kpi_counts.no_data"/> no data</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl">
+                        <div class="card h-100 o_bsc_dash_kpi o_bsc_dash_clickable"
+                             t-on-click="() => this.openInitiatives(true)" title="Open the running initiatives">
+                            <div class="card-body">
+                                <div class="text-muted small">Initiatives running</div>
+                                <div class="o_bsc_dash_big">
+                                    <t t-out="d.initiatives.counts.approved + d.initiatives.counts.in_progress"/>
+                                </div>
+                                <div class="small text-muted">
+                                    average progress <t t-out="d.initiatives.average_progress"/>% ·
+                                    <span t-att-class="d.attention.overdue.length ? 'text-danger fw-bold' : ''">
+                                        <t t-out="d.attention.overdue.length"/> overdue</span> ·
+                                    <t t-out="d.initiatives.counts.proposed"/> proposed
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl">
+                        <div class="card h-100 o_bsc_dash_kpi">
+                            <div class="card-body">
+                                <div class="text-muted small">Initiative budget used</div>
+                                <div class="o_bsc_dash_big"><t t-out="this.budgetPercent"/>%</div>
+                                <div class="small text-muted">
+                                    <t t-out="this.money(d.initiatives.budget_actual)"/> of
+                                    <t t-out="this.money(d.initiatives.budget_planned)"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-12 col-xl-5">
+                        <div class="card h-100">
+                            <div class="card-header py-2"><strong>Perspectives</strong></div>
+                            <div class="card-body">
+                                <p t-if="!d.perspectives.length" class="text-muted mb-0">No objectives yet.</p>
+                                <div t-foreach="d.perspectives" t-as="p" t-key="p.id" class="mb-3 o_bsc_dash_clickable"
+                                     t-on-click="() => this.openPerspective(p.id, p.name)" title="Open the objectives of this perspective">
+                                    <div class="d-flex justify-content-between small">
+                                        <span><strong t-out="p.name"/>
+                                            <span class="text-muted"> · <t t-out="p.objective_count"/> objective(s), weight <t t-out="this.fmt(p.weight)"/>%</span>
+                                        </span>
+                                        <span t-att-class="this.statusClass(p.status)">
+                                            <t t-if="p.has_data"><t t-out="this.fmt(p.score)"/>%</t>
+                                            <t t-else="">no data</t>
+                                        </span>
+                                    </div>
+                                    <div class="progress mt-1" style="height: 8px;">
+                                        <div t-att-class="'progress-bar o_bsc_dash_bar_' + p.status"
+                                             role="progressbar" t-att-style="this.barWidth(p.bar)"/>
+                                    </div>
+                                </div>
+                                <div class="small text-muted mt-2" t-if="d.links.total">
+                                    Cause-effect links validated with data:
+                                    <strong><t t-out="d.links.validated"/> / <t t-out="d.links.total"/></strong>
+                                    (<t t-out="this.linkPercent"/>%)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-xl-7">
+                        <div class="card h-100">
+                            <div class="card-header py-2"><strong>Scorecard index over the cycle</strong></div>
+                            <div class="card-body">
+                                <t t-set="chart" t-value="this.chart"/>
+                                <p t-if="!chart" class="text-muted mb-0">No periods yet.</p>
+                                <svg t-if="chart" class="o_bsc_dash_chart w-100" role="img"
+                                     t-attf-viewBox="0 0 {{chart.width}} {{chart.height}}"
+                                     preserveAspectRatio="xMidYMid meet">
+                                    <t t-foreach="chart.grid" t-as="g" t-key="g.v">
+                                        <line t-att-x1="chart.left" t-att-x2="chart.right"
+                                              t-att-y1="g.y" t-att-y2="g.y" class="o_bsc_dash_grid"/>
+                                        <text t-att-x="chart.left - 6" t-att-y="g.y + 4" text-anchor="end"
+                                              class="o_bsc_dash_axis"><t t-out="g.v"/>%</text>
+                                    </t>
+                                    <line t-att-x1="chart.left" t-att-x2="chart.right"
+                                          t-att-y1="chart.green" t-att-y2="chart.green" class="o_bsc_dash_line_green"/>
+                                    <line t-att-x1="chart.left" t-att-x2="chart.right"
+                                          t-att-y1="chart.amber" t-att-y2="chart.amber" class="o_bsc_dash_line_amber"/>
+                                    <path t-if="chart.path" t-att-d="chart.path" class="o_bsc_dash_path"/>
+                                    <t t-foreach="chart.points" t-as="pt" t-key="pt.id">
+                                        <circle t-if="pt.y !== null" t-att-cx="pt.x" t-att-cy="pt.y" r="5"
+                                                t-att-class="'o_bsc_dash_dot o_bsc_dash_dot_' + pt.status"/>
+                                        <text t-if="pt.y !== null" t-att-x="pt.x" t-att-y="pt.y - 10"
+                                              text-anchor="middle" class="o_bsc_dash_value"><t t-out="pt.label"/></text>
+                                        <text t-att-x="pt.x" t-att-y="chart.bottom + 18" text-anchor="middle"
+                                              class="o_bsc_dash_axis"><t t-out="pt.name"/></text>
+                                    </t>
+                                </svg>
+                                <div class="small text-muted">Dashed lines: the on-track (green) and
+                                    at-risk (amber) thresholds. Empty periods are left out of the line.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-12 col-xl-8">
+                        <div class="card h-100">
+                            <div class="card-header py-2 d-flex justify-content-between">
+                                <strong>Needs attention</strong>
+                                <span class="badge text-bg-warning" t-if="this.attentionCount"><t t-out="this.attentionCount"/></span>
+                            </div>
+                            <div class="card-body">
+                                <p t-if="!this.attentionCount" class="text-success mb-0">
+                                    <i class="oi me-1" data-icon="check_circle"/>Nothing is waiting for a decision.
+                                </p>
+                                <div t-if="d.attention.missing_by_owner.length" class="mb-3">
+                                    <div class="fw-bold small mb-1">
+                                        <i class="oi me-1" data-icon="schedule"/>Figures not reported yet
+                                        (<t t-out="d.attention.missing_total"/>)
+                                        <a href="#" class="ms-2" t-on-click.prevent="() => this.openFigures(true)">open</a>
+                                    </div>
+                                    <ul class="mb-0 small">
+                                        <li t-foreach="d.attention.missing_by_owner" t-as="o" t-key="o.id">
+                                            <strong t-out="o.owner"/>: <t t-out="o.kpis.join(', ')"/>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div t-if="d.attention.red_without_action.length" class="mb-3">
+                                    <div class="fw-bold small mb-1 text-danger">
+                                        <i class="oi me-1" data-icon="warning"/>Off-track objectives with no running initiative
+                                    </div>
+                                    <ul class="mb-0 small">
+                                        <li t-foreach="d.attention.red_without_action" t-as="o" t-key="o.id">
+                                            <a href="#" t-on-click.prevent="() => this.openRecord('bsc.objective', o.id)">
+                                                <t t-out="o.code"/> <t t-out="o.name"/></a>
+                                            <button t-if="d.can_manage" class="btn btn-link btn-sm py-0"
+                                                    t-on-click="() => this.createInitiative(o.id)">propose an initiative</button>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div t-if="d.attention.red_without_comment.length" class="mb-3">
+                                    <div class="fw-bold small mb-1">
+                                        <i class="oi me-1" data-icon="mode_comment"/>Off-track figures without an explanation
+                                    </div>
+                                    <ul class="mb-0 small">
+                                        <li t-foreach="d.attention.red_without_comment" t-as="m" t-key="m.id">
+                                            <a href="#" t-on-click.prevent="() => this.openRecord('bsc.measurement', m.id)"><t t-out="m.name"/></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div t-if="d.attention.held.length" class="mb-3">
+                                    <div class="fw-bold small mb-1">
+                                        <i class="oi me-1" data-icon="pause_circle"/>Automated figures held back or failing
+                                    </div>
+                                    <ul class="mb-0 small">
+                                        <li t-foreach="d.attention.held" t-as="m" t-key="m.id">
+                                            <a href="#" t-on-click.prevent="() => this.openRecord('bsc.measurement', m.id)"><t t-out="m.name"/></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div t-if="d.attention.overdue.length" class="mb-3">
+                                    <div class="fw-bold small mb-1 text-danger">
+                                        <i class="oi me-1" data-icon="event_busy"/>Overdue initiatives
+                                    </div>
+                                    <ul class="mb-0 small">
+                                        <li t-foreach="d.attention.overdue" t-as="i" t-key="i.id">
+                                            <a href="#" t-on-click.prevent="() => this.openRecord('bsc.initiative', i.id)"><t t-out="i.name"/></a>
+                                            <span class="text-muted"> - <t t-out="i.owner"/>, <t t-out="i.days"/> day(s) late</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div t-if="d.attention.over_budget.length">
+                                    <div class="fw-bold small mb-1">
+                                        <i class="oi me-1" data-icon="payments"/>Initiatives over budget
+                                    </div>
+                                    <ul class="mb-0 small">
+                                        <li t-foreach="d.attention.over_budget" t-as="i" t-key="i.id">
+                                            <a href="#" t-on-click.prevent="() => this.openRecord('bsc.initiative', i.id)"><t t-out="i.name"/></a>
+                                            <span class="text-muted"> - <t t-out="this.money(i.actual)"/> of <t t-out="this.money(i.planned)"/></span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-xl-4">
+                        <div class="card h-100">
+                            <div class="card-header py-2"><strong>Strategy review</strong></div>
+                            <div class="card-body">
+                                <t t-if="d.review">
+                                    <div class="mb-2"><t t-out="d.review.name"/></div>
+                                    <div class="mb-3">
+                                        <span t-if="d.review.state === 'done'" class="badge text-bg-success">Held - decisions recorded</span>
+                                        <span t-elif="d.review.decided" class="badge text-bg-info">Decisions drafted</span>
+                                        <span t-else="" class="badge text-bg-warning">Prepared - waiting for the meeting</span>
+                                    </div>
+                                </t>
+                                <p t-else="" class="text-muted">
+                                    No review for this period yet. It is opened automatically
+                                    when the period closes, or you can open it now.
+                                </p>
+                                <button t-if="d.period" class="btn btn-sm btn-primary" t-on-click="this.openReview">
+                                    <t t-if="d.review">Open the review</t>
+                                    <t t-else="">Start the review</t>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-header py-2"><strong>Objectives</strong></div>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0 o_bsc_dash_table">
+                            <thead>
+                                <tr>
+                                    <th>Perspective</th>
+                                    <th>Objective</th>
+                                    <th>Owner</th>
+                                    <th class="text-end">KPIs</th>
+                                    <th class="text-end">Initiatives</th>
+                                    <th class="text-end">Score</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="d.objectives" t-as="o" t-key="o.id"
+                                    class="o_bsc_dash_clickable" t-on-click="() => this.openRecord('bsc.objective', o.id)">
+                                    <td class="text-muted"><t t-out="o.perspective"/></td>
+                                    <td><strong t-if="o.code" class="me-1"><t t-out="o.code"/></strong><t t-out="o.name"/>
+                                        <span t-if="o.qualitative" class="badge text-bg-light ms-1">qualitative</span></td>
+                                    <td><t t-out="o.owner"/></td>
+                                    <td class="text-end"><t t-out="o.kpi_count"/></td>
+                                    <td class="text-end"><t t-out="o.live_initiatives"/></td>
+                                    <td class="text-end"><t t-if="o.status !== 'no_data'"><t t-out="this.fmt(o.score)"/>%</t><t t-else="">–</t></td>
+                                    <td><span t-att-class="this.statusClass(o.status)"><t t-out="o.status_label"/></span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card mb-3" t-if="d.period">
+                    <div class="card-header py-2 d-flex flex-wrap align-items-center gap-2">
+                        <strong>KPIs - <t t-out="d.period.name"/></strong>
+                        <div class="btn-group btn-group-sm ms-auto" role="group">
+                            <button t-att-class="'btn ' + (this.state.kpiFilter === 'all' ? 'btn-primary' : 'btn-light')"
+                                    t-on-click="() => this.setKpiFilter('all')">All</button>
+                            <button t-att-class="'btn ' + (this.state.kpiFilter === 'red' ? 'btn-primary' : 'btn-light')"
+                                    t-on-click="() => this.setKpiFilter('red')">Off track</button>
+                            <button t-att-class="'btn ' + (this.state.kpiFilter === 'amber' ? 'btn-primary' : 'btn-light')"
+                                    t-on-click="() => this.setKpiFilter('amber')">At risk</button>
+                            <button t-att-class="'btn ' + (this.state.kpiFilter === 'missing' ? 'btn-primary' : 'btn-light')"
+                                    t-on-click="() => this.setKpiFilter('missing')">Not reported</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0 o_bsc_dash_table">
+                            <thead>
+                                <tr>
+                                    <th>Obj.</th>
+                                    <th>KPI</th>
+                                    <th class="text-end">Target</th>
+                                    <th class="text-end">Actual</th>
+                                    <th class="text-end">Previous</th>
+                                    <th style="min-width: 120px;">Achievement</th>
+                                    <th>Status</th>
+                                    <th>Owner</th>
+                                    <th>Comment</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-if="!this.filteredKpis.length">
+                                    <td colspan="9" class="text-muted text-center py-3">Nothing to show for this filter.</td>
+                                </tr>
+                                <tr t-foreach="this.filteredKpis" t-as="k" t-key="k.id"
+                                    class="o_bsc_dash_clickable" t-on-click="() => this.openRecord('bsc.measurement', k.id)">
+                                    <td class="text-muted" t-att-title="k.objective_name"><t t-out="k.objective"/></td>
+                                    <td><t t-out="k.name"/> <span class="text-muted small" t-if="k.unit">(<t t-out="k.unit"/>)</span></td>
+                                    <td class="text-end"><t t-out="this.fmt(k.target, 2)"/></td>
+                                    <td class="text-end">
+                                        <t t-if="k.reported">
+                                            <t t-out="this.fmt(k.actual, 2)"/>
+                                            <i class="oi ms-1 text-muted" t-att-data-icon="this.trendIcon(k.trend)" t-att-title="k.trend_label"/>
+                                        </t>
+                                        <span t-else="" class="text-muted">not reported</span>
+                                    </td>
+                                    <td class="text-end text-muted"><t t-out="this.fmt(k.previous, 2)"/></td>
+                                    <td>
+                                        <div t-if="k.reported and k.status !== 'no_data'" class="d-flex align-items-center gap-2">
+                                            <div class="progress flex-grow-1" style="height: 6px;">
+                                                <div t-att-class="'progress-bar o_bsc_dash_bar_' + k.status" role="progressbar"
+                                                     t-att-style="this.barWidth(k.achievement)"/>
+                                            </div>
+                                            <span class="small"><t t-out="this.fmt(k.achievement)"/>%</span>
+                                        </div>
+                                    </td>
+                                    <td><span t-att-class="this.statusClass(k.status)"><t t-out="k.status_label"/></span></td>
+                                    <td class="small"><t t-out="k.owner"/></td>
+                                    <td class="small text-muted o_bsc_dash_comment"><t t-out="k.comment"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-header py-2 d-flex align-items-center">
+                        <strong>Initiative portfolio</strong>
+                        <button class="btn btn-sm btn-link ms-auto" t-on-click="() => this.openInitiatives()">open all</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0 o_bsc_dash_table">
+                            <thead>
+                                <tr>
+                                    <th>Initiative</th>
+                                    <th>Objectives</th>
+                                    <th>Stage</th>
+                                    <th>Owner</th>
+                                    <th>Due</th>
+                                    <th class="text-end">Budget</th>
+                                    <th style="min-width: 120px;">Progress</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-if="!d.initiatives.items.length">
+                                    <td colspan="7" class="text-muted text-center py-3">No initiatives yet.</td>
+                                </tr>
+                                <tr t-foreach="d.initiatives.items" t-as="i" t-key="i.id"
+                                    t-att-class="'o_bsc_dash_clickable' + (i.state === 'done' or i.state === 'cancelled' ? ' text-muted' : '')"
+                                    t-on-click="() => this.openRecord('bsc.initiative', i.id)">
+                                    <td><t t-out="i.name"/></td>
+                                    <td class="small text-muted"><t t-out="i.objectives"/></td>
+                                    <td><t t-out="i.stage"/></td>
+                                    <td class="small"><t t-out="i.owner"/></td>
+                                    <td t-att-class="i.overdue ? 'text-danger fw-bold' : ''"><t t-out="i.date_end"/></td>
+                                    <td class="text-end small">
+                                        <span t-att-class="i.planned and i.actual &gt; i.planned ? 'text-danger' : ''">
+                                            <t t-out="this.money(i.actual)"/></span> / <t t-out="this.money(i.planned)"/>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="progress flex-grow-1" style="height: 6px;">
+                                                <div class="progress-bar" role="progressbar" t-att-style="this.barWidth(i.progress)"/>
+                                            </div>
+                                            <span class="small"><t t-out="i.progress"/>%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </div>
+</t>
+
+</templates>

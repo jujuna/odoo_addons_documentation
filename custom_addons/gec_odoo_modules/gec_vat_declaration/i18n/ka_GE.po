@@ -1,0 +1,2212 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* gec_vat_declaration
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-26 15:48+0000\n"
+"PO-Revision-Date: 2026-10-26 15:48+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: gec_vat_declaration
+#: model:ir.module.module,description:base.module_gec_vat_declaration
+msgid ""
+"\n"
+"Builds the monthly Georgian VAT declaration as the rs.ge portal lays it out: the cell tabs\n"
+"A I, A II, A III, Part III and III-19.6. Odoo proposes the editable cells from the l10n_ge VAT\n"
+"report, the accountant adjusts them, and the locked cells are recomputed with the portal formulas.\n"
+msgstr ""
+"\n"
+"აგებს დღგ-ის ყოველთვიურ დეკლარაციას ისე, როგორც rs.ge პორტალზეა: უჯრების ჩანართები\n"
+"ა I, ა II, ა III, III ნაწილი და III-19⁶. რედაქტირებად უჯრებს Odoo l10n_ge-ის დღგ-ის ანგარიშიდან\n"
+"გვთავაზობს, ბუღალტერი ასწორებს, ჩაკეტილ უჯრებს კი პორტალის ფორმულებით ითვლის.\n"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"%(company)s is not the main branch of its VAT number: the declaration is "
+"normally filed by the main branch."
+msgstr ""
+"%(company)s არ არის თავისი დღგ-ის ნომრის მთავარი ფილიალი: დეკლარაციას, "
+"როგორც წესი, მთავარი ფილიალი წარადგენს."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid "%(names)s and %(count)s more"
+msgstr "%(names)s და კიდევ %(count)s"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"%(tab)s row %(row)s: Odoo VAT is %(odoo).2f, the portal's 18%% gives %(portal).2f; check its taxes "
+"with the magnifier on the VAT cell, or keep the portal figure if the gap is only rounding."
+msgstr ""
+"%(tab)s, სტრიქონი %(row)s: Odoo-ს დღგ — %(odoo).2f, პორტალის 18%% — %(portal).2f; გადასახადები "
+"შეამოწმეთ დღგ-ის უჯრის ლუპის ნიშნით, ან დატოვეთ პორტალის თანხა, თუ სხვაობა მხოლოდ დამრგვალებაა."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_cell.py:0
+msgid "%s (column 5 differs from its tax items: the whole row)"
+msgstr "%s (სვ.5 მის საგადასახადო ჩანაწერებს არ ემთხვევა: ნაჩვენებია მთელი სტრიქონი)"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_cell.py:0
+msgid ""
+"%s (the tax items differ from the cell: shared with other lines, capped, typed or changed since Generate)"
+msgstr ""
+"%s (საგადასახადო ჩანაწერები უჯრას არ ემთხვევა: სხვა სტრიქონებთან საერთო, შეზღუდული, ხელით შეყვანილი ან გენერირების შემდეგ შეცვლილი)"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid "%s is not a readable PDF."
+msgstr "%s არ არის წაკითხვადი PDF."
+
+#. module: gec_vat_declaration
+#. odoo-javascript
+#: code:addons/gec_vat_declaration/static/src/components/gec_vat_rows/gec_vat_rows.js:0
+msgid "%s rows"
+msgstr "%s ჩანაწერი"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+msgid "1 · A-I Taxable"
+msgstr "1 · ა-I დასაბეგრი"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+msgid "16 · III Calculation"
+msgstr "16 · III გაანგარიშება"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+msgid "17 · III-19⁶ Margin"
+msgstr "17 · III-19⁶ მარჟა"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+msgid "2 · A-II Reverse charge"
+msgstr "2 · ა-II უკუდაბეგვრა"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+msgid "3 · A-III Creditable"
+msgstr "3 · ა-III ჩასათვლელი"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+msgid "4 · B-I Issued Invoices"
+msgstr "4 · ბ-I გამოწერილი"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+msgid "5 · B-II Received Invoices"
+msgstr "5 · ბ-II მიღებული"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+msgid "6 · B-III Customs Declarations"
+msgstr "6 · ბ-III საბაჟო დეკლარაციები"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_cell__tab__1
+msgid "A I - Taxable Operations"
+msgstr "ა I - დასაბეგრი ოპერაციები"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_cell__tab__2
+msgid "A II - Reverse Charge VAT"
+msgstr "ა II - უკუდაბეგვრის დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_cell__tab__3
+msgid "A III - Creditable VAT"
+msgstr "ა III - ჩასათვლელი დღგ"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"A III row %(row)s column 4 is negative: the portal reads it as 0, and Odoo "
+"proposes the amount in Part III row 12."
+msgstr ""
+"ა III, სტრიქონი %(row)s, მე-4 სვეტი უარყოფითია: პორტალი მას 0-ად კითხულობს, "
+"Odoo კი ამ თანხას III ნაწილის მე-12 სტრიქონში გვთავაზობს."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"A III row %(row)s: Odoo has %(amount).2f; the portal fills this row only in "
+"December."
+msgstr ""
+"ა III, სტრიქონი %(row)s: Odoo-ში არის %(amount).2f; პორტალი ამ სტრიქონს "
+"მხოლოდ დეკემბერში ავსებს."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid "A III row %(row)s: Odoo has %(amount).2f; type the figure in this row."
+msgstr ""
+"ა III, სტრიქონი %(row)s: Odoo-ში არის %(amount).2f; ჩაწერეთ თანხა ამ "
+"სტრიქონში."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+#: code:addons/gec_vat_declaration/models/gec_vat_rc_declaration.py:0
+msgid "A filed declaration cannot be deleted: reset it to draft first."
+msgstr "წარდგენილი დეკლარაციის წაშლა შეუძლებელია: ჯერ მონახაზში დააბრუნეთ."
+
+#. module: gec_vat_declaration
+#. odoo-javascript
+#: code:addons/gec_vat_declaration/static/src/components/gec_vat_grid/gec_vat_grid.xml:0
+msgid ""
+"A lock means the portal calculates the cell. A wand means Odoo proposes the cell and you can\n"
+"                overwrite it. The grey Odoo figure under a cell shows what Odoo computed when it differs from the cell."
+msgstr ""
+"ბოქლომი ნიშნავს, რომ უჯრას პორტალი ითვლის. ჯადოსნური ჯოხი ნიშნავს, რომ უჯრას"
+" Odoo გთავაზობთ და მისი შეცვლა შეგიძლიათ. უჯრის ქვეშ ნაცრისფრად Odoo-ს თანხა"
+" ჩანს, როცა ის უჯრისგან განსხვავდება."
+
+#. module: gec_vat_declaration
+#. odoo-javascript
+#: code:addons/gec_vat_declaration/static/src/components/gec_vat_rows/gec_vat_rows.xml:0
+msgid "Add a row"
+msgstr "დამატება"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_declaration__decl_type__adjusted
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_rc_declaration__decl_type__adjusted
+msgid "Adjusted"
+msgstr "დაზუსტებული"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__advance_line_ids
+msgid "Advance Line"
+msgstr "ავანსის სტრიქონი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_advance_line__advance_number
+msgid "Advance Number"
+msgstr "ავანსის ფაქტურის ნომერი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_advance_line__advance_series
+msgid "Advance Series"
+msgstr "ავანსის ფაქტურის სერია"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_cell__column__amount
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_line__amount
+msgid "Amount"
+msgstr "თანხა"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid "Another declaration of this type exists for this company and month: %(names)s."
+msgstr "ამ კომპანიისა და თვისთვის ამავე ტიპის სხვა დეკლარაციაც არსებობს: %(names)s."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__account_asset__gec_margin_scheme__antique
+msgid "Antique"
+msgstr "ანტიკვარიატი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_customs_line__assessment_date
+msgid "Assessment Date"
+msgstr "შეფასების თარიღი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_customs_line__assessment_number
+msgid "Assessment Number"
+msgstr "შეფასების ნომერი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__auditable
+msgid "Auditable"
+msgstr "შემოწმებადი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__b1_advance_amount
+msgid "B I Advance VAT"
+msgstr "ბ I ავანსის დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__b1_amount
+msgid "B I VAT Payable"
+msgstr "ბ I გადასახდელი დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__b1_reduce_amount
+msgid "B I VAT Reduced"
+msgstr "ბ I შესამცირებელი დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__b2_advance_amount
+msgid "B II Advance VAT"
+msgstr "ბ II ავანსის დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__b2_amount
+msgid "B II VAT Creditable"
+msgstr "ბ II ჩასათვლელი დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__b2_reduce_amount
+msgid "B II VAT Reduced"
+msgstr "ბ II შესამცირებელი დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__b3_amount
+msgid "B III VAT"
+msgstr "ბ III დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_cell__column__base
+msgid "Base"
+msgstr "ბაზა"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_res_company__gec_vat_fixed_asset_account_ids
+#: model:ir.model.fields,help:gec_vat_declaration.field_res_config_settings__gec_vat_fixed_asset_account_ids
+msgid ""
+"Bill lines on these accounts are fixed-asset purchases: their VAT goes to "
+"column 5 of annex A III of the VAT declaration, the rest to column 4."
+msgstr ""
+"ამ ანგარიშებზე შეძენის ხაზების დღგ აისახება დღგ-ის დეკლარაციის „ა“ დანართის "
+"III ნაწილის ძირითადი საშუალებების სვეტში, დანარჩენი — მე-4 სვეტში."
+
+#. module: gec_vat_declaration
+#. odoo-javascript
+#: code:addons/gec_vat_declaration/static/src/components/gec_vat_grid/gec_vat_grid.js:0
+msgid "Calculated by the portal"
+msgstr "პორტალი ითვლის"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__cell_id
+msgid "Cell"
+msgstr "უჯრა"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"Tab %(tab)s, row %(row)s, column %(column)s (%(name)s) is negative: the portal reads a negative "
+"value as 0."
+msgstr ""
+"ჩანართი %(tab)s, სტრიქონი %(row)s, სვეტი „%(column)s“ (%(name)s) უარყოფითია: პორტალი უარყოფით "
+"მნიშვნელობას 0-ად კითხულობს."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_cell__code
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__code
+msgid "Code"
+msgstr "კოდი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_cell__column
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__column
+msgid "Column"
+msgstr "სვეტი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__account_asset__gec_margin_scheme__collectible
+msgid "Collectors' Item"
+msgstr "საკოლექციო ნივთი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_advance_line__company_id
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_customs_line__company_id
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__company_id
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__company_id
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__company_id
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__company_id
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_search
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_ref_line__company_id
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_rc_declaration_search
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__company_id
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_line__company_id
+msgid "Company"
+msgstr "კომპანია"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_cell__computed
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__computed
+msgid "Computed"
+msgstr "გამოთვლილი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__korect_number
+msgid "Corrected Number"
+msgstr "კორექტირებული ანგარიშ-ფაქტურის ნომერი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__korect_series
+msgid "Corrected Series"
+msgstr "კორექტირებული ანგარიშ-ფაქტურის სერია"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.actions.act_window,help:gec_vat_declaration.action_gec_vat_declaration
+msgid "Create the VAT declaration of a month"
+msgstr "შექმენით თვის დღგ-ის დეკლარაცია"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_advance_line__create_uid
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_cell__create_uid
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__create_uid
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__create_uid
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__create_uid
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__create_uid
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_line__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_advance_line__create_date
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_cell__create_date
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__create_date
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__create_date
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__create_date
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__create_date
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_line__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_customs_line__customs_code
+msgid "Customs Code"
+msgstr "საბაჟოს კოდი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_customs_line__attachment_id
+msgid "Customs Declaration PDF"
+msgstr "საბაჟო დეკლარაციის PDF"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__customs_line_ids
+msgid "Customs Line"
+msgstr "საბაჟო დეკლარაციის სტრიქონი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__date_to
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__date_to
+msgid "Date To"
+msgstr "ბოლო თარიღი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_cell__december_only
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__december_only
+msgid "December Only"
+msgstr "მხოლოდ დეკემბერში"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_advance_line__declaration_id
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_customs_line__declaration_id
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__declaration_id
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__declaration_id
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__declaration_id
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_ref_line__declaration_id
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_line__declaration_id
+msgid "Declaration"
+msgstr "დეკლარაცია"
+
+#. module: gec_vat_declaration
+#. odoo-javascript
+#: code:addons/gec_vat_declaration/static/src/components/gec_vat_rows/gec_vat_rows.xml:0
+msgid "Delete row"
+msgstr "სტრიქონის წაშლა"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_advance_line__delivery_number
+msgid "Delivery Number"
+msgstr "მიწოდების ფაქტურის ნომერი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_advance_line__delivery_series
+msgid "Delivery Series"
+msgstr "მიწოდების ფაქტურის სერია"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_advance_line__display_name
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_cell__display_name
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__display_name
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__display_name
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__display_name
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__display_name
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_line__display_name
+msgid "Display Name"
+msgstr "სახელი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_declaration__state__draft
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_search
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_rc_declaration_search
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_rc_declaration__state__draft
+msgid "Draft"
+msgstr "მონახაზი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_cell__proposed
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_declaration_line__proposed
+msgid ""
+"Editable on the portal; Odoo proposes it from its own report or from other "
+"cells and refreshes it until the accountant overwrites it. A cell that is "
+"neither computed nor proposed is typed."
+msgstr ""
+"პორტალზე რედაქტირებადია; Odoo მას საკუთარი ანგარიშიდან ან სხვა უჯრებიდან "
+"გვთავაზობს და აახლებს, სანამ ბუღალტერი თავად არ შეცვლის. უჯრა, რომელიც არც "
+"გამოთვლილია და არც შემოთავაზებული, ხელით ივსება."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_declaration__state__filed
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_search
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_rc_declaration_search
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_rc_declaration__state__filed
+msgid "Filed"
+msgstr "წარდგენილი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_cell__column__fixed_assets
+msgid "Fixed Assets"
+msgstr "ძირითადი საშუალებები"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_res_company__gec_vat_fixed_asset_account_ids
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_res_config_settings__gec_vat_fixed_asset_account_ids
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.res_config_settings_view_form_gec_vat_declaration
+msgid "Fixed-asset accounts (VAT declaration)"
+msgstr "ძირითადი საშუალებების ანგარიშები (დღგ-ის დეკლარაცია)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_cell__formula
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__formula
+msgid "Formula"
+msgstr "ფორმულა"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_rc_declaration_form
+msgid "Generate"
+msgstr "გენერირება"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_rc_declaration.py:0
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_rc_declaration_form
+msgid "Lines of the corrected bills"
+msgstr "კორექტირებული ანგარიშ-ფაქტურების სტრიქონები"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_rc_declaration.py:0
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_rc_declaration_form
+msgid "Lines of the replacement bills"
+msgstr "შემცვლელი ანგარიშ-ფაქტურების სტრიქონები"
+
+#. module: gec_vat_declaration
+#. odoo-javascript
+#: code:addons/gec_vat_declaration/static/src/components/gec_vat_grid/gec_vat_grid.xml:0
+msgid "Show what makes up Odoo's figure"
+msgstr "Odoo-ს თანხის შემადგენლობის ნახვა"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_cell__formula
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_declaration_line__formula
+msgid "The portal formula of a locked cell, in portal row and column numbers."
+msgstr "დაბლოკილი უჯრის პორტალის ფორმულა, პორტალის სტრიქონებისა და სვეტების ნომრებით."
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+msgid ""
+"Upload the customs declaration or Form 4 PDFs, one row per PDF. The type, the number,\n"
+"                                the customs code, the date and the VAT are read from the PDF and can be corrected; the\n"
+"                                VAT is the \"გადახდილია სულ\" total of a customs declaration and the \"დღგ\" payment line of\n"
+"                                a Form 4. Deleting a row keeps its PDF. Deleting the declaration deletes the PDFs\n"
+"                                uploaded here (with the Documents app, a copy stays in its trash for a while); PDFs\n"
+"                                taken from the Documents folders stay there, and such a PDF comes back at the next\n"
+"                                Generate until it is moved out of its folder."
+msgstr "ატვირთეთ საბაჟო დეკლარაციების ან ფორმა 4-ის PDF ფაილები, თითო PDF — ერთი სტრიქონი. ტიპი, ნომერი, საბაჟოს კოდი, თარიღი და დღგ PDF-იდან იკითხება და შეგიძლიათ შეასწოროთ; დღგ არის საბაჟო დეკლარაციის „გადახდილია სულ“ ჯამი და ფორმა 4-ის „დღგ“ გადასახდელის სტრიქონი. სტრიქონის წაშლისას მისი PDF რჩება. დეკლარაციის წაშლისას აქ ატვირთული PDF-ები იშლება (Documents აპლიკაციის შემთხვევაში მათი ასლი გარკვეული დროით ნაგვის ყუთში რჩება); Documents-ის საქაღალდეებიდან აღებული PDF-ები იქვე რჩება და ასეთი PDF გენერირებისას ისევ ბრუნდება, სანამ საქაღალდიდან არ გადაიტანთ."
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+msgid ""
+"Generate builds the rows from the customer invoices rs.ge accepted; a correction appears\n"
+"                                in the month the buyer accepted it, with the change against the invoice it corrects.\n"
+"                                Rows linked to an Odoo invoice are rebuilt on every Generate; add a row for a paper invoice."
+msgstr "გენერირება სტრიქონებს rs.ge-ზე დადასტურებული მომხმარებლის ანგარიშ-ფაქტურებიდან ქმნის; კორექტირება აისახება იმ თვეში, როცა მყიდველმა ის დაადასტურა, კორექტირებულ ანგარიშ-ფაქტურასთან სხვაობით. Odoo-ს ანგარიშ-ფაქტურასთან დაკავშირებული სტრიქონები ყოველი გენერირებისას თავიდან იქმნება; ქაღალდის ანგარიშ-ფაქტურისთვის დაამატეთ სტრიქონი."
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+msgid ""
+"Generate builds the rows from the vendor bills linked to rs.ge invoices that are accepted,\n"
+"                                in the month of their accounting date, where Odoo credits the VAT; a correction shows the\n"
+"                                change against the bill it corrects. Add a row for a paper invoice or an advance offset."
+msgstr "გენერირება სტრიქონებს rs.ge-ზე დადასტურებულ ანგარიშ-ფაქტურებთან დაკავშირებული მომწოდებლის ანგარიშ-ფაქტურებიდან ქმნის, მათი ბუღალტრული თარიღის თვეში, რომელშიც Odoo მათ დღგ-ს ჩაითვლის; კორექტირება კორექტირებულ ანგარიშ-ფაქტურასთან სხვაობას აჩვენებს. ქაღალდის ანგარიშ-ფაქტურისთვის ან ავანსის გაქვითვისთვის დაამატეთ სტრიქონი."
+
+#. module: gec_vat_declaration
+#: model_terms:ir.actions.act_window,help:gec_vat_declaration.action_gec_vat_declaration
+msgid ""
+"Generate proposes the cells from the Georgian VAT report. Adjust the "
+"editable cells, then type the result into the rs.ge portal."
+msgstr ""
+"გენერირება უჯრებს საქართველოს დღგ-ის ანგარიშიდან გვთავაზობს. შეასწორეთ "
+"რედაქტირებადი უჯრები, შემდეგ შედეგი rs.ge პორტალზე შეიტანეთ."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__generation_warnings
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__generation_warnings
+msgid "Generation Warnings"
+msgstr "გენერირების გაფრთხილებები"
+
+#. module: gec_vat_declaration
+#: model:ir.module.module,shortdesc:base.module_gec_vat_declaration
+msgid "Georgia - VAT Declaration (rs.ge)"
+msgstr "საქართველო - დღგ-ის დეკლარაცია (rs.ge)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_cell__column__goods
+msgid "Goods and Services"
+msgstr "საქონელი და მომსახურება"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_advance_line__id
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_cell__id
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__id
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__id
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__id
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__id
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_line__id
+msgid "ID"
+msgstr "ID"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_cell__tab__17
+msgid "III-19⁶ - Margin Scheme"
+msgstr "III-19⁶ - მარჟის სქემა"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"III-19⁶: margin-scheme goods sold with a tax (%(names)s): the sale price here leaves the tax out, and a "
+"VAT tax on these lines also reaches Odoo's VAT report; check their taxes."
+msgstr "III-19⁶: მარჟის სქემის საქონელი გადასახადით არის გაყიდული (%(names)s): მიწოდების ფასი აქ გადასახადს არ შეიცავს, ხოლო დღგ-ის გადასახადი Odoo-ს დღგ-ის ანგარიშშიც აისახება; შეამოწმეთ ამ სტრიქონების გადასახადები."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"III-19⁶: assets sold on this month's invoices are no longer closed (%(names)s): the sale was undone; "
+"check the row."
+msgstr "III-19⁶: ამ თვის ანგარიშ-ფაქტურებით გაყიდული აქტივები აღარ არის დახურული (%(names)s): გაყიდვა გაუქმდა; შეამოწმეთ სტრიქონი."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"III-19⁶: credit notes (%(names)s) cancel margin-scheme sales; correct the row by hand."
+msgstr "III-19⁶: საკრედიტო ანგარიშ-ფაქტურები (%(names)s) მარჟის სქემით გაყიდვას აუქმებენ; სტრიქონი ხელით შეასწორეთ."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"III-19⁶: assets without a purchase price (%(names)s): Asset Value is 0, so VAT is charged on the full "
+"sale price."
+msgstr "III-19⁶: აქტივებს შესყიდვის ფასი არ აქვს (%(names)s): „აქტივის ღირებულება“ 0-ია, ამიტომ დღგ მიწოდების მთლიან ფასზე ითვლება."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"III-19⁶: assets sold without VAT and without a margin-scheme category (%(names)s): set the category on "
+"the asset or check the invoice."
+msgstr "III-19⁶: აქტივები გაყიდულია დღგ-ისა და მარჟის სქემის კატეგორიის გარეშე (%(names)s): აქტივზე მიუთითეთ კატეგორია ან შეამოწმეთ ანგარიშ-ფაქტურა."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"III-19⁶: purchase price already counted in the month of the first invoice of the sale (%(names)s); "
+"only the sale price counts here."
+msgstr "III-19⁶: შესყიდვის ფასი უკვე აისახა გაყიდვის პირველი ანგარიშ-ფაქტურის თვეში (%(names)s); აქ მხოლოდ მიწოდების ფასი ითვლება."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"III-19⁶: assets sold or disposed this month without a posted invoice line linked to them (%(names)s) "
+"— receipt, Point of Sale or cancelled invoice: type the row if it was a margin-scheme sale."
+msgstr "III-19⁶: ამ თვეში გაყიდულ ან ჩამოწერილ აქტივებს გატარებული ანგარიშ-ფაქტურის სტრიქონი არ უკავშირდება (%(names)s) — ქვითარი, გაყიდვის წერტილი ან გაუქმებული ანგარიშ-ფაქტურა: თუ ეს მარჟის სქემით გაყიდვაა, სტრიქონი ხელით შეავსეთ."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"III-19⁶: assets sold this month on an invoice of another month (%(names)s); they are declared in the "
+"invoice's month."
+msgstr "III-19⁶: აქტივები ამ თვეში გაიყიდა სხვა თვის ანგარიშ-ფაქტურით (%(names)s); ისინი ანგარიშ-ფაქტურის თვეში დეკლარირდება."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__invoice_line_ids
+msgid "Invoice Line"
+msgstr "ანგარიშ-ფაქტურის სტრიქონი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_advance_line__part__sale
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_invoice_line__part__sale
+msgid "Issued (B I)"
+msgstr "გამოწერილი (ბ I)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_advance_line__write_uid
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_cell__write_uid
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__write_uid
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__write_uid
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__write_uid
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__write_uid
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_line__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_advance_line__write_date
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_cell__write_date
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__write_date
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__write_date
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__write_date
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__write_date
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_line__write_date
+msgid "Last Updated on"
+msgstr "ბოლოს განახლებულია"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_cell__line
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__line_ids
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__line
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__line_ids
+msgid "Line"
+msgstr "სტრიქონი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_cell__line_label
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__line_label
+msgid "Line Label"
+msgstr "სტრიქონის ნომერი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__locked
+msgid "Locked"
+msgstr "ჩაკეტილი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_cell__december_only
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_declaration_line__december_only
+msgid ""
+"Locked on the portal except in the December declaration, where it is typed."
+msgstr "პორტალზე ჩაკეტილია, გარდა დეკემბრის დეკლარაციისა, სადაც ხელით ივსება."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_cell__computed
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_declaration_line__computed
+msgid "Locked on the portal: calculated from other cells, never typed."
+msgstr "პორტალზე ჩაკეტილია: სხვა უჯრებიდან ითვლება და ხელით არ ივსება."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid "Margin scheme: Odoo VAT is %(odoo).2f, III-19⁶ gives %(portal).2f."
+msgstr "მარჟის სქემა: Odoo-ს დღგ — %(odoo).2f, III-19⁶ — %(portal).2f."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_account_asset__gec_margin_scheme
+msgid "Margin Scheme"
+msgstr "მარჟის სქემა"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_rc_declaration_form
+msgid "Mark as Filed"
+msgstr "წარდგენილად მონიშვნა"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__date_from
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_search
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_rc_declaration_search
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__date_from
+msgid "Month"
+msgstr "თვე"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_invoice_line__operation_month
+msgid "Month of the taxable operation; the first day stands for the month."
+msgstr "დასაბეგრი ოპერაციის თვე; თვის პირველი დღე თვეს აღნიშნავს."
+
+#. module: gec_vat_declaration
+#: model:ir.module.module,summary:base.module_gec_vat_declaration
+msgid ""
+"Monthly VAT declaration cell tabs proposed from the Georgian VAT report"
+msgstr "დღგ-ის ყოველთვიური დეკლარაციის უჯრები საქართველოს დღგ-ის ანგარიშიდან"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_cell__name
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__name
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__name
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__name
+msgid "Name"
+msgstr "სახელი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_declaration__odoo_net_vat
+msgid ""
+"Net VAT of the l10n_ge VAT report at the last Generate, to compare with Part"
+" III."
+msgstr ""
+"l10n_ge-ის დღგ-ის ანგარიშის წმინდა დღგ ბოლო გენერირებისას, III ნაწილთან "
+"შესადარებლად."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_cell__note
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__note
+msgid "Note"
+msgstr "შენიშვნა"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__number
+msgid "Number"
+msgstr "ნომერი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__odoo_value
+msgid "Odoo"
+msgstr "Odoo"
+
+#. module: gec_vat_declaration
+#. odoo-javascript
+#: code:addons/gec_vat_declaration/static/src/components/gec_vat_grid/gec_vat_grid.js:0
+msgid "Odoo %s"
+msgstr "Odoo %s"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__move_id
+msgid "Odoo Invoice"
+msgstr "Odoo-ს ანგარიშ-ფაქტურა"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__odoo_net_vat
+msgid "Odoo Net VAT"
+msgstr "Odoo-ს წმინდა დღგ"
+
+#. module: gec_vat_declaration
+#. odoo-javascript
+#: code:addons/gec_vat_declaration/static/src/components/gec_vat_grid/gec_vat_grid.js:0
+msgid "Odoo proposes %s; the cell follows Odoo until you type your own value"
+msgstr ""
+"Odoo-ს შემოთავაზება: %s; უჯრა Odoo-ს მიჰყვება, სანამ საკუთარ მნიშვნელობას არ"
+" ჩაწერთ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_declaration_line__odoo_value
+msgid ""
+"Odoo's own figure for this cell, from the VAT report at the last Generate."
+msgstr "Odoo-ს თანხა ამ უჯრისთვის, დღგ-ის ანგარიშიდან ბოლო გენერირებისას."
+
+#. module: gec_vat_declaration
+#. odoo-javascript
+#: code:addons/gec_vat_declaration/static/src/components/gec_vat_rows/gec_vat_rows.xml:0
+msgid "Open in Odoo"
+msgstr "Odoo-ში გახსნა"
+
+#. module: gec_vat_declaration
+#. odoo-javascript
+#: code:addons/gec_vat_declaration/static/src/components/gec_vat_rows/gec_vat_rows.xml:0
+msgid "Open the PDF"
+msgstr "PDF-ის გახსნა"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__operation_month
+msgid "Operation Month"
+msgstr "ოპერაციის თვე"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_advance_line__part
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__part
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_line__part
+msgid "Part"
+msgstr "ნაწილი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_cell__tab__16
+msgid "Part III - VAT Calculation"
+msgstr "III ნაწილი - დღგ-ის გაანგარიშება"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__partner_tin
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_ref_line__partner_tin
+msgid "Partner Tax ID"
+msgstr "კონტრაგენტის ს/ნ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__portal_number
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__portal_number
+msgid "Portal Number"
+msgstr "პორტალის ნომერი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_cell__code
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_declaration_line__code
+msgid "Portal input id without the control_ prefix, e.g. 355_1 or 358_17."
+msgstr ""
+"პორტალის ველის იდენტიფიკატორი control_ პრეფიქსის გარეშე, მაგ. 355_1 ან "
+"358_17."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_cell__line
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_declaration_line__line
+msgid ""
+"Portal row key inside the tab, e.g. 1, 1_1, 13_1, 6_7. The cells of one row "
+"share it."
+msgstr ""
+"პორტალის სტრიქონის გასაღები ჩანართში, მაგ. 1, 1_1, 13_1, 6_7. ერთი სტრიქონის"
+" უჯრებს საერთო გასაღები აქვთ."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_declaration__decl_type__primary
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_rc_declaration__decl_type__primary
+msgid "Primary"
+msgstr "პირველადი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_cell__proposed
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__proposed
+msgid "Proposed"
+msgstr "შემოთავაზებული"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__proposed_value
+msgid "Proposed Value"
+msgstr "შემოთავაზებული მნიშვნელობა"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__purchase_advance_line_ids
+msgid "Purchase Advance Line"
+msgstr "შესყიდვის ავანსის სტრიქონი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__purchase_line_ids
+msgid "Purchase Line"
+msgstr "შესყიდვის სტრიქონი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_cell__column__purchase_price
+msgid "Purchase Price"
+msgstr "შესყიდვის ფასი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_advance_line__part__purchase
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_invoice_line__part__purchase
+msgid "Received (B II)"
+msgstr "მიღებული (ბ II)"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+#: code:addons/gec_vat_declaration/models/gec_vat_rc_declaration.py:0
+msgid "Reset the declaration to draft before regenerating it."
+msgstr "ხელახალი გენერირების წინ დეკლარაცია მონახაზში დააბრუნეთ."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid "Reset the declaration to draft before uploading customs declarations."
+msgstr "საბაჟო დეკლარაციების ატვირთვამდე დეკლარაცია მონახაზში დააბრუნეთ."
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_rc_declaration_form
+msgid "Reset to Draft"
+msgstr "მონახაზზე დაბრუნება"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_cell__row
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__row
+msgid "Row"
+msgstr "სტრიქონი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_cell__line_label
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_declaration_line__line_label
+msgid ""
+"Row number as printed on the grid, e.g. (1¹) or (6) / (7); empty for an "
+"unnumbered row."
+msgstr ""
+"სტრიქონის ნომერი, როგორც ცხრილშია, მაგ. (1¹) ან (6) / (7); უნომრო "
+"სტრიქონისთვის ცარიელია."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_cell__row
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_declaration_line__row
+msgid "Row number as the portal prints it, e.g. 1, 1¹, 14³."
+msgstr "სტრიქონის ნომერი, როგორც პორტალზეა, მაგ. 1, 1¹, 14³."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__account_asset__gec_margin_scheme__second_hand
+msgid "Second-hand Goods"
+msgstr "მეორადი ნივთი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_cell__column__sale_price
+msgid "Sale Price"
+msgstr "მიწოდების ფასი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_cell__sequence
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__sequence
+msgid "Sequence"
+msgstr "მიმდევრობა"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__series
+msgid "Series"
+msgstr "სერია"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_invoice_line__move_id
+msgid ""
+"Set on rows built by Generate; a row without it was typed, e.g. for a paper "
+"invoice."
+msgstr "ივსება გენერირებით შექმნილ სტრიქონებზე; სტრიქონი მის გარეშე ხელით არის შეტანილი, მაგ. ქაღალდის ანგარიშ-ფაქტურისთვის."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_cell__slot
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__slot
+msgid "Slot"
+msgstr "სვეტის ნომერი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_account_move_line__gec_sold_asset_id
+msgid "Sold Asset"
+msgstr "გაყიდული აქტივი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__state
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__state
+msgid "State"
+msgstr "მდგომარეობა"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_cell__tab
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__tab
+msgid "Tab"
+msgstr "ჩანართი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__tab1_line_ids
+msgid "Tab1 Line"
+msgstr "ჩანართი 1"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__tab16_line_ids
+msgid "Tab16 Line"
+msgstr "ჩანართი 16"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__tab17_line_ids
+msgid "Tab17 Line"
+msgstr "ჩანართი 17"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__tab2_line_ids
+msgid "Tab2 Line"
+msgstr "ჩანართი 2"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__tab3_line_ids
+msgid "Tab3 Line"
+msgstr "ჩანართი 3"
+
+#. module: gec_vat_declaration
+#: model:ir.model.constraint,message:gec_vat_declaration.constraint_gec_vat_cell_code_uniq
+msgid "The VAT declaration cell code must be unique."
+msgstr "დღგ-ის დეკლარაციის უჯრის კოდი უნიკალური უნდა იყოს."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_invoice_line__partner_tin
+msgid "The buyer's Tax ID on annex B I, the supplier's on annex B II."
+msgstr "ბ I დანართზე მყიდველის, ბ II დანართზე მომწოდებლის საიდენტიფიკაციო ნომერი."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+#: code:addons/gec_vat_declaration/models/gec_vat_rc_declaration.py:0
+msgid "The declaration month must start on the first day of the month."
+msgstr "დეკლარაციის თვე თვის პირველი დღით უნდა იწყებოდეს."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_declaration__portal_number
+msgid "The declaration number the rs.ge portal gave."
+msgstr "დეკლარაციის ნომერი, რომელიც rs.ge პორტალმა მიანიჭა."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_invoice_line__reduce_amount
+msgid "The decrease of a correction."
+msgstr "კორექტირების შედეგად შემცირება."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_cell__note
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_declaration_line__note
+msgid "The portal tooltip of the cell."
+msgstr "უჯრის მინიშნება პორტალზე."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+#: code:addons/gec_vat_declaration/models/gec_vat_rc_declaration.py:0
+msgid "This declaration is filed: reset it to draft before changing it."
+msgstr "დეკლარაცია წარდგენილია: შეცვლამდე მონახაზში დააბრუნეთ."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_cell__column__total
+msgid "Total"
+msgstr "ჯამი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_customs_line__pdf_type
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__decl_type
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__decl_type
+msgid "Type"
+msgstr "ტიპი"
+
+#. module: gec_vat_declaration
+#. odoo-javascript
+#: code:addons/gec_vat_declaration/static/src/components/gec_vat_rows/gec_vat_rows.xml:0
+msgid "Upload PDFs"
+msgstr "PDF-ების ატვირთვა"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_advance_line__amount
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_customs_line__amount
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__amount
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_cell__column__vat
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_ref_line__amount
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_line__vat
+msgid "VAT"
+msgstr "დღგ"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.res_config_settings_view_form_gec_vat_declaration
+msgid "VAT Declaration"
+msgstr "დღგ-ის დეკლარაცია"
+
+#. module: gec_vat_declaration
+#: model:ir.actions.act_window,name:gec_vat_declaration.action_gec_vat_declaration
+#: model:ir.ui.menu,name:gec_vat_declaration.menu_gec_vat_declaration
+msgid "VAT Declaration (rs.ge)"
+msgstr "დღგ-ის დეკლარაცია (rs.ge)"
+
+#. module: gec_vat_declaration
+#: model:ir.model,name:gec_vat_declaration.model_gec_vat_advance_line
+msgid "VAT Declaration Annex B I / B II Advance Offset"
+msgstr "დღგ-ის დეკლარაცია, დანართი ბ I / ბ II, ავანსის გაქვითვა"
+
+#. module: gec_vat_declaration
+#: model:ir.model,name:gec_vat_declaration.model_gec_vat_invoice_line
+msgid "VAT Declaration Annex B I / B II / Tab 13 / 14 Row"
+msgstr "დღგ-ის დეკლარაცია, დანართი ბ I / ბ II / ჩანართი 13 / 14, სტრიქონი"
+
+#. module: gec_vat_declaration
+#: model:ir.model,name:gec_vat_declaration.model_gec_vat_stock_line
+msgid "VAT Declaration Tab 15 Row"
+msgstr "დღგ-ის დეკლარაციის ჩანართი 15-ის სტრიქონი"
+
+#. module: gec_vat_declaration
+#: model:ir.model,name:gec_vat_declaration.model_gec_vat_customs_line
+msgid "VAT Declaration Annex B III Row"
+msgstr "დღგ-ის დეკლარაცია, დანართი ბ III, სტრიქონი"
+
+#. module: gec_vat_declaration
+#: model:ir.model,name:gec_vat_declaration.model_gec_vat_cell
+msgid "VAT Declaration Cell"
+msgstr "დღგ-ის დეკლარაციის უჯრა"
+
+#. module: gec_vat_declaration
+#: model:ir.model,name:gec_vat_declaration.model_gec_vat_declaration_line
+msgid "VAT Declaration Cell Value"
+msgstr "დღგ-ის დეკლარაციის უჯრის მნიშვნელობა"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.res_config_settings_view_form_gec_vat_declaration
+msgid ""
+"VAT of bill lines on these accounts goes to the fixed-assets column of annex "
+"A III"
+msgstr ""
+"ამ ანგარიშებზე შეძენის ხაზების დღგ აისახება „ა“ III-ის ძირითადი საშუალებების "
+"სვეტში"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__vat_payable
+msgid "VAT Payable"
+msgstr "გადასახდელი დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__reduce_amount
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__vat_reduced
+msgid "VAT Reduced"
+msgstr "შესამცირებელი დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__vat_refund
+msgid "VAT Refund"
+msgstr "შესამცირებელი დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_account_asset__gec_margin_scheme
+msgid ""
+"VAT margin scheme category (annex III-19⁶ of the rs.ge VAT declaration): when the asset is sold, its "
+"Asset Value is declared as the purchase price and the invoice line as the sale price."
+msgstr "დღგ-ის სპეციალური (მარჟის) სქემის კატეგორია (დღგ-ის დეკლარაციის დანართი №III-19⁶): აქტივის გაყიდვისას მისი „აქტივის ღირებულება“ დეკლარირდება შესყიდვის ფასად, ანგარიშ-ფაქტურის სტრიქონი კი — მიწოდების ფასად."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_account_move_line__gec_sold_asset_id
+msgid ""
+"The asset this line sold, set by the asset's Sell action; read by the VAT declaration's annex III-19⁶."
+msgstr "აქტივი, რომელიც ამ სტრიქონით გაიყიდა; ივსება აქტივის „გაყიდვის“ მოქმედებით და მას დღგ-ის დეკლარაციის დანართი №III-19⁶ კითხულობს."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_invoice_line__amount
+msgid ""
+"VAT of the invoice, or the increase of a correction: payable on B I, "
+"creditable on B II."
+msgstr "ანგარიშ-ფაქტურის დღგ ან კორექტირების შედეგად ზრდა: ბ I-ზე გადასახდელი, ბ II-ზე ჩასათვლელი."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration_line__value
+msgid "Value"
+msgstr "მნიშვნელობა"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_cell__slot
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_declaration_line__slot
+msgid "Value column of the portal row the cell sits in: 1, 2 or 3."
+msgstr "პორტალის სტრიქონის სვეტი, რომელშიც უჯრაა: 1, 2 ან 3."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_declaration_line__proposed_value
+msgid ""
+"What Odoo last proposed; the value is refreshed only while it still equals "
+"this."
+msgstr ""
+"Odoo-ს ბოლო შემოთავაზება; მნიშვნელობა მხოლოდ მაშინ ახლდება, როცა ჯერ კიდევ "
+"მას უდრის."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__account_asset__gec_margin_scheme__art
+msgid "Work of Art"
+msgstr "ხელოვნების ნიმუში"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"You cannot change the company or the month of a declaration that has values."
+" Create a new declaration."
+msgstr ""
+"მნიშვნელობების მქონე დეკლარაციის კომპანიისა და თვის შეცვლა შეუძლებელია. "
+"შექმენით ახალი დეკლარაცია."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_advance_line__settlement_id
+msgid "rs.ge Settlement"
+msgstr "rs.ge-ის გაქვითვა"
+
+#. module: gec_vat_declaration
+#: model:ir.model,name:gec_vat_declaration.model_gec_vat_declaration
+msgid "rs.ge VAT Declaration"
+msgstr "rs.ge დღგ-ის დეკლარაცია"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid "%(tab)s: %(name)s is cancelled in Odoo but still confirmed on rs.ge."
+msgstr "%(tab)s: %(name)s Odoo-ში გაუქმებულია, rs.ge-ზე კი ისევ დადასტურებულია."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"%(tab)s: correction %(name)s counts in %(month)s, the month the buyer accepted "
+"it."
+msgstr ""
+"%(tab)s: კორექტირება %(name)s აისახება %(month)s თვეში, როცა მყიდველმა ის "
+"დაადასტურა."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"%(tab)s: correction %(name)s is accepted on rs.ge but %(original)s still counts "
+"in Odoo: run Check Status on it (unreconcile its payments first)."
+msgstr ""
+"%(tab)s: კორექტირება %(name)s rs.ge-ზე დადასტურებულია, მაგრამ %(original)s Odoo-"
+"ში ისევ ითვლება: მასზე გაუშვით „სტატუსის შემოწმება“ (გადახდებს ჯერ შეჯერება "
+"გაუუქმეთ)."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid "%(tab)s: left out, rs.ge status %(status)s: %(names)s."
+msgstr "%(tab)s: არ შევიდა, rs.ge სტატუსი „%(status)s“: %(names)s."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid "%(tab)s: not on rs.ge: %(names)s."
+msgstr "%(tab)s: rs.ge-ზე არ არის: %(names)s."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"B I and tab 13: the invoices carry %(b1).2f VAT, more than A I rows 1-3 (%(a1).2f); the portal requires "
+"rows 1-3 to cover the invoices of the month."
+msgstr "ბ I და ჩანართი 13: ანგარიშ-ფაქტურების დღგ %(b1).2f მეტია ა I-ის 1-3 სტრიქონების დღგ-ზე (%(a1).2f); პორტალი მოითხოვს, რომ 1-3 სტრიქონები თვის ანგარიშ-ფაქტურებს ფარავდეს."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"%(tab)s: accepted on rs.ge but still drafts in Odoo, so their VAT is not "
+"credited: %(names)s."
+msgstr "%(tab)s: rs.ge-ზე დადასტურებულია, მაგრამ Odoo-ში ისევ მონახაზია, ამიტომ მათი დღგ არ ჩაითვალა: %(names)s."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"B II: bills and credit notes with VAT from Georgian suppliers not linked to "
+"an rs.ge invoice: %(names)s."
+msgstr "ბ II: ქართველი მომწოდებლების დღგ-იანი ანგარიშ-ფაქტურები და საკრედიტო ანგარიშ-ფაქტურები, რომლებიც rs.ge-ის ანგარიშ-ფაქტურასთან არ არის დაკავშირებული: %(names)s."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"%(tab)s: correction %(name)s: Odoo cancelled %(original)s of %(month)s, so "
+"Odoo's VAT of that month dropped and this month credits the full VAT; rs.ge "
+"counts only the change here."
+msgstr "%(tab)s: კორექტირება %(name)s: Odoo-მ გააუქმა %(month)s თვის %(original)s, ამიტომ იმ თვის დღგ Odoo-ში შემცირდა და ამ თვეში სრული დღგ ჩაითვალა; rs.ge აქ მხოლოდ სხვაობას ითვლის."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"B II and tab 14: the received invoices carry %(b2).2f VAT, A III row 1 claims %(a3).2f;"
+" row 1 is the VAT of tax invoices received, so check the bills that have no rs.ge invoice."
+msgstr "ბ II და ჩანართი 14: მიღებული ანგარიშ-ფაქტურების დღგ არის %(b2).2f, ა III-ის 1-ლ სტრიქონში კი — %(a3).2f; 1-ლი სტრიქონი მიღებული საგადასახადო ანგარიშ-ფაქტურების დღგ-ია, ამიტომ შეამოწმეთ მომწოდებლის ანგარიშ-ფაქტურები, რომლებიც rs.ge-ის ანგარიშ-ფაქტურასთან არ არის დაკავშირებული."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid "A III row 1 holds VAT without an rs.ge tax invoice in B II: %(bills)s."
+msgstr "ა III-ის 1-ლ სტრიქონში არის დღგ, რომელსაც ბ II-ში rs.ge-ის საგადასახადო ანგარიშ-ფაქტურა არ შეესაბამება: %(bills)s."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"B III: the customs declarations carry %(b3).2f VAT, A III row 2 claims %(a3).2f; row 2 is the VAT paid on "
+"imports: upload the customs declarations missing here, or book the import VAT of those listed."
+msgstr ""
+"ბ III: საბაჟო დეკლარაციების დღგ არის %(b3).2f, ა III-ის მე-2 სტრიქონში კი %(a3).2f; მე-2 სტრიქონი "
+"იმპორტზე გადახდილი დღგ-ია: ატვირთეთ საბაჟო დეკლარაციები, რომლებიც აქ არ არის, ან Odoo-ში გაატარეთ ჩამოთვლილი "
+"დეკლარაციების იმპორტის დღგ."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid "B III: %(file)s: the number, the date or the VAT was not found in the PDF; type it."
+msgstr "ბ III: %(file)s: ნომერი, თარიღი ან დღგ PDF-ში ვერ მოიძებნა; შეიყვანეთ ხელით."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid "B III: assessment number %(number)s is listed %(count)s times; delete the duplicate row."
+msgstr "ბ III: შეფასების ნომერი %(number)s მითითებულია %(count)s-ჯერ; წაშალეთ გამეორებული სტრიქონი."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid "B III: assessment %(number)s is dated %(date)s, outside the declaration month."
+msgstr "ბ III: შეფასება %(number)s დათარიღებულია %(date)s-ით, დეკლარაციის თვის გარეთ."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_customs_line__pdf_type__customs
+msgid "Customs declaration"
+msgstr "საბაჟო დეკლარაცია"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_customs_line__pdf_type__form4
+msgid "Form 4"
+msgstr "ფორმა 4"
+
+#. module: gec_vat_declaration
+#: model:ir.model,name:gec_vat_declaration.model_gec_vat_ref_line
+msgid "VAT Declaration Annex B IV / B V / B VIII / B IX Row"
+msgstr "დღგ-ის დეკლარაცია, დანართი ბ IV / ბ V / ბ VIII / ბ IX, სტრიქონი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_ref_line__grid__b4
+msgid "B IV"
+msgstr "ბ IV"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_ref_line__grid__b5
+msgid "B V"
+msgstr "ბ V"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_ref_line__grid__b8
+msgid "B VIII"
+msgstr "ბ VIII"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_ref_line__grid__b9
+msgid "B IX"
+msgstr "ბ IX"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_ref_line__grid
+msgid "Annex"
+msgstr "დანართი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_ref_line__ref_number
+msgid "Document Number"
+msgstr "დოკუმენტის ნომერი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_ref_line__ref_number
+msgid "The acquisition document number on B IV, the declaration number on B V, B VIII and B IX."
+msgstr "შეძენის დამადასტურებელი დოკუმენტის ნომერი ბ IV-ში, დეკლარაციის ნომერი ბ V-ში, ბ VIII-სა და ბ IX-ში."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_ref_line__ref_date
+msgid "Purchase Date"
+msgstr "შესყიდვის თარიღი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_ref_line__period
+msgid "Period"
+msgstr "პერიოდი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_ref_line__period
+msgid "Reporting month on annexes B V, B VIII and B IX; the first day stands for the month."
+msgstr "ბ V, ბ VIII და ბ IX დანართების საანგარიშო თვე; თვის პირველი დღე თვეს აღნიშნავს."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_ref_line__partner_tin
+msgid "The seller's Tax ID on annex B IV, the supplier's on annex B V."
+msgstr "ბ IV დანართში გამყიდველის, ბ V დანართში მომწოდებლის საიდენტიფიკაციო ნომერი."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_ref_line__partner_name
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_line__partner_name
+msgid "Partner Name"
+msgstr "კონტრაგენტის დასახელება"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_ref_line__owner_tin
+msgid "Owner Tax ID"
+msgstr "მესაკუთრის ს/ნ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_ref_line__owner_name
+msgid "Owner Name"
+msgstr "მესაკუთრის დასახელება"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__b4_amount
+msgid "B IV VAT"
+msgstr "ბ IV დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__b5_amount
+msgid "B V VAT"
+msgstr "ბ V დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__b8_amount
+msgid "B VIII VAT"
+msgstr "ბ VIII დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__b9_amount
+msgid "B IX VAT"
+msgstr "ბ IX დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__b4_line_ids
+msgid "B4 Line"
+msgstr "ბ IV სტრიქონი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__b5_line_ids
+msgid "B5 Line"
+msgstr "ბ V სტრიქონი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__b8_line_ids
+msgid "B8 Line"
+msgstr "ბ VIII სტრიქონი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__b9_line_ids
+msgid "B9 Line"
+msgstr "ბ IX სტრიქონი"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+msgid "7 · B-IV Auction Purchases"
+msgstr "7 · ბ-IV აუქციონზე შეძენილი"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+msgid "8 · B-V Barter"
+msgstr "8 · ბ-V ბარტერი"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+msgid "10 · B-VIII Turnover Corrections"
+msgstr "10 · ბ-VIII ბრუნვის კორექტირება"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+msgid "11 · B-IX Reverse-charge Corrections"
+msgstr "11 · ბ-IX უკუდაბეგვრის კორექტირება"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid "A III row 8 claims %(a3).2f, more than B IV (%(b4).2f)."
+msgstr "ა III-ის მე-8 სტრიქონში მითითებულია %(a3).2f, რაც ბ IV-ის ჯამზე (%(b4).2f) მეტია."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid "A III row 7 claims %(a3).2f, more than B V (%(b5).2f)."
+msgstr "ა III-ის მე-7 სტრიქონში მითითებულია %(a3).2f, რაც ბ V-ის ჯამზე (%(b5).2f) მეტია."
+
+#. module: gec_vat_declaration
+#: model:ir.model,name:gec_vat_declaration.model_gec_vat_rc_declaration
+msgid "Reverse-charge VAT Calculation"
+msgstr "უკუდაბეგვრის წესით დარიცხული დღგ-ის გაანგარიშება"
+
+#. module: gec_vat_declaration
+#: model:ir.model,name:gec_vat_declaration.model_gec_vat_rc_line
+msgid "Reverse-charge VAT Calculation Row"
+msgstr "უკუდაბეგვრის წესით დარიცხული დღგ-ის გაანგარიშების სტრიქონი"
+
+#. module: gec_vat_declaration
+#: model:ir.actions.act_window,name:gec_vat_declaration.action_gec_vat_rc_declaration
+#: model:ir.ui.menu,name:gec_vat_declaration.menu_gec_vat_rc_declaration
+msgid "Reverse-charge VAT (rs.ge)"
+msgstr "უკუდაბეგვრის დღგ (rs.ge)"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.actions.act_window,help:gec_vat_declaration.action_gec_vat_rc_declaration
+msgid "Create the reverse-charge VAT calculation of a month"
+msgstr "შექმენით თვის უკუდაბეგვრის წესით დარიცხული დღგ-ის გაანგარიშება"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.actions.act_window,help:gec_vat_declaration.action_gec_vat_rc_declaration
+msgid "For companies not registered for VAT. Generate lists the foreign service bills of the month; type the goods rows and the corrections by hand, then type the result into the rs.ge portal."
+msgstr "ეს ფორმა დღგ-ზე რეგისტრირებული არ არის კომპანიებისთვის. გენერირება თვის უცხოური მომსახურების ანგარიშ-ფაქტურებს ჩამოთვლის; საქონლის სტრიქონები და შესწორებები ხელით შეიყვანეთ, შემდეგ შედეგი rs.ge პორტალზე შეიტანეთ."
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_rc_declaration_form
+msgid "I-II · Services"
+msgstr "I-II · მომსახურება"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_rc_declaration_form
+msgid "III-IV · Goods"
+msgstr "III-IV · საქონელი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_rc_line__part__services
+msgid "Services"
+msgstr "მომსახურება"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_rc_line__part__goods
+msgid "Goods"
+msgstr "საქონელი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_rc_declaration__services_vat_after_proposed
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_rc_declaration__services_vat_before_proposed
+msgid "What Generate last proposed; the value follows only while it is unchanged."
+msgstr "ბოლო გენერირებისას შემოთავაზებული მნიშვნელობა; მნიშვნელობა მას მიჰყვება მხოლოდ მანამ, სანამ უცვლელია."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_rc_declaration__portal_number
+msgid "The calculation number the rs.ge portal gave."
+msgstr "rs.ge პორტალის მიერ მინიჭებული გაანგარიშების ნომერი."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__services_line_ids
+msgid "Services Line"
+msgstr "მომსახურების სტრიქონი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__services_vat_before
+msgid "Services VAT Before Correction"
+msgstr "მომსახურების დღგ კორექტირებამდე"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__services_vat_after
+msgid "Services VAT After Correction"
+msgstr "მომსახურების დღგ კორექტირების შემდეგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__services_amount_total
+msgid "Services Amount Total"
+msgstr "მომსახურების თანხა სულ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__services_vat_total
+msgid "Services VAT Total"
+msgstr "მომსახურების დღგ სულ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__services_vat_increase
+msgid "Services VAT Increase"
+msgstr "მომსახურების დღგ-ის ზრდა"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__services_vat_decrease
+msgid "Services VAT Decrease"
+msgstr "მომსახურების დღგ-ის შემცირება"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__services_vat_payable
+msgid "Services VAT Payable"
+msgstr "მომსახურების გადასახდელი დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__services_vat_refund
+msgid "Services VAT Refund"
+msgstr "მომსახურების დასაბრუნებელი დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__goods_line_ids
+msgid "Goods Line"
+msgstr "საქონლის სტრიქონი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__goods_vat_before
+msgid "Goods VAT Before Correction"
+msgstr "საქონლის დღგ კორექტირებამდე"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__goods_vat_after
+msgid "Goods VAT After Correction"
+msgstr "საქონლის დღგ კორექტირების შემდეგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__goods_amount_total
+msgid "Goods Amount Total"
+msgstr "საქონლის თანხა სულ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__goods_vat_total
+msgid "Goods VAT Total"
+msgstr "საქონლის დღგ სულ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__goods_vat_increase
+msgid "Goods VAT Increase"
+msgstr "საქონლის დღგ-ის ზრდა"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__goods_vat_decrease
+msgid "Goods VAT Decrease"
+msgstr "საქონლის დღგ-ის შემცირება"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__goods_vat_payable
+msgid "Goods VAT Payable"
+msgstr "საქონლის გადასახდელი დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__goods_vat_refund
+msgid "Goods VAT Refund"
+msgstr "საქონლის დასაბრუნებელი დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__vat_accrued
+msgid "VAT Accrued"
+msgstr "დღგ-ის დარიცხვა"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_line__move_id
+msgid "Odoo Bill"
+msgstr "Odoo-ს ანგარიშ-ფაქტურა"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_rc_line__move_id
+msgid "Set on rows built by Generate; a row without it was typed."
+msgstr "ივსება გენერირებით შექმნილ სტრიქონებზე; სტრიქონი მის გარეშე ხელით არის შეტანილი."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_gec_vat_stock_line__product_ids
+msgid "Set on rows built by Generate; a row without products was typed."
+msgstr "ივსება გენერირებისას; სტრიქონი პროდუქტების გარეშე ხელით არის შეყვანილი."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_line__description
+msgid "Description"
+msgstr "აღწერა"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_line__date
+msgid "Date"
+msgstr "თარიღი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_account_move_line__gec_rc_service
+msgid "Service Type"
+msgstr "მომსახურების სახე"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,help:gec_vat_declaration.field_account_move_line__gec_rc_service
+msgid "Service type shown on the reverse-charge VAT calculation (annex III-19); empty = the product name."
+msgstr "მომსახურების სახე, რომელიც ჩანს უკუდაბეგვრის წესით დარიცხული დღგ-ის გაანგარიშებაში (დანართი III-19); ცარიელის შემთხვევაში პროდუქტის დასახელება."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_rc_declaration.py:0
+msgid "The tax Reverse Charge 18% Non-Deductible is missing: update gec_localization."
+msgstr "გადასახადი „უკუდაბეგვრა 18% ჩაუთვლელი“ ვერ მოიძებნა: განაახლეთ gec_localization."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_rc_declaration.py:0
+msgid "This company is a VAT payer: reverse charge belongs to its monthly VAT declaration, not to this calculation."
+msgstr "ეს კომპანია დღგ-ის გადამხდელია: უკუდაბეგვრა მის ყოველთვიურ დღგ-ის დეკლარაციაში აისახება და არა ამ გაანგარიშებაში."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_rc_declaration.py:0
+msgid "Another calculation exists for this company, month and type: %(names)s."
+msgstr "ამ კომპანიის, თვისა და ტიპის სხვა გაანგარიშებაც არსებობს: %(names)s."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_rc_declaration.py:0
+msgid "Left out of Part I: %(items)s."
+msgstr "I ნაწილში არ შევიდა: %(items)s."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_rc_declaration.py:0
+msgid "vendor has no country"
+msgstr "მომწოდებელს ქვეყანა არ აქვს"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_rc_declaration.py:0
+msgid "no product"
+msgstr "პროდუქტი არ არის"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_rc_declaration.py:0
+msgid "product is not a service"
+msgstr "პროდუქტი მომსახურება არ არის"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_rc_declaration.py:0
+msgid "zero or negative amount"
+msgstr "ნულოვანი ან უარყოფითი თანხა"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_rc_declaration.py:0
+msgid "Part II rows 4/5 were filled from the corrections of this month: %(names)s."
+msgstr "II ნაწილის მე-4/მე-5 სტრიქონები შეივსო ამ თვის კორექტირებებიდან: %(names)s."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_rc_declaration.py:0
+msgid ""
+"Part II row %(row)s keeps the typed %(typed).2f; Odoo calculates %(odoo).2f "
+"from this month's corrections."
+msgstr ""
+"II ნაწილის მე-%(row)s სტრიქონში რჩება ხელით შეყვანილი %(typed).2f; Odoo ამ "
+"თვის კორექტირებებიდან ითვლის %(odoo).2f-ს."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_rc_declaration.py:0
+msgid "Credit notes of foreign vendors that do not reverse a whole bill, so Part I may be too high: %(names)s."
+msgstr "უცხოელი გამყიდველების საკრედიტო ანგარიშ-ფაქტურები, რომლებიც მთელ ანგარიშ-ფაქტურას არ აუქმებს, ამიტომ I ნაწილი შეიძლება ზედმეტად მაღალი იყოს: %(names)s."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_rc_declaration.py:0
+msgid "Bill %(name)s of %(month)s was cancelled: file an adjusted calculation for %(month)s."
+msgstr "ანგარიშ-ფაქტურა %(name)s (%(month)s) გაუქმდა: წარადგინეთ დაზუსტებული გაანგარიშება %(month)s თვისთვის."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_rc_declaration.py:0
+msgid "You cannot change the company or the month of a calculation that has rows. Create a new calculation."
+msgstr "ვერ შეცვლით იმ გაანგარიშების კომპანიას ან თვეს, რომელსაც სტრიქონები აქვს. შექმენით ახალი გაანგარიშება."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/account_move.py:0
+msgid "The filed declaration %(names)s lists %(moves)s: reset it to draft first."
+msgstr "წარდგენილ დეკლარაციაში %(names)s შეტანილია %(moves)s: ჯერ მონახაზში დააბრუნეთ."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/account_asset.py:0
+msgid ""
+"%(line)s already sold %(asset)s: sell each asset on its own invoice line, or click Set to Running on "
+"%(asset)s if it was sold by mistake."
+msgstr "%(line)s-ზე უკვე გაიყიდა %(asset)s: თითოეული აქტივი ანგარიშ-ფაქტურის ცალკე სტრიქონზე გაყიდეთ ან, თუ %(asset)s შეცდომით გაიყიდა, მის ფორმაზე დააჭირეთ ღილაკს „მიმდინარედ დაყენება“."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_rc_declaration.py:0
+msgid "A row amount cannot be negative: enter corrections in Part II or IV rows 4 and 5."
+msgstr "სტრიქონის თანხა უარყოფითი ვერ იქნება: კორექტირებები შეიყვანეთ II ან IV ნაწილის მე-4 და მე-5 სტრიქონებში."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_advance_line__part__spec_sale
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_invoice_line__part__spec_sale
+msgid "Issued Petroleum (tab 13)"
+msgstr "გამოწერილი ნსაფ (ჩანართი 13)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_advance_line__part__spec_purchase
+#: model:ir.model.fields.selection,name:gec_vat_declaration.selection__gec_vat_invoice_line__part__spec_purchase
+msgid "Received Petroleum (tab 14)"
+msgstr "მიღებული ნსაფ (ჩანართი 14)"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+msgid "13 · Issued Petroleum Invoices"
+msgstr "13 · გამოწერილი ნსაფ"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+msgid "14 · Received Petroleum Invoices"
+msgstr "14 · მიღებული ნსაფ"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+msgid "15 · Petroleum Stock Balances"
+msgstr "15 · ფაქტიურად დარიცხული ნაშთები"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__korect_date
+msgid "Corrected Date"
+msgstr "კორექტირებული ანგარიშ-ფაქტურის თარიღი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__operation_date
+msgid "Operation Date"
+msgstr "ოპერაციის თარიღი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__station_from
+msgid "Departure Station"
+msgstr "გაგზავნის სტაციონარის N"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__station_to
+msgid "Destination Station"
+msgstr "დანიშნულების სტაციონარის N"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__product_code
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__product_code
+msgid "RS Product Code"
+msgstr "ნავთობპროდუქტის კოდი"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__quantity_l
+msgid "Litres"
+msgstr "რაოდენობა ლიტრებში"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_invoice_line__quantity_kg
+msgid "Kilograms"
+msgstr "რაოდენობა კილოგრამებში"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__b13_amount
+msgid "Tab 13 VAT Payable"
+msgstr "13 გადასახდელი დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__b13_reduce_amount
+msgid "Tab 13 VAT Reduced"
+msgstr "13 შესამცირებელი დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__b13_advance_amount
+msgid "Tab 13 Advance VAT"
+msgstr "13 ავანსის დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__b14_amount
+msgid "Tab 14 VAT Creditable"
+msgstr "14 ჩასათვლელი დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__b14_reduce_amount
+msgid "Tab 14 VAT Reduced"
+msgstr "14 შესამცირებელი დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__b14_advance_amount
+msgid "Tab 14 Advance VAT"
+msgstr "14 ავანსის დღგ"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__spec_line_ids
+msgid "Tab 13 Invoices"
+msgstr "ჩანართი 13: ანგარიშ-ფაქტურები"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__spec_advance_line_ids
+msgid "Tab 13 Advances"
+msgstr "ჩანართი 13: ავანსები"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__spec_purchase_line_ids
+msgid "Tab 14 Invoices"
+msgstr "ჩანართი 14: ანგარიშ-ფაქტურები"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__spec_purchase_advance_line_ids
+msgid "Tab 14 Advances"
+msgstr "ჩანართი 14: ავანსები"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__product_ids
+msgid "Products"
+msgstr "პროდუქტები"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__opening_kg
+msgid "Opening (kg)"
+msgstr "ნაშთი თვის დასაწყისში (კგ)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__opening_l
+msgid "Opening (L)"
+msgstr "ნაშთი თვის დასაწყისში (ლ)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__received_kg
+msgid "Received (kg)"
+msgstr "მიღებული და წარმოებული (კგ)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__received_l
+msgid "Received (L)"
+msgstr "მიღებული და წარმოებული (ლ)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__spec_sold_kg
+msgid "Sold with ნსაფ (kg)"
+msgstr "რეალიზებული ნსაფ-ით (კგ)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__spec_sold_l
+msgid "Sold with ნსაფ (L)"
+msgstr "რეალიზებული ნსაფ-ით (ლ)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__sold_kg
+msgid "Sold without Discount (kg)"
+msgstr "ფასდათმობის გარეშე რეალიზებული, რაოდენობა (კგ)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__sold_l
+msgid "Sold without Discount (L)"
+msgstr "ფასდათმობის გარეშე რეალიზებული, რაოდენობა (ლ)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__sold_amount_kg
+msgid "Sold without Discount, Amount (kg)"
+msgstr "ფასდათმობის გარეშე რეალიზებული, თანხა (კგ)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__sold_amount_l
+msgid "Sold without Discount, Amount (L)"
+msgstr "ფასდათმობის გარეშე რეალიზებული, თანხა (ლ)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__discount_sold_kg
+msgid "Sold with Discount (kg)"
+msgstr "ფასდათმობით რეალიზებული, რაოდენობა (კგ)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__discount_sold_l
+msgid "Sold with Discount (L)"
+msgstr "ფასდათმობით რეალიზებული, რაოდენობა (ლ)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__discount_amount_kg
+msgid "Sold with Discount, Amount (kg)"
+msgstr "ფასდათმობით რეალიზებული, თანხა (კგ)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__discount_amount_l
+msgid "Sold with Discount, Amount (L)"
+msgstr "ფასდათმობით რეალიზებული, თანხა (ლ)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__own_use_kg
+msgid "Own Use (kg)"
+msgstr "გახარჯული პირადი მოხმარებისათვის (კგ)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__own_use_l
+msgid "Own Use (L)"
+msgstr "გახარჯული პირადი მოხმარებისათვის (ლ)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__processed_kg
+msgid "Processed (kg)"
+msgstr "გადამუშავებულის ოდენობა (კგ)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__processed_l
+msgid "Processed (L)"
+msgstr "გადამუშავებულის ოდენობა (ლ)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__closing_kg
+msgid "Closing (kg)"
+msgstr "ნაშთი თვის ბოლოსთვის (კგ)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_stock_line__closing_l
+msgid "Closing (L)"
+msgstr "ნაშთი თვის ბოლოსთვის (ლ)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__stock_line_ids
+msgid "Tab 15 Stock Balances"
+msgstr "ჩანართი 15: ნაშთები"
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+msgid ""
+"Generate builds the rows from the petroleum invoices (ნსაფ) rs.ge accepted; a correction\n"
+"                                appears in the month the buyer accepted it, with the change against the invoice it corrects.\n"
+"                                Rows linked to an Odoo invoice are rebuilt on every Generate; add a row for a paper invoice."
+msgstr "გენერირება სტრიქონებს rs.ge-ზე დადასტურებული ნსაფ-ებიდან ქმნის; კორექტირება აისახება იმ თვეში, როცა მყიდველმა ის დაადასტურა, კორექტირებულ ანგარიშ-ფაქტურასთან სხვაობით. Odoo-ს ანგარიშ-ფაქტურასთან დაკავშირებული სტრიქონები ყოველი გენერირებისას თავიდან იქმნება; ქაღალდის ანგარიშ-ფაქტურისთვის დაამატეთ სტრიქონი."
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+msgid ""
+"Generate builds the rows from the vendor bills imported as petroleum invoices (ნსაფ) that\n"
+"                                are accepted on rs.ge, in the month of their accounting date; a correction shows the change\n"
+"                                against the bill it corrects. Add a row for a paper invoice or an advance offset."
+msgstr "გენერირება სტრიქონებს ნსაფ-ად იმპორტირებული, rs.ge-ზე დადასტურებული მომწოდებლის ანგარიშ-ფაქტურებიდან ქმნის, მათი ბუღალტრული თარიღის თვეში; კორექტირება კორექტირებულ ანგარიშ-ფაქტურასთან სხვაობას აჩვენებს. ქაღალდის ანგარიშ-ფაქტურისთვის ან ავანსის გაქვითვისთვის დაამატეთ სტრიქონი."
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+msgid ""
+"Generate builds one row per petroleum product code: the stock at the start of the month, the vendor\n"
+"                                receipts of the month, the quantities sold with ნსაფ (tab 13) and the invoiced sales without\n"
+"                                ნსაფ, with and without a line discount (amounts with VAT). Own use, processed and the closing\n"
+"                                balance are left empty; type them on the portal. Add a row for a product Odoo does not hold."
+msgstr "გენერირება ქმნის თითო სტრიქონს ნავთობპროდუქტის თითო ოთხნიშნა კოდისთვის: ნაშთი თვის დასაწყისში, თვის განმავლობაში მომწოდებლისგან მიღებული რაოდენობა, ნსაფ-ით რეალიზებული რაოდენობა (ჩანართი 13) და ნსაფ-ის გარეშე, ანგარიშ-ფაქტურით რეალიზებული, ფასდათმობითა და ფასდათმობის გარეშე (თანხები დღგ-ის ჩათვლით). პირადი მოხმარებისათვის გახარჯული, გადამუშავებული და თვის ბოლოს ნაშთი ცარიელი რჩება; შეიყვანეთ პორტალზე. დაამატეთ სტრიქონი იმ პროდუქტისთვის, რომელიც Odoo-ში არ არის."
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_declaration__scan_warnings
+msgid "Scan Warnings"
+msgstr "სკანირების გაფრთხილებები"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__services_vat_after_proposed
+msgid "Services Vat After Proposed"
+msgstr "მომსახურების დღგ კორექტირების შემდეგ (შემოთავაზებული)"
+
+#. module: gec_vat_declaration
+#: model:ir.model.fields,field_description:gec_vat_declaration.field_gec_vat_rc_declaration__services_vat_before_proposed
+msgid "Services Vat Before Proposed"
+msgstr "მომსახურების დღგ კორექტირებამდე (შემოთავაზებული)"
+
+#. module: gec_vat_declaration
+#: model:ir.model,name:gec_vat_declaration.model_gec_vat_declaration_row
+msgid "VAT Declaration Row"
+msgstr "დღგ-ის დეკლარაციის სტრიქონი"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"%(tab)s: correction %(name)s is posted but not accepted on rs.ge yet, and "
+"%(original)s still counts in Odoo: Odoo's VAT holds both until it is "
+"accepted."
+msgstr ""
+"%(tab)s: კორექტირება %(name)s გატარებულია, მაგრამ rs.ge-ზე ჯერ არ არის "
+"დადასტურებული, %(original)s კი Odoo-ში ისევ ითვლება: დადასტურებამდე "
+"Odoo-ს დღგ ორივეს ითვლის."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"%(tab)s: correction %(name)s is dated %(month)s and the reversal of "
+"%(original)s %(reversal_month)s, so %(row)s row 1 of both months differs "
+"from rs.ge, which counts only the change."
+msgstr ""
+"%(tab)s: კორექტირება %(name)s დათარიღებულია %(month)s თვით, "
+"%(original)s-ის საპირისპირო გატარება კი %(reversal_month)s თვით, ამიტომ "
+"ორივე თვის %(row)s-ის 1-ლი სტრიქონი rs.ge-სგან განსხვავდება, რომელიც "
+"მხოლოდ სხვაობას ითვლის."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"%(tab)s: corrections accepted on rs.ge but still drafts in Odoo, so their "
+"VAT is not counted: %(names)s."
+msgstr ""
+"%(tab)s: rs.ge-ზე დადასტურებული კორექტირებები Odoo-ში ისევ მონახაზებია, "
+"ამიტომ მათი დღგ არ ითვლება: %(names)s."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"%(tab)s: %(names)s are dated on rs.ge in an earlier month but booked in "
+"this one: their VAT is in this month's A I and on that month's B I; file "
+"an adjusted declaration for that month."
+msgstr ""
+"%(tab)s: %(names)s rs.ge-ზე ადრინდელი თვითაა დათარიღებული, Odoo-ში კი ამ "
+"თვეშია გატარებული: მათი დღგ ამ თვის ა I-შია, ბ I-ში კი იმ თვისაა; იმ "
+"თვისთვის დაზუსტებული დეკლარაცია წარადგინეთ."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"Cell 7 holds %(cell7).2f, but A I row 1 is Odoo's figure, which already "
+"subtracts the month's credit notes and corrections: type in cell 7 only "
+"decreases not booked in Odoo."
+msgstr ""
+"მე-7 უჯრაში %(cell7).2f წერია, მაგრამ ა I-ის 1-ლი სტრიქონი Odoo-ს "
+"მონაცემია, რომელიც თვის საკრედიტო ანგარიშ-ფაქტურებსა და კორექტირებებს უკვე "
+"აკლებს: მე-7 "
+"უჯრაში მხოლოდ Odoo-ში გაუტარებელი შემცირება შეიყვანეთ."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"Cell 7 holds %(cell7).2f, more than the VAT reduced in B I, tab 13 and B "
+"VIII (%(cap).2f); per the portal, cell 7 must not exceed that sum."
+msgstr ""
+"მე-7 უჯრაში %(cell7).2f წერია, რაც ბ I-ის, მე-13 ჩანართისა და ბ VIII-ის "
+"შესამცირებელი დღგ-ის ჯამზე (%(cap).2f) მეტია; პორტალის მიხედვით, მე-7 "
+"უჯრა ამ ჯამს არ უნდა აღემატებოდეს."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"Mark as Filed also locks this month for %(names)s (own Tax ID): file their "
+"declarations first."
+msgstr ""
+"წარდგენილად მონიშვნა ამ თვეს %(names)s-ისთვისაც (საკუთარი ს/ნ) ჩაკეტავს: "
+"ჯერ მათი დეკლარაციები წარადგინეთ."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid "%s can be marked as filed only after its month has ended."
+msgstr "%s წარდგენილად მხოლოდ თვის დასრულების შემდეგ შეიძლება მოინიშნოს."
+
+#. module: gec_vat_declaration
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_declaration_form
+#: model_terms:ir.ui.view,arch_db:gec_vat_declaration.view_gec_vat_rc_declaration_form
+msgid "Marking as filed locks the tax month for the company and all its branches; Reset to Draft does not unlock it. Continue?"
+msgstr "წარდგენილად მონიშვნა ჩაკეტავს საგადასახადო თვეს კომპანიისა და მისი ყველა ფილიალისთვის; მონახაზზე დაბრუნება მას არ გახსნის. გავაგრძელოთ?"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid "A I"
+msgstr "ა I"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid "A II"
+msgstr "ა II"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid "A III"
+msgstr "ა III"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid "B I"
+msgstr "ბ I"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid "B II"
+msgstr "ბ II"
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_declaration.py:0
+msgid ""
+"%(name)s: %(names)s of earlier months are not filed yet, and marking as filed locks every earlier "
+"month; file or delete them first."
+msgstr ""
+"%(name)s: წინა თვეების %(names)s წარდგენილი არ არის, წარდგენილად მონიშვნა კი ყველა წინა თვეს ჩაკეტავს; "
+"ჯერ ისინი წარადგინეთ ან წაშალეთ."
+
+#. module: gec_vat_declaration
+#. odoo-python
+#: code:addons/gec_vat_declaration/models/gec_vat_rc_declaration.py:0
+msgid ""
+"%(bills)s are declared in Part I, but their lines have no reverse-charge tax, so Odoo books no VAT for "
+"them: reset them to draft and add the tax %(tax)s to their lines."
+msgstr ""
+"%(bills)s I ნაწილში შევიდა, მაგრამ მათ ხაზებს უკუდაბეგვრის გადასახადი არ აქვს, ამიტომ Odoo მათზე დღგ-ს "
+"არ ატარებს: დააბრუნეთ ისინი მონახაზზე და მათ ხაზებს დაამატეთ გადასახადი „%(tax)s“."

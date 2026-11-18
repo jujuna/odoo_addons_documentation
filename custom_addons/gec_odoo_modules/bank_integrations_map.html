@@ -1,0 +1,1864 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Georgian Bank Integrations — One Map</title>
+<meta name="description" content="One developer map for the five gec_odoo_modules bank integrations: gec_bank (shared contract), gec_payroll_bank (engine), tbc_bank, bog_bank and basis_bank. Shared spine, differences, failure playbook, all in one visual page.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --ground:#F3F4F1;--surface:#FFFFFF;--surface-2:#F8F9F7;--surface-3:#F1F3F0;
+  --ink:#1B2330;--muted:#5A6574;--faint:#8B95A3;
+  --line:#DCE1E6;--line-2:#EBEEF1;--code-bg:#F1F4F3;
+  --base:#1F4E8C;--base-2:#E7EFF9;--base-3:#D5E4F5;
+  --payroll:#2E7D4F;--payroll-2:#E2F1E8;--payroll-3:#CAE6D6;
+  --tbc:#0E7C8C;--tbc-2:#DDF0F2;--tbc-3:#BEE3E7;
+  --bog:#B45309;--bog-2:#FAEBD9;--bog-3:#F2D8B4;
+  --basis:#6D28D9;--basis-2:#EDE7FB;--basis-3:#DCD0F6;
+  --ok:#227A4B;--ok-2:#E2F1E8;--warn:#B45309;--warn-2:#FAEBD9;--bad:#B42318;--bad-2:#FBE9E7;--info:#1F4E8C;--info-2:#E7EFF9;
+  --shadow:0 1px 2px rgba(20,30,40,.05),0 10px 30px rgba(20,30,40,.06);
+  --shadow-lg:0 2px 6px rgba(20,30,40,.06),0 24px 60px rgba(20,30,40,.10);
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --r:16px;--r-sm:10px;--r-xs:7px;
+  --w:1180px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#111519;--surface:#1A1F26;--surface-2:#20262E;--surface-3:#252C35;
+    --ink:#E6EAEE;--muted:#A2ACB8;--faint:#77828E;
+    --line:#2C343E;--line-2:#242C35;--code-bg:#171D24;
+    --base:#7FA7E0;--base-2:#1C2A3E;--base-3:#24344C;
+    --payroll:#6CC08B;--payroll-2:#18301F;--payroll-3:#1F3E2A;
+    --tbc:#4FBAC6;--tbc-2:#12333A;--tbc-3:#17424B;
+    --bog:#E0A052;--bog-2:#38260F;--bog-3:#493218;
+    --basis:#B08CF2;--basis-2:#271B44;--basis-3:#33245A;
+    --ok:#6CC08B;--ok-2:#18301F;--warn:#E0A052;--warn-2:#38260F;--bad:#E5645A;--bad-2:#3B1D1B;--info:#7FA7E0;--info-2:#1C2A3E;
+    --shadow:0 1px 2px rgba(0,0,0,.35),0 10px 30px rgba(0,0,0,.3);
+    --shadow-lg:0 2px 6px rgba(0,0,0,.4),0 24px 60px rgba(0,0,0,.45);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#111519;--surface:#1A1F26;--surface-2:#20262E;--surface-3:#252C35;
+  --ink:#E6EAEE;--muted:#A2ACB8;--faint:#77828E;
+  --line:#2C343E;--line-2:#242C35;--code-bg:#171D24;
+  --base:#7FA7E0;--base-2:#1C2A3E;--base-3:#24344C;
+  --payroll:#6CC08B;--payroll-2:#18301F;--payroll-3:#1F3E2A;
+  --tbc:#4FBAC6;--tbc-2:#12333A;--tbc-3:#17424B;
+  --bog:#E0A052;--bog-2:#38260F;--bog-3:#493218;
+  --basis:#B08CF2;--basis-2:#271B44;--basis-3:#33245A;
+  --ok:#6CC08B;--ok-2:#18301F;--warn:#E0A052;--warn-2:#38260F;--bad:#E5645A;--bad-2:#3B1D1B;--info:#7FA7E0;--info-2:#1C2A3E;
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 10px 30px rgba(0,0,0,.3);
+  --shadow-lg:0 2px 6px rgba(0,0,0,.4),0 24px 60px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+body{margin:0;background:var(--ground);color:var(--ink);font:14.5px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+::selection{background:var(--base-3);color:var(--ink)}
+a{color:var(--base);text-decoration:none}
+a:hover{text-decoration:underline}
+code,kbd,.mono{font-family:var(--mono);font-size:.86em}
+code{background:var(--code-bg);border:1px solid var(--line-2);border-radius:5px;padding:.1em .38em;white-space:nowrap}
+.wrap{max-width:var(--w);margin:0 auto;padding:0 22px}
+h1,h2,h3,h4{margin:0;line-height:1.25;font-weight:600;letter-spacing:-.01em}
+p{margin:0 0 12px}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--base);outline-offset:2px;border-radius:4px}
+
+/* ---------- top bar ---------- */
+.topbar{position:sticky;top:0;z-index:60;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+.topbar-inner{display:flex;align-items:center;gap:18px;height:58px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;white-space:nowrap;text-decoration:none!important;color:var(--ink)}
+.brand .dots{display:flex;gap:3px}
+.brand .dot{width:9px;height:9px;border-radius:3px}
+.brand small{font-weight:400;color:var(--faint);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.nav{display:flex;gap:2px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{padding:7px 11px;border-radius:999px;color:var(--muted);font-size:12.5px;font-weight:500;white-space:nowrap;text-decoration:none!important}
+.nav a:hover{color:var(--ink);background:var(--surface-2)}
+.nav a.active{color:var(--base);background:var(--base-2)}
+.theme-btn{flex:0 0 auto;width:34px;height:34px;border:1px solid var(--line);border-radius:10px;display:grid;place-items:center;color:var(--muted)}
+.theme-btn:hover{color:var(--ink);background:var(--surface-2)}
+.progress{position:fixed;top:0;left:0;height:3px;width:0%;background:linear-gradient(90deg,var(--base),var(--tbc),var(--bog),var(--basis));z-index:70;transition:width .1s linear}
+
+/* ---------- hero ---------- */
+.hero{padding:64px 0 30px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:-40% -10% auto -10%;height:420px;background:
+ radial-gradient(600px 300px at 20% 10%,color-mix(in srgb,var(--base) 12%,transparent),transparent 70%),
+ radial-gradient(500px 260px at 80% 0%,color-mix(in srgb,var(--tbc) 12%,transparent),transparent 70%),
+ radial-gradient(500px 260px at 55% 40%,color-mix(in srgb,var(--basis) 10%,transparent),transparent 70%);
+ pointer-events:none}
+.hero .wrap{position:relative}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+.eyebrow .bar{width:26px;height:2px;background:linear-gradient(90deg,var(--base),var(--tbc),var(--bog),var(--basis));border-radius:2px}
+h1.title{font-size:clamp(30px,4.6vw,46px);font-weight:700;letter-spacing:-.025em;max-width:900px}
+h1.title em{font-style:normal;background:linear-gradient(90deg,var(--base),var(--tbc) 40%,var(--bog) 70%,var(--basis));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .lead{max-width:780px;font-size:16.5px;color:var(--muted);margin-top:16px}
+.hero .lead strong{color:var(--ink);font-weight:600}
+.statrow{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px;min-width:118px;box-shadow:var(--shadow)}
+.stat b{display:block;font-size:22px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.stat span{font-size:11px;color:var(--muted);letter-spacing:.04em}
+.stat.s-base b{color:var(--base)}.stat.s-payroll b{color:var(--payroll)}.stat.s-tbc b{color:var(--tbc)}.stat.s-bog b{color:var(--bog)}.stat.s-basis b{color:var(--basis)}
+.startrow{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:30px}
+.startcard{display:block;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 18px 16px;box-shadow:var(--shadow);color:var(--ink);text-decoration:none!important;position:relative;overflow:hidden;transition:transform .18s ease,box-shadow .18s ease}
+.startcard:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);text-decoration:none}
+.startcard::after{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--sc,var(--base))}
+.startcard h3{font-size:15px;margin-bottom:5px}
+.startcard p{margin:0;font-size:12.8px;color:var(--muted)}
+.startcard .go{display:inline-block;margin-top:10px;font-size:12px;font-weight:600;color:var(--sc,var(--base))}
+
+/* ---------- sections ---------- */
+section{padding:58px 0 8px;scroll-margin-top:70px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--faint);letter-spacing:.06em}
+.sec-head h2{font-size:clamp(22px,3vw,30px);letter-spacing:-.02em}
+.sec-sub{max-width:820px;color:var(--muted);font-size:14.5px;margin:6px 0 24px}
+.sec-sub strong{color:var(--ink)}
+.divider{height:1px;background:var(--line);margin-top:52px}
+
+/* ---------- generic cards/chips ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:500;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);white-space:nowrap}
+.chip.mono{font-family:var(--mono);font-size:10.5px}
+.chip.c-base{background:var(--base-2);border-color:var(--base-3);color:var(--base)}
+.chip.c-payroll{background:var(--payroll-2);border-color:var(--payroll-3);color:var(--payroll)}
+.chip.c-tbc{background:var(--tbc-2);border-color:var(--tbc-3);color:var(--tbc)}
+.chip.c-bog{background:var(--bog-2);border-color:var(--bog-3);color:var(--bog)}
+.chip.c-basis{background:var(--basis-2);border-color:var(--basis-3);color:var(--basis)}
+.chip.c-ok{background:var(--ok-2);border-color:var(--ok-2);color:var(--ok)}
+.chip.c-warn{background:var(--warn-2);border-color:var(--warn-2);color:var(--warn)}
+.chip.c-bad{background:var(--bad-2);border-color:var(--bad-2);color:var(--bad)}
+.badge-unverified{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--warn);background:var(--warn-2);border:1px dashed color-mix(in srgb,var(--warn) 55%,transparent);padding:3px 8px;border-radius:999px}
+.note,.tip,.trap{border-radius:var(--r-sm);padding:12px 14px;font-size:13px;border:1px solid var(--line);background:var(--surface-2);margin:12px 0}
+.note{border-left:3px solid var(--base)}
+.tip{border-left:3px solid var(--ok);background:var(--ok-2)}
+.trap{border-left:3px solid var(--bad);background:var(--bad-2)}
+.trap strong,.tip strong,.note strong{font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-size:12px;color:var(--muted);margin:14px 0 0}
+.legend .sw{display:inline-flex;align-items:center;gap:6px}
+.legend .sw i{width:12px;height:12px;border-radius:4px;display:inline-block}
+
+/* ---------- architecture diagram ---------- */
+.archbox{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:10px;overflow:hidden}
+.arch-svg{display:block;width:100%;height:auto}
+.arch-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}
+.modcard{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 16px 14px;box-shadow:var(--shadow);cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;overflow:hidden}
+.modcard:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.modcard::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--mc)}
+.modcard h3{font-size:15px;display:flex;align-items:center;gap:8px}
+.modcard .ver{font-family:var(--mono);font-size:10.5px;color:var(--faint)}
+.modcard p{font-size:12.6px;color:var(--muted);margin:7px 0 10px}
+.modcard .chips{display:flex;flex-wrap:wrap;gap:5px}
+.modcard.m-base{--mc:var(--base)}.modcard.m-payroll{--mc:var(--payroll)}.modcard.m-tbc{--mc:var(--tbc)}.modcard.m-bog{--mc:var(--bog)}.modcard.m-basis{--mc:var(--basis)}
+
+/* ---------- pipeline ---------- */
+.pipe{display:flex;gap:8px;overflow-x:auto;padding:6px 2px 14px;scrollbar-width:thin}
+.pipe-node{flex:0 0 auto;width:132px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 11px 10px;position:relative;transition:border-color .15s ease,box-shadow .15s ease,transform .15s ease}
+.pipe-node:hover{border-color:var(--base);transform:translateY(-2px)}
+.pipe-node .n{font-family:var(--mono);font-size:10px;color:var(--faint)}
+.pipe-node b{display:block;font-size:12.6px;font-weight:600;margin-top:3px;line-height:1.3}
+.pipe-node small{display:block;font-size:10.5px;color:var(--muted);margin-top:4px;line-height:1.35}
+.pipe-node .bar{position:absolute;left:11px;right:11px;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--pb,var(--base));opacity:.25}
+.pipe-node.sel{border-color:var(--pb,var(--base));box-shadow:0 0 0 3px color-mix(in srgb,var(--pb,var(--base)) 18%,transparent)}
+.pipe-node.sel .bar{opacity:1}
+.pipe-node[data-pb="shared"]{--pb:var(--base)}
+.pipe-node[data-pb="bank"]{--pb:var(--tbc)}
+.pipe-node[data-pb="proof"]{--pb:var(--payroll)}
+.pipe-arrow{align-self:center;color:var(--faint);flex:0 0 auto;font-size:14px}
+.step-shell{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:20px;margin-top:8px}
+.step-pane{display:none}
+.step-pane.on{display:block;animation:fade .22s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.step-pane h3{font-size:17px;margin-bottom:4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.step-pane .step-eyebrow{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.05em;text-transform:uppercase}
+.step-grid{display:grid;grid-template-columns:1.05fr 1.6fr;gap:18px;margin-top:14px}
+.shared-list{background:var(--base-2);border:1px solid var(--base-3);border-radius:var(--r-sm);padding:14px 16px}
+.shared-list h4{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--base);margin-bottom:9px}
+.shared-list ul{margin:0;padding-left:16px}
+.shared-list li{font-size:12.8px;margin:5px 0}
+.bankgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.bankcell{border:1px solid var(--line);border-radius:var(--r-sm);padding:12px;background:var(--surface-2)}
+.bankcell h5{font-size:11px;letter-spacing:.07em;text-transform:uppercase;margin-bottom:7px;display:flex;align-items:center;gap:6px}
+.bankcell.t-tbc h5{color:var(--tbc)}.bankcell.t-bog h5{color:var(--bog)}.bankcell.t-basis h5{color:var(--basis)}
+.bankcell.t-tbc{border-top:3px solid var(--tbc)}.bankcell.t-bog{border-top:3px solid var(--bog)}.bankcell.t-basis{border-top:3px solid var(--basis)}
+.bankcell ul{margin:0;padding-left:15px}
+.bankcell li{font-size:12.3px;margin:4px 0}
+.bankcell .mono{font-size:11px;word-break:break-word;white-space:normal}
+
+/* ---------- tables ---------- */
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);box-shadow:var(--shadow)}
+table{border-collapse:separate;border-spacing:0;width:100%;min-width:900px;font-size:12.8px}
+th,td{padding:9px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line-2)}
+thead th{background:var(--surface-2);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line)}
+tbody th.col-dim{position:sticky;left:0;background:var(--surface);z-index:4;font-weight:500;font-size:12.3px;min-width:168px;border-right:1px solid var(--line)}
+tr.grp th{background:var(--surface-3);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);font-weight:600;position:sticky;left:0}
+tr.same td{background:color-mix(in srgb,var(--ok-2) 55%,var(--surface))}
+tr.diff td{background:var(--surface)}
+tr:hover td{background:var(--surface-2)}
+tr.same:hover td{background:color-mix(in srgb,var(--ok-2) 80%,var(--surface))}
+th.h-tbc{color:var(--tbc)}th.h-bog{color:var(--bog)}th.h-basis{color:var(--basis)}
+.cmp-tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 14px}
+.toggle{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);cursor:pointer;user-select:none}
+.toggle input{appearance:none;width:34px;height:20px;border-radius:999px;background:var(--line);position:relative;transition:background .15s ease;cursor:pointer;flex:0 0 auto}
+.toggle input::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s ease;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.toggle input:checked{background:var(--base)}
+.toggle input:checked::after{left:16px}
+body.only-diff tr.same{display:none}
+.legend-dot{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.legend-dot i{width:10px;height:10px;border-radius:3px;background:var(--ok-2);border:1px solid var(--ok);display:inline-block}
+
+/* ---------- tabs / profiles ---------- */
+.banktabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.banktab{padding:10px 18px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font-weight:600;font-size:13.5px;display:inline-flex;align-items:center;gap:8px;transition:all .15s ease}
+.banktab .bic{font-family:var(--mono);font-size:10.5px;font-weight:500;color:var(--faint)}
+.banktab[data-bank="tbc"].on{border-color:var(--tbc);background:var(--tbc-2);color:var(--tbc)}
+.banktab[data-bank="bog"].on{border-color:var(--bog);background:var(--bog-2);color:var(--bog)}
+.banktab[data-bank="basis"].on{border-color:var(--basis);background:var(--basis-2);color:var(--basis)}
+.bankpanel{display:none}
+.bankpanel.on{display:block;animation:fade .22s ease}
+.profile{--pc:var(--tbc);--pc2:var(--tbc-2);--pc3:var(--tbc-3)}
+.profile.p-bog{--pc:var(--bog);--pc2:var(--bog-2);--pc3:var(--bog-3)}
+.profile.p-basis{--pc:var(--basis);--pc2:var(--basis-2);--pc3:var(--basis-3)}
+.profile-head{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;justify-content:space-between;border-top:4px solid var(--pc);border-radius:var(--r) var(--r) 0 0;background:var(--surface);border-left:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:18px 20px}
+.profile-head h3{font-size:20px}
+.profile-head .sub{color:var(--muted);font-size:13px;margin-top:4px}
+.profile-head .headchips{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.factgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-top:0;border-radius:0 0 var(--r) var(--r);overflow:hidden}
+.fact{background:var(--surface);padding:12px 14px}
+.fact dt{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:3px}
+.fact dd{margin:0;font-size:12.8px;font-weight:500}
+.fact dd .mono{font-size:11.5px;font-weight:400}
+.subsec{margin-top:26px}
+.subsec h4{font-size:15px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.subsec h4 .tag{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:600}
+.sig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.sig{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:14px;border-top:3px solid var(--pc)}
+.sig b{display:block;font-size:13px;margin-bottom:4px}
+.sig p{font-size:12.4px;color:var(--muted);margin:0}
+.lifecycle{display:flex;gap:6px;flex-wrap:wrap;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:14px}
+.state{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;font-size:11.5px;font-weight:600;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);font-family:var(--mono)}
+.state.st-pending{background:var(--surface-3);border-color:var(--line);color:var(--muted)}
+.state.st-await{background:var(--warn-2);border-color:color-mix(in srgb,var(--warn) 35%,transparent);color:var(--warn)}
+.state.st-bank{background:var(--info-2);border-color:color-mix(in srgb,var(--info) 30%,transparent);color:var(--info)}
+.state.st-sent{background:var(--tbc-2);border-color:color-mix(in srgb,var(--tbc) 35%,transparent);color:var(--tbc)}
+.state.st-ok{background:var(--ok-2);border-color:color-mix(in srgb,var(--ok) 35%,transparent);color:var(--ok)}
+.state.st-bad{background:var(--bad-2);border-color:color-mix(in srgb,var(--bad) 35%,transparent);color:var(--bad)}
+.state.st-unknown{background:var(--bad-2);border-color:color-mix(in srgb,var(--bad) 55%,transparent);color:var(--bad);border-style:dashed}
+.lifecycle .arr{color:var(--faint)}
+.lifecycle .branch{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.wirebox{background:var(--code-bg);border:1px solid var(--line);border-radius:var(--r-sm);padding:14px;font-family:var(--mono);font-size:11.6px;line-height:1.7;overflow-x:auto;white-space:pre}
+.wirebox .k{color:var(--pc)}
+.recov{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.recov .rc{border:1px solid var(--line);border-radius:var(--r-sm);padding:11px 13px;background:var(--surface)}
+.recov .rc b{font-size:12.5px;display:block;margin-bottom:3px}
+.recov .rc p{font-size:12.2px;color:var(--muted);margin:0}
+
+/* ---------- playbook ---------- */
+.pb-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.pb-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}
+.pb-card h3{font-size:15.5px;margin-bottom:4px}
+.pb-card .verdict{font-family:var(--mono);font-size:11px;color:var(--faint);margin-bottom:10px}
+.pb-card .steps3{display:grid;gap:8px}
+.pb-line{display:grid;grid-template-columns:92px 1fr;gap:10px;font-size:12.6px;align-items:start}
+.pb-line dt{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);padding-top:2px}
+.pb-line dd{margin:0}
+.pb-banks{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+
+/* ---------- payroll flow ---------- */
+.flow{display:grid;gap:10px;counter-reset:step}
+.flowline{display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:start}
+.flowline .fl-n{width:34px;height:34px;border-radius:10px;background:var(--payroll-2);color:var(--payroll);display:grid;place-items:center;font-family:var(--mono);font-size:13px;font-weight:600;border:1px solid var(--payroll-3)}
+.flowline .fl-b{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:13px 15px}
+.flowline .fl-b b{font-size:13.5px}
+.flowline .fl-b p{font-size:12.6px;color:var(--muted);margin:4px 0 0}
+.flowline .fl-b .chips{margin-top:8px;display:flex;flex-wrap:wrap;gap:5px}
+.handoff{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.ho{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:12px;border-top:3px solid var(--hc,var(--line))}
+.ho b{font-family:var(--mono);font-size:12px;display:block}
+.ho p{font-size:11.8px;color:var(--muted);margin:5px 0 0}
+.ho.h-pending{--hc:var(--faint)}.ho.h-prepared{--hc:var(--base)}.ho.h-transmitted{--hc:var(--tbc)}.ho.h-confirmed{--hc:var(--ok)}.ho.h-partial{--hc:var(--warn)}.ho.h-failed{--hc:var(--bad)}.ho.h-uncertain{--hc:var(--bad)}
+
+/* ---------- contract / hooks ---------- */
+.contract-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.ccard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:14px;position:relative}
+.ccard::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:3px;border-radius:3px;background:var(--base-3)}
+.ccard{padding-left:18px}
+.ccard b{font-size:13px;display:block;margin-bottom:4px}
+.ccard p{font-size:12.3px;color:var(--muted);margin:0}
+.hooks{display:grid;gap:8px}
+.hook{display:grid;grid-template-columns:minmax(220px,300px) 1fr;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:12px 14px;align-items:start}
+.hook code{font-size:11.5px;background:transparent;border:0;padding:0;color:var(--base);font-weight:500}
+.hook .who{font-size:10.5px;color:var(--faint);margin-top:3px}
+.hook p{margin:0;font-size:12.6px;color:var(--muted)}
+
+/* ---------- gotchas ---------- */
+.acc{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);margin-bottom:8px;overflow:hidden}
+.acc summary{list-style:none;cursor:pointer;padding:13px 16px;display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:500}
+.acc summary::-webkit-details-marker{display:none}
+.acc summary .caret{margin-left:auto;color:var(--faint);transition:transform .15s ease;flex:0 0 auto}
+.acc[open] summary .caret{transform:rotate(90deg)}
+.acc .acc-body{padding:0 16px 14px;color:var(--muted);font-size:12.9px}
+.acc .acc-body p{margin:0 0 8px}
+.acc .acc-body p:last-child{margin-bottom:0}
+.acc .sym{font-weight:600;color:var(--ink)}
+.gotcha-tools{display:flex;gap:8px;margin-bottom:12px}
+.btn-small{font-size:12px;font-weight:500;border:1px solid var(--line);border-radius:8px;padding:6px 11px;color:var(--muted);background:var(--surface)}
+.btn-small:hover{color:var(--ink);border-color:var(--faint)}
+
+/* ---------- reference ---------- */
+.ref-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:16px}
+.gloss{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}
+.gloss div{font-size:12.6px}
+.gloss b{display:block;font-size:12.8px;color:var(--ink)}
+.gloss span{color:var(--muted)}
+.timeline-note{font-size:12.5px;color:var(--muted)}
+footer{margin-top:60px;border-top:1px solid var(--line);background:var(--surface)}
+.footer-inner{padding:28px 0 40px;font-size:12.4px;color:var(--muted)}
+.footer-inner .cols{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:24px}
+.footer-inner h4{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+.footer-inner a{color:var(--muted)}
+.footer-inner a:hover{color:var(--ink)}
+.credits{margin-top:22px;padding-top:16px;border-top:1px solid var(--line-2);display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:11.8px;color:var(--faint)}
+.reveal{opacity:0;transform:translateY(10px);transition:opacity .5s ease,transform .5s ease}
+.reveal.in{opacity:1;transform:none}
+
+@media (max-width:1020px){
+  .startrow,.arch-cards,.sig-grid,.contract-grid{grid-template-columns:1fr 1fr}
+  .step-grid,.ref-grid{grid-template-columns:1fr}
+  .handoff{grid-template-columns:repeat(2,1fr)}
+  .factgrid{grid-template-columns:repeat(2,1fr)}
+  .gloss{grid-template-columns:1fr}
+  .pb-grid{grid-template-columns:1fr}
+}
+@media (max-width:720px){
+  .startrow,.arch-cards,.sig-grid,.contract-grid,.bankgrid{grid-template-columns:1fr}
+  .recov{grid-template-columns:1fr}
+  .hook{grid-template-columns:1fr}
+  .nav{display:none}
+  .topbar-inner{justify-content:space-between}
+  .hero{padding-top:44px}
+  .statrow .stat{flex:1 1 40%}
+  .footer-inner .cols{grid-template-columns:1fr}
+  thead th{top:0}
+}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="#top" aria-label="Top">
+      <span class="dots"><span class="dot" style="background:var(--base)"></span><span class="dot" style="background:var(--payroll)"></span><span class="dot" style="background:var(--tbc)"></span><span class="dot" style="background:var(--bog)"></span><span class="dot" style="background:var(--basis)"></span></span>
+      <span>Bank Integrations <small>gec_odoo_modules</small></span>
+    </a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#overview">Overview</a>
+      <a href="#spine">Shared spine</a>
+      <a href="#compare">Compare</a>
+      <a href="#banks">Banks</a>
+      <a href="#playbook">Failure playbook</a>
+      <a href="#payroll">Payroll</a>
+      <a href="#contract">Contract</a>
+      <a href="#gotchas">Gotchas</a>
+      <a href="#reference">Reference</a>
+    </nav>
+    <a class="theme-btn" href="bank_flow_lab.html" title="Method-level Flow Lab" style="width:auto;padding:0 10px;font-size:12px;text-decoration:none">Flow Lab ↗</a>
+    <button class="theme-btn" id="themeBtn" aria-label="Toggle dark mode" title="Toggle dark mode">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="overview" style="padding-bottom:8px">
+  <div class="wrap">
+    <div class="eyebrow"><span class="bar"></span>Developer map · Odoo 20 · static reading of 2026-10-04</div>
+    <h1 class="title">Five modules. Three banks.<br><em>One shared spine.</em></h1>
+    <p class="lead">
+      <strong>tbc_bank</strong>, <strong>bog_bank</strong> and <strong>basis_bank</strong> all send Georgian bank transfers the same way:
+      claim the payment durably, transmit, record the answer past the ORM, then wait for the statement as proof.
+      The shared contract — and now the shared transfer flow itself — lives in <strong>gec_bank</strong>; <strong>gec_payroll_bank</strong> is the engine that turns a payslip run into sealed, unsent batches.
+      This page is the whole picture in one scroll — scannable on the surface, with the exact mechanics one click below it.
+    </p>
+    <div class="statrow">
+      <div class="stat s-base"><b>5</b><span>modules</span></div>
+      <div class="stat s-base"><b>460</b><span>methods mapped</span></div>
+      <div class="stat s-payroll"><b>30</b><span>walkthroughs</span></div>
+      <div class="stat s-tbc"><b>3</b><span>bank adapters</span></div>
+      <div class="stat s-bog"><b>7</b><span>handoff states</span></div>
+      <div class="stat s-basis"><b>29</b><span>flow maps</span></div>
+    </div>
+
+    <nav class="startrow" aria-label="Start here">
+      <a class="startcard" href="#spine" style="--sc:var(--base)">
+        <h3>How money actually leaves Odoo</h3>
+        <p>The 9-step spine every bank shares — from channel pre-flight to statement reconcile — and exactly where each bank bends it.</p>
+        <span class="go">Walk the spine →</span>
+      </a>
+      <a class="startcard" href="#compare" style="--sc:var(--tbc)">
+        <h3>What is common vs what is not</h3>
+        <p>A 30-row comparison matrix with a “differences only” switch. Green rows are guarantees you can rely on in any bank.</p>
+        <span class="go">Open the matrix →</span>
+      </a>
+      <a class="startcard" href="#playbook" style="--sc:var(--bog)">
+        <h3>When the answer is not yes or no</h3>
+        <p>Timeouts, duplicates, bank warnings, wrong OTP, approvals voided — the failure playbook with the exact recovery per bank.</p>
+        <span class="go">Read the playbook →</span>
+      </a>
+    </nav>
+  </div>
+</section>
+
+<!-- ============ ARCHITECTURE ============ -->
+<section id="architecture">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">01</span><h2>The shape of the stack</h2></div>
+    <p class="sec-sub">
+      The payroll engine drives the channel; the channel is defined once in <strong>gec_bank</strong> and implemented by each bank adapter;
+      every piece of state ultimately lives in core Odoo records. <strong>Click any card below</strong> — the three bank cards jump to their profiles.
+    </p>
+
+    <div class="archbox reveal">
+      <svg class="arch-svg" viewBox="0 0 1160 634" role="img" aria-label="Architecture: gec_payroll_bank drives the gec_bank contract, implemented by TBC, BOG and Basis adapters, on top of core Odoo models.">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" style="fill:var(--faint)"/>
+          </marker>
+          <marker id="arr-p" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" style="fill:var(--payroll)"/>
+          </marker>
+        </defs>
+
+        <!-- payroll -->
+        <rect x="330" y="16" width="500" height="118" rx="16" style="fill:var(--payroll-2);stroke:var(--payroll-3)"/>
+        <text x="580" y="46" text-anchor="middle"  font-size="17" font-weight="600" style="font-family:var(--sans);fill:var(--payroll)">gec_payroll_bank — the engine</text>
+        <text x="580" y="67" text-anchor="middle"  font-size="12" style="font-family:var(--sans);fill:var(--muted)">knows no bank · orchestrates payslips → payments → sealed batches</text>
+        <rect x="352" y="86" width="108" height="30" rx="8" style="fill:var(--surface);stroke:var(--line)"/>
+        <text x="406" y="105" text-anchor="middle"  font-size="10" style="font-family:var(--mono);fill:var(--payroll)">pay wizard</text>
+        <rect x="472" y="86" width="108" height="30" rx="8" style="fill:var(--surface);stroke:var(--line)"/>
+        <text x="526" y="105" text-anchor="middle"  font-size="10" style="font-family:var(--mono);fill:var(--payroll)">register passes</text>
+        <rect x="592" y="86" width="108" height="30" rx="8" style="fill:var(--surface);stroke:var(--line)"/>
+        <text x="646" y="105" text-anchor="middle"  font-size="10" style="font-family:var(--mono);fill:var(--payroll)">sealed batches</text>
+        <rect x="712" y="86" width="108" height="30" rx="8" style="fill:var(--surface);stroke:var(--line)"/>
+        <text x="766" y="105" text-anchor="middle"  font-size="10" style="font-family:var(--mono);fill:var(--payroll)">4h watchdog</text>
+
+        <!-- arrow payroll -> base -->
+        <line x1="580" y1="134" x2="580" y2="180"  stroke-width="2" marker-end="url(#arr-p)" style="stroke:var(--payroll)"/>
+        <rect x="592" y="142" width="330" height="30" rx="8" style="fill:var(--surface);stroke:var(--payroll-3)"/>
+        <text x="757" y="161" text-anchor="middle"  font-size="11" style="font-family:var(--sans);fill:var(--payroll)">calls the channel hooks · reads the handoff state</text>
+
+        <!-- gec_bank -->
+        <rect x="330" y="184" width="500" height="118" rx="16" style="fill:var(--base-2);stroke:var(--base-3)"/>
+        <text x="580" y="214" text-anchor="middle"  font-size="17" font-weight="600" style="font-family:var(--sans);fill:var(--base)">gec_bank — the shared contract</text>
+        <text x="580" y="235" text-anchor="middle"  font-size="12" style="font-family:var(--sans);fill:var(--muted)">7 abstract mixins · the transfer flow · no screens of its own</text>
+        <rect x="352" y="248" width="150" height="24" rx="7" style="fill:var(--surface);stroke:var(--line)"/>
+        <text x="427" y="264" text-anchor="middle"  font-size="9.5" style="font-family:var(--mono);fill:var(--base)">durable claim + write</text>
+        <rect x="514" y="248" width="150" height="24" rx="7" style="fill:var(--surface);stroke:var(--line)"/>
+        <text x="589" y="264" text-anchor="middle"  font-size="9.5" style="font-family:var(--mono);fill:var(--base)">field guard + OAuth</text>
+        <rect x="676" y="248" width="150" height="24" rx="7" style="fill:var(--surface);stroke:var(--line)"/>
+        <text x="751" y="264" text-anchor="middle"  font-size="9.5" style="font-family:var(--mono);fill:var(--base)">approval + connection</text>
+        <rect x="352" y="278" width="150" height="24" rx="7" style="fill:var(--surface);stroke:var(--line)"/>
+        <text x="427" y="294" text-anchor="middle"  font-size="9.5" style="font-family:var(--mono);fill:var(--base)">transfer flow + fences</text>
+        <rect x="514" y="278" width="150" height="24" rx="7" style="fill:var(--surface);stroke:var(--line)"/>
+        <text x="589" y="294" text-anchor="middle"  font-size="9.5" style="font-family:var(--mono);fill:var(--base)">audit log + redaction</text>
+        <rect x="676" y="278" width="150" height="24" rx="7" style="fill:var(--surface);stroke:var(--line)"/>
+        <text x="751" y="294" text-anchor="middle"  font-size="9.5" style="font-family:var(--mono);fill:var(--base)">statement match</text>
+
+        <!-- arrows base -> banks -->
+        <line x1="230" y1="302" x2="230" y2="356"  stroke-width="1.5" marker-end="url(#arr)" style="stroke:var(--faint)"/>
+        <line x1="580" y1="302" x2="580" y2="356"  stroke-width="1.5" marker-end="url(#arr)" style="stroke:var(--faint)"/>
+        <line x1="930" y1="302" x2="930" y2="356"  stroke-width="1.5" marker-end="url(#arr)" style="stroke:var(--faint)"/>
+        <text x="580" y="326" text-anchor="middle"  font-size="11.5" style="font-family:var(--sans);fill:var(--muted)">each adapter implements the same contract, under its own code</text>
+
+        <!-- TBC -->
+        <rect x="80" y="356" width="300" height="150" rx="16" style="fill:var(--tbc-2);stroke:var(--tbc-3)"/>
+        <text x="230" y="386" text-anchor="middle"  font-size="15" font-weight="600" style="font-family:var(--sans);fill:var(--tbc)">tbc_bank</text>
+        <text x="230" y="406" text-anchor="middle"  font-size="10" style="font-family:var(--mono);fill:var(--faint)">TBCBGE22 · tbc_transfer</text>
+        <text x="230" y="432" text-anchor="middle"  font-size="11" style="font-family:var(--sans);fill:var(--muted)">OAuth2 bearer · BIS /bab/v1</text>
+        <text x="230" y="451" text-anchor="middle"  font-size="11" style="font-family:var(--sans);fill:var(--muted)">1 transfer per request</text>
+        <text x="230" y="470" text-anchor="middle"  font-size="11" style="font-family:var(--sans);fill:var(--muted)">transferId · 5 transfer types</text>
+        <text x="230" y="489" text-anchor="middle"  font-size="11" style="font-family:var(--sans);fill:var(--muted)">movements → statement</text>
+        <!-- BOG -->
+        <rect x="430" y="356" width="300" height="150" rx="16" style="fill:var(--bog-2);stroke:var(--bog-3)"/>
+        <text x="580" y="386" text-anchor="middle"  font-size="15" font-weight="600" style="font-family:var(--sans);fill:var(--bog)">bog_bank</text>
+        <text x="580" y="406" text-anchor="middle"  font-size="10" style="font-family:var(--mono);fill:var(--faint)">BAGAGE22 · bog_transfer</text>
+        <text x="580" y="432" text-anchor="middle"  font-size="11" style="font-family:var(--sans);fill:var(--muted)">Keycloak bearer · businessonline</text>
+        <text x="580" y="451" text-anchor="middle"  font-size="11" style="font-family:var(--sans);fill:var(--muted)">document or one bulk call</text>
+        <text x="580" y="470" text-anchor="middle"  font-size="11" style="font-family:var(--sans);fill:var(--muted)">UniqueId + DocumentNo · warn codes</text>
+        <text x="580" y="489" text-anchor="middle"  font-size="11" style="font-family:var(--sans);fill:var(--muted)">status letters → sent/confirmed</text>
+        <!-- Basis -->
+        <rect x="780" y="356" width="300" height="150" rx="16" style="fill:var(--basis-2);stroke:var(--basis-3)"/>
+        <text x="930" y="386" text-anchor="middle"  font-size="15" font-weight="600" style="font-family:var(--sans);fill:var(--basis)">basis_bank</text>
+        <text x="930" y="406" text-anchor="middle"  font-size="10" style="font-family:var(--mono);fill:var(--faint)">CBASGE22 · basisbank_transfer</text>
+        <text x="930" y="432" text-anchor="middle"  font-size="11" style="font-family:var(--sans);fill:var(--muted)">login + ticket · Digipass OTP</text>
+        <text x="930" y="451" text-anchor="middle"  font-size="11" style="font-family:var(--sans);fill:var(--muted)">package ops 4/5/6 or op 7</text>
+        <text x="930" y="470" text-anchor="middle"  font-size="11" style="font-family:var(--sans);fill:var(--muted)">BankInternalID · report pages</text>
+        <text x="930" y="489" text-anchor="middle"  font-size="11" style="font-family:var(--sans);fill:var(--muted)">Resync + 48h check (active)</text>
+
+        <!-- arrows banks -> core -->
+        <line x1="230" y1="506" x2="230" y2="548"  stroke-width="1.5" marker-end="url(#arr)" style="stroke:var(--faint)"/>
+        <line x1="580" y1="506" x2="580" y2="548"  stroke-width="1.5" marker-end="url(#arr)" style="stroke:var(--faint)"/>
+        <line x1="930" y1="506" x2="930" y2="548"  stroke-width="1.5" marker-end="url(#arr)" style="stroke:var(--faint)"/>
+        <text x="580" y="531" text-anchor="middle"  font-size="11.5" style="font-family:var(--sans);fill:var(--muted)">durable writes bypass the ORM · after_durable schedules the recompute</text>
+
+        <!-- core -->
+        <rect x="80" y="552" width="1000" height="64" rx="14"   stroke-dasharray="5 4" style="fill:var(--surface);stroke:var(--line)"/>
+        <text x="580" y="576" text-anchor="middle"  font-size="13" font-weight="600" style="font-family:var(--sans);fill:var(--ink)">Core Odoo — where the state actually lives</text>
+        <text x="580" y="598" text-anchor="middle"  font-size="10.5" style="font-family:var(--mono);fill:var(--muted)">account.payment · account.batch.payment · account.bank.statement.line · account.payment.method.line</text>
+      </svg>
+    </div>
+
+    <div class="arch-cards">
+      <article class="modcard m-base" data-goto-tab="compare">
+        <h3>gec_bank <span class="ver">20.0.1.0.0</span></h3>
+        <p>The contract and the flow. Seven abstract mixins (service, guard, sendable, approval, connection, OAuth, api log) plus the shared transfer flow on account.payment, the channel hooks and the statement confirmation. No views of its own beyond two inherited payment views, no buttons, no crons.</p>
+        <div class="chips"><span class="chip mono">103 methods</span><span class="chip mono">105 edges</span><span class="chip mono">7 mixins</span></div>
+      </article>
+      <article class="modcard m-payroll" data-goto-tab="payroll">
+        <h3>gec_payroll_bank <span class="ver">20.0.1.0.0</span></h3>
+        <p>The engine. Pay wizard → standard payment register → one sealed batch per channel/kind/currency → hand off. Names no bank, does no network I/O, never sends.</p>
+        <div class="chips"><span class="chip mono">44 methods</span><span class="chip mono">1 cron · 4h</span><span class="chip mono">4 test files</span></div>
+      </article>
+      <article class="modcard m-tbc" data-goto-tab="banks" data-bank="tbc">
+        <h3>tbc_bank <span class="ver">20.0.1.5.1</span></h3>
+        <p>One BIS transfer per payment on the shared flow, OAuth2, 5 transfer types incl. treasury and SWIFT; balance snapshots. All three crons ship inactive.</p>
+        <div class="chips"><span class="chip mono">86 methods</span><span class="chip mono">TBCBGE22</span><span class="chip mono">6 walkthroughs</span></div>
+      </article>
+      <article class="modcard m-bog" data-goto-tab="banks" data-bank="bog">
+        <h3>bog_bank <span class="ver">20.0.1.0.0</span></h3>
+        <p>Single document or one bulk call (≤500) on the shared flow, unique ids checked by the bank, warn codes with “Create Anyway”, status letters. Four crons ship inactive.</p>
+        <div class="chips"><span class="chip mono">114 methods</span><span class="chip mono">BAGAGE22</span><span class="chip mono">7 walkthroughs</span></div>
+      </article>
+      <article class="modcard m-basis" data-goto-tab="banks" data-bank="basis">
+        <h3>basis_bank <span class="ver">20.0.1.15.0</span></h3>
+        <p>Its own flow and state field: Digipass OTP on every send, all-or-nothing packages (op 4/5/6) or mixed op 7, Resync wizard, and the only active background job — the hourly 48-hour check.</p>
+        <div class="chips"><span class="chip mono">113 methods</span><span class="chip mono">CBASGE22</span><span class="chip mono">7 walkthroughs</span></div>
+      </article>
+      <article class="modcard m-base">
+        <h3>Where to look first</h3>
+        <p>New to the stack? Read the <a href="#spine">shared spine</a> top to bottom. Debugging money? Jump to the <a href="#playbook">failure playbook</a>. Writing a new bank? Read <a href="#contract">the contract</a> and the hooks table.</p>
+        <div class="chips"><span class="chip">static source reading</span><span class="chip">no Odoo run</span></div>
+      </article>
+    </div>
+
+    <div class="legend">
+      <span class="sw"><i style="background:var(--base)"></i> gec_bank · contract</span>
+      <span class="sw"><i style="background:var(--payroll)"></i> gec_payroll_bank · engine</span>
+      <span class="sw"><i style="background:var(--tbc)"></i> TBC</span>
+      <span class="sw"><i style="background:var(--bog)"></i> BOG</span>
+      <span class="sw"><i style="background:var(--basis)"></i> Basis</span>
+      <span class="sw"><span class="badge-unverified">API unverified</span> reply shapes inferred from module code</span>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="divider"></div></div>
+
+<!-- ============ SHARED SPINE ============ -->
+<section id="spine">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">02</span><h2>The shared spine — anatomy of one send</h2></div>
+    <p class="sec-sub">
+      Every payment from every adapter walks the same nine stages. <strong>Steps 1–4 and 7–9 are inherited</strong>
+      from <code>gec_bank</code> and the payroll engine; a bank adapter only rewrites <strong>how it transmits and how it reads the answer</strong>
+      (and adds its own proof machinery). Click a stage to see the shared guarantee and what each bank does there.
+    </p>
+
+    <div class="pipe reveal" role="tablist" aria-label="Send stages">
+      <button class="pipe-node sel" data-step="1" data-pb="shared" role="tab" aria-selected="true">
+        <span class="n">01 · shared</span><b>Pre-flight</b><small>channel &amp; recipients are usable</small><span class="bar"></span>
+      </button>
+      <span class="pipe-arrow">→</span>
+      <button class="pipe-node" data-step="2" data-pb="shared" role="tab" aria-selected="false">
+        <span class="n">02 · shared</span><b>Fences</b><small>sendable + not already at the bank</small><span class="bar"></span>
+      </button>
+      <span class="pipe-arrow">→</span>
+      <button class="pipe-node" data-step="3" data-pb="bank" role="tab" aria-selected="false">
+        <span class="n">03 · bank</span><b>Order checks</b><small>collect every problem first</small><span class="bar"></span>
+      </button>
+      <span class="pipe-arrow">→</span>
+      <button class="pipe-node" data-step="4" data-pb="shared" role="tab" aria-selected="false">
+        <span class="n">04 · shared</span><b>Durable claim</b><small>request id + “sending”, own cursor</small><span class="bar"></span>
+      </button>
+      <span class="pipe-arrow">→</span>
+      <button class="pipe-node" data-step="5" data-pb="bank" role="tab" aria-selected="false">
+        <span class="n">05 · bank</span><b>Transmit</b><small>soft call, never auto-retried</small><span class="bar"></span>
+      </button>
+      <span class="pipe-arrow">→</span>
+      <button class="pipe-node" data-step="6" data-pb="bank" role="tab" aria-selected="false">
+        <span class="n">06 · bank</span><b>Read the answer</b><small>accepted · refused · unknown</small><span class="bar"></span>
+      </button>
+      <span class="pipe-arrow">→</span>
+      <button class="pipe-node" data-step="7" data-pb="shared" role="tab" aria-selected="false">
+        <span class="n">07 · shared</span><b>Durable write</b><small>mirror to core, recompute by hand</small><span class="bar"></span>
+      </button>
+      <span class="pipe-arrow">→</span>
+      <button class="pipe-node" data-step="8" data-pb="shared" role="tab" aria-selected="false">
+        <span class="n">08 · shared</span><b>Log &amp; notify</b><small>redacted row, toast, dialog closes</small><span class="bar"></span>
+      </button>
+      <span class="pipe-arrow">→</span>
+      <button class="pipe-node" data-step="9" data-pb="proof" role="tab" aria-selected="false">
+        <span class="n">09 · proof</span><b>Prove &amp; reconcile</b><small>only the statement closes the loop</small><span class="bar"></span>
+      </button>
+    </div>
+
+    <div class="step-shell reveal">
+      <!-- STEP 1 -->
+      <div class="step-pane on" id="step-1">
+        <div class="step-eyebrow">stage 01 · shared by gec_payroll_bank + gec_bank</div>
+        <h3>Pre-flight <span class="chip c-payroll">runs before a pay run</span></h3>
+        <p class="sec-sub" style="margin-bottom:0">The payroll engine asks the channel one question: “can I use you?” — and the core checks are <strong>sealed</strong>: banks may only append their own.</p>
+        <div class="step-grid">
+          <div class="shared-list">
+            <h4>The shared guarantee</h4>
+            <ul>
+              <li><code>_gec_bank_config_errors()</code> = core checks + <code>_gec_bank_extra_config_errors()</code>. Banks cannot remove a core check.</li>
+              <li>Channel must be an outbound line on a <strong>bank journal</strong>, with a reconcilable <em>Outstanding Payments</em> account that is not the journal default and not a cash/credit-card account.</li>
+              <li><code>api</code> channels additionally need the journal IBAN — otherwise payments can never wait for the statement.</li>
+              <li>Per-recipient checks run via <code>_gec_bank_check(kind, lines)</code>; everything is joined into one error.</li>
+            </ul>
+          </div>
+          <div class="bankgrid">
+            <div class="bankcell t-tbc"><h5>TBC</h5><ul>
+              <li>Connection must exist and not be <code>blocked</code>.</li>
+              <li>Treasury recipients: exactly 9-digit code, GEL only.</li>
+              <li>Non-Georgian IBANs are refused.</li>
+            </ul></div>
+            <div class="bankcell t-bog"><h5>BOG</h5><ul>
+              <li>Connection present and unblocked.</li>
+              <li>No State Treasury recipients at all.</li>
+              <li>Georgian IBAN (<code>GE…</code>, 22 chars) + known BIC per account.</li>
+            </ul></div>
+            <div class="bankcell t-basis"><h5>Basis</h5><ul>
+              <li>Connection + channel setup checks.</li>
+              <li>Recipient needs a BIC (treasury partners skipped).</li>
+              <li>GEL + a non-empty memo for national transfers.</li>
+            </ul></div>
+          </div>
+        </div>
+        <div class="trap"><strong>Trap:</strong> one bad channel refuses the <em>whole</em> pay run. Nothing is posted before the check passes, so there is nothing to clean up.</div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step-pane" id="step-2">
+        <div class="step-eyebrow">stage 02 · shared · account.payment</div>
+        <h3>Fences <span class="chip c-base">both directions</span></h3>
+        <p class="sec-sub" style="margin-bottom:0">A payment may not leave twice, and a payment the bank may hold may not be silently undone.</p>
+        <div class="step-grid">
+          <div class="shared-list">
+            <h4>The shared guarantee</h4>
+            <ul>
+              <li><code>_gec_bank_check_sendable()</code> refuses <strong>drafts</strong> (no journal entry yet) and anything no longer <strong>Paid</strong> — already matched, rejected or cancelled. This is the double-payment fence.</li>
+              <li><code>_gec_bank_at_bank()</code> blocks every undo path: payment reset-to-draft, cancel, delete, and the journal entry’s reset/cancel.</li>
+              <li>A bypass context key exists for exactly one core flow: un-matching a statement.</li>
+            </ul>
+          </div>
+          <div class="bankgrid">
+            <div class="bankcell t-tbc"><h5>TBC at-bank states</h5><ul>
+              <li><code>sending</code>, <code>sent</code>, <code>confirmed</code>, <code>unknown</code></li>
+            </ul></div>
+            <div class="bankcell t-bog"><h5>BOG at-bank states</h5><ul>
+              <li><code>sending</code>, <code>created</code>, <code>sent</code>, <code>confirmed</code>, <code>unknown</code></li>
+              <li><code>created</code> counts too — BOG holds a document.</li>
+            </ul></div>
+            <div class="bankcell t-basis"><h5>Basis at-bank states</h5><ul>
+              <li><code>sending</code>, <code>sent</code>, <code>unknown</code>, <code>not_in_report</code>, <code>confirmed</code></li>
+            </ul></div>
+          </div>
+        </div>
+        <div class="tip"><strong>Why:</strong> the fences run from the buttons and the <code>@api.ondelete</code> hook, not from every <code>write</code>. A direct ORM write can still bypass them — scripts beware.</div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step-pane" id="step-3">
+        <div class="step-eyebrow">stage 03 · bank-specific · nothing reserved yet</div>
+        <h3>Order checks <span class="chip c-tbc">every adapter</span></h3>
+        <p class="sec-sub" style="margin-bottom:0">Each adapter gathers <em>all</em> the problems in one pass, so a refusal leaves zero trace: no request id, no state change, no bank call.</p>
+        <div class="step-grid">
+          <div class="shared-list">
+            <h4>The shared pattern</h4>
+            <ul>
+              <li>Refuse before reserving. The claim in stage 04 is the last thing that writes.</li>
+              <li>Errors are accumulated, not raised one by one — the operator sees the full list at once.</li>
+              <li>The same checks run whether the payment came from the payment form or from Pay Salaries.</li>
+            </ul>
+          </div>
+          <div class="bankgrid">
+            <div class="bankcell t-tbc"><h5>TBC · _tbc_check_order</h5><ul>
+              <li>amount &gt; 0; journal IBAN present</li>
+              <li>treasury: GEL + 9-digit code</li>
+              <li>recipient account present</li>
+              <li>transfer type matches the IBAN bank code</li>
+              <li>foreign: beneficiary address/bank + SHA/OUR</li>
+            </ul></div>
+            <div class="bankcell t-bog"><h5>BOG · order of refusals</h5><ul>
+              <li>own bank → last send unknown → failed → already sent → approval missing → not Paid → channel config</li>
+              <li>attachments are uploaded before anything is claimed</li>
+            </ul></div>
+            <div class="bankcell t-basis"><h5>Basis · _check_before_send</h5><ul>
+              <li>recipient account + <code>allow_out_payment</code></li>
+              <li>missing BIC; empty memo</li>
+              <li>non-GEL national/treasury</li>
+              <li>method setup (sealed core checks)</li>
+            </ul></div>
+          </div>
+        </div>
+        <div class="trap"><strong>Basis subtlety:</strong> the send button posts a draft before checking. A refusal rolls that posting back — and the entry number quoted in the error is freed, so don’t go looking for it.</div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step-pane" id="step-4">
+        <div class="step-eyebrow">stage 04 · the heart of gec_bank</div>
+        <h3>Durable claim <span class="chip c-base">one conditional UPDATE</span></h3>
+        <p class="sec-sub" style="margin-bottom:0">Before any money moves, the payment is claimed with its request id and a “sending” state — written on its <strong>own cursor</strong>, outside the request’s transaction.</p>
+        <div class="step-grid">
+          <div class="shared-list">
+            <h4>The shared guarantee</h4>
+            <ul>
+              <li><code>_reserve_send()</code>: <code>UPDATE … WHERE state NOT IN blocked</code> with a 2 s lock timeout, on an independent cursor.</li>
+              <li>A crash <strong>cannot roll the request id back</strong>; a double-click finds no row to claim.</li>
+              <li>Only plain stored columns may be claimed (<code>_durable_columns</code> validates).</li>
+              <li><strong>REPEATABLE READ rule:</strong> after a durable write, the same transaction must never UPDATE that row again — PostgreSQL refuses and Odoo re-runs the whole request, send included.</li>
+            </ul>
+          </div>
+          <div class="bankgrid">
+            <div class="bankcell t-tbc"><h5>TBC · claimed fields</h5><ul>
+              <li><code>gec_bank_request_id</code>: numeric string &lt; 10⁹, reused across retries</li>
+              <li><code>gec_bank_state='sending'</code></li>
+              <li>blocked: <code>sending/sent/confirmed/unknown</code></li>
+            </ul></div>
+            <div class="bankcell t-bog"><h5>BOG · claimed fields</h5><ul>
+              <li><code>gec_bank_request_id</code> (UUID) + <code>bog_document_no</code> <code>ODOO&lt;id&gt;</code>; the old <code>bog_bulk_key</code> cleared</li>
+              <li><code>gec_bank_state='sending'</code></li>
+              <li>blocked: <code>sending/created/sent/confirmed/unknown</code></li>
+            </ul></div>
+            <div class="bankcell t-basis"><h5>Basis · claimed fields</h5><ul>
+              <li><code>ClientInternalID</code> / <code>DocNum</code> = payment id</li>
+              <li><code>basisbank_state='sending'</code> + send date for every member (all-or-nothing claim)</li>
+              <li>blocked: <code>awaiting_approval</code>, <code>failed</code>, <code>sending/sent/unknown/not_in_report/confirmed</code></li>
+            </ul></div>
+          </div>
+        </div>
+        <div class="trap"><strong>The law:</strong> claim first, transmit second. Every adapter reserves <em>before</em> the POST, so a lost answer always has a request id to recover by — never a blind resend.</div>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="step-pane" id="step-5">
+        <div class="step-eyebrow">stage 05 · bank-specific · network</div>
+        <h3>Transmit <span class="chip c-warn">soft — an answer may never come</span></h3>
+        <p class="sec-sub" style="margin-bottom:0">One HTTP call in soft mode: transport errors return a status instead of raising, so “no answer” is a first-class outcome, not an exception.</p>
+        <div class="step-grid">
+          <div class="shared-list">
+            <h4>The shared pattern</h4>
+            <ul>
+              <li>Every call goes through the adapter’s <code>_call()</code>: token/ticket, request, redacted log row on its own cursor.</li>
+              <li><code>http_status = 0</code> means “no response”. Nobody auto-retries it.</li>
+              <li>TLS, token caching and retry rules live here; pay-run payloads do not.</li>
+            </ul>
+          </div>
+          <div class="bankgrid">
+            <div class="bankcell t-tbc"><h5>TBC</h5><ul>
+              <li><code>POST transfers/single</code> — one order per payment</li>
+              <li>60 s timeout; batch = per-payment savepoint loop</li>
+              <li>bearer token, 401 → one re-auth retry</li>
+            </ul></div>
+            <div class="bankcell t-bog"><h5>BOG</h5><ul>
+              <li>one document per payment, or <strong>one bulk POST</strong> for a batch (≤ 500, no per-line result)</li>
+              <li>60 s money timeout; 5 req/s process-local throttle</li>
+              <li>429 → one retry; 401 → one re-auth</li>
+            </ul></div>
+            <div class="bankcell t-basis"><h5>Basis</h5><ul>
+              <li>op 7 single item, or package ops 4/5/6 (all-or-nothing) / op 7 mixed</li>
+              <li>15 s timeout; <strong>Digipass OTP inside the body</strong></li>
+              <li>ticket in body, refreshed per call; code 3 → one re-auth (report only)</li>
+            </ul></div>
+          </div>
+        </div>
+        <div class="note"><strong>Basis twist:</strong> the OTP dialog row is deleted before the send. If the send fails pre-claim, the rollback restores it — the OTP is not lost, but it is transient by design.</div>
+      </div>
+
+      <!-- STEP 6 -->
+      <div class="step-pane" id="step-6">
+        <div class="step-eyebrow">stage 06 · bank-specific · the most read code in each module</div>
+        <h3>Read the answer <span class="chip c-base">accepted · refused · unknown</span></h3>
+        <p class="sec-sub" style="margin-bottom:0">Every reply is parsed into exactly one of three meanings. The hard rule everywhere: <strong>ambiguous is never a failure</strong>.</p>
+        <div class="step-grid">
+          <div class="shared-list">
+            <h4>The shared rule</h4>
+            <ul>
+              <li><strong>Accepted</strong> → the bank holds the request; record its bank id.</li>
+              <li><strong>Refused</strong> → a definite no; safe to fix and resend.</li>
+              <li><strong>Unknown</strong> → no answer, 5xx, timeout, or “id already exists”. Never resend blindly — recover first.</li>
+              <li><code>_parse_json</code>/<code>_first_key</code> handle arrays, bare integers and bare strings: never assume a dict.</li>
+            </ul>
+          </div>
+          <div class="bankgrid">
+            <div class="bankcell t-tbc"><h5>TBC</h5><ul>
+              <li>207 multi-status: <code>succeeded[].transferId</code> → sent</li>
+              <li><code>failed[]</code> → failed; 4xx → failed</li>
+              <li>duplicate code → park <code>unknown</code>, then look it up</li>
+              <li>0 / 5xx / no id → <code>unknown</code></li>
+            </ul></div>
+            <div class="bankcell t-bog"><h5>BOG</h5><ul>
+              <li>ResultCode 0 → <code>created</code> — <em>ready to sign, not moved</em></li>
+              <li>warn 333/444/701 → <code>awaiting_confirmation</code>; 363 → failed</li>
+              <li>702 (id exists) → <code>unknown</code> — “check before resending”</li>
+              <li>letters A/Z S/T P R/D/C arrive later</li>
+            </ul></div>
+            <div class="bankcell t-basis"><h5>Basis</h5><ul>
+              <li>ErrorCode 0 → sent (package: accepted as a whole)</li>
+              <li>2 / 3 → clean retry: OTP wrong / ticket stale</li>
+              <li>999 → <code>unknown</code>; others → failed</li>
+              <li>op 7: per-item verdict keyed by <code>ClientInternalID</code></li>
+            </ul></div>
+          </div>
+        </div>
+        <div class="trap"><strong>Most expensive mix-up:</strong> BOG’s <code>created</code> and Basis’ “package accepted” mean the bank has the order — not that money left. TBC’s <code>transferId</code> is the closest to “sent”, and still not “paid”.</div>
+      </div>
+
+      <!-- STEP 7 -->
+      <div class="step-pane" id="step-7">
+        <div class="step-eyebrow">stage 07 · shared · past the ORM</div>
+        <h3>Durable write &amp; mirror</h3>
+        <p class="sec-sub" style="margin-bottom:0">The result is written on its own cursor too, then mirrored onto core fields — and because that write bypassed the ORM, the batch recompute is scheduled <strong>by hand</strong>.</p>
+        <div class="step-grid">
+          <div class="shared-list">
+            <h4>The shared guarantee</h4>
+            <ul>
+              <li><code>_durable_write()</code> — independent cursor, lock fallback to a tracked ORM write (returns <code>False</code>, logged).</li>
+              <li>Results flow through <code>_gec_bank_write_result()</code>: only whitelisted columns (<code>_gec_bank_result_columns</code>), written through the guard; a state that keeps no approval clears it.</li>
+              <li><code>_gec_bank_mirror_vals()</code>: held → <code>is_sent = True</code>; refused from Paid → <code>state = 'rejected'</code> and <code>is_sent</code> cleared.</li>
+              <li><code>_gec_bank_after_durable()</code> re-schedules batch <code>state</code> and <code>amount_residual</code> recomputes.</li>
+              <li>A rejected payment <strong>keeps its journal entry</strong> — history is not unwound.</li>
+            </ul>
+          </div>
+          <div class="bankgrid">
+            <div class="bankcell t-tbc"><h5>TBC · held means</h5><ul>
+              <li><code>sent</code>, <code>confirmed</code></li>
+              <li>result columns whitelisted in <code>_gec_bank_result_columns</code> (+ <code>tbc_bank_status</code>)</li>
+            </ul></div>
+            <div class="bankcell t-bog"><h5>BOG · held means</h5><ul>
+              <li><code>created</code>, <code>sent</code>, <code>confirmed</code></li>
+              <li>batch and members written in one durable pass</li>
+            </ul></div>
+            <div class="bankcell t-basis"><h5>Basis · held means</h5><ul>
+              <li><code>sent</code>, <code>confirmed</code></li>
+              <li>claim is all-or-nothing across the batch</li>
+            </ul></div>
+          </div>
+        </div>
+        <div class="tip"><strong>Why <code>after_durable</code> exists:</strong> a normal ORM write triggers computes automatically. A durable write does not — forget this call and the batch silently shows the old state.</div>
+      </div>
+
+      <!-- STEP 8 -->
+      <div class="step-pane" id="step-8">
+        <div class="step-eyebrow">stage 08 · shared · survives the rollback</div>
+        <h3>Log &amp; notify</h3>
+        <p class="sec-sub" style="margin-bottom:0">One log row per bank call, committed on its own cursor — so the evidence of a failure outlives the transaction that failed. Then one notification closes the dialog.</p>
+        <div class="step-grid">
+          <div class="shared-list">
+            <h4>The shared guarantee</h4>
+            <ul>
+              <li>Row values: <code>endpoint</code>, <code>http_status</code>, <code>error_message</code>, redacted request/response payloads, <code>duration_ms</code>.</li>
+              <li>Secrets are redacted by exact key match against the bank’s sensitive-key set (<code>[REDACTED]</code>), with a text-regex fallback.</li>
+              <li><code>_gec_bank_notify()</code> returns a <code>display_notification</code> action that also closes the send dialog; sticky unless success.</li>
+              <li>Nightly autovacuum per connection: rows older than <code>log_retention_days</code> (default 90; 0 = keep all) are deleted — except rows each bank protects.</li>
+            </ul>
+          </div>
+          <div class="bankgrid">
+            <div class="bankcell t-tbc"><h5>TBC log</h5><ul>
+              <li><code>tbc.api.log</code>; endpoints containing <code>transfers</code> are never vacuumed</li>
+            </ul></div>
+            <div class="bankcell t-bog"><h5>BOG log</h5><ul>
+              <li><code>bog.api.log</code> adds <code>result_code</code>, <code>correlation_id</code>, <code>is_money_movement</code></li>
+              <li>money-movement rows are never vacuumed</li>
+            </ul></div>
+            <div class="bankcell t-basis"><h5>Basis log</h5><ul>
+              <li><code>basisbank.api.log</code> adds <code>error_code</code></li>
+              <li><code>main/upload</code> rows are never vacuumed</li>
+            </ul></div>
+          </div>
+        </div>
+        <div class="trap"><strong>Forensics:</strong> the log row survives the very rollback that erased the payment change. When a send “did nothing”, the log is the only place that knows whether the bank was reached.</div>
+      </div>
+
+      <!-- STEP 9 -->
+      <div class="step-pane" id="step-9">
+        <div class="step-eyebrow">stage 09 · the only true finish line</div>
+        <h3>Prove &amp; reconcile <span class="chip c-ok">statement = proof</span></h3>
+        <p class="sec-sub" style="margin-bottom:0">The payment is only <em>confirmed</em> when the bank’s own record of the movement matches it. Reference text alone never counts.</p>
+        <div class="step-grid">
+          <div class="shared-list">
+            <h4>The shared guarantee</h4>
+            <ul>
+              <li><code>_gec_bank_matches_payment()</code>: money <strong>out</strong> (<code>amount &lt; 0</code>) for the exact amount in the payment’s currency — otherwise no match, even with the right reference.</li>
+              <li><code>_gec_bank_reconcile_payment()</code> matches the open Outstanding line as superuser; the batch and the bill follow.</li>
+              <li>Statement imports dedupe by <code>unique_import_id</code>, so re-running an import is safe.</li>
+              <li>Status polling can confirm, but <strong>only the statement reconciles</strong>.</li>
+            </ul>
+          </div>
+          <div class="bankgrid">
+            <div class="bankcell t-tbc"><h5>TBC</h5><ul>
+              <li>status <code>Finished</code>/<code>Completed</code> → confirmed</li>
+              <li>statement movement <code>paymentId</code> = transfer id <em>or</em> request id</li>
+            </ul></div>
+            <div class="bankcell t-bog"><h5>BOG</h5><ul>
+              <li>letters <code>S/T</code> → sent, <code>P</code> → confirmed</li>
+              <li>statement matched by document key + number</li>
+            </ul></div>
+            <div class="bankcell t-basis"><h5>Basis</h5><ul>
+              <li>report matched by <code>BankInternalID</code>, else <code>DocNum</code></li>
+              <li>48 h check: flags <code>not_in_report</code>, never touches accounting</li>
+            </ul></div>
+          </div>
+        </div>
+        <div class="note"><strong>Why so strict?</strong> a reversal or a credit can carry the same reference text. Matching on direction + amount + the bank’s own id is what makes the confirmation trustworthy.</div>
+      </div>
+    </div>
+
+    <div class="startrow" style="margin-top:22px">
+      <div class="card" style="padding:16px 18px;--sc:var(--base)">
+        <h3 style="font-size:14px;margin-bottom:6px">Law 1 · Own cursor</h3>
+        <p style="font-size:12.6px;color:var(--muted);margin:0">Claim, result, and log rows commit on independent cursors. A rollback cannot erase a request the bank already saw.</p>
+      </div>
+      <div class="card" style="padding:16px 18px;--sc:var(--bad)">
+        <h3 style="font-size:14px;margin-bottom:6px">Law 2 · Never touch the claimed row again</h3>
+        <p style="font-size:12.6px;color:var(--muted);margin:0">REPEATABLE READ: one more ORM UPDATE in the same transaction makes PostgreSQL refuse and Odoo re-run the request — a double send.</p>
+      </div>
+      <div class="card" style="padding:16px 18px;--sc:var(--warn)">
+        <h3 style="font-size:14px;margin-bottom:6px">Law 3 · Unknown ≠ failed</h3>
+        <p style="font-size:12.6px;color:var(--muted);margin:0">A timeout may mean the bank got it. Every adapter parks it, logs it, and recovers by the request id before anyone resends.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="divider"></div></div>
+
+<!-- ============ COMPARE ============ -->
+<section id="compare">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">03</span><h2>Common vs not common</h2></div>
+    <p class="sec-sub">
+      The fast answer first: <strong>the entire spine is shared</strong> — claim, write, log, fences, approval, routing, reconcile.
+      A bank adapter only replaces its <strong>session, payload, answer codes and recovery</strong>. The matrix below has the full detail;
+      flip the switch to hide everything that behaves identically.
+    </p>
+
+    <div class="startrow" style="grid-template-columns:1.1fr 1fr;margin-bottom:26px">
+      <div class="card reveal" style="padding:18px 20px;border-top:4px solid var(--ok)">
+        <h3 style="font-size:15px;margin-bottom:8px">Same in every bank <span class="chip c-ok">rely on it</span></h3>
+        <div class="gloss" style="grid-template-columns:1fr 1fr">
+          <div><b>Durable claim</b><span>request id written before any POST, on its own cursor</span></div>
+          <div><b>Durable result write</b><span>answer survives a rollback; core mirror + manual recompute</span></div>
+          <div><b>Redacted audit log</b><span>one row per call, own cursor, retention default 90 days</span></div>
+          <div><b>At-bank undo fence</b><span>reset/cancel/delete refused while the bank may hold it</span></div>
+          <div><b>Sendable fence</b><span>drafts and no-longer-Paid are refused</span></div>
+          <div><b>Approval model</b><span>same mixin: approver + delegates, self-approval flag</span></div>
+          <div><b>Recipient routing</b><span>partner account at the paying bank, matched by BIC</span></div>
+          <div><b>Statement match rule</b><span>direction + exact amount + bank key; never reference alone</span></div>
+          <div><b>7 handoff states</b><span>the payroll watchdog vocabulary</span></div>
+          <div><b>Human sends the batch</b><span>Pay Salaries stops at sealed batches; each is sent from its own form</span></div>
+        </div>
+      </div>
+      <div class="card reveal" style="padding:18px 20px;border-top:4px solid var(--bog)">
+        <h3 style="font-size:15px;margin-bottom:8px">Only the bank knows <span class="chip c-bog">per-adapter</span></h3>
+        <div class="gloss" style="grid-template-columns:1fr 1fr">
+          <div><b>Session style</b><span>bearer token vs ticket-in-body + Digipass OTP</span></div>
+          <div><b>Send unit &amp; batching</b><span>one request vs bulk vs all-or-nothing package</span></div>
+          <div><b>Request / bank ids</b><span>transferExternalId vs UniqueId+DocumentNo vs DocNum</span></div>
+          <div><b>Answer vocabulary</b><span>207 multi-status vs ResultCode+warns vs ErrorCode+ops</span></div>
+          <div><b>What “accepted” means</b><span>sent vs created (to sign) vs package accepted</span></div>
+          <div><b>Recovery mechanism</b><span>Recover vs Recover-by-activity vs Resync report</span></div>
+          <div><b>Statement source</b><span>movements vs statement v2 vs getreport</span></div>
+          <div><b>State names</b><span>TBC &amp; BOG share <code>gec_bank_state</code>; Basis owns its own</span></div>
+          <div><b>Special machinery</b><span>snapshots · warn+Create Anyway · OTP &amp; 48 h flag</span></div>
+          <div><b>Cron reality</b><span>all opt-in except Basis’ hourly 48 h check</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cmp-tools">
+      <label class="toggle"><input type="checkbox" id="onlyDiff"> Show differences only</label>
+      <span class="legend-dot"><i></i> green row = identical behaviour in all three banks</span>
+      <span class="legend-dot"><span class="badge-unverified">API unverified</span> reply shapes inferred from client code</span>
+    </div>
+
+    <div class="tablewrap reveal">
+      <table aria-label="Cross-bank comparison">
+        <thead>
+          <tr>
+            <th>Dimension</th>
+            <th class="h-tbc">TBC · tbc_bank</th>
+            <th class="h-bog">BOG · bog_bank</th>
+            <th class="h-basis">Basis · basis_bank</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="grp"><th colspan="4">Identity &amp; wiring</th></tr>
+          <tr class="diff"><th class="col-dim">Module version</th><td><code>20.0.1.5.1</code></td><td><code>20.0.1.0.0</code></td><td><code>20.0.1.15.0</code></td></tr>
+          <tr class="diff"><th class="col-dim">Journal becomes “this bank” when…</th><td>BIC starts <code>TBCBGE22</code></td><td>BIC starts <code>BAGAGE22</code></td><td>BIC is <code>CBASGE22</code> <em>and</em> a connection exists on the company or parent</td></tr>
+          <tr class="diff"><th class="col-dim">Payment method code</th><td><code>tbc_transfer</code></td><td><code>bog_transfer</code></td><td><code>basisbank_transfer</code></td></tr>
+          <tr class="diff"><th class="col-dim">Connection per company</th><td><code>tbc.connection</code></td><td><code>bog.connection</code></td><td><code>basisbank.connection</code></td></tr>
+          <tr class="same"><th class="col-dim">Shared base</th><td colspan="3">All three inherit the same 7 <code>gec_bank</code> mixins — service, guard, sendable, approval, connection, OAuth, api log. TBC and BOG additionally run the shared transfer flow on <code>account.payment</code> (<code>gec_bank_state</code> + hooks); Basis keeps its own flow and state field but shares the guard, the durable service, the mixins and the undo fence.</td></tr>
+          <tr class="same"><th class="col-dim">API verification</th><td colspan="3">None verified against the real bank — endpoints, codes and reply shapes are read from module code only.</td></tr>
+
+          <tr class="grp"><th colspan="4">Session &amp; auth</th></tr>
+          <tr class="diff"><th class="col-dim">API base</th><td><code>/bab/v1</code> on <code>test-api.tbcbank.ge</code> / <code>api.tbcbank.ge</code></td><td><code>api.businessonline.ge/api</code></td><td><code>https://{host}/{v2}/api</code> · default <code>bis.bankonline.ge</code></td></tr>
+          <tr class="diff"><th class="col-dim">Auth style</th><td>OAuth2 client-credentials (Basic + scope)</td><td>OAuth2 Keycloak client-credentials</td><td>Login + Password → ticket inside every JSON body</td></tr>
+          <tr class="diff"><th class="col-dim">Token / ticket life</th><td>cached bearer, 60 s safety margin</td><td>cached bearer, 60 s margin, 300 s fallback</td><td>540 s ticket, refreshed on each successful call</td></tr>
+          <tr class="diff"><th class="col-dim">Retry rules</th><td>401 → re-auth once</td><td>429 → retry once; 401 → re-auth once</td><td>code 3 → re-auth once (report reads only)</td></tr>
+          <tr class="diff"><th class="col-dim">Rate limiting</th><td>—</td><td>5 req/s, process-local (multi-worker can breach; 429 is the backstop)</td><td>—</td></tr>
+          <tr class="diff"><th class="col-dim">Blocked / error signals</th><td>user-blocked titles → durable <code>blocked</code></td><td>HTTP errors → <code>error</code></td><td>codes 4/5 or <code>ActiveClient:false</code> → <code>blocked</code>; code 6 / failed login → <code>error</code></td></tr>
+
+          <tr class="grp"><th colspan="4">Sending</th></tr>
+          <tr class="diff"><th class="col-dim">Send unit</th><td>one transfer per request</td><td>one document per payment, or one bulk call per batch</td><td>one op-7 item, or one package</td></tr>
+          <tr class="diff"><th class="col-dim">Batch strategy</th><td>per-payment loop, each in its own savepoint</td><td>one bulk POST (≤ 500) — bare key, no per-line result</td><td>package ops 4/5/6 all-or-nothing, or op 7 with per-item verdicts</td></tr>
+          <tr class="diff"><th class="col-dim">Extra send gate</th><td>—</td><td>—</td><td><strong>Digipass OTP</strong> inside the payload; dialog first</td></tr>
+          <tr class="diff"><th class="col-dim">Call timeout</th><td>60 s</td><td>60 s money / 15 s read</td><td>15 s</td></tr>
+          <tr class="same"><th class="col-dim">Auto-send from Pay Salaries</th><td colspan="3"><strong>Never.</strong> Pay Salaries ends at sealed batches and opens the batch list; each batch is sent from its own form by a human (Basis: and the human types the OTP).</td></tr>
+          <tr class="diff"><th class="col-dim">Transfer types</th><td>own · internal · national · treasury · foreign</td><td>domestic · foreign</td><td>internal · national · foreign · treasury</td></tr>
+
+          <tr class="grp"><th colspan="4">Identifiers &amp; idempotency</th></tr>
+          <tr class="diff"><th class="col-dim">Our request id</th><td><code>gec_bank_request_id</code> — <code>transferExternalId</code>, numeric &lt; 10⁹, reused across retries</td><td><code>gec_bank_request_id</code> = <code>UniqueId</code> (UUID) + <code>bog_document_no</code> <code>ODOO&lt;id&gt;</code>, <code>CheckUniqueId:true</code></td><td><code>ClientInternalID</code> and <code>DocNum</code> = payment id</td></tr>
+          <tr class="diff"><th class="col-dim">Bank’s id</th><td><code>gec_bank_reference</code> = <code>transferId</code></td><td><code>gec_bank_reference</code> = <code>UniqueKey</code>; bulk: a bare integer key in <code>bog_bulk_key</code></td><td><code>basisbank_bank_internal_id</code> = <code>BankInternalID</code> (op 7 only); packages get one only from the report</td></tr>
+          <tr class="diff"><th class="col-dim">Duplicate answer</th><td>400 <code>DUPLICATED…</code> or 207 text → park <code>unknown</code>, then look up</td><td>363 → <code>failed</code> (Create Anyway withheld); a resend hits 702 → <code>unknown</code></td><td>not a documented answer — recovery through the report only</td></tr>
+          <tr class="same"><th class="col-dim">Claim mechanism</th><td colspan="3">The same <code>_reserve_send</code> conditional UPDATE on an independent cursor, before the POST, with a 2 s lock timeout.</td></tr>
+
+          <tr class="grp"><th colspan="4">States &amp; proof</th></tr>
+          <tr class="diff"><th class="col-dim">State field</th><td><code>gec_bank_state</code> — the shared 8 values</td><td><code>gec_bank_state</code> + <code>awaiting_confirmation</code>/<code>created</code>; <code>bog_state</code> — 8 batch values</td><td><code>basisbank_state</code> — 9 values + batch states</td></tr>
+          <tr class="diff"><th class="col-dim">Key quirk</th><td><code>sent</code> on a 207 with a <code>transferId</code></td><td><code>created</code> = ready to sign, <strong>not sent</strong></td><td><code>sent_pending_confirm</code> = package accepted, per-member not proven</td></tr>
+          <tr class="diff"><th class="col-dim">Paper trail</th><td><code>transferId</code>; status <code>Finished</code>/<code>Completed</code></td><td>letters: <code>A/Z</code> created · <code>S/T</code> sent · <code>P</code> confirmed · <code>R/D/C</code> failed (package letters invert <code>P</code>!)</td><td><code>BankInternalID</code> from the report; 48 h missing → <code>not_in_report</code></td></tr>
+          <tr class="same"><th class="col-dim">Core mirror</th><td colspan="3">held → <code>is_sent = True</code>; refused from Paid → <code>state = 'rejected'</code> and <code>is_sent</code> cleared.</td></tr>
+          <tr class="same"><th class="col-dim">Only the statement reconciles</th><td colspan="3">Status polling can confirm; reconciliation always comes from an imported statement line matched by direction + amount + bank key.</td></tr>
+          <tr class="diff"><th class="col-dim">Status polling</th><td>hourly, ≤ 100 sent/unknown <em>(ships inactive)</em></td><td>hourly document + batch polls <em>(ships inactive)</em></td><td>none — replaced by the 48 h report check <em>(active)</em></td></tr>
+          <tr class="diff"><th class="col-dim">Recovery action</th><td>Recover by request id; only “not found” resets to <code>pending</code>; 15 min stale guard</td><td>Recover by <code>DocumentNo</code> in today’s activities; Reset keeps <code>UniqueId</code>; 15 min guard</td><td>Resync wizard pages the report; Reset re-reads the report first</td></tr>
+
+          <tr class="grp"><th colspan="4">Statements</th></tr>
+          <tr class="diff"><th class="col-dim">Import source</th><td>paged <code>GET accounts/movements</code> (700/page, ≤ 200 pages, Tbilisi time)</td><td><code>v2/statement</code> pages until <code>totalCount</code> / short page</td><td>paged <code>main/getreport</code> (PageNo/PageCount) under a per-journal advisory lock</td></tr>
+          <tr class="diff"><th class="col-dim">Skip rules</th><td><code>statusCode ≠ 0</code> — still awaiting authorization</td><td>entry id + readable date required</td><td>no <code>BankInternalID</code>, our IBAN on neither side, unreadable date</td></tr>
+          <tr class="diff"><th class="col-dim">Dedup id</th><td><code>tbcbank-&lt;journal&gt;-&lt;movementId&gt;</code></td><td><code>bogbank-&lt;journal&gt;-&lt;entryId&gt;</code></td><td><code>basisbank/&lt;journal&gt;/&lt;BankInternalID&gt;</code></td></tr>
+          <tr class="diff"><th class="col-dim">Confirmation key</th><td>movement <code>paymentId</code> = transfer id <em>or</em> request id</td><td>document key + document number</td><td><code>BankInternalID</code> first, then <code>DocNum</code></td></tr>
+          <tr class="diff"><th class="col-dim">Balance snapshots</th><td><code>tbc.statement</code>: opening/closing + credit/debit sums; live upsert every 2 h <em>(inactive)</em></td><td><code>bog.statement</code>: no opening balance; closing derived from the last daily summary; live every 2 h <em>(inactive)</em></td><td>none stored — the import takes a lock and dedups instead</td></tr>
+
+          <tr class="grp"><th colspan="4">Payroll extras</th></tr>
+          <tr class="diff"><th class="col-dim">Recipient / type checks</th><td>9-digit treasury codes, Georgian IBAN only, treasury stamped on the payment</td><td>no State Treasury recipients, GE IBAN (22), known BIC; salaries → <code>BULK</code> ≤ 10,000 else <code>MT103</code></td><td>GEL + memo + BIC per recipient; salary batch → op 5</td></tr>
+          <tr class="diff"><th class="col-dim">Handoff mapping</th><td><code>sent → transmitted</code>; pending/awaiting/approved → prepared; sending/unknown → uncertain</td><td><code>created → pending</code>; sent → transmitted; awaiting_confirmation → prepared</td><td>same 7-state vocabulary; packages sit at <code>transmitted</code> until the report proves members</td></tr>
+          <tr class="diff"><th class="col-dim">Background jobs active out of the box</th><td>none (3 crons ship inactive)</td><td>none (4 crons ship inactive)</td><td>the hourly 48 h check — plus daily statement import <em>inactive</em></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="divider"></div></div>
+
+<!-- ============ BANK PROFILES ============ -->
+<section id="banks">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">04</span><h2>The three banks, one by one</h2></div>
+    <p class="sec-sub">
+      Same spine, different personality. Each profile gives you the identity, the exact state machine, the signature mechanisms,
+      the wire format and the recovery moves. Every API detail carries the “inferred from code” caveat from the module maps.
+    </p>
+
+    <div class="banktabs" role="tablist" aria-label="Bank profiles">
+      <button class="banktab on" data-bank="tbc" role="tab" aria-selected="true">TBC Bank <span class="bic">TBCBGE22</span></button>
+      <button class="banktab" data-bank="bog" role="tab" aria-selected="false">Bank of Georgia <span class="bic">BAGAGE22</span></button>
+      <button class="banktab" data-bank="basis" role="tab" aria-selected="false">Basis Bank <span class="bic">CBASGE22</span></button>
+    </div>
+
+    <!-- ================= TBC ================= -->
+    <div class="bankpanel on profile" data-bank="tbc">
+      <div class="profile-head">
+        <div>
+          <h3>tbc_bank — TBC Bank via BIS</h3>
+          <div class="sub">One transfer per request · OAuth2 · the only adapter with balance snapshots · <span class="badge-unverified">API unverified</span></div>
+        </div>
+        <div class="headchips">
+          <span class="chip c-tbc mono">TBCBGE22</span><span class="chip mono">tbc_transfer</span><span class="chip mono">v20.0.1.5.1</span><span class="chip mono">3 crons · all inactive</span>
+        </div>
+      </div>
+      <dl class="factgrid">
+        <div class="fact"><dt>API base</dt><dd><span class="mono">/bab/v1</span> on test / production host</dd></div>
+        <div class="fact"><dt>Auth</dt><dd>OAuth2 client-credentials, cached bearer (60 s margin)</dd></div>
+        <div class="fact"><dt>Request id</dt><dd><span class="mono">gec_bank_request_id</span> ↔ <span class="mono">transferExternalId</span></dd></div>
+        <div class="fact"><dt>Bank id</dt><dd><span class="mono">gec_bank_reference</span> ↔ <span class="mono">transferId</span></dd></div>
+        <div class="fact"><dt>Batch send</dt><dd>per-payment loop, one savepoint each</dd></div>
+        <div class="fact"><dt>Timeout</dt><dd>60 s</dd></div>
+        <div class="fact"><dt>Statement source</dt><dd><span class="mono">GET accounts/movements</span>, 700/page</dd></div>
+        <div class="fact"><dt>Status poll</dt><dd>hourly, ≤100 — ships inactive</dd></div>
+      </dl>
+
+      <div class="subsec">
+        <h4>State machine <span class="tag">gec_bank_state · shared flow</span></h4>
+        <div class="lifecycle">
+          <span class="state st-pending">pending</span><span class="arr">→</span>
+          <span class="state st-await">awaiting_approval</span><span class="arr">→</span>
+          <span class="state st-await">approved</span><span class="arr">→</span>
+          <span class="state st-bank">sending</span><span class="arr">→</span>
+          <span class="state st-sent">sent</span><span class="arr">→</span>
+          <span class="state st-ok">confirmed</span>
+          <span class="branch">
+            <span class="state st-unknown">unknown</span>
+            <span class="state st-bad">failed</span>
+          </span>
+        </div>
+        <div class="legend"><span class="sw"><i style="background:var(--ok-2);border:1px solid var(--ok)"></i> sent/confirmed mirror to <code>is_sent</code></span><span class="sw"><i style="background:var(--bad-2);border:1px solid var(--bad)"></i> failed mirrors to Odoo Rejected</span><span class="sw"><i style="background:var(--bad-2);border:1px dashed var(--bad)"></i> unknown = no answer, recover first</span></div>
+      </div>
+
+      <div class="subsec">
+        <h4>Signature moves</h4>
+        <div class="sig-grid">
+          <div class="sig"><b>Five transfer types</b><p>own · internal · national · treasury · foreign map to BIS type names. Treasury needs GEL and a 9-digit code, and drops the credit account; foreign needs the SWIFT block + SHA/OUR.</p></div>
+          <div class="sig"><b>Duplicate is not a failure</b><p>A duplicate answer parks the payment as <code>unknown</code>, then looks the transfer up by request id. Found → adopt <code>transferId</code>; not found keeps <code>unknown</code>.</p></div>
+          <div class="sig"><b>Strict ambiguity separation</b><p>0 / 5xx / 207 without id → <code>unknown</code>, never auto-retried. Definite 4xx → <code>failed</code>. The two never mix.</p></div>
+          <div class="sig"><b>Guarded recovery</b><p>Recover refuses a <code>sending</code> younger than 15 minutes. Only TBC’s own “not found” answer may reset to <code>pending</code> — the signal that a resend is safe.</p></div>
+          <div class="sig"><b>Statement confirms by movement id</b><p>The imported movement carries <code>paymentId</code>; the adapter matches it against transfer id <em>or</em> request id (the docs don’t say which it echoes) plus the debit amount.</p></div>
+          <div class="sig"><b>Balance snapshots</b><p><code>tbc.statement</code> stores opening/closing balances and credit/debit sums — live upsert every 2 h (inactive) plus period rows. Informational only.</p></div>
+        </div>
+      </div>
+
+      <div class="subsec">
+        <h4>On the wire <span class="tag">single transfer order · inferred</span></h4>
+        <div class="wirebox">POST /bab/v1/transfers/single
+{ "singleTransferOrders": [ {
+    <span class="k">"transferType"</span>: "TransferToOtherBankNationalCurrency",
+    <span class="k">"transferExternalId"</span>: "842173965",
+    <span class="k">"debitAccount"</span>:  { "accountNumber": "GE..", "accountCurrencyCode": "GEL" },
+    <span class="k">"creditAccount"</span>: { "accountNumber": "GE..", "accountCurrencyCode": "GEL" },
+    <span class="k">"amount"</span>: { "amount": 250.00, "currency": "GEL" },
+    <span class="k">"description"</span>: "Salary 2026-09",
+    <span class="k">"beneficiaryName"</span>: "N. Beridze",
+    <span class="k">"beneficiaryTaxCode"</span>: "010…",          <span style="opacity:.55">// national</span>
+    <span class="k">"treasuryCode"</span>: "101001000"             <span style="opacity:.55">// treasury only</span>
+} ] }
+→ 207 Multi-Status · succeeded[0].transferId = "998877"   (or a failed[] entry)</div>
+      </div>
+
+      <div class="subsec">
+        <h4>Recovery moves</h4>
+        <div class="recov">
+          <div class="rc"><b>No answer / timeout</b><p>Refresh after the fact, or Recover: GET by request id. 15-minute guard on <code>sending</code>.</p></div>
+          <div class="rc"><b>“Duplicate” answer</b><p>Automatic lookup — never raises, never resends. If the lookup misses, the payment stays <code>unknown</code>.</p></div>
+          <div class="rc"><b>Definite refusal</b><p><code>failed</code> / Odoo Rejected, entry kept, approval cleared. Fix the data, reset, send again.</p></div>
+          <div class="rc"><b>Never proven</b><p>Refresh Status, import statements, or Confirm Manually. Only the statement reconciles.</p></div>
+        </div>
+      </div>
+
+      <div class="note"><strong>Payroll note:</strong> Pay Salaries ends at the sealed batch — TBC gets no automatic send. The channel hook stamps treasury recipients (<code>treasury</code> + 9-digit code) and refuses any non-Georgian IBAN before the run starts.</div>
+    </div>
+
+    <!-- ================= BOG ================= -->
+    <div class="bankpanel profile p-bog" data-bank="bog">
+      <div class="profile-head">
+        <div>
+          <h3>bog_bank — Bank of Georgia Business Online</h3>
+          <div class="sub">Documents and bulk files · warn codes with “Create Anyway” · status letters · <span class="badge-unverified">API unverified</span></div>
+        </div>
+        <div class="headchips">
+          <span class="chip c-bog mono">BAGAGE22</span><span class="chip mono">bog_transfer</span><span class="chip mono">v20.0.1.0.0</span><span class="chip mono">4 crons · all inactive</span>
+        </div>
+      </div>
+      <dl class="factgrid">
+        <div class="fact"><dt>API base</dt><dd><span class="mono">api.businessonline.ge/api</span> + v2 statements</dd></div>
+        <div class="fact"><dt>Auth</dt><dd>OAuth2 Keycloak, cached bearer (60 s margin, 300 s fallback)</dd></div>
+        <div class="fact"><dt>Request id</dt><dd><span class="mono">gec_bank_request_id</span> (UniqueId) + <span class="mono">bog_document_no</span></dd></div>
+        <div class="fact"><dt>Bank id</dt><dd><span class="mono">gec_bank_reference</span> (UniqueKey) · <span class="mono">bog_bulk_key</span></dd></div>
+        <div class="fact"><dt>Batch send</dt><dd>one bulk POST, ≤ 500 lines, no per-line result</dd></div>
+        <div class="fact"><dt>Timeout</dt><dd>60 s money · 15 s read</dd></div>
+        <div class="fact"><dt>Statement source</dt><dd><span class="mono">v2/statement</span> pages until totalCount</dd></div>
+        <div class="fact"><dt>Throttle</dt><dd>5 req/s, process-local (429 backstop)</dd></div>
+      </dl>
+
+      <div class="subsec">
+        <h4>State machine <span class="tag">gec_bank_state + BOG additions · payment</span></h4>
+        <div class="lifecycle">
+          <span class="state st-pending">pending</span><span class="arr">→</span>
+          <span class="state st-await">awaiting_approval</span><span class="arr">→</span>
+          <span class="state st-await">approved</span><span class="arr">→</span>
+          <span class="state st-bank">sending</span><span class="arr">→</span>
+          <span class="state st-bank">created</span><span class="arr">→</span>
+          <span class="state st-sent">sent</span><span class="arr">→</span>
+          <span class="state st-ok">confirmed</span>
+          <span class="branch">
+            <span class="state st-await">awaiting_confirmation</span>
+            <span class="state st-unknown">unknown</span>
+            <span class="state st-bad">failed</span>
+          </span>
+        </div>
+        <div class="legend"><span class="sw"><i style="background:var(--bog-2);border:1px solid var(--bog)"></i> created = document ready to sign — <strong>money has not moved</strong></span></div>
+      </div>
+
+      <div class="subsec">
+        <h4>Signature moves</h4>
+        <div class="sig-grid">
+          <div class="sig"><b>“Created” is not “sent”</b><p>ResultCode 0 means BOG accepted the document for signing. Only status letters or the statement move a payment past <code>created</code>.</p></div>
+          <div class="sig"><b>Warn codes + Create Anyway</b><p>333/444/701 inside HTTP 200 mean the document was <em>not</em> created. “Create Anyway” resends the same <code>UniqueId</code>; a real duplicate answers 702 instead of paying twice. 363 (duplicate) is the one warn that goes straight to <code>failed</code>.</p></div>
+          <div class="sig"><b>CheckUniqueId</b><p>Every document asks BOG to enforce id uniqueness. A resend of an id BOG already holds answers 702 → the payment parks at <code>unknown</code>.</p></div>
+          <div class="sig"><b>Bulk reality</b><p>The bulk POST returns a bare integer key with zero per-line results. The package is a container: a signed package can hide a rejected line → the batch ends <code>partial</code>. Package letters invert the document ones (<code>P</code> = To be Signed!).</p></div>
+          <div class="sig"><b>Recover in today’s activities</b><p>Status lookup needs the <code>UniqueKey</code>, so a lost answer is recovered by <code>DocumentNo</code> in today’s activities (quota 800/day) → then the key + status refresh.</p></div>
+          <div class="sig"><b>Name match score</b><p><code>bog_match_percent</code> against the configured threshold (default 80) records how well the beneficiary name matched. <code>gec_bank_confirmed_source</code> records what confirmed it.</p></div>
+        </div>
+      </div>
+
+      <div class="subsec">
+        <h4>On the wire <span class="tag">document · inferred</span></h4>
+        <div class="wirebox">POST /api/documents/domestic
+[ {
+    <span class="k">"Nomination"</span>: "Salary 2026-09",
+    <span class="k">"UniqueId"</span>: "…uuid…",
+    <span class="k">"CheckUniqueId"</span>: true,
+    <span class="k">"Amount"</span>: 1200.00,       <span class="k">"Currency"</span>: "GEL",
+    <span class="k">"DocumentNo"</span>: "ODOO42",
+    <span class="k">"ValueDate"</span>: "2026-10-04",
+    <span class="k">"SourceAccountNumber"</span>: "GE..",
+    <span class="k">"BeneficiaryAccountNumber"</span>: "GE..",
+    <span class="k">"BeneficiaryBankCode"</span>: "TBCBGE22",
+    <span class="k">"BeneficiaryInn"</span>: "…",  <span class="k">"BeneficiaryName"</span>: "N. Beridze",
+    <span class="k">"PayerInn"</span>: "…",        <span class="k">"IsSalary"</span>: true, <span class="k">"DispatchType"</span>: "BULK"
+} ]
+→ [ { "UniqueKey": 987654, "ResultCode": 0, "Match": 100 } ]
+  ResultCode 0 = ready to sign · 333/444/701 warn (not created) · 363 failed · 702 unknown</div>
+      </div>
+
+      <div class="subsec">
+        <h4>Recovery moves</h4>
+        <div class="recov">
+          <div class="rc"><b>No answer / timeout</b><p><code>unknown</code>; Recover searches today’s activities by <code>DocumentNo</code>. Batch members recover individually.</p></div>
+          <div class="rc"><b>Bank warning (333/444/701)</b><p><code>awaiting_confirmation</code>. Create Anyway re-sends the same <code>UniqueId</code>; Reset to Pending keeps it so a future retry can only hit 702, never double-pay.</p></div>
+          <div class="rc"><b>Duplicate (363 / 702)</b><p>363 → <code>failed</code>, Create Anyway is never offered. 702 → <code>unknown</code>: BOG already holds the id — recover, don’t recreate.</p></div>
+          <div class="rc"><b>Never proven</b><p>Refresh Status (letters S/T → sent, P → confirmed) or import the statement. Confirm Manually sets status only — the statement reconciles.</p></div>
+        </div>
+      </div>
+
+      <div class="note"><strong>Payroll note:</strong> the BOG channel refuses State Treasury recipients outright, so a mixed payroll fails fast instead of half-paying through the wrong bank. Salaries are flagged <code>IsSalary</code> and dispatched as <code>BULK</code> (≤ 10,000) or <code>MT103</code>.</div>
+    </div>
+
+    <!-- ================= BASIS ================= -->
+    <div class="bankpanel profile p-basis" data-bank="basis">
+      <div class="profile-head">
+        <div>
+          <h3>basis_bank — Basis Bank bankonline</h3>
+          <div class="sub">Ticket in the body · Digipass OTP on every send · packages and op 7 · the only active background job · <span class="badge-unverified">API unverified</span></div>
+        </div>
+        <div class="headchips">
+          <span class="chip c-basis mono">CBASGE22</span><span class="chip mono">basisbank_transfer</span><span class="chip mono">v20.0.1.15.0</span><span class="chip mono">48 h cron active</span>
+        </div>
+      </div>
+      <dl class="factgrid">
+        <div class="fact"><dt>API base</dt><dd><span class="mono">https://{host}/{v2}/api</span> · bis.bankonline.ge</dd></div>
+        <div class="fact"><dt>Auth</dt><dd>Login + Password → <span class="mono">TicketId</span> in every body (540 s)</dd></div>
+        <div class="fact"><dt>Request id</dt><dd><span class="mono">ClientInternalID</span> / <span class="mono">DocNum</span> = payment id</dd></div>
+        <div class="fact"><dt>Bank id</dt><dd><span class="mono">BankInternalID</span> (op 7 only)</dd></div>
+        <div class="fact"><dt>Batch send</dt><dd>package op 4/5/6, or op 7 mixed with per-item verdicts</dd></div>
+        <div class="fact"><dt>OTP</dt><dd>Digipass code inside the payload; dialog before send</dd></div>
+        <div class="fact"><dt>Statement source</dt><dd><span class="mono">main/getreport</span> pages + advisory lock</dd></div>
+        <div class="fact"><dt>48 h check</dt><dd>hourly, active by default</dd></div>
+      </dl>
+
+      <div class="subsec">
+        <h4>State machine <span class="tag">basisbank_state</span></h4>
+        <div class="lifecycle">
+          <span class="state st-pending">pending</span><span class="arr">→</span>
+          <span class="state st-await">awaiting_approval</span><span class="arr">→</span>
+          <span class="state st-await">awaiting_otp</span><span class="arr">→</span>
+          <span class="state st-bank">sending</span><span class="arr">→</span>
+          <span class="state st-sent">sent</span><span class="arr">→</span>
+          <span class="state st-ok">confirmed</span>
+          <span class="branch">
+            <span class="state st-unknown">unknown</span>
+            <span class="state st-await">not_in_report</span>
+            <span class="state st-bad">failed</span>
+          </span>
+        </div>
+        <div class="legend"><span class="sw">batch: <code>draft → awaiting_approval → awaiting_otp → sending → sent_pending_confirm / awaiting_ib_confirmation → done</code></span></div>
+      </div>
+
+      <div class="subsec">
+        <h4>Signature moves</h4>
+        <div class="sig-grid">
+          <div class="sig"><b>Digipass OTP everywhere</b><p>Every upload and password change carries the OTP in the JSON body. Codes 2 and 3 are the only “clean refusal”: nothing reached the bank, payments go back to <code>pending</code>, the batch re-arms at <code>awaiting_otp</code>.</p></div>
+          <div class="sig"><b>Packages vs op 7</b><p>Ops 4 (GEL) / 5 (salary) / 6 (treasury) are all-or-nothing. Op 7 mixes internal / national / foreign / treasury groups and answers per item, keyed by <code>ClientInternalID</code> — the only way to get a partial result.</p></div>
+          <div class="sig"><b>Resync wizard</b><p>For an <code>unknown</code> batch or payment: pages the report over the send window and confirms by <code>BankInternalID</code>, else <code>DocNum</code>, always checking a debit from our IBAN for the exact amount.</p></div>
+          <div class="sig"><b>The 48-hour check</b><p>The only bank job active by default: an hourly cron gives every sent-but-unproven payment 48 h, reads the report once per journal/currency, confirms what it finds and flags the rest <code>not_in_report</code> with a chatter note and an activity — <strong>accounting untouched</strong>.</p></div>
+          <div class="sig"><b>Reset re-reads the report</b><p>“Reset to Pending” isn’t blind: it reads the bank report first. Batch reset is refused while any member is sending/sent/unknown.</p></div>
+          <div class="sig"><b>Connection flips journals</b><p>CBASGE22 alone isn’t enough — a connection must exist on the company or a parent. Creating one cascades <code>is_basisbank</code> and recomputes states of old posted payments. Review those payments (<code>KNOWN_ISSUES.md</code> A3).</p></div>
+        </div>
+      </div>
+
+      <div class="subsec">
+        <h4>On the wire <span class="tag">op 7 item · inferred</span></h4>
+        <div class="wirebox">POST /v2/api/main/uploadsingletransfersbatch
+{ <span class="k">"TicketId"</span>: "…", <span class="k">"Lang"</span>: "GEO", <span class="k">"Otp"</span>: "123456",
+  <span class="k">"NationalCurrencyTransfers"</span>: [ {
+      <span class="k">"SenderAcc"</span>: "GE..", <span class="k">"Amount"</span>: 250.00,
+      <span class="k">"ReceiverAcc"</span>: "GE..", <span class="k">"ReceiverAccName"</span>: "N. Beridze",
+      <span class="k">"ReceiverBankCode"</span>: "TBCBGE22",
+      <span class="k">"Descrip"</span>: "Salary 2026-09",
+      <span class="k">"ClientInternalID"</span>: 42, <span class="k">"DocNum"</span>: 42,
+      <span class="k">"TaxPayerTaxCode"</span>: "…"          <span style="opacity:.55">// when the item carries VAT</span>
+  } ] }
+→ ErrorCode 0 · item BankInternalID;  2/3 = retry OTP · 999 unknown · others failed
+  packages: uploadpackagegel (4) · uploadpackagesalary (5) · uploadpackagetreasury (6)</div>
+      </div>
+
+      <div class="subsec">
+        <h4>Recovery moves</h4>
+        <div class="recov">
+          <div class="rc"><b>No answer / timeout</b><p>Payments park <code>unknown</code> (or stay <code>sending</code> if the worker died). Resync from the report; never resend blindly.</p></div>
+          <div class="rc"><b>Wrong OTP (2/3)</b><p>Clean retry: members back to <code>pending</code>, batch at <code>awaiting_otp</code>, posting untouched, fresh code re-sends.</p></div>
+          <div class="rc"><b>Definite refusal</b><p><code>failed</code> / Odoo Rejected with the entry kept. Packages fail wholesale (code 11); op 7 fails only the item.</p></div>
+          <div class="rc"><b>Never proven</b><p>After 48 h → <code>not_in_report</code> + activity. Resync confirms from the report, or Reset to Pending re-reads it.</p></div>
+        </div>
+      </div>
+
+      <div class="note"><strong>Payroll note:</strong> a salary run produces a draft op-5 package — Pay Salaries stops before the OTP. The channel hooks stamp transfer types (internal only for same-BIC, treasury by code), require GEL + memo + BIC per recipient, and pre-flight every recipient before the run starts.</div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="divider"></div></div>
+
+<!-- ============ FAILURE PLAYBOOK ============ -->
+<section id="playbook">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">05</span><h2>Failure playbook</h2></div>
+    <p class="sec-sub">
+      The moment that matters in every integration is the moment the answer is unclear. These are the recurring situations,
+      what each bank’s answer really means, and the exact move. <strong>The one rule that never bends:</strong> an unclear answer is
+      recovered by id, never resent.
+    </p>
+
+    <div class="pb-grid">
+      <article class="pb-card">
+        <h3>No answer at all</h3>
+        <div class="verdict">timeout · http_status 0 · 5xx → unknown</div>
+        <dl class="steps3">
+          <div class="pb-line"><dt>Meaning</dt><dd>The bank may or may not have received the order. There is no way to tell from Odoo.</dd></div>
+          <div class="pb-line"><dt>Odoo does</dt><dd>Writes the claim durably first, parks the payment <code>unknown</code> with a warning, logs the failed call on its own cursor. Never auto-retries.</dd></div>
+          <div class="pb-line"><dt>You do</dt><dd><strong>TBC:</strong> Recover by request id (wait 15 min if still <code>sending</code>). <strong>BOG:</strong> Recover by <code>DocumentNo</code> in today’s activities. <strong>Basis:</strong> Resync from the bank report over the send window.</dd></div>
+        </dl>
+        <div class="pb-banks"><span class="chip c-tbc">TBC · Recover</span><span class="chip c-bog">BOG · Recover</span><span class="chip c-basis">Basis · Resync</span></div>
+      </article>
+
+      <article class="pb-card">
+        <h3>“Duplicate” answer</h3>
+        <div class="verdict">the bank already knows this request id</div>
+        <dl class="steps3">
+          <div class="pb-line"><dt>Meaning</dt><dd>A previous attempt did reach the bank and its answer was lost. The transfer may already exist.</dd></div>
+          <div class="pb-line"><dt>Odoo does</dt><dd><strong>TBC:</strong> parks <code>unknown</code> and looks the transfer up automatically; found → adopt <code>transferId</code>. <strong>BOG:</strong> 363 → <code>failed</code> with Create Anyway withheld; 702 → <code>unknown</code>. <strong>Basis:</strong> no duplicate answer documented.</dd></div>
+          <div class="pb-line"><dt>You do</dt><dd>Never create a new payment to “try again”. Recover the existing request. BOG’s Reset deliberately keeps the <code>UniqueId</code> so a resend can only hit 702.</dd></div>
+        </dl>
+        <div class="pb-banks"><span class="chip c-tbc">207 / 400 DUPLICATED</span><span class="chip c-bog">363 · 702</span></div>
+      </article>
+
+      <article class="pb-card">
+        <h3>Bank warning: document not created</h3>
+        <div class="verdict">BOG-only · ResultCode 333 / 444 / 701 inside HTTP 200</div>
+        <dl class="steps3">
+          <div class="pb-line"><dt>Meaning</dt><dd>BOG refused to create the document but invites a corrected retry — e.g. 333 insufficient working balance. Money has not moved.</dd></div>
+          <div class="pb-line"><dt>Odoo does</dt><dd>Parks the payment <code>awaiting_confirmation</code> and offers <strong>Create Anyway</strong>, which re-sends the <em>same</em> <code>UniqueId</code>. If BOG secretly holds it, the answer is 702 → <code>unknown</code> (recover, don’t duplicate).</dd></div>
+          <div class="pb-line"><dt>You do</dt><dd>Fund/settle the cause, then Create Anyway. If the payment was reset instead, the UniqueId is kept — safe by design. 363 (duplicate) is never offered this path.</dd></div>
+        </dl>
+        <div class="pb-banks"><span class="chip c-bog">Create Anyway · same UniqueId</span></div>
+      </article>
+
+      <article class="pb-card">
+        <h3>Definite refusal</h3>
+        <div class="verdict">4xx · failed[] · letter R/D/C · ErrorCode ≠ 0 (except retryable)</div>
+        <dl class="steps3">
+          <div class="pb-line"><dt>Meaning</dt><dd>The bank rejected the order. No money moved and the request id is spent — this is the safe failure.</dd></div>
+          <div class="pb-line"><dt>Odoo does</dt><dd>Payment goes <code>failed</code>, mirror sets Odoo state <code>rejected</code> and clears <code>is_sent</code>. The journal entry is kept.</dd></div>
+          <div class="pb-line"><dt>You do</dt><dd>Fix the data, Reset to Pending / Draft, correct and resend. Basis packages fail wholesale (code 11); op 7 fails only the item. BOG 363 never gets Create Anyway.</dd></div>
+        </dl>
+        <div class="pb-banks"><span class="chip c-tbc">TBC failed</span><span class="chip c-bog">BOG failed</span><span class="chip c-basis">Basis failed</span></div>
+      </article>
+
+      <article class="pb-card">
+        <h3>Sent, but never confirmed</h3>
+        <div class="verdict">the bank holds it; proof hasn’t arrived</div>
+        <dl class="steps3">
+          <div class="pb-line"><dt>Meaning</dt><dd>The transfer was accepted, but no status/statement has proven it yet. This is normal for minutes–hours, suspicious after days.</dd></div>
+          <div class="pb-line"><dt>Odoo does</dt><dd><strong>TBC:</strong> status poll (inactive) + statement import. <strong>BOG:</strong> status letters + statement. <strong>Basis:</strong> the hourly 48 h check flags <code>not_in_report</code> with an activity — without touching accounting, because the bank may still book it.</dd></div>
+          <div class="pb-line"><dt>You do</dt><dd>Activate the statement import crons; use Refresh Status / Resync; escalate with the bank if flagged. Confirm Manually sets status only — the statement is what reconciles.</dd></div>
+        </dl>
+        <div class="pb-banks"><span class="chip c-tbc">Refresh</span><span class="chip c-bog">Refresh letters</span><span class="chip c-basis">48 h + Resync</span></div>
+      </article>
+
+      <article class="pb-card">
+        <h3>“These payments are at the bank…”</h3>
+        <div class="verdict">undo blocked · all banks</div>
+        <dl class="steps3">
+          <div class="pb-line"><dt>Meaning</dt><dd>Reset to Draft, Cancel or Delete was attempted on a payment the bank holds, may hold, or already confirmed.</dd></div>
+          <div class="pb-line"><dt>Odoo does</dt><dd><code>_gec_bank_at_bank()</code> raises from the payment buttons, the journal-entry buttons and the delete hook. States: TBC <code>sending/sent/confirmed/unknown</code>; BOG adds <code>created</code>; Basis adds <code>not_in_report</code>.</dd></div>
+          <div class="pb-line"><dt>You do</dt><dd>Don’t fight the fence. Use Recover/Resync first; once the payment is proven untouched, Reset becomes possible again.</dd></div>
+        </dl>
+        <div class="pb-banks"><span class="chip c-base">bypass key exists for core statement unmatching only</span></div>
+      </article>
+
+      <article class="pb-card">
+        <h3>Wrong Digipass code</h3>
+        <div class="verdict">Basis-only · ErrorCode 2 or 3</div>
+        <dl class="steps3">
+          <div class="pb-line"><dt>Meaning</dt><dd>Code 2 = wrong OTP, code 3 = stale ticket. Both are the only answers treated as a clean refusal.</dd></div>
+          <div class="pb-line"><dt>Odoo does</dt><dd>Every claimed payment goes back to <code>pending</code>, the batch re-arms at <code>awaiting_otp</code>, the send date is cleared, and the posting is untouched.</dd></div>
+          <div class="pb-line"><dt>You do</dt><dd>Just retry with a fresh code. Nothing to reconcile, nothing to recover.</dd></div>
+        </dl>
+        <div class="pb-banks"><span class="chip c-basis">retryable</span></div>
+      </article>
+
+      <article class="pb-card">
+        <h3>Approval voided by an edit</h3>
+        <div class="verdict">all banks · maker–checker</div>
+        <dl class="steps3">
+          <div class="pb-line"><dt>Meaning</dt><dd>Someone changed the amount, recipient, memo or another order/document field after approval. The approver signed different numbers.</dd></div>
+          <div class="pb-line"><dt>Odoo does</dt><dd>The payment <code>write</code> override sees the protected field and resets awaiting/approved → <code>pending</code> (Basis: batch → <code>draft</code>), clears the approver and posts chatter. Send then re-proves the approval server-side.</dd></div>
+          <div class="pb-line"><dt>You do</dt><dd>Re-submit for approval. Maker cannot be the checker unless the connection explicitly allows self-approval.</dd></div>
+        </dl>
+        <div class="pb-banks"><span class="chip c-tbc">TBC_ORDER_FIELDS</span><span class="chip c-bog">BOG_DOCUMENT_FIELDS</span><span class="chip c-basis">BASISBANK_APPROVAL_CONTENT_FIELDS</span></div>
+      </article>
+
+      <article class="pb-card">
+        <h3>A bank hook tried to re-route the payment</h3>
+        <div class="verdict">payroll-only defence</div>
+        <dl class="steps3">
+          <div class="pb-line"><dt>Meaning</dt><dd>A channel hook returned routing or booking fields (<code>partner_bank_id</code>, <code>payment_method_line_id</code>) or tried to overwrite a sealed batch key.</dd></div>
+          <div class="pb-line"><dt>Odoo does</dt><dd>The engine intersects with the protected-field set / reserved batch keys and raises. The whole pay run rolls back: payments, reconciliation, paid state, remembered routing, batch.</dd></div>
+          <div class="pb-line"><dt>You do</dt><dd>Routing must be decided <em>before</em> creation. Hooks may only decorate with their own fields on the payment or the batch.</dd></div>
+        </dl>
+        <div class="pb-banks"><span class="chip c-payroll">gec_payroll_bank</span></div>
+      </article>
+
+      <article class="pb-card">
+        <h3>The statement is imported but nothing matches</h3>
+        <div class="verdict">all banks · the reference alone is never enough</div>
+        <dl class="steps3">
+          <div class="pb-line"><dt>Meaning</dt><dd>A line with the right reference can still be a credit or a reversal. A match requires money <strong>out</strong> (<code>amount &lt; 0</code>) for the exact amount in the payment’s currency.</dd></div>
+          <div class="pb-line"><dt>Odoo does</dt><dd>Skips unmatched lines silently; each adapter’s hook only confirms payments whose bank key appears on the line (TBC <code>paymentId</code>, BOG key+number, Basis <code>BankInternalID</code>/<code>DocNum</code>).</dd></div>
+          <div class="pb-line"><dt>You do</dt><dd>Check direction and amount first, then the adapter’s key. If the bank never imported it, the payment stays <code>sent</code>/<code>unknown</code> — that is the correct state.</dd></div>
+        </dl>
+        <div class="pb-banks"><span class="chip c-base">_gec_bank_matches_payment</span></div>
+      </article>
+
+      <article class="pb-card">
+        <h3>The connection went blocked or error</h3>
+        <div class="verdict">all banks · sends halt, data stays safe</div>
+        <dl class="steps3">
+          <div class="pb-line"><dt>Meaning</dt><dd>Credentials, a bank-side block, or a suspended service. TBC sets <code>blocked</code> on user-blocked titles; BOG reports HTTP errors; Basis sets <code>blocked</code> on codes 4/5 or <code>ActiveClient:false</code> and <code>error</code> on code 6 / failed login.</dd></div>
+          <div class="pb-line"><dt>Odoo does</dt><dd>Refuses new sends with a channel config error; already-sent payments are unaffected and remain recoverable from the log.</dd></div>
+          <div class="pb-line"><dt>You do</dt><dd>Fix the cause in the bank’s portal (unblock user, renew credentials), then Test Connection. The API log has the exact endpoint and redacted payload that failed.</dd></div>
+        </dl>
+        <div class="pb-banks"><span class="chip c-tbc">TBC</span><span class="chip c-bog">BOG</span><span class="chip c-basis">Basis</span></div>
+      </article>
+
+      <article class="pb-card">
+        <h3>Batch sent — some members refused</h3>
+        <div class="verdict">partial is a normal outcome, not a crash</div>
+        <dl class="steps3">
+          <div class="pb-line"><dt>Meaning</dt><dd><strong>TBC:</strong> each member is its own savepoint/request — one failure never rolls back siblings. <strong>BOG:</strong> one bulk call, but a signed package can hide a rejected line. <strong>Basis:</strong> op 7 gives per-item verdicts; packages are all-or-nothing.</dd></div>
+          <div class="pb-line"><dt>Odoo does</dt><dd>Counts outcomes from the resulting states: the batch handoff becomes <code>partial</code> (some failed), <code>failed</code> (all failed) or <code>confirmed</code> (every member confirmed). The watchdog treats <code>partial</code> as urgent.</dd></div>
+          <div class="pb-line"><dt>You do</dt><dd>Fix just the refused members and resend them; sent/confirmed/unknown members are skipped by the batch filter. For BOG, Refresh Batch Status after the package letter arrives.</dd></div>
+        </dl>
+        <div class="pb-banks"><span class="chip c-tbc">per-savepoint</span><span class="chip c-bog">bulk + refresh</span><span class="chip c-basis">op 7 per item</span></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="divider"></div></div>
+
+<!-- ============ PAYROLL BRIDGE ============ -->
+<section id="payroll">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">06</span><span class="chip c-payroll">gec_payroll_bank</span><h2>The payroll bridge</h2></div>
+    <p class="sec-sub">
+      How a validated payslip run becomes sealed bank batches. The engine <strong>names no bank and makes no network call</strong>:
+      it creates normal Odoo payments through the standard register, groups them per channel, seals one batch each, and then stops.
+      The bank adapters answer its hooks; a human presses Send.
+    </p>
+
+    <div class="flow reveal">
+      <div class="flowline">
+        <div class="fl-n">1</div>
+        <div class="fl-b">
+          <b>Two entry buttons, one wizard</b>
+          <p>“Pay Salaries” on the run kanban, or the button/list action on payslips — only validated slips with net wage &gt; 0 continue. Payslip ids travel in the context, never in <code>active_ids</code>.</p>
+          <div class="chips"><span class="chip mono">action_gec_pay_salaries</span><span class="chip mono">hr.payroll.pay.wizard</span></div>
+        </div>
+      </div>
+      <div class="flowline">
+        <div class="fl-n">2</div>
+        <div class="fl-b">
+          <b>The wizard builds the routing</b>
+          <p>One row per payslip and one per authority <code>(partner, account)</code>; amounts are residual balances. The header bank fills <em>empty rows only</em>; a manual channel needs the “Record only” acknowledgement; the choice can be remembered on the employee.</p>
+          <div class="chips"><span class="chip mono">_gec_default_channel</span><span class="chip mono">_gec_authority_vals</span><span class="chip mono">_gec_remember_routing</span></div>
+        </div>
+      </div>
+      <div class="flowline">
+        <div class="fl-n">3</div>
+        <div class="fl-b">
+          <b><code>_gec_payroll_pay</code> — one click, one transaction</b>
+          <p>Posts draft entries, runs every pre-flight check, groups lines by <code>(channel, kind, account_type, currency)</code> and runs the standard register once per group — <strong>authorities first</strong>, so core’s <code>matched_payment_ids</code> never spreads salary links. Then settles, seals, and hands off.</p>
+          <div class="chips"><span class="chip mono">_gec_payroll_check_payable</span><span class="chip mono">_gec_payroll_assert_settled</span><span class="chip mono">_gec_payroll_create_batches</span></div>
+        </div>
+      </div>
+      <div class="flowline">
+        <div class="fl-n">4</div>
+        <div class="fl-b">
+          <b>Guards that protect the run</b>
+          <p>Rows are locked <code>FOR UPDATE</code> and compared to a residual snapshot taken when the wizard opened — anything settled or partially paid in between refuses the <em>whole</em> run. A reconcilable stray credit line owed to somebody blocks hard; the stock payslip Pay button inherits the lock and guards too.</p>
+          <div class="chips"><span class="chip mono">residual snapshot</span><span class="chip mono">partial guard</span><span class="chip mono">settled guard</span><span class="chip mono">stray credit lines</span></div>
+        </div>
+      </div>
+      <div class="flowline">
+        <div class="fl-n">5</div>
+        <div class="fl-b">
+          <b>Seal the batches</b>
+          <p>One <code>account.batch.payment</code> per <code>(channel, kind, currency)</code>, <code>batch_type=outbound</code>. Eight routing fields become immutable behind an in-process token that never crosses RPC; payments cannot join or leave; the envelope constraint keeps every member on the same journal, channel, company and date.</p>
+          <div class="chips"><span class="chip mono">gec_payroll_is_batch</span><span class="chip mono">GEC_PAYROLL_IMMUTABLE_FIELDS</span><span class="chip mono">batch write token</span></div>
+        </div>
+      </div>
+      <div class="flowline">
+        <div class="fl-n">6</div>
+        <div class="fl-b">
+          <b>Handoff — and stop</b>
+          <p>The engine opens the batch list and stops: each batch is sent from its own form, by the person who approves and transmits it. <strong>Nothing is sent automatically</strong>: the wizard ends with sealed, unsent batches. From here it is the bank module’s Send button — and for Basis, a Digipass OTP. The watchdog later asks each channel for the batch’s handoff state.</p>
+          <div class="chips"><span class="chip mono">_gec_payroll_handoff</span><span class="chip mono">_gec_bank_handoff_state</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsec">
+      <h4>The seven handoff states <span class="tag">what the watchdog speaks</span></h4>
+      <div class="handoff">
+        <div class="ho h-prepared"><b>prepared</b><p>Sealed, not sent (or waiting for approval). Alerts after 48 h.</p></div>
+        <div class="ho h-pending"><b>pending</b><p>At the bank but not yet accepted — e.g. BOG <code>created</code>. Alerts after 48 h.</p></div>
+        <div class="ho h-transmitted"><b>transmitted</b><p>Bank holds it, result pending. Silent, never urgent.</p></div>
+        <div class="ho h-confirmed"><b>confirmed</b><p>Every member proven. The only state the watchdog forgets.</p></div>
+        <div class="ho h-partial"><b>partial</b><p>Some members confirmed/failed — merged from payments. Urgent.</p></div>
+        <div class="ho h-failed"><b>failed</b><p>All members failed. Urgent.</p></div>
+        <div class="ho h-uncertain"><b>uncertain</b><p>Timeout / no answer / unknown. Urgent — resync, never reverse.</p></div>
+        <div class="ho h-confirmed" style="--hc:var(--faint)"><b>merge rule</b><p>One failed member → <code>partial</code>; all failed → <code>failed</code>; all confirmed → <code>confirmed</code>.</p></div>
+      </div>
+
+      <div class="tablewrap" style="margin-top:14px">
+        <table style="min-width:820px" aria-label="Handoff mapping per bank">
+          <thead><tr><th>Handoff state</th><th class="h-tbc">TBC pays</th><th class="h-bog">BOG pays</th><th class="h-basis">Basis pays</th></tr></thead>
+          <tbody>
+            <tr><th class="col-dim">prepared</th><td><code>pending / awaiting_approval / approved</code></td><td><code>pending / awaiting_approval / approved / awaiting_confirmation</code></td><td><code>pending / awaiting_approval / awaiting_otp</code></td></tr>
+            <tr><th class="col-dim">pending</th><td>—</td><td><code>created</code></td><td>—</td></tr>
+            <tr><th class="col-dim">transmitted</th><td><code>sent</code></td><td><code>sent</code></td><td>package at <code>sent_pending_confirm</code></td></tr>
+            <tr><th class="col-dim">confirmed</th><td><code>confirmed</code></td><td><code>confirmed</code></td><td><code>confirmed</code></td></tr>
+            <tr><th class="col-dim">partial / failed / confirmed</th><td colspan="3">Merged from member states by <code>_gec_bank_merge_handoff_states</code> — the same rule in every adapter.</td></tr>
+            <tr><th class="col-dim">uncertain</th><td><code>sending / unknown</code></td><td><code>sending / unknown</code></td><td><code>sending / unknown</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="subsec">
+      <h4>The watchdog <span class="tag">every 4 hours</span></h4>
+      <div class="startrow" style="grid-template-columns:1fr 1fr">
+        <div class="card" style="padding:16px 18px">
+          <p style="margin:0 0 10px"><strong>What it does.</strong> Scans unacknowledged payroll batches, asks each channel for its handoff state, and opens a “Payroll batch not confirmed by the bank” activity on the creator when something is wrong. It dedups by the last state it notified, and terminal states are recorded silently.</p>
+          <p style="margin:0"><strong>Timing.</strong> Urgent states (<code>partial</code>, <code>failed</code>, <code>uncertain</code>) alert immediately. Calm states (<code>prepared</code>, <code>pending</code>) get 48 hours measured from batch creation. Batches created with “Record only” on a manual channel are excluded forever.</p>
+        </div>
+        <div class="trap" style="margin:0">
+          <strong>Known rough edges (from the map):</strong>
+          <ul style="margin:8px 0 0;padding-left:18px;font-size:12.8px">
+            <li>Pay Salaries opens the batch list; each batch is sent from its own form — with several batches, nothing is sent until each is opened and its Send pressed.</li>
+            <li>The watchdog has no age cutoff: any unacknowledged batch that never reaches <code>confirmed</code> keeps being re-inspected (it only stops re-notifying the same state).</li>
+            <li>Basis ≤ 10,000 / TBC / BOG all leave sending to a human — an unattended payroll will sit at <code>prepared</code> until it shows up in the activity.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="divider"></div></div>
+
+<!-- ============ CONTRACT ============ -->
+<section id="contract">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">07</span><span class="chip c-base">gec_bank</span><h2>The contract every bank signs</h2></div>
+    <p class="sec-sub">
+      <strong>gec_bank</strong> ships no screen: its product is this contract — seven abstract mixins, the shared transfer flow on
+      <code>account.payment</code>, and two families of hooks. A bank adapter inherits the mixins, opts its method code into the
+      flow, answers the hooks, and gets every behaviour on this page for free.
+    </p>
+
+    <div class="contract-grid">
+      <div class="ccard"><b>1 · Durable send claim</b><p><code>_reserve_send</code> writes the request id + sending state in one conditional UPDATE on its own cursor, before any money moves. Only plain stored columns; no fallback.</p></div>
+      <div class="ccard"><b>2 · Durable outcome write</b><p><code>_durable_write</code> records the bank answer past the ORM; <code>_gec_bank_write_result</code> whitelists the columns, clears a spent approval, and mirrors <code>is_sent</code> / <code>rejected</code>; <code>_gec_bank_after_durable</code> schedules the batch recompute.</p></div>
+      <div class="ccard"><b>3 · Audit log row</b><p>One row per call on its own cursor, payloads redacted against the bank’s sensitive keys, duration measured. The row survives the rollback it describes.</p></div>
+      <div class="ccard"><b>4 · Response parsing</b><p><code>_parse_json</code> + <code>_first_key</code>: empty → <code>None</code>; never assume a dict. A missed key degrades one field, never corrupts a statement.</p></div>
+      <div class="ccard"><b>5 · Field guard</b><p><code>gec.bank.guard.mixin</code>: the transfer fields are refused to every direct write without the in-process token — forms, imports and RPC cannot forge an approval or undo a sent state.</p></div>
+      <div class="ccard"><b>6 · OAuth cache</b><p><code>gec.bank.oauth.mixin</code>: the bearer token cached with a 60-second margin, sudo-read, written only by the service methods that cannot be called over RPC.</p></div>
+      <div class="ccard"><b>7 · Channel checks</b><p><code>_gec_bank_config_errors</code> = sealed core checks + <code>_gec_bank_extra_config_errors</code>. Banks only add. One joined refusal before a pay run.</p></div>
+      <div class="ccard"><b>8 · Payment &amp; batch values</b><p><code>_gec_bank_payment_vals</code> decorates one created payment; <code>_gec_bank_batch_vals</code> merges into the batch. Booking fields and caller-owned keys are refused.</p></div>
+      <div class="ccard"><b>9 · Handoff state</b><p><code>_gec_bank_handoff_state</code> answers with one of 7 states; the merge helper folds per-payment answers. No I/O, ever.</p></div>
+      <div class="ccard"><b>10 · Channel kind</b><p><code>_gec_bank_channel_kind</code> (<code>api</code>/<code>file</code>/<code>manual</code>) and the opt-in <code>_gec_bank_transfer_flow</code>. Only the bank override may say <code>api</code>.</p></div>
+      <div class="ccard"><b>11 · Recipient account</b><p><code>_gec_bank_recipient_account</code> finds the partner’s account at the paying bank by 8-char BIC; the register key routes the payment there.</p></div>
+      <div class="ccard"><b>12 · Approval team</b><p>Approver + delegates + company, stored name, and the constraint that the primary approver cannot be a delegate. Banks supply the table.</p></div>
+    </div>
+
+    <div class="subsec">
+      <h4>The six controls <span class="tag">what is refused, and when</span></h4>
+      <div class="contract-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="ccard" style="--base:var(--bog)"><b>Mapped bank outcome</b><p>held → <code>is_sent</code>; rejected from Paid → <code>state=rejected</code> + clear <code>is_sent</code>; executed changes nothing.</p></div>
+        <div class="ccard" style="--base:var(--bog)"><b>At-bank fence</b><p>Reset/cancel/delete of a payment or its entry is refused while the bank holds it or may hold it.</p></div>
+        <div class="ccard" style="--base:var(--bog)"><b>Sendable fence</b><p>Drafts and no-longer-Paid payments are refused before any bank call — the double-payment guard.</p></div>
+        <div class="ccard" style="--base:var(--bog)"><b>Approver rule</b><p>The primary approver may not sit in the delegates list; an approver who may no longer approve voids what they approved.</p></div>
+        <div class="ccard" style="--base:var(--bog)"><b>Channel config fences</b><p>Outbound, bank journal, reconcilable Outstanding account ≠ journal default, not cash type, and an IBAN for <code>api</code> channels.</p></div>
+        <div class="ccard" style="--base:var(--bog)"><b>Statement verification</b><p>Money out, exact amount in the payment’s currency; reconcile the open Outstanding line. Reference alone never matches.</p></div>
+      </div>
+    </div>
+
+    <div class="subsec">
+      <h4>The hooks <span class="tag">what a bank adapter implements</span></h4>
+      <p class="sec-sub" style="margin-bottom:12px"><strong>Channel hooks</strong> (on <code>account.payment.method.line</code>, called by Pay Salaries and the checks):</p>
+      <div class="hooks">
+        <div class="hook"><div><code>_gec_bank_transfer_flow()</code><div class="who">the opt-in · per method code</div></div><p>True for the bank’s own code on a journal that belongs to it. Only opted-in channels run the shared transfer flow.</p></div>
+        <div class="hook"><div><code>_gec_bank_channel_kind()</code><div class="who">called by the wizard + checks · guard on <code>self.code</code> first</div></div><p>Answers <code>api</code>, <code>file</code> or <code>manual</code>. Base: <code>file</code> if the method generates files, else <code>manual</code>. Only a bank may claim <code>api</code>.</p></div>
+        <div class="hook"><div><code>_gec_bank_extra_config_errors()</code><div class="who">folded into the sealed config check</div></div><p>Appends blocking messages (connection missing/blocked, credentials…). Core checks cannot be removed, only added to.</p></div>
+        <div class="hook"><div><code>_gec_bank_check(kind, lines)</code><div class="who">called before a pay run · accumulator</div></div><p>Per-recipient and per-kind refusals: treasury codes, IBAN country, BIC, memo, GEL rules. Returns a list; the engine joins them.</p></div>
+        <div class="hook"><div><code>_gec_bank_payment_vals(kind, payment)</code><div class="who">after each payment is created + reconciled</div></div><p>Decorates the payment (transfer type, salary flag, treasury code). May not touch booking fields or the method line.</p></div>
+        <div class="hook"><div><code>_gec_bank_batch_vals(kind)</code><div class="who">merged into the batch create vals</div></div><p>Adds batch-level fields (salary flag, endpoint…). The caller-owned keys are reserved — an override raises and the run rolls back.</p></div>
+        <div class="hook"><div><code>_gec_bank_handoff_state(batch)</code><div class="who">watchdog · no network I/O allowed</div></div><p>One of the 7 handoff states, from the payments or the batch. The merge helper folds per-payment states; a batch is confirmed only when every payment is.</p></div>
+      </div>
+      <p class="sec-sub" style="margin:16px 0 12px"><strong>Transfer-flow hooks</strong> (on <code>account.payment</code>, answered per method code by TBC and BOG):</p>
+      <div class="hooks">
+        <div class="hook"><div><code>_gec_bank_label_for(code)</code> · <code>_gec_bank_connection_record()</code><div class="who">messages · configuration</div></div><p>The bank’s translated name and its connection record (sudo). Without a usable connection there is no approver rule to check.</p></div>
+        <div class="hook"><div><code>_gec_bank_send_one()</code> · <code>_gec_bank_refresh_one()</code><div class="who">the network steps</div></div><p>Send one payment (returns True or a notification) and refresh its status from the bank. Everything else in the send is shared.</p></div>
+        <div class="hook"><div><code>_gec_bank_new_request_vals()</code> · <code>_gec_bank_check_instructions()</code><div class="who">the claim · the refusal</div></div><p>What the durable claim writes (the request id, minted once and reused) and what the bank is documented to reject, checked before anything is claimed.</p></div>
+        <div class="hook"><div><code>_gec_bank_payload_fields()</code> · <code>_gec_bank_result_columns()</code><div class="who">approval voiding · result whitelist</div></div><p>The fields the instructions are built from (a change voids the approval) and the columns a bank answer may write durably.</p></div>
+        <div class="hook"><div><code>_gec_bank_state_groups()</code> · <code>_gec_bank_protected_fields()</code> · <code>_gec_bank_at_bank()</code><div class="who">meaning · guard · fences</div></div><p>Which groups a bank’s extra states belong to (BOG: created → at_bank/held/open), which fields only bank flows write, and when the bank holds the payment.</p></div>
+      </div>
+    </div>
+
+    <div class="tip" style="margin-top:18px"><strong>Writing a new bank in five moves:</strong> inherit the mixins (guard, service, sendable, approval, connection — OAuth if it’s a bearer bank) → set <code>_gec_bank_log_model</code> + <code>_gec_bank_sensitive_keys</code> and add your result columns → opt your method code in (<code>_gec_bank_transfer_flow</code>) and answer the transfer-flow hooks with your request id → wire your journal by BIC and your Send button to <code>_gec_bank_send_transfers</code> → add your own states and place them in <code>_gec_bank_state_groups</code>. The spine (claim, write, log, fences, mirror, handoff, statements) comes for free.</div>
+  </div>
+</section>
+
+<div class="wrap"><div class="divider"></div></div>
+
+<!-- ============ GOTCHAS ============ -->
+<section id="gotchas">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">08</span><h2>Gotchas, by the symptom</h2></div>
+    <p class="sec-sub">The questions developers actually ask in the first hour, distilled from the 98 Q&amp;A entries in the five maps. Symptom → cause → fix.</p>
+    <div class="gotcha-tools">
+      <button class="btn-small" data-expand="open">Expand all</button>
+      <button class="btn-small" data-expand="close">Collapse all</button>
+    </div>
+
+    <h3 style="font-size:14px;margin:18px 0 10px;color:var(--muted)">Shared <span class="chip c-base">gec_bank</span></h3>
+    <details class="acc"><summary><span class="sym">“These fields are set by the bank integration and cannot be changed directly.”</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Cause:</strong> the guard mixin refused a direct write of a protected field (bank state, request id, reference, approver…) — <code>readonly</code> only guides the web client; the guard enforces it over forms, imports and RPC.</p><p><strong>Fix:</strong> don’t fight it. The state changes through the bank’s buttons (Send, Recover, Resync, Reset); bank flows write through their own token-guarded path.</p></div></details>
+    <details class="acc"><summary><span class="sym">The Outstanding Payments account stays empty on a bank channel.</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Cause:</strong> the fill runs at create time only, and only for channels whose kind is <code>api</code>.</p><p><strong>Fix:</strong> set the account by hand, or re-create the payment method line on an <code>api</code> channel.</p></div></details>
+    <details class="acc"><summary><span class="sym">“This payment is being changed by another operation. Reload it and send again.”</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Cause:</strong> the durable claim hit its 2-second lock timeout — another transaction is editing the row.</p><p><strong>Fix:</strong> just reload and send again. Nothing was claimed, no money was touched.</p></div></details>
+    <details class="acc"><summary><span class="sym">“These payments are at the bank, or may be…” on reset / cancel / delete.</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Cause:</strong> the at-bank fence — the payment is in a state where the bank holds it or the last send was never answered.</p><p><strong>Fix:</strong> don’t force it. Use the adapter’s recovery (Recover / Resync), then undo once the payment is proven untouched.</p></div></details>
+    <details class="acc"><summary><span class="sym">The batch still shows the old state after the bank answered.</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Cause:</strong> the durable write bypasses the ORM, so the batch recompute did not run.</p><p><strong>Fix:</strong> the adapter must call <code>_gec_bank_after_durable(vals)</code>; it re-schedules batch <code>state</code> and <code>amount_residual</code>.</p></div></details>
+    <details class="acc"><summary><span class="sym">API logs grow forever / never get cleaned.</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Cause:</strong> retention <code>0</code> skips the connection, and with no override the base vacuum domain deletes nothing (it is a whitelist of deletable rows).</p><p><strong>Fix:</strong> set <code>log_retention_days</code> (default 90) and make sure the bank’s <code>_gec_bank_log_vacuum_domain</code> selects the routine rows it wants removed.</p></div></details>
+
+    <h3 style="font-size:14px;margin:22px 0 10px;color:var(--tbc)">TBC <span class="chip c-tbc">tbc_bank</span></h3>
+    <details class="acc"><summary><span class="sym">The Send button is missing on a payment.</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Cause:</strong> the form only shows Send for <code>gec_bank_code = 'tbc_transfer'</code> + Odoo state <code>paid</code> + <code>gec_bank_state</code> in <code>pending / approved</code>.</p><p><strong>Fix:</strong> for other states use Recover / Refresh / Confirm Manually (each has its own visibility rule). If the payment is not a TBC transfer at all, check the journal BIC.</p></div></details>
+    <details class="acc"><summary><span class="sym">A TBC bank journal is not flagged as TBC.</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Cause:</strong> the BIC must start with <code>TBCBGE22</code> (11-char BIC is accepted — the first 8 decide).</p><p><strong>Fix:</strong> correct <code>bank_bic</code>; the connection itself is resolved per company, not per journal.</p></div></details>
+    <details class="acc"><summary><span class="sym">“Send” refuses with no bank call — the log is empty.</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Cause:</strong> <code>_tbc_check_order</code> refused before the claim: amount, journal IBAN, treasury GEL + 9-digit code, recipient account, transfer type vs IBAN bank, SWIFT fields + SHA/OUR.</p><p><strong>Fix:</strong> the error lists every problem at once; fix them all and resend. Nothing was reserved.</p></div></details>
+    <details class="acc"><summary><span class="sym">An <code>unknown</code> payment won’t resend.</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Cause:</strong> the claim blocks <code>unknown</code> on purpose — the previous attempt may have reached TBC.</p><p><strong>Fix:</strong> Recover. Only TBC’s own “not found” answer may reset it to <code>pending</code> as a safe-to-resend signal; the 15-minute guard applies while it is still <code>sending</code>.</p></div></details>
+    <details class="acc"><summary><span class="sym">A memo edit silently killed the approval.</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Cause:</strong> any write touching <code>TBC_ORDER_FIELDS</code> revokes an awaiting/approved transfer back to <code>pending</code> so changed instructions can’t ride the old approval.</p><p><strong>Fix:</strong> re-submit and re-approve. The maker can’t be the checker unless the connection allows self-approval.</p></div></details>
+
+    <h3 style="font-size:14px;margin:22px 0 10px;color:var(--bog)">BOG <span class="chip c-bog">bog_bank</span></h3>
+    <details class="acc"><summary><span class="sym">The payment is “confirmed” but still shows unreconciled.</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Cause:</strong> status refresh, Recover and Confirm Manually change <code>gec_bank_state</code> only. <strong>Only the statement reconciles.</strong></p><p><strong>Fix:</strong> import the statement, or activate the daily statement sync cron for active connections.</p></div></details>
+    <details class="acc"><summary><span class="sym">An <code>unknown</code> document blocks every retry.</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Cause:</strong> ambiguous answers are never resent — the sendable filter skips <code>unknown</code>, batch members included.</p><p><strong>Fix:</strong> Recover by <code>DocumentNo</code> in today’s activities; the found <code>DocKey</code> restores <code>created</code> and the status can refresh.</p></div></details>
+    <details class="acc"><summary><span class="sym">ResultCode 333 (insufficient working balance): was it sent or not?</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Not created.</strong> Warn codes 333/444/701 inside HTTP 200 mean BOG did <em>not</em> create the document. The payment waits at <code>awaiting_confirmation</code>.</p><p><strong>Fix:</strong> settle the cause, then <strong>Create Anyway</strong> — it re-sends the same <code>UniqueId</code>. If BOG secretly holds it, the answer is 702 → <code>unknown</code>, never a double payment.</p></div></details>
+    <details class="acc"><summary><span class="sym">A bulk batch says package signed, but one salary is missing.</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Cause:</strong> the bulk POST returns no per-line result. A signed package can contain a rejected line; the batch becomes <code>partial</code> only after the line statuses are read.</p><p><strong>Fix:</strong> Refresh Batch Status (or the batch poll cron) — the rejected member turns <code>failed</code> with its reject code, the rest continue.</p></div></details>
+    <details class="acc"><summary><span class="sym">Recover can’t find a document from yesterday.</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Cause:</strong> the recovery endpoint is today’s activities only (quota 800/day/account).</p><p><strong>Fix:</strong> run Recover the same day, or confirm through the statement import; a lost document still has its API log row.</p></div></details>
+
+    <h3 style="font-size:14px;margin:22px 0 10px;color:var(--basis)">Basis <span class="chip c-basis">basis_bank</span></h3>
+    <details class="acc"><summary><span class="sym">The journal is at Basis but Odoo doesn’t treat it as a Basis journal.</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Cause:</strong> Basis needs both: BIC <code>CBASGE22</code> <em>and</em> a connection on the company or a parent company.</p><p><strong>Fix:</strong> create the connection (journals refresh automatically) or correct the BIC.</p></div></details>
+    <details class="acc"><summary><span class="sym">An <code>unknown</code> batch refuses reset and resend.</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Cause:</strong> the claim treats <code>sending</code>, <code>sent</code>, <code>unknown</code> and <code>not_in_report</code> as blocked — a blind resend could duplicate a package.</p><p><strong>Fix:</strong> use the batch <strong>Resync</strong> wizard; batch reset is refused while any member is sending/sent/unknown.</p></div></details>
+    <details class="acc"><summary><span class="sym">“Not in Bank Report” — why didn’t it reverse the payment?</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>By design.</strong> After 48 hours without a report hit the hourly check only flags: state, chatter note, and a TODO activity. The bank may still book the transfer, so accounting is untouched.</p><p><strong>Fix:</strong> Resync later, or Reset to Pending — which re-reads the report before doing anything.</p></div></details>
+    <details class="acc"><summary><span class="sym">Old posted payments suddenly turned Pending.</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Cause:</strong> creating a connection cascades <code>is_basisbank</code> and recomputes states — including months-old outbound payments on those journals (<code>KNOWN_ISSUES.md</code> A3, a double-payment path).</p><p><strong>Fix:</strong> review old payments after creating a connection; only drafts should ever be sent. The same cascade fires when the connection moves between companies.</p></div></details>
+    <details class="acc"><summary><span class="sym">One transfer in an op-7 batch was refused — what happened to the rest?</span><span class="caret">›</span></summary><div class="acc-body"><p>Op 7 answers <strong>per item</strong>: only the refused payment goes <code>failed</code> (entry kept), the accepted ones proceed, and the batch can still reach <code>done</code>. Packages (ops 4/5/6) are all-or-nothing — error 11 fails the whole package.</p></div></details>
+
+    <h3 style="font-size:14px;margin:22px 0 10px;color:var(--payroll)">Payroll bridge <span class="chip c-payroll">gec_payroll_bank</span></h3>
+    <details class="acc"><summary><span class="sym">The “Pay Salaries” button is missing.</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Cause:</strong> <code>gec_payroll_can_pay</code> is false (no validated slip with net wage &gt; 0) or you are not in Payroll Administrator. The run entry point is the kanban card action.</p><p><strong>Fix:</strong> confirm the slips / check the group.</p></div></details>
+    <details class="acc"><summary><span class="sym">“The amounts changed while you were working — nothing was created.”</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Cause:</strong> between the wizard’s residual snapshot and the row lock, another transaction settled a line (a 50.00 partial payment is enough).</p><p><strong>Fix:</strong> reopen the wizard; the rollback means nothing was written. A retry takes a fresh snapshot — the partial guard then refuses instead.</p></div></details>
+    <details class="acc"><summary><span class="sym">“You cannot set partner_bank_id on an already posted payment.”</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Cause:</strong> a channel hook returned a booking field (or the method line) in <code>_gec_bank_payment_vals</code>. Routing must be decided before creation.</p><p><strong>Fix:</strong> move that logic earlier; hooks may only add their own decoration fields.</p></div></details>
+    <details class="acc"><summary><span class="sym">“The bank hook tried to re-route a posted payment” — the whole run rolled back.</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Cause:</strong> the hook returned a protected field (<code>partner_bank_id</code>, <code>payment_method_line_id</code>) or a reserved batch key (<code>journal_id</code>, <code>payment_ids</code>, <code>gec_payroll_*</code>…).</p><p><strong>Fix:</strong> pure decoration only. The rollback is deliberate: payment, reconciliation, paid state, routing and batch are all restored.</p></div></details>
+    <details class="acc"><summary><span class="sym">A batch cannot be deleted or edited.</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Sealed by design:</strong> eight routing fields are immutable behind an in-process token that never crosses RPC; membership is locked and an envelope constraint holds the batch together.</p><p><strong>Recovery path:</strong> reset a rejected payment to draft → cancel it → “Mark Unpaid” → pay again. The rejected payment stays as history.</p></div></details>
+    <details class="acc"><summary><span class="sym">Activity: “Payroll batch not confirmed by the bank.”</span><span class="caret">›</span></summary><div class="acc-body"><p><strong>Cause:</strong> the 4-hourly watchdog read the handoff state: <code>partial</code>/<code>failed</code>/<code>uncertain</code> alert immediately; <code>prepared</code>/<code>pending</code> after 48 hours. Manual-ack batches are excluded.</p><p><strong>Fix:</strong> check with the bank / use the adapter recovery — never resend blindly.</p></div></details>
+  </div>
+</section>
+
+<div class="wrap"><div class="divider"></div></div>
+
+<!-- ============ REFERENCE ============ -->
+<section id="reference">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">09</span><h2>Reference shelf</h2></div>
+    <p class="sec-sub">Background jobs, vocabulary and the honest limits of this page — everything you need to navigate the five modules without opening the maps again.</p>
+
+    <div class="ref-grid">
+      <div>
+        <h3 style="font-size:15px;margin-bottom:10px">Background jobs <span class="chip c-ok">on</span> <span class="chip">off by default</span></h3>
+        <div class="tablewrap">
+          <table style="min-width:640px" aria-label="Cron jobs">
+            <thead><tr><th>Job</th><th>Cadence</th><th>Ships</th><th>What it does</th></tr></thead>
+            <tbody>
+              <tr><th class="col-dim">Payroll · stale batches (gec_payroll_bank)</th><td>every 4 h</td><td><span class="chip c-ok">ON</span></td><td>Handoff watchdog; urgent states at once, calm states after 48 h, activity on the creator.</td></tr>
+              <tr><th class="col-dim">Basis · 48 h confirm-or-reset</th><td>hourly</td><td><span class="chip c-ok">ON</span></td><td>Confirms what the report shows; flags the rest <code>not_in_report</code> — accounting untouched.</td></tr>
+              <tr class="same"><th class="col-dim">Statement sync (TBC / BOG / Basis)</th><td>1 / day</td><td><span class="chip">off</span></td><td>Imports the last days of movements per active connection’s journals.</td></tr>
+              <tr class="same"><th class="col-dim">Live snapshots (TBC / BOG)</th><td>every 2 h</td><td><span class="chip">off</span></td><td>Month-to-date balance snapshot per journal (informational only).</td></tr>
+              <tr><th class="col-dim">TBC · transfer status poll</th><td>1 h</td><td><span class="chip">off</span></td><td>Refreshes up to 100 newest <code>sent</code>/<code>unknown</code> payments with a transfer id.</td></tr>
+              <tr><th class="col-dim">BOG · document + batch status polls</th><td>1 h each</td><td><span class="chip">off</span></td><td>Reads status letters; up to 100 per run; batch members included.</td></tr>
+              <tr class="same"><th class="col-dim">API log vacuum (gec_bank mixin)</th><td>Odoo autovacuum</td><td><span class="chip c-ok">ON</span></td><td>Deletes routine rows older than <code>log_retention_days</code> (default 90; 0 = keep all). Money/protected rows stay.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size:15px;margin-bottom:10px">Vocabulary</h3>
+          <div class="card" style="padding:16px 18px">
+            <div class="gloss" style="grid-template-columns:1fr">
+              <div><b>Claim / durable write</b><span>a write committed on its own cursor, outside the transaction, so a rollback cannot undo it.</span></div>
+              <div><b>REPEATABLE READ rule</b><span>after such a write, the same transaction must never UPDATE the row again — PostgreSQL refuses and Odoo re-runs the request.</span></div>
+              <div><b>At-bank</b><span>the payment is in a state where the bank holds it or may hold it; all undo paths are fenced.</span></div>
+              <div><b>Unknown</b><span>no usable answer (timeout / 5xx / ambiguous). Recover by id; never blind-resend.</span></div>
+              <div><b>Guard / write token</b><span>the in-process Python object a bank flow must hold to write protected fields; it cannot cross RPC or an import.</span></div>
+              <div><b>Handoff state</b><span>the 7-value vocabulary the payroll watchdog reads from the bank channel.</span></div>
+              <div><b>Sealed batch</b><span>a payroll batch whose routing fields are immutable behind an in-process token; members cannot join or leave.</span></div>
+              <div><b>Soft call</b><span>a bank call that returns the outcome (including “no response”) instead of raising.</span></div>
+              <div><b>Create Anyway (BOG)</b><span>resend the same <code>UniqueId</code> after a warn code; safe because the bank enforces uniqueness.</span></div>
+              <div><b>Not in report (Basis)</b><span>48 h passed without the bank report showing the transfer — a flag, not a reversal.</span></div>
+              <div><b>unique_import_id</b><span>the per-bank dedup key that makes re-importing a statement safe.</span></div>
+              <div><b>BIC routing</b><span>the partner account at the paying bank is chosen by the first 8 BIC characters.</span></div>
+            </div>
+          </div>
+        <div class="trap" style="margin-top:14px"><strong>Honest limits.</strong> This page is a static reading of the five modules at commit <code>9f10619</code> (refactoring of banks, 2026-10-04) plus the companion Flow Lab. No Odoo was run, no bank was called. All API descriptions are inferred from client code. The Flow Lab holds the line-level detail; method names stay valid longer than line numbers.</div>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:18px"><strong>Map ↔ code:</strong> every claim on this page can be traced back to a method in the Flow Lab (<code>bank_flow_lab.html</code>) — each walkthrough there shows the exact methods, fields, branch conditions and source for every flow on this page. Start there, or from the <code>README_DEV.md</code> inside each module.</div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap footer-inner">
+    <div class="cols">
+      <div>
+        <h4>What this page is</h4>
+        <p>A synthesis of the five modules (<code>gec_bank</code>, <code>gec_payroll_bank</code>,
+        <code>tbc_bank</code>, <code>bog_bank</code>, <code>basis_bank</code>) and the method-level Flow Lab
+        (<code>bank_flow_lab.html</code>). Every flow, method name and field
+        was read from the source at commit <code>9f10619</code> on 2026-10-04.</p>
+      </div>
+      <div>
+        <h4>Honest limits</h4>
+        <p>Static reading only — no Odoo was executed and no bank was called. All three bank API descriptions
+        (endpoints, codes, reply shapes) are inferred from the client code; the real APIs were not verified.
+        Line numbers drift as the modules evolve; method names stay valid longer.</p>
+      </div>
+      <div>
+        <h4>Deep dives</h4>
+        <p>The Flow Lab (<code>bank_flow_lab.html</code>) holds every method, call edge, flow map and
+        walkthrough. Each module keeps <code>README.md</code> (user guide) and <code>README_DEV.md</code>
+        (developer guide); <code>basis_bank</code> additionally ships <code>KNOWN_ISSUES.md</code> and
+        <code>tbc_bank</code> ships <code>BIS_API.md</code>.</p>
+      </div>
+    </div>
+    <div class="credits">
+      <span>Snapshot 2026-10-04</span><span>Odoo 20</span><span>460 methods · 1057 call edges · 30 walkthroughs</span>
+      <span style="margin-left:auto">GEC – Business Growth Services</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(() => {
+'use strict';
+const $  = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+
+/* theme */
+const root = document.documentElement;
+const saved = localStorage.getItem('bankmap-theme');
+if (saved) root.dataset.theme = saved;
+$('#themeBtn').addEventListener('click', () => {
+  const dark = root.dataset.theme === 'dark' || (!root.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
+  root.dataset.theme = dark ? 'light' : 'dark';
+  localStorage.setItem('bankmap-theme', root.dataset.theme);
+});
+
+/* progress */
+const progress = $('#progress');
+addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const p = h.scrollTop / Math.max(1, h.scrollHeight - h.clientHeight);
+  progress.style.width = (p * 100).toFixed(2) + '%';
+}, {passive:true});
+
+/* scrollspy */
+const navLinks = $$('.nav a');
+const secs = navLinks.map(a => $(a.getAttribute('href'))).filter(Boolean);
+const spy = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id));
+  });
+}, {rootMargin:'-20% 0px -70% 0px'});
+secs.forEach(s => spy.observe(s));
+
+/* reveal */
+const rev = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); rev.unobserve(e.target); } });
+}, {rootMargin:'0px 0px -8% 0px'});
+$$('.reveal').forEach(el => rev.observe(el));
+
+/* pipeline */
+$$('.pipe-node').forEach(btn => btn.addEventListener('click', () => {
+  $$('.pipe-node').forEach(b => { b.classList.toggle('sel', b === btn); b.setAttribute('aria-selected', b === btn); });
+  $$('.step-pane').forEach(p => p.classList.toggle('on', p.id === 'step-' + btn.dataset.step));
+}));
+
+/* bank tabs */
+function openBank(key, scroll) {
+  $$('.banktab').forEach(t => t.classList.toggle('on', t.dataset.bank === key));
+  $$('.bankpanel').forEach(p => p.classList.toggle('on', p.dataset.bank === key));
+  if (scroll) $('#banks').scrollIntoView({behavior:'smooth'});
+}
+$$('.banktab').forEach(t => t.addEventListener('click', () => openBank(t.dataset.bank, false)));
+$$('[data-goto-tab]').forEach(el => el.addEventListener('click', () => {
+  const tab = el.dataset.gotoTab;
+  if (tab === 'banks') openBank(el.dataset.bank || 'tbc', true);
+  else if (tab === 'payroll') $('#payroll').scrollIntoView({behavior:'smooth'});
+  else $('#compare').scrollIntoView({behavior:'smooth'});
+}));
+
+/* compare filter */
+$('#onlyDiff').addEventListener('change', e => document.body.classList.toggle('only-diff', e.target.checked));
+
+/* expand / collapse gotchas */
+$$('[data-expand]').forEach(btn => btn.addEventListener('click', () => {
+  const open = btn.dataset.expand === 'open';
+  $$('.acc').forEach(d => { d.open = open; });
+  btn.closest('.gotcha-tools').querySelectorAll('[data-expand]').forEach(b => b.classList.toggle('active', b === btn));
+}));
+})();
+</script>
+</body>
+</html>

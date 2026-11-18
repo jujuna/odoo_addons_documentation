@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_rs_form30_declaration_list" model="ir.ui.view">
+        <field name="name">rs.form30.declaration.list</field>
+        <field name="model">rs.form30.declaration</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="date_from"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="line_count"/>
+                <field name="warning_count"/>
+                <field name="total_amount" sum="Total"/>
+                <field name="total_tax" sum="Total"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'exported'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rs_form30_declaration_form" model="ir.ui.view">
+        <field name="name">rs.form30.declaration.form</field>
+        <field name="model">rs.form30.declaration</field>
+        <field name="arch" type="xml">
+            <form class="o_rs_form30_declaration_form">
+                <header>
+                    <button name="action_generate" type="object" string="Generate Lines" class="btn-primary" invisible="state != 'draft'"
+                            confirm="Generated rows are rebuilt from the current data; manual and In File rows are kept. Continue?"/>
+                    <button name="action_export" type="object" string="Export rs.ge Files" class="btn-primary" invisible="state != 'draft' or (not line_ids and not car_line_ids and not service_line_ids)"/>
+                    <button name="action_draft" type="object" string="Reset to Draft" groups="account.group_account_manager" invisible="state != 'exported'"
+                            confirm="The declaration returns to draft; rows already in the exported file stay marked In File. Continue?"/>
+                    <button name="action_add_manual_row" type="object" string="Add Manual Row"
+                            groups="account.group_account_user" invisible="state != 'draft'"/>
+                    <button name="action_clear_in_file" type="object" string="Clear In File Marks"
+                            groups="account.group_account_user"
+                            confirm="Rows of the last exported file will be treated as not declared. Continue?"
+                            invisible="state != 'draft' or not has_in_file"/>
+                    <button name="action_export_explanation" type="object" string="Explanation Workbook"
+                            groups="account.group_account_user" invisible="not summary_line_ids"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-warning" role="alert" invisible="not generation_warnings">
+                        <field name="generation_warnings" invisible="1"/>
+                        <field name="generation_warnings_display" nolabel="1"/>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group name="period">
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft' or line_ids"/>
+                            <field name="date_from" readonly="state != 'draft'"/>
+                            <field name="date_to"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="has_in_file" invisible="1"/>
+                        </group>
+                        <group name="totals">
+                            <field name="export_warned_rows" readonly="state != 'draft'"/>
+                            <field name="line_count"/>
+                            <field name="file_line_count" string="Rows in File"/>
+                            <field name="left_out_count" string="Rows Left Out" invisible="not left_out_count"/>
+                            <field name="left_out_service_count" string="Annex E Rows Left Out"
+                                   invisible="not left_out_service_count"/>
+                            <field name="warning_count" string="Warnings"/>
+                            <field name="blocker_count" string="Blockers" invisible="not blocker_count"/>
+                            <field name="unpaid_count" string="Unpaid Entries" invisible="not unpaid_count"/>
+                            <field name="total_amount"/>
+                            <field name="total_tax"/>
+                            <field name="total_pension"/>
+                            <field name="export_file" filename="export_filename" invisible="not export_file"/>
+                            <field name="export_filename" invisible="1"/>
+                            <field name="export_file_d" filename="export_filename_d" invisible="not export_file_d"/>
+                            <field name="export_filename_d" invisible="1"/>
+                            <field name="export_file_e" filename="export_filename_e" invisible="not export_file_e"/>
+                            <field name="export_filename_e" invisible="1"/>
+                            <field name="explanation_file" filename="explanation_filename" invisible="not explanation_file"/>
+                            <field name="explanation_filename" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="annex_a" string="2. Annex A — Payments and withheld tax">
+                            <field name="line_ids" widget="rs_form30_grid" readonly="1">
+                                <list create="0" edit="0" delete="0" limit="100" decoration-warning="warning">
+                                    <field name="source" readonly="1"/>
+                                    <field name="partner_id"/>
+                                    <field name="identification"/>
+                                    <field name="first_name"/>
+                                    <field name="last_name"/>
+                                    <field name="address" optional="hide"/>
+                                    <field name="country_id"/>
+                                    <field name="category_id"/>
+                                    <field name="income_type_id"/>
+                                    <field name="amount" sum="Total"/>
+                                    <field name="pension_amount" sum="Total"/>
+                                    <field name="other_relief" sum="Total"/>
+                                    <field name="date"/>
+                                    <field name="rate"/>
+                                    <field name="tax_amount" sum="Total"/>
+                                    <field name="international_agreement_exempt_tax" optional="hide"/>
+                                    <field name="foreign_tax_credit" optional="hide"/>
+                                    <field name="from_treasury" optional="hide"/>
+                                    <field name="warning"/>
+                                    <field name="warning_display" column_invisible="1"/>
+                                    <field name="payslip_id" optional="hide"/>
+                                    <field name="withholding_line_id" optional="hide"/>
+                                    <field name="payment_id" column_invisible="1"/>
+                                    <field name="move_id" column_invisible="1"/>
+                                    <field name="issue_level" column_invisible="1"/>
+                                    <field name="in_file"/>
+                                    <field name="exported_on"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="annex_d" string="3. Annex D — Private use of a company car">
+                            <field name="car_line_ids" widget="rs_form30_car_grid" readonly="state != 'draft'">
+                                <list editable="bottom">
+                                    <field name="vehicle_id" options="{'no_create': True}"/>
+                                    <field name="license_plate"/>
+                                    <field name="engine_id" options="{'no_create': True}"/>
+                                    <field name="employee_id" options="{'no_create': True}"/>
+                                    <field name="name"/>
+                                    <field name="identification"/>
+                                    <field name="amount" sum="Total"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="annex_e" string="4. Annex E — Service fees not withheld at source">
+                            <field name="service_line_ids" widget="rs_form30_service_grid" readonly="1">
+                                <list create="0" edit="0" delete="0" limit="100">
+                                    <field name="identification"/>
+                                    <field name="first_name"/>
+                                    <field name="last_name"/>
+                                    <field name="address"/>
+                                    <field name="country_id"/>
+                                    <field name="service_type_id"/>
+                                    <field name="amount" sum="Total"/>
+                                    <field name="date"/>
+                                    <field name="warning"/>
+                                    <field name="warning_display" column_invisible="1"/>
+                                    <field name="issue_level" column_invisible="1"/>
+                                    <field name="in_file"/>
+                                    <field name="exported_on"/>
+                                    <field name="partner_id" column_invisible="1"/>
+                                    <field name="withholding_line_id" column_invisible="1"/>
+                                    <field name="payment_id" column_invisible="1"/>
+                                    <field name="move_id" column_invisible="1"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="not_declared" string="Not Declared"
+                              invisible="not unpaid_move_ids and not not_payable_move_ids and not missing_tax_move_ids">
+                            <label for="unpaid_move_ids" invisible="not unpaid_move_ids"/>
+                            <field name="unpaid_move_ids" nolabel="1" invisible="not unpaid_move_ids">
+                                <list>
+                                    <field name="date"/>
+                                    <field name="name"/>
+                                    <field name="ref"/>
+                                    <field name="partner_id"/>
+                                    <field name="amount_total_signed"/>
+                                </list>
+                            </field>
+                            <label for="not_payable_move_ids" invisible="not not_payable_move_ids"/>
+                            <field name="not_payable_move_ids" nolabel="1" invisible="not not_payable_move_ids">
+                                <list>
+                                    <field name="date"/>
+                                    <field name="name"/>
+                                    <field name="ref"/>
+                                    <field name="partner_id"/>
+                                    <field name="amount_total_signed"/>
+                                </list>
+                            </field>
+                            <label for="missing_tax_move_ids" invisible="not missing_tax_move_ids"/>
+                            <field name="missing_tax_move_ids" nolabel="1" invisible="not missing_tax_move_ids">
+                                <list>
+                                    <field name="date"/>
+                                    <field name="name"/>
+                                    <field name="ref"/>
+                                    <field name="partner_id"/>
+                                    <field name="amount_total_signed"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="main_part" string="5. Main part — cells 16–69">
+                            <field name="summary_line_ids" widget="rs_form30_summary_grid" readonly="state != 'draft'">
+                                <list editable="bottom" limit="200">
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="note"/>
+                                    <field name="value"/>
+                                    <field name="value_bool"/>
+                                    <field name="computed" column_invisible="1"/>
+                                    <field name="proposed" column_invisible="1"/>
+                                    <field name="proposed_value" column_invisible="1"/>
+                                    <field name="is_boolean" column_invisible="1"/>
+                                    <field name="is_section" column_invisible="1"/>
+                                    <field name="sequence" column_invisible="1"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                    <chatter/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_rs_form30_line_manual_form" model="ir.ui.view">
+        <field name="name">rs.form30.line.manual.form</field>
+        <field name="model">rs.form30.line</field>
+        <field name="arch" type="xml">
+            <form string="Manual Row">
+                <field name="declaration_id" invisible="1"/>
+                <field name="source" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+                <group>
+                    <group name="recipient" string="Recipient">
+                        <field name="partner_id" readonly="context.get('rs_form30_locked')"/>
+                        <field name="identification" readonly="context.get('rs_form30_locked')"/>
+                        <field name="first_name" readonly="context.get('rs_form30_locked')"/>
+                        <field name="last_name" readonly="context.get('rs_form30_locked')"/>
+                        <field name="address" readonly="context.get('rs_form30_locked')"/>
+                        <field name="country_id" readonly="context.get('rs_form30_locked')"/>
+                        <field name="category_id" readonly="context.get('rs_form30_locked')"/>
+                    </group>
+                    <group name="payment" string="Payment">
+                        <field name="income_type_id" readonly="context.get('rs_form30_locked')"/>
+                        <field name="date" readonly="context.get('rs_form30_locked')"/>
+                        <field name="amount" readonly="context.get('rs_form30_locked')"/>
+                        <field name="pension_amount" readonly="context.get('rs_form30_locked')"/>
+                        <field name="other_relief" readonly="context.get('rs_form30_locked')"/>
+                        <field name="rate" readonly="context.get('rs_form30_locked')"/>
+                        <field name="tax_amount" readonly="context.get('rs_form30_locked')"/>
+                        <field name="international_agreement_exempt_tax" readonly="context.get('rs_form30_locked')"/>
+                        <field name="foreign_tax_credit" readonly="context.get('rs_form30_locked')"/>
+                        <field name="from_treasury" readonly="context.get('rs_form30_locked')"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="Save" special="save" class="btn-primary" invisible="context.get('rs_form30_locked')"/>
+                    <button string="Discard" special="cancel" class="btn-secondary"/>
+                    <button string="Delete" type="object" name="unlink" class="btn btn-danger ms-auto"
+                            invisible="not id or context.get('rs_form30_locked')"
+                            confirm="Delete this manual row?"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_rs_form30_exempt_usage_list" model="ir.ui.view">
+        <field name="name">rs.form30.exempt.usage.list</field>
+        <field name="model">rs.form30.exempt.usage</field>
+        <field name="arch" type="xml">
+            <list create="0" edit="0" delete="0">
+                <field name="date"/>
+                <field name="declaration_id"/>
+                <field name="line_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="balance_before"/>
+                <field name="amount" sum="Total"/>
+                <field name="balance_after"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rs_form30_car_engine_list" model="ir.ui.view">
+        <field name="name">rs.form30.car.engine.list</field>
+        <field name="model">rs.form30.car.engine</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="amount"/>
+                <field name="valid_from" optional="show"/>
+                <field name="valid_to" optional="show"/>
+                <field name="active" widget="boolean_toggle" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_rs_form30_car_engine" model="ir.actions.act_window">
+        <field name="name">Car Engine Bands</field>
+        <field name="res_model">rs.form30.car.engine</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <record id="view_rs_form30_service_type_list" model="ir.ui.view">
+        <field name="name">rs.form30.service.type.list</field>
+        <field name="model">rs.form30.service.type</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="valid_from" optional="hide"/>
+                <field name="valid_to" optional="hide"/>
+                <field name="active" widget="boolean_toggle" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_rs_form30_service_type" model="ir.actions.act_window">
+        <field name="name">Service Types</field>
+        <field name="res_model">rs.form30.service.type</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <record id="view_rs_form30_declaration_search" model="ir.ui.view">
+        <field name="name">rs.form30.declaration.search</field>
+        <field name="model">rs.form30.declaration</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="exported" string="Exported" domain="[('state', '=', 'exported')]"/>
+                <group name="group_by">
+                    <filter name="group_company" string="Company" context="{'group_by': 'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_rs_form30_declaration" model="ir.actions.act_window">
+        <field name="name">Income Tax Declaration (Form 30)</field>
+        <field name="res_model">rs.form30.declaration</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create the declaration of a month</p>
+            <p>Generate the lines from paid payslips and withholding payments, review the warnings, then export the file for the rs.ge annex import.</p>
+        </field>
+    </record>
+</odoo>

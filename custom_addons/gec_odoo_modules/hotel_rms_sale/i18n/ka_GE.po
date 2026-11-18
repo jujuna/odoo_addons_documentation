@@ -1,0 +1,185 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* hotel_rms_sale
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-25 10:43+0000\n"
+"PO-Revision-Date: 2026-10-25 10:43+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: hotel_rms_sale
+#: model:ir.module.module,description:base.module_hotel_rms_sale
+msgid ""
+"\n"
+"Connects Hotel Revenue Management to rental sales orders and a pricelist. Rental order lines\n"
+"become the reservations of the hotel, and the pricelist gives the current price of each night.\n"
+"Approved prices are written back to the pricelist as one fixed price per night and room product.\n"
+"Full documentation: README.md in the module directory.\n"
+msgstr ""
+"\n"
+"აკავშირებს სასტუმროს შემოსავლების მართვას გაქირავების გაყიდვის შეკვეთებთან და ფასების სიასთან. გაქირავების შეკვეთის სტრიქონები\n"
+"სასტუმროს ჯავშნებად იქცევა, ფასების სია კი ყოველი ღამის მიმდინარე ფასს იძლევა.\n"
+"დამტკიცებული ფასები ფასების სიაში ბრუნდება, როგორც ერთი ფიქსირებული ფასი თითო ღამისა და ოთახის პროდუქტისთვის.\n"
+"სრული დოკუმენტაცია: README.md მოდულის დირექტორიაში.\n"
+
+#. module: hotel_rms_sale
+#. odoo-python
+#: code:addons/hotel_rms_sale/models/hotel_rms_property.py:0
+msgid "%s prices applied to the pricelist"
+msgstr "%s ფასი გამოყენებულია ფასების სიაში"
+
+#. module: hotel_rms_sale
+#: model_terms:ir.ui.view,arch_db:hotel_rms_sale.hotel_rms_price_view_form
+msgid "<span class=\"badge text-bg-warning\">Not for sale</span>"
+msgstr "<span class=\"badge text-bg-warning\">არ იყიდება</span>"
+
+#. module: hotel_rms_sale
+#: model:ir.model.constraint,message:hotel_rms_sale.constraint_hotel_rms_room_type_product_tmpl_unique
+msgid "An Odoo product can be the room product of one room type only."
+msgstr ""
+"ერთი Odoo პროდუქტი მხოლოდ ერთი ოთახის ტიპის ოთახის პროდუქტი შეიძლება იყოს."
+
+#. module: hotel_rms_sale
+#. odoo-python
+#: code:addons/hotel_rms_sale/models/hotel_rms_property.py:0
+msgid "Apply to pricelist"
+msgstr "ფასების სიაში გამოყენება"
+
+#. module: hotel_rms_sale
+#. odoo-python
+#: code:addons/hotel_rms_sale/models/hotel_rms_property.py:0
+msgid ""
+"Applying prices to the pricelist needs the access right Sales: Administrator"
+" or Product: Manager."
+msgstr ""
+"ფასების სიაში ფასების გამოსაყენებლად საჭიროა წვდომის უფლება: გაყიდვები: "
+"ადმინისტრატორი ან პროდუქტი: მენეჯერი."
+
+#. module: hotel_rms_sale
+#: model:ir.model.fields,help:hotel_rms_sale.field_hotel_rms_property__pricelist_id
+msgid ""
+"Current prices are read from this pricelist, and approved prices are written"
+" back to it as one fixed price per night and room product. Empty: prices "
+"come from a CSV import and are exported to CSV."
+msgstr ""
+"მიმდინარე ფასები იკითხება ამ ფასების სიიდან, დამტკიცებული ფასები კი უკან "
+"იწერება მასში, როგორც ერთი ფიქსირებული ფასი თითო ღამისა და ოთახის "
+"პროდუქტისთვის. თუ ცარიელია: ფასები CSV იმპორტიდან მოდის და CSV-ში "
+"ექსპორტირდება."
+
+#. module: hotel_rms_sale
+#: model:ir.model,name:hotel_rms_sale.model_hotel_rms_import
+msgid "Data Import"
+msgstr "მონაცემთა იმპორტი"
+
+#. module: hotel_rms_sale
+#: model:ir.model.fields,field_description:hotel_rms_sale.field_hotel_rms_import__display_name
+#: model:ir.model.fields,field_description:hotel_rms_sale.field_hotel_rms_price__display_name
+#: model:ir.model.fields,field_description:hotel_rms_sale.field_hotel_rms_property__display_name
+#: model:ir.model.fields,field_description:hotel_rms_sale.field_hotel_rms_room_type__display_name
+#: model:ir.model.fields,field_description:hotel_rms_sale.field_product_pricelist_item__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: hotel_rms_sale
+#: model:ir.model,name:hotel_rms_sale.model_hotel_rms_property
+msgid "Hotel"
+msgstr "სასტუმრო"
+
+#. module: hotel_rms_sale
+#: model:ir.module.module,shortdesc:base.module_hotel_rms_sale
+msgid "Hotel Revenue Management - Sales & Pricelist"
+msgstr "სასტუმროს შემოსავლების მართვა - გაყიდვები და ფასების სია"
+
+#. module: hotel_rms_sale
+#: model:ir.model.fields,field_description:hotel_rms_sale.field_product_pricelist_item__hotel_rms_price_id
+msgid "Hotel price"
+msgstr "სასტუმროს ფასი"
+
+#. module: hotel_rms_sale
+#: model:ir.model.fields,field_description:hotel_rms_sale.field_hotel_rms_import__id
+#: model:ir.model.fields,field_description:hotel_rms_sale.field_hotel_rms_price__id
+#: model:ir.model.fields,field_description:hotel_rms_sale.field_hotel_rms_property__id
+#: model:ir.model.fields,field_description:hotel_rms_sale.field_hotel_rms_room_type__id
+#: model:ir.model.fields,field_description:hotel_rms_sale.field_product_pricelist_item__id
+msgid "ID"
+msgstr "ID"
+
+#. module: hotel_rms_sale
+#: model:ir.model,name:hotel_rms_sale.model_hotel_rms_price
+msgid "Nightly Price"
+msgstr "ღამის ფასი"
+
+#. module: hotel_rms_sale
+#: model:ir.model.fields,field_description:hotel_rms_sale.field_hotel_rms_price__not_for_sale
+msgid "Not For Sale"
+msgstr "არ იყიდება"
+
+#. module: hotel_rms_sale
+#: model_terms:ir.ui.view,arch_db:hotel_rms_sale.hotel_rms_price_view_search
+msgid "Not for sale"
+msgstr "არ იყიდება"
+
+#. module: hotel_rms_sale
+#: model:ir.model.fields,field_description:hotel_rms_sale.field_hotel_rms_room_type__product_tmpl_id
+msgid "Odoo room product"
+msgstr "ოთახის პროდუქტი Odoo-ში"
+
+#. module: hotel_rms_sale
+#: model:ir.model.fields,field_description:hotel_rms_sale.field_hotel_rms_property__pricelist_id
+msgid "Pricelist"
+msgstr "ფასების სია"
+
+#. module: hotel_rms_sale
+#: model:ir.model,name:hotel_rms_sale.model_product_pricelist_item
+msgid "Pricelist Rule"
+msgstr "ფასების სიის წესი"
+
+#. module: hotel_rms_sale
+#: model:ir.module.module,summary:base.module_hotel_rms_sale
+msgid "Read bookings and nightly prices from rental orders and the pricelist"
+msgstr ""
+"ჯავშნებისა და ღამის ფასების წაკითხვა გაქირავების შეკვეთებიდან და ფასების "
+"სიიდან"
+
+#. module: hotel_rms_sale
+#: model:ir.model,name:hotel_rms_sale.model_hotel_rms_room_type
+msgid "Room Type"
+msgstr "ოთახის ტიპი"
+
+#. module: hotel_rms_sale
+#. odoo-python
+#: code:addons/hotel_rms_sale/models/hotel_rms_import.py:0
+msgid ""
+"The current prices of this hotel come from its pricelist. Import "
+"reservations only."
+msgstr ""
+"ამ სასტუმროს მიმდინარე ფასები მისი ფასების სიიდან მოდის. შემოიტანეთ მხოლოდ "
+"ჯავშნები."
+
+#. module: hotel_rms_sale
+#: model:ir.model.fields,help:hotel_rms_sale.field_hotel_rms_price__not_for_sale
+msgid ""
+"The pricelist price of this night is 0: the night is not sold, so it has no "
+"recommendation and its price is not applied."
+msgstr ""
+"ამ ღამის ფასი ფასების სიაში 0-ია: ღამე არ იყიდება, ამიტომ მას რეკომენდაცია "
+"არ აქვს და მისი ფასი არ გამოიყენება."
+
+#. module: hotel_rms_sale
+#: model:ir.model.fields,help:hotel_rms_sale.field_hotel_rms_room_type__product_tmpl_id
+msgid ""
+"The rental product that sells this room type: its rental order lines are the"
+" reservations and its pricelist price is the current price."
+msgstr ""
+"გაქირავების პროდუქტი, რომელიც ამ ოთახის ტიპს ყიდის: მისი გაქირავების "
+"შეკვეთის სტრიქონები ჯავშნებია, ფასების სიაში მისი ფასი კი მიმდინარე ფასია."

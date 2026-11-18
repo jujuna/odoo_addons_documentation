@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="gec_vat_declaration.GecVatGrid">
+        <section class="o_gec_vat_grid" t-att-class="this.className" t-ref="this.root">
+            <header class="o_gvg_title" t-out="this.layout.title"/>
+
+            <div class="o_gvg_table_wrap">
+                <table class="o_gvg_table">
+                    <thead>
+                        <t t-if="this.layout.groupHeader">
+                            <tr>
+                                <th rowspan="2" class="o_gvg_label_head" t-out="this.contentHeader"/>
+                                <th rowspan="2" class="o_gvg_no_head"/>
+                                <th t-att-colspan="this.layout.groupHeader.span" class="o_gvg_group_head"
+                                    t-out="this.layout.groupHeader.label"/>
+                                <t t-foreach="this.layout.columns.slice(this.layout.groupHeader.span)" t-as="column" t-key="column">
+                                    <th rowspan="2" class="o_gvg_column_head" t-out="column"/>
+                                </t>
+                            </tr>
+                            <tr>
+                                <t t-foreach="this.layout.columns.slice(0, this.layout.groupHeader.span)" t-as="column" t-key="column">
+                                    <th class="o_gvg_column_head" t-out="column"/>
+                                </t>
+                            </tr>
+                        </t>
+                        <t t-else="">
+                            <tr>
+                                <th class="o_gvg_label_head" t-out="this.contentHeader"/>
+                                <th class="o_gvg_no_head"/>
+                                <t t-foreach="this.layout.columns" t-as="column" t-key="column">
+                                    <th class="o_gvg_column_head" t-out="column"/>
+                                </t>
+                            </tr>
+                        </t>
+                        <tr t-if="this.layout.numbering" class="o_gvg_numbering">
+                            <th colspan="2"/>
+                            <t t-foreach="this.layout.numbering" t-as="number" t-key="number">
+                                <th t-out="number"/>
+                            </t>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="this.rows" t-as="row" t-key="row.key">
+                            <tr>
+                                <td class="o_gvg_label">
+                                    <span t-out="row.name"/>
+                                    <i t-if="row.note" class="oi o_gvg_help" data-icon="help" role="img" tabindex="0"
+                                       t-att-title="row.note" t-att-aria-label="row.note"/>
+                                </td>
+                                <td class="o_gvg_no" t-out="row.label"/>
+                                <t t-foreach="this.slots" t-as="slot" t-key="slot">
+                                    <t t-set="cell" t-value="row.cells[slot]"/>
+                                    <td t-if="!cell"/>
+                                    <td t-else="" class="o_gvg_cell"
+                                        t-att-class="{ 'o_gvg_locked': cell.data.locked, 'o_gvg_editing': cell.isInEdition }"
+                                        t-att-data-cell-id="cell.id"
+                                        t-att-tabindex="this.isEditable(cell) ? 0 : false"
+                                        t-on-click="() => this.onCellClick(cell)"
+                                        t-on-keydown="(ev) => this.onCellKeydown(ev, cell)">
+                                        <div class="o_gvg_value">
+                                            <i t-if="cell.data.locked" class="oi o_gvg_padlock" data-icon="lock" role="img"
+                                               tabindex="0" t-att-title="cell.data.formula || this.calculatedTitle"
+                                               t-att-aria-label="cell.data.formula || this.calculatedTitle"/>
+                                            <i t-elif="cell.data.proposed" class="oi o_gvg_wand" data-icon="wand_stars"
+                                               t-att-title="this.wandTitle(cell)" aria-hidden="true"/>
+                                            <Field name="'value'" record="cell" readonly="!this.isEditable(cell)"/>
+                                            <button t-if="cell.data.auditable" type="button" class="btn btn-link p-0 o_gvg_audit"
+                                                    title="Show what makes up Odoo's figure"
+                                                    aria-label="Show what makes up Odoo's figure"
+                                                    t-on-click.stop="() => this.openAudit(cell)">
+                                                <i class="oi" data-icon="search" aria-hidden="true"/>
+                                            </button>
+                                        </div>
+                                        <small t-if="this.showOdooValue(cell)" class="o_gvg_odoo"
+                                               t-out="this.odooValueText(cell)"/>
+                                    </td>
+                                </t>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+            <footer class="o_gvg_hint">
+                <i class="oi" data-icon="info" aria-hidden="true"/>
+                A lock means the portal calculates the cell. A wand means Odoo proposes the cell and you can
+                overwrite it. The grey Odoo figure under a cell shows what Odoo computed when it differs from the cell.
+            </footer>
+        </section>
+    </t>
+
+</templates>

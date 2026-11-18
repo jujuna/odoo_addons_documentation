@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_gec_abc_health_form" model="ir.ui.view">
+        <field name="name">gec.abc.health.form</field>
+        <field name="model">gec.abc.health</field>
+        <field name="arch" type="xml">
+            <form string="ABC Setup Health Check">
+                <div class="alert alert-success" role="alert" invisible="not all_clear">
+                    Nothing to report. Every activity measures something, every rule
+                    has a pool and a base to spread it over, and no allocatable cost
+                    is sitting where a rule cannot reach it.
+                </div>
+                <div class="alert alert-danger" role="alert" invisible="error_count == 0">
+                    <b><field name="error_count" nolabel="1" class="oe_inline"/></b>
+                    thing(s) will produce wrong numbers rather than no numbers.
+                    Fix these before the next run.
+                </div>
+                <div class="alert alert-warning" role="alert"
+                     invisible="warning_count == 0 or error_count > 0">
+                    <b><field name="warning_count" nolabel="1" class="oe_inline"/></b>
+                    thing(s) look wrong but may simply be a period with no data.
+                </div>
+                <group>
+                    <group>
+                        <label for="date_from" string="Period"/>
+                        <div class="o_row">
+                            <field name="date_from" nolabel="1" class="oe_inline"/>
+                            <i class="oi mx-2" data-icon="east" aria-label="to" title="to"/>
+                            <field name="date_to" nolabel="1" class="oe_inline"/>
+                        </div>
+                    </group>
+                    <group>
+                        <field name="company_id" groups="base.group_multi_company"
+                               options="{'no_create': True}"/>
+                        <field name="warning_count" invisible="1"/>
+                        <field name="info_count" invisible="1"/>
+                        <field name="all_clear" invisible="1"/>
+                    </group>
+                </group>
+                <field name="check_ids" nolabel="1" invisible="all_clear">
+                    <list string="Findings" create="false" edit="false"
+                          decoration-danger="severity == 'error'"
+                          decoration-warning="severity == 'warning'"
+                          decoration-muted="severity == 'info'">
+                        <field name="severity" widget="badge"
+                               decoration-danger="severity == 'error'"
+                               decoration-warning="severity == 'warning'"
+                               decoration-info="severity == 'info'"/>
+                        <field name="category"/>
+                        <field name="name"/>
+                        <field name="res_model" column_invisible="True"/>
+                        <button name="action_open" type="object" icon="east"
+                                title="Open the record" invisible="not res_model"/>
+                    </list>
+                    <form string="Finding">
+                        <group>
+                            <field name="severity"/>
+                            <field name="category"/>
+                            <field name="name"/>
+                        </group>
+                        <field name="detail" widget="text" nolabel="1"/>
+                        <field name="res_model" invisible="1"/>
+                        <footer>
+                            <button name="action_open" type="object" string="Go to it"
+                                    class="btn-primary" invisible="not res_model"/>
+                            <button string="Close" class="btn-secondary" special="cancel"/>
+                        </footer>
+                    </form>
+                </field>
+                <footer>
+                    <button name="action_check" type="object" string="Check Again"
+                            class="btn-primary"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_gec_abc_health" model="ir.actions.act_window">
+        <field name="name">Setup Health Check</field>
+        <field name="res_model">gec.abc.health</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'gec_check_on_open': True}</field>
+    </record>
+
+</odoo>

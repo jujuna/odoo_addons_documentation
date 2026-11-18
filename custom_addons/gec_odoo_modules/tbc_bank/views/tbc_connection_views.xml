@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_tbc_connection_form" model="ir.ui.view">
+        <field name="name">tbc.connection.form</field>
+        <field name="model">tbc.connection</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_test_connection" type="object" groups="tbc_bank.group_tbc_manager"
+                            string="Test Connection" class="btn-primary"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,active,error,blocked"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_logs" type="object" groups="tbc_bank.group_tbc_manager"
+                                class="oe_stat_button" icon="view_list">
+                            <span class="o_stat_text">API Logs</span>
+                        </button>
+                    </div>
+                    <group>
+                        <group string="Connection">
+                            <field name="company_id"/>
+                            <field name="environment"/>
+                            <field name="api_host" placeholder="Leave blank for the default host"/>
+                        </group>
+                        <group string="Credentials">
+                            <field name="client_id"/>
+                            <field name="client_secret" password="True"/>
+                        </group>
+                    </group>
+                    <group string="Approval">
+                        <field name="processing_mode"/>
+                        <field name="approval_id"
+                               required="processing_mode == 'odoo_approve'"
+                               invisible="processing_mode != 'odoo_approve'"/>
+                        <field name="allow_self_approval"
+                               invisible="processing_mode != 'odoo_approve'"/>
+                    </group>
+                    <group string="Logging">
+                        <field name="log_retention_days"/>
+                    </group>
+                    <group string="Last Error" invisible="not last_error_message">
+                        <field name="last_error_code"/>
+                        <field name="last_error_message"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_tbc_connection_list" model="ir.ui.view">
+        <field name="name">tbc.connection.list</field>
+        <field name="model">tbc.connection</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="company_id"/>
+                <field name="environment"/>
+                <field name="processing_mode"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'active'"
+                       decoration-danger="state in ('error', 'blocked')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_tbc_connection" model="ir.actions.act_window">
+        <field name="name">TBC Connections</field>
+        <field name="res_model">tbc.connection</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

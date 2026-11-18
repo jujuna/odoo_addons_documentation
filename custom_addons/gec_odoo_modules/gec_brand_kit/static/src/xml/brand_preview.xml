@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-name="gec_brand_kit.BrandPreview">
+    <div class="o_gec_bp_wrap w-100">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="text-muted small">Preview of the unsaved values. Users see the brand only after Apply.</span>
+            <button type="button" class="btn btn-sm btn-secondary" t-on-click="this.toggleDark">
+                <t t-if="this.state.dark">Light mode</t>
+                <t t-else="">Dark mode</t>
+            </button>
+        </div>
+        <div t-att-class="this.rootClass" t-att-style="this.rootStyle">
+            <div class="o_gec_bp_navbar">
+                <span class="o_gec_bp_apps">▦</span>
+                <span class="o_gec_bp_app" t-out="this.appName"/>
+                <span class="o_gec_bp_menu">Orders</span>
+                <span class="o_gec_bp_menu">Products</span>
+                <span class="ms-auto o_gec_bp_menu">●</span>
+            </div>
+            <div class="o_gec_bp_body">
+                <div class="o_gec_bp_cp">
+                    <span class="o_gec_bp_crumb">Quotations</span>
+                    <span class="o_gec_bp_btn">New</span>
+                </div>
+                <div class="o_gec_bp_content">
+                    <table class="o_gec_bp_list">
+                        <thead><tr><th>Number</th><th>Customer</th><th class="text-end">Total</th></tr></thead>
+                        <tbody>
+                            <tr t-foreach="this.rows" t-as="row" t-key="row.name">
+                                <td t-out="row.name"/><td t-out="row.partner"/><td class="text-end" t-out="row.amount"/>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="o_gec_bp_sheet">
+                        <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                            <span class="o_gec_bp_btn">Confirm</span>
+                            <span class="o_gec_bp_status">
+                                <t t-foreach="this.steps" t-as="step" t-key="step_index">
+                                    <span t-att-class="step_index === 1 ? 'o_gec_bp_step o_gec_bp_step_current' : 'o_gec_bp_step'" t-out="step"/>
+                                </t>
+                            </span>
+                        </div>
+                        <div class="o_gec_bp_title">S00041</div>
+                        <div class="o_gec_bp_text">ბრენდის სტილი — Brand Style Aa 123</div>
+                        <div class="o_gec_bp_tabs">
+                            <span class="o_gec_bp_tab o_gec_bp_tab_active">Order Lines</span>
+                            <span class="o_gec_bp_tab">Other Info</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</t>
+
+</templates>

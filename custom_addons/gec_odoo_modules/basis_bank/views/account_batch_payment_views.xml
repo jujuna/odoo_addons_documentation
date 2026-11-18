@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_batch_payment_form_basisbank" model="ir.ui.view">
+        <field name="name">account.batch.payment.form.basisbank</field>
+        <field name="model">account.batch.payment</field>
+        <field name="inherit_id" ref="account_batch_payment.view_batch_payment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_basisbank_submit_for_approval" type="object"
+                        string="Submit for Approval" class="oe_highlight"
+                        invisible="not is_basisbank or batch_type != 'outbound' or basisbank_state != 'draft' or not basisbank_approval_id"/>
+                <button name="action_basisbank_approve" type="object"
+                        string="Approve" class="oe_highlight"
+                        invisible="not is_basisbank or batch_type != 'outbound' or basisbank_state != 'awaiting_approval' or not basisbank_can_approve"/>
+                <button name="action_send_basisbank" type="object" groups="basis_bank.group_basisbank_user"
+                        string="Send to Basis Bank" class="oe_highlight"
+                        invisible="not is_basisbank or batch_type != 'outbound' or not (basisbank_state == 'awaiting_otp' or (basisbank_state == 'draft' and not basisbank_approval_id))"/>
+                <button name="action_basisbank_resync" type="object" groups="basis_bank.group_basisbank_user"
+                        string="Resync from Bank"
+                        invisible="not is_basisbank or batch_type != 'outbound' or basisbank_state != 'unknown'"/>
+                <button name="action_basisbank_reset_to_pending" type="object" groups="basis_bank.group_basisbank_user"
+                        string="Reset to Pending"
+                        confirm="Resending creates new transfers at the bank for the payments the bank report does not show. Only continue if Resync from Bank confirmed they are missing. Reset this batch to draft?"
+                        invisible="not is_basisbank or batch_type != 'outbound' or basisbank_state not in ('unknown', 'failed')"/>
+            </xpath>
+            <xpath expr="//button[@id='validate_button'][@name='validate_batch_button']" position="attributes">
+                <attribute name="invisible" add="is_basisbank" separator=" or "/>
+            </xpath>
+            <xpath expr="//header" position="after">
+                <div class="alert alert-warning" role="alert"
+                     invisible="not is_basisbank or basisbank_state != 'unknown'">
+                    This batch needs attention: the last send returned an unexpected error, or some sent payments were never confirmed by the bank report.
+                    Use <b>Resync from Bank</b> to re-check, then review the payments (see the log below).
+                    <b>Reset to Pending</b> resets the payments the bank never confirmed and lets you send the batch again for them only.
+                </div>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <group string="Basis Bank" invisible="not is_basisbank or batch_type != 'outbound'">
+                    <group>
+                        <field name="is_basisbank" invisible="1"/>
+                        <field name="basisbank_endpoint" readonly="1"/>
+                        <field name="basisbank_state" readonly="1" widget="badge"
+                               decoration-success="basisbank_state == 'done'"
+                               decoration-info="basisbank_state in ('sent_pending_confirm', 'awaiting_ib_confirmation')"
+                               decoration-warning="basisbank_state in ('awaiting_approval', 'awaiting_otp', 'sending')"
+                               decoration-danger="basisbank_state in ('failed', 'unknown')"/>
+                        <field name="basisbank_sent_date" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="basisbank_approval_id" readonly="1"/>
+                        <field name="basisbank_approved_by" readonly="1"/>
+                        <field name="basisbank_approved_date" readonly="1"/>
+                        <field name="basisbank_can_approve" invisible="1"/>
+                    </group>
+                    <group colspan="2">
+                        <field name="basisbank_bank_response" readonly="1"
+                               invisible="not basisbank_bank_response"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_account_batch_payment_list_basisbank" model="ir.ui.view">
+        <field name="name">account.batch.payment.list.basisbank</field>
+        <field name="model">account.batch.payment</field>
+        <field name="inherit_id" ref="account_batch_payment.view_batch_payment_tree"/>
+        <field name="arch" type="xml">
+            <field name="state" position="after">
+                <field name="basisbank_state" optional="hide" widget="badge"
+                       decoration-success="basisbank_state == 'done'"
+                       decoration-info="basisbank_state in ('sent_pending_confirm', 'awaiting_ib_confirmation')"
+                       decoration-warning="basisbank_state in ('awaiting_approval', 'awaiting_otp', 'sending')"
+                       decoration-danger="basisbank_state in ('failed', 'unknown')"/>
+                <field name="basisbank_endpoint" optional="hide"/>
+                <field name="is_basisbank" column_invisible="1"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="action_basisbank_batch_payment" model="ir.actions.act_window">
+        <field name="name">Batches</field>
+        <field name="res_model">account.batch.payment</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_basisbank', '=', True)]</field>
+    </record>
+
+    <record id="action_basisbank_pending_approval" model="ir.actions.act_window">
+        <field name="name">Batches Awaiting Approval</field>
+        <field name="res_model">account.batch.payment</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_basisbank', '=', True), ('basisbank_state', '=', 'awaiting_approval')]</field>
+    </record>
+</odoo>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="hotel_rms.PricePosition">
+        <div t-if="this.visible" class="o_rms_price_position">
+            <div class="o_rms_pp_track">
+                <span t-foreach="this.markers" t-as="marker" t-key="marker.key"
+                      t-attf-class="o_rms_pp_marker o_rms_pp_{{ marker.key }}" t-att-style="marker.style"
+                      t-att-title="marker.label + ': ' + marker.text"/>
+            </div>
+            <div class="o_rms_pp_ends">
+                <span t-out="this.price(this.props.min)"/>
+                <span t-out="this.price(this.props.max)"/>
+            </div>
+            <div class="o_rms_pp_legend o_rms_legend_items">
+                <span t-foreach="this.markers" t-as="marker" t-key="marker.key" class="o_rms_legend_item">
+                    <i t-attf-class="o_rms_pp_key o_rms_pp_{{ marker.key }}"/>
+                    <span><t t-out="marker.label"/> <b t-out="marker.text"/></span>
+                </span>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="business_process_view_form" model="ir.ui.view">
+        <field name="name">business.process.form</field>
+        <field name="model">business.process</field>
+        <field name="arch" type="xml">
+            <form string="Business Process">
+                <header>
+                    <button name="action_submit_review" type="object" string="Submit for Review"
+                            class="btn-primary" invisible="state != 'draft' or not is_manager"
+                            help="Freeze this draft so it can be checked. Nothing changes for employees yet."/>
+                    <button name="action_open_publish" type="object" string="Publish" class="btn-secondary"
+                            invisible="state != 'draft' or not is_manager"
+                            help="Make this version valid now, without a review step. You will be asked whether it is a small or a major change."/>
+                    <button name="action_open_publish" type="object" string="Publish" class="btn-primary"
+                            invisible="state != 'review' or not is_manager"
+                            help="Make this version valid: employees see it in the Process Map. You will be asked whether it is a small or a major change."/>
+                    <button name="action_back_to_draft" type="object" string="Back to Draft"
+                            invisible="state != 'review' or not is_manager"
+                            help="Make the version editable again."/>
+                    <button name="action_new_version" type="object" string="New Version"
+                            class="btn-primary"
+                            invisible="state not in ('published', 'deprecated') or not is_manager or not is_latest_version"
+                            help="To change a published process: creates an editable draft copy. This version stays valid until the new one is published; when publishing you say whether it is a small or a major change."/>
+                    <button name="action_restore" type="object" string="Restore"
+                            invisible="state != 'deprecated' or is_superseded or not is_manager"
+                            help="Publish this version again."/>
+                    <button name="action_deprecate" type="object" string="Deprecate"
+                            invisible="state != 'published' or not is_manager"
+                            help="Withdraw the process without a replacement. Nothing is deleted: it stays in All Processes and can be restored."
+                            confirm="The process leaves the Process Map and employees no longer see it. Nothing is deleted: it stays in All Processes (status Deprecated) and can be restored. Continue?"/>
+                    <button name="action_open_import" type="object" string="Import Diagram"
+                            invisible="state != 'draft' or not is_manager"
+                            help="Replace or complete the diagram with a draw.io, Visio or .bpmn file."/>
+                    <button name="action_match_responsibles" type="object" string="Match Lanes"
+                            invisible="state != 'draft' or not is_manager"
+                            help="Link lanes to departments, job positions or user groups with the same name."/>
+                    <button name="action_acknowledge" type="object" string="I have read it"
+                            class="btn-primary"
+                            invisible="state != 'published' or not ack_required or is_acknowledged"
+                            help="Confirm that you have read and understood this version."/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,review,published"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_versions" type="object" class="oe_stat_button" invisible="version_count &lt;= 1">
+                            <field name="version_count" widget="statinfo" string="Versions"/>
+                        </button>
+                        <button name="action_view_review_items" type="object" class="oe_stat_button" invisible="review_count == 0 or not is_manager">
+                            <field name="review_count" widget="statinfo" string="To Review"/>
+                        </button>
+                        <button name="action_view_acks" type="object" class="oe_stat_button"
+                                invisible="not ack_required or not is_manager">
+                            <field name="ack_count" widget="statinfo" string="Read by"/>
+                        </button>
+                        <button name="action_export_bpmn" type="object" class="oe_stat_button" string="BPMN"/>
+                        <button name="action_export_drawio" type="object" class="oe_stat_button" string="draw.io"/>
+                    </div>
+                    <widget name="web_ribbon" title="Deprecated" bg_color="text-bg-secondary"
+                            invisible="state != 'deprecated' or is_superseded"/>
+                    <widget name="web_ribbon" title="Old Version" bg_color="text-bg-secondary"
+                            invisible="not is_superseded"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <field name="active" invisible="1"/>
+                    <field name="is_manager" invisible="1"/>
+                    <field name="is_latest_version" invisible="1"/>
+                    <field name="diagram_preview" invisible="1"/>
+                    <field name="is_acknowledged" invisible="1"/>
+                    <widget name="web_ribbon" title="Read" bg_color="text-bg-success"
+                            invisible="state != 'published' or not ack_required or not is_acknowledged"/>
+                    <field name="is_superseded" invisible="1"/>
+                    <field name="other_version_id" invisible="1"/>
+                    <div class="alert alert-info mb-3" role="status"
+                         invisible="not is_manager or state != 'review'">
+                        <b>In review: read-only.</b> To change it, click <b>Back to Draft</b>. To make it valid, click <b>Publish</b>.
+                        <a href="/bpmn_process_management/guide#edit" target="_blank" class="ms-1" title="User guide">How it works?</a>
+                    </div>
+                    <div class="alert alert-info mb-3" role="status"
+                         invisible="not is_manager or state != 'published' or not is_latest_version">
+                        <b>Published: read-only.</b> Everyone works with this version. To change it, click <b>New Version</b>: you get an editable draft, and this version stays valid until you publish the new one.
+                        <a href="/bpmn_process_management/guide#edit" target="_blank" class="ms-1" title="User guide">How it works?</a>
+                    </div>
+                    <div class="alert alert-warning d-flex flex-wrap align-items-center gap-2 mb-3" role="status"
+                         invisible="not is_manager or state == 'draft' or is_latest_version or not other_version_id">
+                        <div class="flex-grow-1">
+                            <b>This is not the version to edit.</b> Changes are made in <field name="other_version_label" class="fw-bold"/>.
+                        </div>
+                        <button name="action_open_other_version" type="object" string="Open it" class="btn btn-sm btn-primary"/>
+                    </div>
+                    <div class="alert alert-secondary mb-3" role="status"
+                         invisible="not is_manager or state != 'deprecated' or not is_latest_version">
+                        <b>Deprecated: hidden from the Process Map.</b> Nothing was deleted. Click <b>Restore</b> to publish it again, or <b>New Version</b> to rework it.
+                        <a href="/bpmn_process_management/guide#edit" target="_blank" class="ms-1" title="User guide">How it works?</a>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Return of rejected goods"
+                                   readonly="state != 'draft' or not is_manager"/>
+                        </h1>
+                        <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"
+                               placeholder="Tags..." readonly="not is_manager"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code" placeholder="e.g. SCM-07"
+                                   readonly="state != 'draft' or not is_manager"/>
+                            <field name="previous_version_id" invisible="1"/>
+                            <field name="version" readonly="state != 'draft' or not is_manager or previous_version_id"
+                                   help="Set automatically for later versions: when publishing you say whether it is a small change (1.0 → 1.1) or a major change (1.x → 2.0)."/>
+                            <field name="category" readonly="state != 'draft' or not is_manager"/>
+                            <field name="level" readonly="state != 'draft' or not is_manager"/>
+                        </group>
+                        <group>
+                            <field name="owner_id" readonly="not is_manager"/>
+                            <field name="parent_id" readonly="not is_manager"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="not is_manager"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Diagram" name="diagram">
+                            <field name="bpmn_xml" widget="bpmn_editor" nolabel="1" colspan="2"
+                                   readonly="state != 'draft' or not is_manager"/>
+                        </page>
+                        <page string="Process Card" name="card">
+                            <group>
+                                <group string="Start and scope">
+                                    <field name="trigger" readonly="state != 'draft' or not is_manager"
+                                           placeholder="e.g. A customer asks to return a product"/>
+                                    <field name="supplier" readonly="state != 'draft' or not is_manager"
+                                           placeholder="e.g. Customer, carrier"/>
+                                    <field name="customer" readonly="state != 'draft' or not is_manager"
+                                           placeholder="e.g. Customer, accounting"/>
+                                </group>
+                                <group string="Inputs and outputs">
+                                    <field name="process_input" readonly="state != 'draft' or not is_manager"
+                                           placeholder="Return form, invoice, product..."/>
+                                    <field name="process_output" readonly="state != 'draft' or not is_manager"
+                                           placeholder="Refund, credit note, restocked product..."/>
+                                </group>
+                            </group>
+                            <div class="text-muted small mb-2">
+                                The process on one page (SIPOC): what starts it, who supplies and receives what, and how it is measured.
+                                <a href="/bpmn_process_management/guide#card" target="_blank">Learn more</a>
+                            </div>
+                            <label for="kpi_ids" string="Indicators (KPI)" class="o_form_label fw-bold mt-2"/>
+                            <field name="kpi_ids" nolabel="1" readonly="not is_manager">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="target"/>
+                                    <field name="frequency"/>
+                                    <field name="source" optional="show"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Description" name="description">
+                            <field name="description" nolabel="1"
+                                   readonly="state != 'draft' or not is_manager"
+                                   placeholder="Purpose, scope, inputs and outputs, KPIs..."/>
+                        </page>
+                        <page string="Elements" name="elements">
+                            <field name="element_ids" nolabel="1" readonly="1">
+                                <list>
+                                    <field name="element_group"/>
+                                    <field name="name"/>
+                                    <field name="lane_name" optional="show"/>
+                                    <field name="responsible_name" optional="show"/>
+                                    <field name="link_count" optional="show"/>
+                                    <field name="review_status" widget="badge"
+                                           decoration-warning="review_status == 'pending'"
+                                           decoration-success="review_status == 'none'"/>
+                                    <field name="review_reason" optional="show"/>
+                                    <field name="element_type" optional="hide"/>
+                                    <field name="element_id" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Version &amp; Review" name="version">
+                            <group>
+                                <group string="Version">
+                                    <field name="root_id"/>
+                                    <field name="previous_version_id"/>
+                                    <field name="published_date"/>
+                                    <field name="published_by_id"/>
+                                    <field name="change_type" invisible="not change_type"/>
+                                    <field name="change_note" invisible="not change_note"/>
+                                </group>
+                                <group string="Control">
+                                    <div colspan="2" class="text-muted small">
+                                        <a href="/bpmn_process_management/guide#periodic" target="_blank">Periodic review</a> ·
+                                        <a href="/bpmn_process_management/guide#ack" target="_blank">Read confirmation</a> ·
+                                        <a href="/bpmn_process_management/guide#versions" target="_blank">Versions</a>
+                                    </div>
+                                    <field name="review_interval" readonly="not is_manager"/>
+                                    <field name="next_review_date" readonly="not is_manager"/>
+                                    <field name="ack_required" readonly="not is_manager"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="business_process_view_list" model="ir.ui.view">
+        <field name="name">business.process.list</field>
+        <field name="model">business.process</field>
+        <field name="arch" type="xml">
+            <list string="Business Processes" decoration-muted="state == 'deprecated'">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="version"/>
+                <field name="category"/>
+                <field name="level" optional="show"/>
+                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" optional="show"/>
+                <field name="parent_id" optional="show"/>
+                <field name="owner_id" widget="many2one_avatar_user" optional="show"/>
+                <field name="published_date" optional="hide"/>
+                <field name="change_type" optional="hide"/>
+                <field name="next_review_date" optional="hide"/>
+                <field name="review_count" optional="show" string="To Review"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'"
+                       decoration-warning="state == 'review'" decoration-success="state == 'published'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="business_process_view_kanban" model="ir.ui.view">
+        <field name="name">business.process.kanban</field>
+        <field name="model">business.process</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="category" class="o_bpmn_process_kanban" sample="1">
+                <field name="state"/>
+                <field name="review_count"/>
+                <field name="diagram_preview"/>
+                <field name="level"/>
+                <templates>
+                    <t t-name="card" class="o_bpmn_card p-0">
+                        <div class="o_bpmn_card_preview">
+                            <field t-if="record.diagram_preview.raw_value" name="diagram_preview" widget="image"
+                                   options="{'img_class': 'o_bpmn_kanban_img'}"/>
+                            <div t-else="" class="o_bpmn_card_nopreview">BPMN</div>
+                            <span t-if="record.level.raw_value" class="o_bpmn_card_level">
+                                L<t t-out="record.level.raw_value"/>
+                            </span>
+                        </div>
+                        <div class="o_bpmn_card_body">
+                            <div class="d-flex align-items-center gap-2">
+                                <field name="code" class="o_bpmn_card_code"/>
+                                <field name="state" widget="label_selection" class="ms-auto"
+                                       options="{'classes': {'draft': 'info', 'review': 'warning', 'published': 'success', 'deprecated': 'default'}}"/>
+                            </div>
+                            <field name="name" class="o_bpmn_card_title"/>
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                        </div>
+                        <footer class="o_bpmn_card_footer">
+                            <span class="o_bpmn_card_version">v<field name="version"/></span>
+                            <span t-if="record.review_count.raw_value" class="badge rounded-pill text-bg-warning"
+                                  title="Items to review">! <field name="review_count"/></span>
+                            <field name="owner_id" widget="many2one_avatar_user" class="ms-auto"/>
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="business_process_view_search" model="ir.ui.view">
+        <field name="name">business.process.search</field>
+        <field name="model">business.process</field>
+        <field name="arch" type="xml">
+            <search string="Business Processes">
+                <field name="name" filter_domain="['|', ('name', 'ilike', self), ('code', 'ilike', self)]"/>
+                <field name="element_ids" string="Diagram Element"
+                       filter_domain="[('element_ids.name', 'ilike', self)]"/>
+                <field name="element_ids" string="Responsible (lane)"
+                       filter_domain="['|', ('element_ids.responsible_name', 'ilike', self), ('element_ids.lane_name', 'ilike', self)]"/>
+                <field name="owner_id"/>
+                <field name="parent_id"/>
+                <field name="tag_ids"/>
+                <filter name="published" string="Published" domain="[('state', '=', 'published')]"/>
+                <filter name="in_progress" string="Draft / In Review" domain="[('state', 'in', ('draft', 'review'))]"/>
+                <filter name="deprecated" string="Deprecated" domain="[('state', '=', 'deprecated')]"/>
+                <separator/>
+                <filter name="current" string="Current Versions" domain="[('is_superseded', '=', False)]"
+                        help="Hides old versions replaced by a newer published one."/>
+                <filter name="old_versions" string="Old Versions" domain="[('is_superseded', '=', True)]"/>
+                <separator/>
+                <filter name="to_review" string="Items to Review" domain="[('review_count', '>', 0)]"/>
+                <filter name="my" string="My Processes" domain="[('owner_id', '=', uid)]"/>
+                <filter name="review_due" string="Review Due" domain="[('state', '=', 'published'), ('next_review_date', '&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter name="group_category" string="Process Type" context="{'group_by': 'category'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_level" string="Level" context="{'group_by': 'level'}"/>
+                    <filter name="group_parent" string="Parent Process" context="{'group_by': 'parent_id'}"/>
+                    <filter name="group_owner" string="Owner" context="{'group_by': 'owner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="business_process_action_map" model="ir.actions.act_window">
+        <field name="name">Process Map</field>
+        <field name="res_model">business.process</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="business_process_view_search"/>
+        <field name="context">{}</field>
+        <field name="domain">[('state', '=', 'published')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No published process yet</p>
+            <p>Process managers model processes in BPMN 2.0, or import them from draw.io,
+               Microsoft Visio, Camunda or Signavio, then publish them here for everyone.</p>
+        </field>
+    </record>
+
+    <record id="business_process_action_all" model="ir.actions.act_window">
+        <field name="name">All Processes</field>
+        <field name="res_model">business.process</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="business_process_view_search"/>
+        <field name="context">{'search_default_current': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first process</p>
+            <p>Draw it with the BPMN editor or use <b>Import Diagram</b> for draw.io, Visio
+               and .bpmn files.</p>
+        </field>
+    </record>
+</odoo>

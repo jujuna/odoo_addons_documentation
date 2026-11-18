@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- Multi-company rules: global (no group), so ANDed with every group rule below. -->
+        <record id="rule_bsc_perspective_company" model="ir.rule">
+            <field name="name">BSC Perspective: multi-company</field>
+            <field name="model_id" ref="model_bsc_perspective"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_bsc_scorecard_company" model="ir.rule">
+            <field name="name">BSC Scorecard: multi-company</field>
+            <field name="model_id" ref="model_bsc_scorecard"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_bsc_objective_company" model="ir.rule">
+            <field name="name">BSC Objective: multi-company</field>
+            <field name="model_id" ref="model_bsc_objective"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_bsc_kpi_company" model="ir.rule">
+            <field name="name">BSC KPI: multi-company</field>
+            <field name="model_id" ref="model_bsc_kpi"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_bsc_period_company" model="ir.rule">
+            <field name="name">BSC Period: multi-company</field>
+            <field name="model_id" ref="model_bsc_period"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_bsc_measurement_company" model="ir.rule">
+            <field name="name">BSC Measurement: multi-company</field>
+            <field name="model_id" ref="model_bsc_measurement"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_bsc_initiative_company" model="ir.rule">
+            <field name="name">BSC Initiative: multi-company</field>
+            <field name="model_id" ref="model_bsc_initiative"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_bsc_review_company" model="ir.rule">
+            <field name="name">BSC Review: multi-company</field>
+            <field name="model_id" ref="model_bsc_review"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- A contributor reads everything but writes only figures of their KPIs and initiatives they proposed. -->
+        <record id="rule_bsc_measurement_own_write" model="ir.rule">
+            <field name="name">BSC Measurement: write own KPIs only</field>
+            <field name="model_id" ref="model_bsc_measurement"/>
+            <field name="groups" eval="[(4, ref('bsc_strategy.group_bsc_contributor'))]"/>
+            <field name="domain_force">[('kpi_id.owner_id', '=', user.id)]</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="rule_bsc_measurement_manager_write" model="ir.rule">
+            <field name="name">BSC Measurement: managers write all</field>
+            <field name="model_id" ref="model_bsc_measurement"/>
+            <field name="groups" eval="[(4, ref('bsc_strategy.group_bsc_manager'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="rule_bsc_initiative_own_write" model="ir.rule">
+            <field name="name">BSC Initiative: contributors edit their own</field>
+            <field name="model_id" ref="model_bsc_initiative"/>
+            <field name="groups" eval="[(4, ref('bsc_strategy.group_bsc_contributor'))]"/>
+            <field name="domain_force">['|', ('owner_id', '=', user.id), ('create_uid', '=', user.id)]</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="rule_bsc_initiative_manager_write" model="ir.rule">
+            <field name="name">BSC Initiative: managers edit all</field>
+            <field name="model_id" ref="model_bsc_initiative"/>
+            <field name="groups" eval="[(4, ref('bsc_strategy.group_bsc_manager'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

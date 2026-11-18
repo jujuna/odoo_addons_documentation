@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data noupdate="1">
+        <record id="structure_type_geo_overtime" model="hr.payroll.structure.type">
+            <field name="name">GEO Overtime</field>
+            <field name="wage_type">monthly</field>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="structure_geo_overtime" model="hr.payroll.structure">
+            <field name="name">GEO Overtime Pay</field>
+            <field name="type_id" ref="structure_type_geo_overtime"/>
+            <field name="country_id" ref="base.ge"/>
+            <field name="rule_ids" eval="[]"/>
+            <field name="use_worked_day_lines" eval="False"/>
+        </record>
+    </data>
+    <data noupdate="0">
+        <record id="rule_geo_overtime_worklog_ot" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Overtime Work Logs</field>
+            <field name="sequence">25</field>
+            <field name="code">WORKLOG_OT</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('worklog_ot')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('worklog_ot')
+explanation_info = payslip.gec_component_explanation('worklog_ot')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_overtime')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_overtime_gross" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.GROSS')])]"/>
+            <field name="name">Gross</field>
+            <field name="sequence">100</field>
+            <field name="code">GROSS</field>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories['BASIC'] + categories['ALW']</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_overtime')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_overtime_pension_ee" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
+            <field name="name">Pension Employee Contribution</field>
+            <field name="sequence">120</field>
+            <field name="code">PENSION_EE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = employee.pension_fund_member</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+result = -(categories['GROSS'] * pension_rate)
+            </field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_overtime')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_overtime_pit" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
+            <field name="name">Income Tax</field>
+            <field name="sequence">140</field>
+            <field name="code">PIT</field>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pit_rate = payslip._rule_parameter('gec_ge_pit_rate') / 100
+pension = -result_rules['PENSION_EE']['total']
+advance_pension = result_rules['ADV_PEE_PRE']['total']
+taxable = payslip.gec_pit_taxable_gross(categories['GROSS'], pension, advance_pension)
+result = -(taxable * pit_rate)
+explanation_info = payslip.gec_pit_explanation(categories['GROSS'], taxable, pension, -result, advance_pension)
+            </field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="partner_id" ref="partner_state_treasury"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_overtime')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_overtime_pension_er" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Pension Company Contribution</field>
+            <field name="sequence">160</field>
+            <field name="code">PENSION_ER</field>
+            <field name="appears_on_employee_cost_dashboard" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = employee.pension_fund_member</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employer'] / 100
+result = categories['GROSS'] * pension_rate
+            </field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_overtime')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_overtime_net" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.NET')])]"/>
+            <field name="name">Net Salary</field>
+            <field name="sequence">200</field>
+            <field name="code">NET</field>
+            <field name="appears_on_employee_cost_dashboard" eval="True"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories['BASIC'] + categories['ALW'] + categories['DED']
+explanation_info = payslip.gec_net_explanation(categories['BASIC'] + categories['ALW'], -categories['DED'], 0.0, result)</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="employee_move_line" eval="True"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_overtime')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <function model="account.chart.template" name="_gec_configure_ge_payroll_accounts"/>
+    </data>
+</odoo>

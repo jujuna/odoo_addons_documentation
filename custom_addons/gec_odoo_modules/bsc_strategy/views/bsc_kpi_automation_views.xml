@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_bsc_kpi_form_source" model="ir.ui.view">
+        <field name="name">bsc.kpi.form.source</field>
+        <field name="model">bsc.kpi</field>
+        <field name="inherit_id" ref="bsc_strategy.view_bsc_kpi_form"/>
+        <field name="arch" type="xml">
+            <!-- The source is chosen with the panel buttons below, which also fill the open periods. -->
+            <field name="data_source" position="attributes">
+                <attribute name="invisible">1</attribute>
+                <attribute name="groups"/>
+            </field>
+            <xpath expr="//button[@name='action_open_current_measurement']/.." position="before">
+                <div class="alert alert-light border mb-3" role="status"
+                     invisible="data_source == 'odoo'">
+                    <i class="oi me-1" data-icon="keyboard" title="Entered manually"/>
+                    <b>The owner types this figure in each period.</b>
+                    <span class="text-muted">
+                        If Odoo already records it - sales, invoices, won deals,
+                        deliveries, completed tasks - connect it and it fills itself
+                        every night.
+                    </span>
+                    <button name="action_open_connect_wizard" type="object"
+                            string="Connect to Odoo data" icon="link"
+                            class="btn btn-primary btn-sm ms-2"
+                            groups="bsc_strategy.group_bsc_manager"
+                            invisible="not id"/>
+                </div>
+                <div class="alert alert-success mb-3" role="status"
+                     invisible="data_source != 'odoo'">
+                    <i class="oi me-1" data-icon="link" title="Computed from Odoo data"/>
+                    <b>Filled automatically from Odoo:</b>
+                    <field name="source_id" readonly="1" class="oe_inline fw-bold ms-1"
+                           options="{'no_open': True}"/>
+                    <div class="text-muted small mt-1">
+                        <field name="source_description" readonly="1" nolabel="1"/>
+                    </div>
+                    <div class="small mt-1" invisible="not auto_last_run">
+                        Last refreshed: <field name="auto_last_run" readonly="1" class="oe_inline"/>
+                    </div>
+                    <div class="text-danger small mt-1" invisible="not auto_last_error">
+                        <field name="auto_last_error" readonly="1" class="oe_inline"/>
+                    </div>
+                    <div class="mt-2" groups="bsc_strategy.group_bsc_manager">
+                        <button name="action_test_source" type="object" icon="experiment"
+                                string="Test on Current Period" class="btn btn-secondary btn-sm me-1"/>
+                        <button name="action_refresh_now" type="object" icon="refresh"
+                                string="Refresh Now" class="btn btn-secondary btn-sm me-1"/>
+                        <button name="action_open_connect_wizard" type="object" icon="swap_horiz"
+                                string="Change" class="btn btn-secondary btn-sm me-1"/>
+                        <button name="action_disconnect_source" type="object" icon="link_off"
+                                string="Type In Instead" class="btn btn-link btn-sm"
+                                confirm="From now on the owner types the figure in. Figures already pulled are kept. Continue?"/>
+                    </div>
+                </div>
+            </xpath>
+            <xpath expr="//notebook" position="before">
+                <group string="Next Period's Target">
+                    <field name="target_rule"/>
+                    <field name="target_growth"
+                           invisible="target_rule not in ['previous_growth', 'baseline_growth']"/>
+                    <div colspan="2" class="text-muted"
+                         invisible="target_rule != 'baseline_growth'">
+                        Uses the baseline recorded above. A target proposed this way is
+                        still only a proposal - it stays editable on every row.
+                    </div>
+                </group>
+            </xpath>
+            <xpath expr="//page[@name='advanced']/group" position="after">
+                <group string="Odoo Data" invisible="data_source != 'odoo'"
+                       groups="bsc_strategy.group_bsc_manager">
+                    <field name="source_model_name" invisible="1"/>
+                    <label for="source_extra_domain" string="Only count records where"/>
+                    <field name="source_extra_domain" nolabel="1" colspan="2"
+                           widget="domain" options="{'model': 'source_model_name'}"/>
+                    <field name="source_scale"/>
+                    <field name="auto_deviation_limit"/>
+                    <div colspan="2" class="text-muted">
+                        A new figure that moves further than this from the previous
+                        period is held back for the owner to confirm. The owner still
+                        answers for an automated figure.
+                    </div>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_bsc_kpi_list_source" model="ir.ui.view">
+        <field name="name">bsc.kpi.list.source</field>
+        <field name="model">bsc.kpi</field>
+        <field name="inherit_id" ref="bsc_strategy.view_bsc_kpi_list"/>
+        <field name="arch" type="xml">
+            <field name="owner_id" position="after" options="{'no_create': True}">
+                <field name="data_source" optional="hide"/>
+                <field name="source_id" optional="hide"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_bsc_kpi_search_source" model="ir.ui.view">
+        <field name="name">bsc.kpi.search.source</field>
+        <field name="model">bsc.kpi</field>
+        <field name="inherit_id" ref="bsc_strategy.view_bsc_kpi_search"/>
+        <field name="arch" type="xml">
+            <filter name="filter_no_data" position="after">
+                <separator/>
+                <filter name="filter_automated" string="Automated"
+                        domain="[('data_source', '=', 'odoo')]"/>
+                <filter name="filter_manual" string="Typed In"
+                        domain="[('data_source', '=', 'manual')]"/>
+                <filter name="filter_source_error" string="Source Failing"
+                        domain="[('auto_last_error', '!=', False)]"/>
+            </filter>
+        </field>
+    </record>
+
+</odoo>

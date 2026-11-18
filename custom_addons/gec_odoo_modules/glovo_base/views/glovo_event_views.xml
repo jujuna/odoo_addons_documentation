@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="glovo_event_view_list" model="ir.ui.view">
+        <field name="name">glovo.event.list</field>
+        <field name="model">glovo.event</field>
+        <field name="arch" type="xml">
+            <list create="0" decoration-danger="state == 'failed'" decoration-muted="state == 'processed'">
+                <field name="create_date" string="Received On"/>
+                <field name="event_type"/>
+                <field name="glovo_order_id"/>
+                <field name="store_external_id"/>
+                <field name="state"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="glovo_event_view_form" model="ir.ui.view">
+        <field name="name">glovo.event.form</field>
+        <field name="model">glovo.event</field>
+        <field name="arch" type="xml">
+            <form create="0">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="event_type"/>
+                            <field name="glovo_order_id"/>
+                            <field name="store_external_id"/>
+                        </group>
+                        <group>
+                            <field name="state"/>
+                            <field name="create_date" string="Received On"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group string="Error" invisible="not error">
+                        <field name="error" nolabel="1" colspan="2"/>
+                    </group>
+                    <group string="Raw Payload">
+                        <field name="payload" nolabel="1" colspan="2"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="glovo_event_view_search" model="ir.ui.view">
+        <field name="name">glovo.event.search</field>
+        <field name="model">glovo.event</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="glovo_order_id"/>
+                <field name="store_external_id"/>
+                <filter name="failed" string="Failed" domain="[('state', '=', 'failed')]"/>
+                <filter name="received" string="Not Processed" domain="[('state', '=', 'received')]"/>
+                <separator/>
+                <filter name="group_event_type" string="Event Type" context="{'group_by': 'event_type'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="glovo_event_action" model="ir.actions.act_window">
+        <field name="name">Glovo Events</field>
+        <field name="res_model">glovo.event</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

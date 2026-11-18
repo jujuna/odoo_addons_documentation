@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_gec_margin_level_list" model="ir.ui.view">
+        <field name="name">gec.margin.level.list</field>
+        <field name="model">gec.margin.level</field>
+        <field name="arch" type="xml">
+            <list string="Margin Levels">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="description" string="Definition"/>
+                <field name="column_name" string="Column" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_gec_margin_level_form" model="ir.ui.view">
+        <field name="name">gec.margin.level.form</field>
+        <field name="model">gec.margin.level</field>
+        <field name="arch" type="xml">
+            <form string="Margin Level">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. EBITDA"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code" placeholder="ebitda"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group>
+                            <field name="column_name"/>
+                            <field name="description"/>
+                        </group>
+                    </group>
+                    <group string="Components summed into this level">
+                        <field name="component_ids" nolabel="1" widget="many2many_tags"
+                               options="{'no_create': True}"/>
+                    </group>
+                    <div class="alert alert-info" role="alert">
+                        Saving creates a real column on the Analytic Margin report,
+                        and deleting the level drops it again. Components left out
+                        of every level — typically Finance Costs and Income Tax —
+                        never enter a margin.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_gec_margin_level" model="ir.actions.act_window">
+        <field name="name">Margin Levels</field>
+        <field name="res_model">gec.margin.level</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define your margin ladder</p>
+            <p>
+                Each level is a measure on the Analytic Margin report, defined by
+                which components it sums. The default ladder is Contribution →
+                Gross → EBITDA → EBIT; add, reorder or remove rungs to match how
+                you read your P&amp;L.
+            </p>
+        </field>
+    </record>
+
+</odoo>

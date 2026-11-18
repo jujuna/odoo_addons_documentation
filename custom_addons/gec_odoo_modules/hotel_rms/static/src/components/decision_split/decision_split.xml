@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="hotel_rms.DecisionSplit">
+        <div class="o_rms_decision_split">
+            <div class="o_rms_ds_bar">
+                <span t-foreach="this.parts" t-as="part" t-key="part.key"
+                      t-attf-class="o_rms_ds_part o_rms_ds_{{ part.key }}" t-att-style="part.style"/>
+            </div>
+            <div class="o_rms_ds_legend o_rms_legend_items">
+                <span t-foreach="this.parts" t-as="part" t-key="part.key" class="o_rms_legend_item">
+                    <i t-attf-class="o_rms_ds_key o_rms_ds_{{ part.key }}"/>
+                    <span><t t-out="part.label"/> <b t-out="part.count"/></span>
+                </span>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="hotel_rms.DecisionSplitField">
+        <DecisionSplit accepted="this.counts.accepted" edited="this.counts.edited" rejected="this.counts.rejected"/>
+    </t>
+</templates>

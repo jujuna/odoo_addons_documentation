@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Active but inert: returns at once unless a company chose a Monthly Allocation mode in Accounting settings. -->
+    <record id="ir_cron_gec_allocation_closed_period" model="ir.cron">
+        <field name="name">Activity-Based Costing: allocate the last closed period</field>
+        <field name="model_id" ref="model_gec_allocation_run"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_generate_closed_periods()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">months</field>
+        <field name="active" eval="True"/>
+        <field name="user_id" ref="base.user_root"/>
+        <!-- Early on the 5th: after a normal close, before anybody needs the
+             month's figures. -->
+        <field name="nextcall"
+               eval="(DateTime.now() + relativedelta(months=1, day=5, hour=3, minute=0, second=0)).strftime('%Y-%m-%d %H:%M:%S')"/>
+    </record>
+
+</odoo>

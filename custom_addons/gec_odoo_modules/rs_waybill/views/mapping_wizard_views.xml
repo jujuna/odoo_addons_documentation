@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+      <record id="view_rs_mapping_wizard_form" model="ir.ui.view">
+          <field name="name">rs.waybill.mapping.wizard.form</field>
+          <field name="model">rs.waybill.mapping.wizard</field>
+          <field name="arch" type="xml">
+              <form string="Resolve Unresolved Goods">
+                  <div class="alert alert-info" role="alert">
+                      Pick one of your products for each row, and which of its units the seller's
+                      unit is (e.g. 2 შეკვრა = 2 x Pack of 12). Product mappings are remembered —
+                      the next waybill from the same seller with the same barcode will auto-resolve.
+                  </div>
+                  <field name="line_ids" nolabel="1">
+                      <list editable="bottom" create="false" delete="false">
+                          <field name="line_id" column_invisible="1"/>
+                          <field name="company_id" column_invisible="1"/>
+                          <field name="external_barcode" string="Seller's Code"/>
+                          <field name="external_name" string="Seller's Name"/>
+                          <field name="product_id"
+                                 string="Map to Our Product"
+                                 required="1"
+                                 context="{'default_name': external_name, 'default_barcode': external_barcode}"/>
+                          <field name="rs_quantity"/>
+                          <field name="rs_unit_name"/>
+                          <field name="allowed_uom_ids" column_invisible="1"/>
+                          <field name="uom_id" required="1"/>
+                      </list>
+                  </field>
+                  <footer>
+                      <button name="action_apply" type="object"
+                              string="Apply Mappings" class="btn-primary"/>
+                      <button string="Cancel" class="btn-secondary" special="cancel"/>
+                  </footer>
+              </form>
+          </field>
+      </record>
+</odoo>

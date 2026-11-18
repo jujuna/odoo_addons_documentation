@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="gec_access_manager.Grants">
+        <div class="o_action o_gec_grants_action">
+            <Layout display="{ controlPanel: {} }">
+                <div class="o_gec_grants_page" t-ref="this.rootRef">
+                    <div t-if="this.missing" class="alert alert-warning o_gec_grants_missing">
+                        This access profile no longer exists.
+                    </div>
+                    <t t-else="">
+                        <t t-set="profile" t-value="this.profile"/>
+                        <t t-set="view" t-value="this.view()"/>
+
+                        <div class="o_gec_grants_head">
+                            <h2 class="o_gec_grants_title" t-out="this.title"/>
+                            <div class="text-muted o_gec_grants_members">
+                                <i class="oi oi-fw" data-icon="group"/>
+                                <t t-out="this.membersText"/><t t-if="profile.direct.length">: <span class="o_gec_grants_holders" t-out="this.holdersText"/></t>
+                            </div>
+                            <div t-if="profile.via_groups" class="small text-muted o_gec_grants_via_groups"
+                                 t-out="this.viaGroupsText"/>
+                        </div>
+                        <div class="o_gec_grants_toolbar">
+                            <div class="o_gec_grants_searchbox">
+                                <i class="oi oi-fw" data-icon="search"/>
+                                <input type="search" class="form-control o_gec_grants_search"
+                                       placeholder="Search an app or a level..."
+                                       t-att-value="this.state.search" t-on-input="this.onSearch"/>
+                            </div>
+                            <SelectMenu t-if="this.editable" class="'o_gec_grants_from_user'"
+                                        choices="this.userChoices" placeholder="this.userPlaceholder"
+                                        onSelect="(userId) => this.pickUser(userId)"/>
+                            <div class="o_gec_ladder o_gec_grants_filter" role="group">
+                                <button type="button" class="btn btn-sm o_gec_option"
+                                        t-att-class="{'o_gec_selected': this.state.filter === 'all'}"
+                                        t-att-aria-pressed="this.state.filter === 'all' ? 'true' : 'false'"
+                                        t-on-click="() => this.setFilter('all')">All</button>
+                                <button type="button" class="btn btn-sm o_gec_option"
+                                        t-att-class="{'o_gec_selected': this.state.filter === 'given'}"
+                                        t-att-aria-pressed="this.state.filter === 'given' ? 'true' : 'false'"
+                                        t-on-click="() => this.setFilter('given')">Given only</button>
+                                <button t-if="this.closedCount or this.state.filter === 'closed'" type="button"
+                                        class="btn btn-sm o_gec_option o_gec_filter_closed"
+                                        t-att-class="{'o_gec_selected': this.state.filter === 'closed'}"
+                                        t-att-aria-pressed="this.state.filter === 'closed' ? 'true' : 'false'"
+                                        t-on-click="() => this.setFilter('closed')">
+                                    Not given <span class="o_gec_count" t-out="this.closedCount"/>
+                                </button>
+                            </div>
+                        </div>
+                        <div t-if="this.state.skipped.length" class="alert alert-warning py-2 mt-2 mb-0 o_gec_grants_skipped"
+                             t-out="this.skippedText"/>
+
+                        <div t-if="!this.editable" class="alert alert-info o_gec_grants_notice o_gec_grants_readonly" t-out="profile.readonly_reason"/>
+                        <div t-if="!profile.active" class="alert alert-warning o_gec_grants_notice o_gec_grants_archived">
+                            This profile is archived, so it gives nothing.
+                        </div>
+
+                        <div class="o_gec_grants_summary">
+                            <span class="o_gec_grants_eyebrow">Gives</span>
+                            <span t-foreach="this.chips()" t-as="chip" t-key="chip_index"
+                                  class="o_gec_chip o_gec_chip_primary" t-out="chip"/>
+                            <span t-if="!this.chips().length" class="text-muted">Nothing yet</span>
+                        </div>
+
+                        <div t-if="view.warned.length" class="alert alert-warning o_gec_grants_notice o_gec_grants_warnings">
+                            <div t-foreach="view.warned" t-as="row" t-key="row.privilege_id"
+                                 class="d-flex flex-wrap align-items-center gap-2 o_gec_grants_warning"
+                                 t-att-class="{'o_gec_focus': row.privilege_id === this.focusId}"
+                                 t-att-data-privilege="row.privilege_id">
+                                <i class="oi oi-fw" data-icon="warning"/>
+                                <span t-out="this.warningText(row)"/>
+                                <button t-if="this.editable" type="button" class="btn btn-link btn-sm p-0 o_gec_grants_remove"
+                                        t-on-click="() => this.chooseLevel(row, null)">Remove the grant</button>
+                            </div>
+                        </div>
+
+                        <div t-if="view.empty" class="o_gec_grants_card text-muted text-center p-4 o_gec_grants_nothing">Nothing matches.</div>
+
+                        <section t-foreach="view.sections" t-as="section" t-key="section.key"
+                                 class="o_gec_grants_section" t-att-data-section="section.key">
+                            <t t-set="opened" t-value="this.isOpen(section)"/>
+                            <h5 class="o_gec_grants_section_title">
+                                <button t-if="section.collapsible" type="button"
+                                        class="btn btn-link p-0 text-reset text-decoration-none o_gec_section_toggle"
+                                        t-att-aria-expanded="opened ? 'true' : 'false'"
+                                        t-on-click="() => this.toggleSection(section.key)">
+                                    <i class="oi oi-fw" t-att-data-icon="opened ? 'expand_more' : 'chevron_right'"/>
+                                    <t t-out="section.title"/>
+                                </button>
+                                <t t-else="" t-out="section.title"/>
+                            </h5>
+                            <t t-if="opened">
+                                <input t-if="section.key === 'extra'" type="search"
+                                       class="form-control form-control-sm mb-2 o_gec_grants_extra_search"
+                                       placeholder="Search an extra right..."
+                                       t-att-value="this.state.extraSearch" t-on-input="this.onExtraSearch"/>
+
+                                <t t-if="section.rows">
+                                    <div t-foreach="section.groups" t-as="group" t-key="group.id"
+                                         class="o_gec_grants_category" t-att-data-category="group.id">
+                                        <div class="o_gec_grants_category_title" t-out="group.name"/>
+                                        <div class="o_gec_grants_card">
+                                            <div t-foreach="group.rows" t-as="row" t-key="row.privilege_id"
+                                                 class="o_gec_grants_row"
+                                                 t-att-class="{'o_gec_focus': row.privilege_id === this.focusId}"
+                                                 t-att-data-privilege="row.privilege_id">
+                                                <div class="o_gec_grants_row_inner">
+                                                    <div class="o_gec_grants_label">
+                                                        <t t-set="icon" t-value="this.iconOf(row.app)"/>
+                                                        <img t-if="icon and icon.src" class="o_gec_app_icon" t-att-src="icon.src" alt=""/>
+                                                        <i t-elif="icon" class="oi o_gec_app_icon" t-att-data-icon="icon.name"
+                                                           t-att-style="icon.style"/>
+                                                        <span t-else="" class="o_gec_app_icon"/>
+                                                        <div class="o_gec_grants_label_text">
+                                                            <div class="o_gec_grants_name" t-out="row.name"/>
+                                                            <div t-if="row.app and row.app.name !== row.name" class="o_gec_grants_sub"
+                                                                 t-out="row.app.name"/>
+                                                            <div t-if="row.description" class="o_gec_grants_sub" t-out="row.description"/>
+                                                            <t t-set="badge" t-value="this.badgeOf(row)"/>
+                                                            <span t-if="badge" t-attf-class="o_gec_status o_gec_status_{{badge.type}}"
+                                                                  t-att-title="badge.title" t-out="badge.text"/>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="o_gec_grants_levels flex-grow-1">
+                                                        <div t-if="row.ladder and row.levels.length > 1"
+                                                             class="o_gec_ladder" role="group">
+                                                            <button type="button" class="btn btn-sm o_gec_option o_gec_none"
+                                                                    t-att-class="{
+                                                                        'o_gec_selected': this.selectedLevel(row) === null,
+                                                                        'o_gec_disabled': !this.editable
+                                                                    }"
+                                                                    t-att-aria-pressed="this.selectedLevel(row) === null ? 'true' : 'false'"
+                                                                    t-att-aria-disabled="this.editable ? 'false' : 'true'"
+                                                                    t-on-click="() => this.chooseLevel(row, null)">Nothing extra</button>
+                                                            <t t-foreach="row.levels" t-as="level" t-key="level.id">
+                                                                <t t-set="info" t-value="this.levelState(row, level)"/>
+                                                                <button type="button" class="btn btn-sm o_gec_option"
+                                                                        t-att-class="{
+                                                                            'btn-primary': info.selected,
+                                                                            'o_gec_selected': info.selected,
+                                                                            'o_gec_given': info.given.length > 0,
+                                                                            'o_gec_own': info.own,
+                                                                            'o_gec_locked': level.locked,
+                                                                            'o_gec_disabled': !this.editable or level.locked
+                                                                        }"
+                                                                        t-att-aria-pressed="info.selected ? 'true' : 'false'"
+                                                                        t-att-aria-disabled="(!this.editable or level.locked) ? 'true' : 'false'"
+                                                                        t-att-data-level="level.id" t-att-title="info.title"
+                                                                        t-on-click="() => this.chooseLevel(row, level)">
+                                                                    <i t-if="level.locked" class="oi oi-fw" data-icon="lock"/>
+                                                                    <i t-elif="info.given.length" class="oi o_gec_included" data-icon="check"/>
+                                                                    <span class="o_gec_level_name" t-out="level.name"/>
+                                                                </button>
+                                                            </t>
+                                                        </div>
+                                                        <div t-else="" class="o_gec_checks">
+                                                            <t t-foreach="row.levels" t-as="level" t-key="level.id">
+                                                                <t t-set="info" t-value="this.levelState(row, level)"/>
+                                                                <div class="o_gec_check"
+                                                                     t-att-class="{
+                                                                         'o_gec_selected': info.selected,
+                                                                         'o_gec_given': info.given.length > 0,
+                                                                         'o_gec_own': info.own,
+                                                                         'o_gec_locked': level.locked
+                                                                     }"
+                                                                     t-att-data-level="level.id" t-att-title="info.title">
+                                                                    <CheckBox className="row.ladder ? 'form-switch' : ''"
+                                                                              value="info.selected or info.given.length > 0"
+                                                                              disabled="!this.editable or level.locked or info.given.length > 0"
+                                                                              onChange="(on) => this.toggle(row, level, on)">
+                                                                        <i t-if="level.locked" class="oi oi-fw" data-icon="lock"/>
+                                                                        <span class="o_gec_level_name" t-out="level.name"/>
+                                                                    </CheckBox>
+                                                                    <span t-if="info.given.length" class="o_gec_given_by">
+                                                                        Given by <t t-out="info.given.join(', ')"/>
+                                                                    </span>
+                                                                </div>
+                                                            </t>
+                                                        </div>
+                                                        <div t-foreach="this.detailLines(row)" t-as="line" t-key="line_index"
+                                                             class="o_gec_detail" t-out="line"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+
+                                <div t-else="" class="o_gec_grants_card o_gec_extras">
+                                    <div t-foreach="section.extras" t-as="extra" t-key="extra.id"
+                                         class="o_gec_grants_row o_gec_extra">
+                                        <t t-set="info" t-value="this.levelState(null, extra)"/>
+                                        <div class="o_gec_check o_gec_check_plain"
+                                             t-att-class="{
+                                                 'o_gec_selected': info.selected,
+                                                 'o_gec_given': info.given.length > 0,
+                                                 'o_gec_own': info.own,
+                                                 'o_gec_locked': extra.locked
+                                             }"
+                                             t-att-data-level="extra.id" t-att-title="info.title">
+                                            <CheckBox className="'form-switch'" value="info.selected or info.given.length > 0"
+                                                      disabled="!this.editable or extra.locked or info.given.length > 0"
+                                                      onChange="(on) => this.toggle(null, extra, on)">
+                                                <i t-if="extra.locked" class="oi oi-fw" data-icon="lock"/>
+                                                <span class="o_gec_level_name" t-out="extra.name"/>
+                                            </CheckBox>
+                                            <span t-if="info.given.length" class="o_gec_given_by">
+                                                Given by <t t-out="info.given.join(', ')"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div t-if="!section.extras.length" class="text-muted p-3">Nothing matches.</div>
+                                </div>
+                            </t>
+                        </section>
+
+                        <div t-if="view.others.length" class="o_gec_grants_section o_gec_grants_others">
+                            <h5 class="o_gec_grants_section_title">Other groups this profile gives</h5>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span t-foreach="view.others" t-as="group" t-key="group.id"
+                                      class="o_gec_chip o_gec_grants_other"
+                                      t-att-data-level="group.id">
+                                    <span t-out="group.name"/>
+                                    <button t-if="this.editable" type="button" title="Remove" aria-label="Remove"
+                                            class="btn btn-link btn-sm p-0 text-reset o_gec_grants_other_remove"
+                                            t-on-click="() => this.removeOther(group.id)">
+                                        <i class="oi oi-fw" data-icon="close"/>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div t-if="this.hiddenEntries.length or this.hiddenNobody" class="o_gec_grants_section o_gec_grants_hidden">
+                            <h5 class="o_gec_grants_section_title">Hidden from the menu, but records still open</h5>
+                            <div class="o_gec_grants_card">
+                            <div t-if="this.hiddenNobody" class="o_gec_grants_row small text-muted o_gec_grants_hidden_nobody">
+                                This profile has no users.
+                            </div>
+                            <div t-foreach="this.hiddenEntries" t-as="entry" t-key="entry_index"
+                                 class="o_gec_grants_row d-flex flex-wrap align-items-center gap-2 o_gec_grants_hidden_entry">
+                                <span class="fw-bold" t-out="entry.menu"/>
+                                <span class="flex-grow-1 small text-muted" t-out="entry.text"/>
+                                <button type="button" class="btn btn-sm btn-outline-secondary o_gec_grants_hidden_details"
+                                        t-on-click="() => this.openProfile()">Details</button>
+                            </div>
+                            </div>
+                        </div>
+
+                        <div class="o_gec_grants_section o_gec_grants_legend">
+                            <h5 class="o_gec_grants_section_title">How to read this page</h5>
+                            <div class="o_gec_grants_card">
+                                <div class="o_gec_grants_row o_gec_legend_row">
+                                    <span class="o_gec_ladder" aria-hidden="true">
+                                        <span class="btn btn-sm o_gec_option btn-primary o_gec_selected">Level</span>
+                                    </span>
+                                    <span>Chosen: this profile's users get this level.</span>
+                                </div>
+                                <div class="o_gec_grants_row o_gec_legend_row">
+                                    <span class="o_gec_ladder" aria-hidden="true">
+                                        <span class="btn btn-sm o_gec_option o_gec_given"><i class="oi o_gec_included" data-icon="check"/>Level</span>
+                                    </span>
+                                    <span>Included in another level of this profile. Point at it to see which one. To remove it, remove that level.</span>
+                                </div>
+                                <div class="o_gec_grants_row o_gec_legend_row">
+                                    <span class="o_gec_ladder" aria-hidden="true">
+                                        <span class="btn btn-sm o_gec_option o_gec_none o_gec_selected">Nothing extra</span>
+                                    </span>
+                                    <span>This profile gives nothing extra for this app. Users keep what their user form gives.</span>
+                                </div>
+                                <div class="o_gec_grants_row o_gec_legend_row">
+                                    <span class="o_gec_ladder" aria-hidden="true">
+                                        <span class="btn btn-sm o_gec_option o_gec_own"><span class="o_gec_level_name">Level</span></span>
+                                    </span>
+                                    <span>Underlined: all users of this profile already have it on their user form.</span>
+                                </div>
+                                <div class="o_gec_grants_row o_gec_legend_row">
+                                    <span class="o_gec_ladder" aria-hidden="true">
+                                        <span class="btn btn-sm o_gec_option o_gec_locked"><i class="oi oi-fw" data-icon="lock"/>Level</span>
+                                    </span>
+                                    <span>Locked: you can only give levels you have yourself. Ask a Settings administrator.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div t-if="this.editable and this.dirtyCount()"
+                             class="o_gec_grants_savebar">
+                            <div class="o_gec_grants_dirty_box me-auto">
+                                <div class="o_gec_grants_dirty" t-out="this.dirtyText"/>
+                                <div t-foreach="this.changeLines" t-as="line" t-key="line_index"
+                                     class="o_gec_grants_change" t-out="line"/>
+                            </div>
+                            <button type="button" class="btn btn-secondary o_gec_grants_discard"
+                                    t-att-disabled="this.state.saving" t-on-click="this.discard">Discard</button>
+                            <button type="button" class="btn btn-primary o_gec_grants_save"
+                                    t-att-disabled="this.state.saving" t-on-click="this.save">Save</button>
+                        </div>
+                    </t>
+                </div>
+            </Layout>
+        </div>
+    </t>
+
+</templates>

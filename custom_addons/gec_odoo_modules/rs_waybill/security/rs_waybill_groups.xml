@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_groups_privilege_waybill" model="res.groups.privilege">
+        <field name="name">RS.GE Waybills</field>
+        <field name="category_id" ref="base.module_category_supply_chain"/>
+    </record>
+
+    <!-- Works with waybills: drafts, Save, Activate, Complete, Cancel, Received/Reject,
+         Adjustment, product mapping. Given to Inventory, Sales and Purchase users. -->
+    <record id="group_waybill_user" model="res.groups">
+        <field name="name">User</field>
+        <field name="sequence">10</field>
+        <field name="privilege_id" ref="res_groups_privilege_waybill"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- Also the excise code list, deleting product mappings, Settings / Fetch All. -->
+    <record id="group_waybill_manager" model="res.groups">
+        <field name="name">Administrator</field>
+        <field name="sequence">20</field>
+        <field name="privilege_id" ref="res_groups_privilege_waybill"/>
+        <field name="implied_ids" eval="[(4, ref('group_waybill_user'))]"/>
+        <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+
+    <record id="stock.group_stock_user" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('group_waybill_user'))]"/>
+    </record>
+    <record id="sales_team.group_sale_salesman" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('group_waybill_user'))]"/>
+    </record>
+    <record id="purchase.group_purchase_user" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('group_waybill_user'))]"/>
+    </record>
+</odoo>

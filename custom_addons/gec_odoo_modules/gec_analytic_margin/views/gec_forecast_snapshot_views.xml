@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Read-only on purpose: a forecast edited after the month began is not the one the month was planned on. -->
+    <record id="gec_forecast_snapshot_view_list" model="ir.ui.view">
+        <field name="name">gec.forecast.snapshot.list</field>
+        <field name="model">gec.forecast.snapshot</field>
+        <field name="arch" type="xml">
+            <list string="Revenue Forecasts" create="false" edit="false">
+                <field name="month" widget="date" options="{'format': 'MMMM yyyy'}"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="basis"/>
+                <field name="forecast_revenue" sum="Total"/>
+                <field name="actual_revenue"/>
+                <field name="error_pct" widget="percentage"/>
+                <field name="recorded_on"/>
+                <field name="reconstructed"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="gec_forecast_snapshot_view_form" model="ir.ui.view">
+        <field name="name">gec.forecast.snapshot.form</field>
+        <field name="model">gec.forecast.snapshot</field>
+        <field name="arch" type="xml">
+            <form string="Revenue Forecast" create="false" edit="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="month"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="basis"/>
+                            <field name="recorded_on"/>
+                            <field name="reconstructed"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="forecast_revenue"/>
+                            <field name="actual_revenue"/>
+                            <field name="error_pct" widget="percentage"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_gec_forecast_snapshot" model="ir.actions.act_window">
+        <field name="name">Revenue Forecasts</field>
+        <field name="res_model">gec.forecast.snapshot</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No forecast recorded yet</p>
+            <p>On the first of every month the month's revenue forecast is frozen here — its budget, or the run
+               rate of the three months before — so the dashboard can measure how accurate forecasts are.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_gec_forecast_snapshot"
+              name="Revenue Forecasts"
+              parent="menu_gec_abc_reports"
+              action="action_gec_forecast_snapshot"
+              sequence="28"/>
+
+    <record id="ir_cron_gec_forecast_snapshot" model="ir.cron">
+        <field name="name">Activity-Based Costing: record the month's revenue forecast</field>
+        <field name="model_id" ref="model_gec_forecast_snapshot"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_record_month()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">months</field>
+        <field name="active" eval="True"/>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="nextcall"
+               eval="(DateTime.now() + relativedelta(months=1, day=1, hour=1, minute=0, second=0)).strftime('%Y-%m-%d %H:%M:%S')"/>
+    </record>
+
+</odoo>

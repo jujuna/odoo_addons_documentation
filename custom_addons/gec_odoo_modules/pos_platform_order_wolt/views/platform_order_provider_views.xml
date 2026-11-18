@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="platform_order_provider_form_inherit" model="ir.ui.view">
+        <field name="name">platform.order.provider.form.inherit.pos_platform_order_wolt</field>
+        <field name="model">platform.order.provider</field>
+        <field name="inherit_id" ref="pos_platform_order.view_platform_order_provider_form"/>
+        <field name="arch" type="xml">
+            <group name="provider_credentials" position="inside">
+                <group invisible="code != 'wolt'" string="Credentials from Wolt" colspan="2">
+                    <group>
+                        <field name="wolt_client_id" string="Client ID"
+                            required="code == 'wolt' and state != 'disabled'"/>
+                        <field name="wolt_client_secret" string="Client Secret" password="True"
+                            groups="base.group_system" required="code == 'wolt' and state != 'disabled'"/>
+                    </group>
+                </group>
+                <group invisible="code != 'wolt'" string="Give these to Wolt" colspan="2">
+                    <group>
+                        <field name="wolt_webhook_url" string="Order Webhook URL" widget="CopyClipboardURL"/>
+                        <field name="wolt_redirect_url" string="Redirect URL" widget="CopyClipboardURL"/>
+                        <field name="wolt_webhook_secret" string="Webhook Signing Secret" password="True"
+                            widget="CopyClipboardChar" groups="base.group_system"/>
+                        <button name="action_wolt_generate_webhook_secret" type="object" icon="key"
+                            groups="base.group_system" string="Generate Signing Secret"
+                            confirm="Generate a new secret, refusing Wolt notifications until you send it to Wolt?"/>
+                    </group>
+                </group>
+            </group>
+        </field>
+    </record>
+
+</odoo>

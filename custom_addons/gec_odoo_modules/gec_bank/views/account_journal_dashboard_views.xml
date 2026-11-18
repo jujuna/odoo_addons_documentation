@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="account_journal_dashboard_kanban_view" model="ir.ui.view">
+        <field name="name">account.journal.dashboard.kanban.gec_bank</field>
+        <field name="model">account.journal</field>
+        <field name="inherit_id" ref="account.account_journal_dashboard_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//t[@t-name='card']/t[@t-call='JournalTop']" position="before">
+                <div t-if="dashboard.gec_bank_logo and !(bank_unconfigured and dashboard.display_connect_bank_in_dashboard)"
+                     class="o_gec_bank_logo" aria-hidden="true"
+                     t-attf-style="background-image: url('#{dashboard.gec_bank_logo}');"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

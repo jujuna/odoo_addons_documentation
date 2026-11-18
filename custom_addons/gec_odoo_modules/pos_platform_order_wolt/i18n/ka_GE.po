@@ -1,0 +1,642 @@
+# Georgian translation of the Odoo addon pos_platform_order_wolt.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-31 16:39+0000\n"
+"PO-Revision-Date: 2026-10-31 16:39+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian (ka_GE)\n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#. module: pos_platform_order_wolt
+#: model:ir.module.module,description:base.module_pos_platform_order_wolt
+msgid ""
+"\n"
+"Wolt Marketplace integration for the Point of Sale:\n"
+"- link venues with Wolt self-service onboarding (SSIO)\n"
+"- receive Wolt orders through signed webhooks, accept / reject / ready / delivered\n"
+"- push the menu, item prices and availability to Wolt\n"
+"- set the venue online or offline and push opening hours\n"
+msgstr ""
+"\n"
+"Wolt Marketplace-ის ინტეგრაცია გაყიდვის წერტილთან:\n"
+"- ობიექტების დაკავშირება Wolt-ის თვითმომსახურებით ჩართვის (SSIO) მეშვეობით\n"
+"- Wolt-ის შეკვეთების შემოსვლა ხელმოწერილი webhook-ებით, მათი მიღება / უარყოფა / მზადაა / მიწოდებულია\n"
+"- მენიუს, პროდუქტების ფასებისა და ხელმისაწვდომობის გაგზავნა Wolt-ზე\n"
+"- ობიექტის ონლაინრეჟიმზე ან ხაზგარეშე რეჟიმზე გადაყვანა და სამუშაო საათების გაგზავნა\n"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.constraint,message:pos_platform_order_wolt.constraint_platform_order_wolt_token_store_uniq
+msgid "A Wolt store has only one token pair."
+msgstr "Wolt-ის მაღაზიას მხოლოდ ერთი ტოკენის წყვილი აქვს."
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_wolt_token__access_token
+msgid "Access Token"
+msgstr "წვდომის ტოკენი"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_entity__wolt_token_expiry
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.view_platform_order_entity_form_inherit
+msgid "Access Token Valid Until"
+msgstr "წვდომის ტოკენის მოქმედების ვადა"
+
+#. module: pos_platform_order_wolt
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.view_platform_order_entity_form_inherit
+msgid "Check Status"
+msgstr "სტატუსის შემოწმება"
+
+#. module: pos_platform_order_wolt
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.platform_order_provider_form_inherit
+msgid "Client ID"
+msgstr "კლიენტის ID"
+
+#. module: pos_platform_order_wolt
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.platform_order_provider_form_inherit
+msgid "Client Secret"
+msgstr "კლიენტის საიდუმლო"
+
+#. module: pos_platform_order_wolt
+#. odoo-javascript
+#: code:addons/pos_platform_order_wolt/static/src/app/models/pos_order.js:0
+msgid "Closing soon"
+msgstr "მალე დაიკეტება"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_provider__code
+msgid "Code"
+msgstr "კოდი"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_wolt_token__company_id
+msgid "Company"
+msgstr "კომპანია"
+
+#. module: pos_platform_order_wolt
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.view_platform_order_entity_form_inherit
+msgid "Connect to Wolt"
+msgstr "Wolt-თან დაკავშირება"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_entity__wolt_connected
+msgid "Connected to Wolt"
+msgstr "დაკავშირებულია Wolt-თან"
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/controllers/main.py:0
+msgid "Connecting to Wolt failed: %s"
+msgstr "Wolt-თან დაკავშირება ვერ მოხერხდა: %s"
+
+#. module: pos_platform_order_wolt
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.view_platform_order_entity_form_inherit
+msgid "Connection"
+msgstr "კავშირი"
+
+#. module: pos_platform_order_wolt
+#. odoo-javascript
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/pos_order.py:0
+#: code:addons/pos_platform_order_wolt/static/src/app/services/pos_store.js:0
+msgid "Contact Wolt support to reject an order that is already accepted."
+msgstr "უკვე მიღებული შეკვეთის უარყოფისთვის დაუკავშირდით Wolt-ის მხარდაჭერას."
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_wolt_token__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_wolt_token__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: pos_platform_order_wolt
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.platform_order_provider_form_inherit
+msgid "Credentials from Wolt"
+msgstr "ავტორიზაციის მონაცემები Wolt-ისგან"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_pos_order__wolt_self_delivery
+msgid "Delivered by Venue"
+msgstr "ობიექტის მიერ მიწოდებული"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_entity__display_name
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_provider__display_name
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_wolt_token__display_name
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_pos_order__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/platform_order_entity.py:0
+#: code:addons/pos_platform_order_wolt/utils/wolt_request.py:0
+msgid "Enable the Wolt provider (test or production) first."
+msgstr "ჯერ ჩართეთ Wolt-ის მიმწოდებელი (სატესტო ან საწარმოო)."
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_wolt_token__expiry
+msgid "Expiry"
+msgstr "ვადის გასვლის თარიღი"
+
+#. module: pos_platform_order_wolt
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.platform_order_provider_form_inherit
+msgid "Generate Signing Secret"
+msgstr "ხელმოწერის საიდუმლოს გენერირება"
+
+#. module: pos_platform_order_wolt
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.platform_order_provider_form_inherit
+msgid ""
+"Generate a new secret, refusing Wolt notifications until you send it to "
+"Wolt?"
+msgstr "დაგენერირდეს ახალი საიდუმლო, რის გამოც Wolt-ის შეტყობინებები არ მიიღება, სანამ მას Wolt-ს არ გაუგზავნით?"
+
+#. module: pos_platform_order_wolt
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.platform_order_provider_form_inherit
+msgid "Give these to Wolt"
+msgstr "გადაეცით ეს Wolt-ს"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,help:pos_platform_order_wolt.field_platform_order_provider__wolt_webhook_secret
+msgid ""
+"Give this secret to Wolt together with the webhook URL. Wolt signs every "
+"notification with it."
+msgstr "გადაეცით ეს საიდუმლო Wolt-ს webhook URL-თან ერთად. Wolt ამ საიდუმლოთი ხელს აწერს ყოველ შეტყობინებას."
+
+#. module: pos_platform_order_wolt
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.view_platform_order_entity_form_inherit
+msgid "Go Offline"
+msgstr "ხაზგარეშე რეჟიმზე გადასვლა"
+
+#. module: pos_platform_order_wolt
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.view_platform_order_entity_form_inherit
+msgid "Go Online"
+msgstr "ონლაინრეჟიმზე გადასვლა"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_entity__id
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_provider__id
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_wolt_token__id
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_pos_order__id
+msgid "ID"
+msgstr "ID"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields.selection,name:pos_platform_order_wolt.selection__pos_order__wolt_order_type__instant
+msgid "Instant"
+msgstr "მყისიერი"
+
+#. module: pos_platform_order_wolt
+#. odoo-javascript
+#: code:addons/pos_platform_order_wolt/static/src/app/models/pos_order.js:0
+msgid "Items unavailable"
+msgstr "პროდუქტები ხელმისაწვდომი არ არის"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_wolt_token__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_wolt_token__write_date
+msgid "Last Updated on"
+msgstr "ბოლოს განახლდა"
+
+#. module: pos_platform_order_wolt
+#. odoo-javascript
+#: code:addons/pos_platform_order_wolt/static/src/app/screens/ticket_screen/ticket_screen.xml:0
+msgid "Mark Delivered"
+msgstr "მიწოდებულად მონიშვნა"
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/pos_order.py:0
+msgid "Mark the order as ready first."
+msgstr "ჯერ შეკვეთა მზადად მონიშნეთ."
+
+#. module: pos_platform_order_wolt
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.view_platform_order_entity_form_inherit
+msgid "Menu Updates"
+msgstr "მენიუს განახლებები"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,help:pos_platform_order_wolt.field_platform_order_provider__wolt_client_id
+msgid "OAuth client ID issued by Wolt for this integration."
+msgstr "ამ ინტეგრაციისთვის Wolt-ის მიერ გაცემული OAuth კლიენტის ID."
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_entity__wolt_venue_online
+msgid "Online on Wolt"
+msgstr "ონლაინ Wolt-ზე"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_entity__wolt_venue_open
+msgid "Open on Wolt"
+msgstr "ღიაა Wolt-ზე"
+
+#. module: pos_platform_order_wolt
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.platform_order_provider_form_inherit
+msgid "Order Webhook URL"
+msgstr "შეკვეთის Webhook-ის URL"
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/pos_order.py:0
+msgid "Order has been rejected successfully."
+msgstr "შეკვეთა წარმატებით უარყოფილია."
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/pos_order.py:0
+msgid "Order marked as delivered."
+msgstr "შეკვეთა მიწოდებულად მოინიშნა."
+
+#. module: pos_platform_order_wolt
+#. odoo-javascript
+#: code:addons/pos_platform_order_wolt/static/src/app/services/pos_store.js:0
+msgid "Order rejected successfully."
+msgstr "შეკვეთა წარმატებით უარყოფილია."
+
+#. module: pos_platform_order_wolt
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.view_platform_order_entity_form_inherit
+msgid "Orders"
+msgstr "შეკვეთები"
+
+#. module: pos_platform_order_wolt
+#. odoo-javascript
+#: code:addons/pos_platform_order_wolt/static/src/app/models/pos_order.js:0
+msgid "Other reason"
+msgstr "სხვა მიზეზი"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model,name:pos_platform_order_wolt.model_platform_order_entity
+msgid "Platform Order Entity"
+msgstr "პლატფორმის შეკვეთის ერთეული"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model,name:pos_platform_order_wolt.model_platform_order_provider
+msgid "Platform Order Provider"
+msgstr "პლატფორმის შეკვეთის მიმწოდებელი"
+
+#. module: pos_platform_order_wolt
+#: model:ir.module.module,shortdesc:base.module_pos_platform_order_wolt
+msgid "Platform Order Provider: Wolt"
+msgstr "პლატფორმის შეკვეთის მიმწოდებელი: Wolt"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model,name:pos_platform_order_wolt.model_pos_order
+msgid "Point of Sale Order"
+msgstr "გაყიდვის წერტილის შეკვეთა"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields.selection,name:pos_platform_order_wolt.selection__pos_order__wolt_order_type__preorder
+msgid "Preorder"
+msgstr "წინასწარი შეკვეთა"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_entity__wolt_fallback_product_id
+msgid "Product for Unknown Wolt Items"
+msgstr "პროდუქტი უცნობი Wolt ელემენტებისთვის"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,help:pos_platform_order_wolt.field_platform_order_entity__wolt_pending_product_tmpl_ids
+msgid ""
+"Products whose price or availability changed since the last push to Wolt."
+msgstr "პროდუქტები, რომელთა ფასი ან ხელმისაწვდომობა Wolt-ზე ბოლო გაგზავნის შემდეგ შეიცვალა."
+
+#. module: pos_platform_order_wolt
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.view_platform_order_entity_form_inherit
+msgid "Push Opening Hours"
+msgstr "სამუშაო საათების გაგზავნა"
+
+#. module: pos_platform_order_wolt
+#: model:ir.module.module,summary:base.module_pos_platform_order_wolt
+msgid "Receive and manage Wolt marketplace orders in the Point of Sale"
+msgstr "Wolt Marketplace-ის შეკვეთების მიღება და მართვა გაყიდვის წერტილში"
+
+#. module: pos_platform_order_wolt
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.view_platform_order_entity_form_inherit
+msgid "Reconnect to Wolt"
+msgstr "Wolt-თან ხელახლა დაკავშირება"
+
+#. module: pos_platform_order_wolt
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.platform_order_provider_form_inherit
+msgid "Redirect URL"
+msgstr "გადამისამართების URL"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_wolt_token__refresh_token
+msgid "Refresh Token"
+msgstr "განახლების ტოკენი"
+
+#. module: pos_platform_order_wolt
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.view_platform_order_entity_form_inherit
+msgid "Replace Wolt's weekly opening hours with this store's Service Hours?"
+msgstr "შეიცვალოს Wolt-ის ყოველკვირეული სამუშაო საათები ამ მაღაზიის მომსახურების საათებით?"
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/platform_order_entity.py:0
+msgid "Set the Service Hours of store %s first."
+msgstr "ჯერ მიუთითეთ მაღაზიის %s მომსახურების საათები."
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/pos_order.py:0
+msgid "Some items are not available."
+msgstr "ზოგი პროდუქტი ხელმისაწვდომი არ არის."
+
+#. module: pos_platform_order_wolt
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.view_platform_order_entity_form_inherit
+msgid "Stop Wolt orders for this venue until you go online again?"
+msgstr "ამ ობიექტზე Wolt-ის შეკვეთების მიღება შეწყდეს, სანამ ხელახლა ონლაინრეჟიმზე არ გადახვალთ?"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_wolt_token__store_id
+msgid "Store"
+msgstr "მაღაზია"
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/platform_order_entity.py:0
+msgid "The Service Hours of %s have no weekly opening hours."
+msgstr "%s-ის მომსახურების საათებში ყოველკვირეული სამუშაო საათები არ არის."
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/pos_order.py:0
+msgid "The restaurant cannot take your order right now."
+msgstr "რესტორანს ახლა თქვენი შეკვეთის მიღება არ შეუძლია."
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/pos_order.py:0
+msgid "The restaurant is closing soon."
+msgstr "რესტორანი მალე დაიკეტება."
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,help:pos_platform_order_wolt.field_platform_order_provider__code
+msgid "The technical code of this platform order provider."
+msgstr "ამ პლატფორმის შეკვეთის მიმწოდებლის ტექნიკური კოდი."
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.constraint,message:pos_platform_order_wolt.constraint_pos_order_wolt_order_ref_uniq
+msgid "This Wolt order already exists."
+msgstr "ეს Wolt-ის შეკვეთა უკვე არსებობს."
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/platform_order_entity.py:0
+msgid "Use 'Connect to Wolt' on store %s first."
+msgstr "ჯერ მაღაზიაზე %s გამოიყენეთ 'Wolt-თან დაკავშირება'."
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,help:pos_platform_order_wolt.field_platform_order_entity__wolt_fallback_product_id
+msgid ""
+"Used for Wolt items that were not created by Odoo's menu sync, with Wolt's "
+"name and price. Without it such an order cannot be imported."
+msgstr "გამოიყენება იმ Wolt ელემენტებისთვის, რომლებიც Odoo-ს მენიუს სინქრონიზაციით არ შექმნილა, Wolt-ის სახელითა და ფასით. მის გარეშე ასეთი შეკვეთის იმპორტი ვერ მოხერხდება."
+
+#. module: pos_platform_order_wolt
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.view_platform_order_entity_form_inherit
+msgid "Venue"
+msgstr "ობიექტი"
+
+#. module: pos_platform_order_wolt
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.platform_order_provider_form_inherit
+msgid "Webhook Signing Secret"
+msgstr "Webhook-ის ხელმოწერის საიდუმლო"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields.selection,name:pos_platform_order_wolt.selection__platform_order_provider__code__wolt
+#: model:platform.order.provider,name:pos_platform_order_wolt.platform_order_provider_wolt
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.view_platform_order_entity_form_inherit
+msgid "Wolt"
+msgstr "Wolt"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_provider__wolt_client_id
+msgid "Wolt Client ID"
+msgstr "Wolt-ის კლიენტის ID"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_provider__wolt_client_secret
+msgid "Wolt Client Secret"
+msgstr "Wolt-ის კლიენტის საიდუმლო"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_entity__wolt_items_pushed_at
+msgid "Wolt Items Pushed On"
+msgstr "პროდუქტების Wolt-ზე გაგზავნის თარიღი"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_entity__wolt_pending_product_tmpl_ids
+msgid "Wolt Items to Push"
+msgstr "Wolt-ზე გასაგზავნი პროდუქტები"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_entity__wolt_oauth_state
+msgid "Wolt Oauth State"
+msgstr "Wolt OAuth-ის state"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_pos_order__wolt_order_type
+msgid "Wolt Order Type"
+msgstr "Wolt-ის შეკვეთის ტიპი"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_entity__wolt_pending_order_refs
+msgid "Wolt Pending Order Refs"
+msgstr "Wolt-ის მოლოდინში მყოფი შეკვეთების მითითებები"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_provider__wolt_redirect_url
+msgid "Wolt Redirect URL"
+msgstr "Wolt-ის გადამისამართების URL"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_entity__wolt_venue_status_date
+msgid "Wolt Status Checked On"
+msgstr "Wolt-ის სტატუსის შემოწმების თარიღი"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model,name:pos_platform_order_wolt.model_platform_order_wolt_token
+msgid "Wolt Venue Token"
+msgstr "Wolt ობიექტის ტოკენი"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_provider__wolt_webhook_secret
+msgid "Wolt Webhook Signing Secret"
+msgstr "Wolt Webhook-ის ხელმოწერის საიდუმლო"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,field_description:pos_platform_order_wolt.field_platform_order_provider__wolt_webhook_url
+msgid "Wolt Webhook URL"
+msgstr "Wolt Webhook-ის URL"
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/pos_order.py:0
+msgid ""
+"Wolt cancelled this order after it was paid in Odoo: refund it in the POS if"
+" Wolt does not pay it."
+msgstr "Wolt-მა ეს შეკვეთა გააუქმა მას შემდეგ, რაც ის Odoo-ში გადახდილი იყო: თუ Wolt მას არ გადაიხდის, დააბრუნეთ თანხა POS-ში."
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/pos_order.py:0
+msgid "Wolt couriers report delivery themselves."
+msgstr "Wolt-ის კურიერები მიწოდების შესახებ თავად აცნობებენ."
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/platform_order_entity.py:0
+msgid "Wolt did not return a venue in the access token."
+msgstr "Wolt-მა წვდომის ტოკენში ობიექტი არ მიუთითა."
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/platform_order_entity.py:0
+msgid ""
+"Wolt item %(name)s (POS ID %(pos_id)s) has no product: sync the menu from "
+"Odoo or set a Product for Unknown Wolt Items on the store."
+msgstr "Wolt-ის ელემენტს %(name)s (POS ID %(pos_id)s) პროდუქტი არ აქვს: დაასინქრონეთ მენიუ Odoo-დან ან მაღაზიაზე მიუთითეთ პროდუქტი უცნობი Wolt ელემენტებისთვის."
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/platform_order_entity.py:0
+msgid "Wolt menu sync failed for %(store)s: %(error)s"
+msgstr "Wolt-ზე მენიუს სინქრონიზაცია ვერ მოხერხდა მაღაზიისთვის %(store)s: %(error)s"
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,help:pos_platform_order_wolt.field_pos_order__wolt_self_delivery
+msgid ""
+"Wolt order delivered by the venue's own couriers instead of Wolt couriers."
+msgstr "Wolt-ის შეკვეთა, რომელსაც Wolt-ის კურიერების ნაცვლად ობიექტის საკუთარი კურიერები აწვდიან."
+
+#. module: pos_platform_order_wolt
+#: model:ir.model.fields,help:pos_platform_order_wolt.field_platform_order_entity__wolt_pending_order_refs
+msgid "Wolt orders received while the POS was closed or whose import failed."
+msgstr "Wolt-ის შეკვეთები, რომლებიც მიღებულია, როცა POS დახურული იყო, ან რომელთა იმპორტი ვერ მოხერხდა."
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/pos_order.py:0
+msgid "Wolt refused the rejection: %s"
+msgstr "Wolt-მა უარყოფა არ დაუშვა: %s"
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/platform_order_entity.py:0
+msgid "Wolt request failed for %s: %s"
+msgstr "Wolt-ის მოთხოვნა ვერ შესრულდა %s-ისთვის: %s"
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/pos_order.py:0
+msgid "Wolt request failed: %s"
+msgstr "Wolt-ის მოთხოვნა ვერ შესრულდა: %s"
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/platform_order_wolt_token.py:0
+msgid ""
+"Wolt token refresh failed for %(store)s, reconnect the store: %(error)s"
+msgstr "Wolt-ის ტოკენის განახლება ვერ მოხერხდა მაღაზიისთვის %(store)s, ხელახლა დააკავშირეთ მაღაზია: %(error)s"
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/platform_order_wolt_token.py:0
+msgid "Wolt token refresh is busy, please retry."
+msgstr "Wolt-ის ტოკენის განახლება უკვე მიმდინარეობს, გთხოვთ, სცადოთ ხელახლა."
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/platform_order_entity.py:0
+msgid "Wolt venue %s is already linked to %s."
+msgstr "Wolt-ის ობიექტი %s უკვე დაკავშირებულია %s-თან."
+
+#. module: pos_platform_order_wolt
+#: model:ir.actions.server,name:pos_platform_order_wolt.ir_cron_wolt_sync_ir_actions_server
+msgid "Wolt: import queued orders, push item changes, keep tokens alive"
+msgstr "Wolt: რიგში მყოფი შეკვეთების იმპორტი, პროდუქტების ცვლილებების გაგზავნა, ტოკენების მოქმედების შენარჩუნება"
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/pos_order.py:0
+msgid "Wolt: no order found for %s."
+msgstr "Wolt: შეკვეთა %s-ისთვის ვერ მოიძებნა."
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/platform_order_entity.py:0
+msgid "Wolt: notification without venue ID."
+msgstr "Wolt: შეტყობინებაში ობიექტის ID არ არის."
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/platform_order_wolt_token.py:0
+msgid "Wolt disconnected store %s: press Connect to Wolt on the store."
+msgstr ""
+"Wolt-მა მაღაზია %s გათიშა: მაღაზიაზე დააჭირეთ „Wolt-თან დაკავშირებას“."
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/platform_order_entity.py:0
+msgid "Wolt accepts one menu sync every 15 minutes; try again later."
+msgstr ""
+"Wolt მენიუს სინქრონიზაციას 15 წუთში ერთხელ იღებს; სცადეთ მოგვიანებით."
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/pos_order.py:0
+msgid ""
+"Only an accepted order that is not delivered or cancelled can be marked as "
+"delivered."
+msgstr ""
+"მიწოდებულად შეიძლება მოინიშნოს მხოლოდ მიღებული შეკვეთა, რომელიც ჯერ არ "
+"მიწოდებულა და არ გაუქმებულა."
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/pos_order.py:0
+msgid "Odoo cannot check Wolt order %s, try closing the session again: %s"
+msgstr "Odoo ვერ ამოწმებს Wolt-ის შეკვეთას %s, სცადეთ სესიის ხელახლა დახურვა: %s"
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/pos_order.py:0
+msgid ""
+"Wolt order %s is still in progress at Wolt: wait until Wolt reports it "
+"delivered or cancelled, then close the session again."
+msgstr ""
+"Wolt-ის შეკვეთა %s Wolt-ში ჯერ კიდევ მიმდინარეობს: დაელოდეთ, სანამ Wolt მას "
+"მიწოდებულად ან გაუქმებულად მონიშნავს, შემდეგ სესია ხელახლა დახურეთ."
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/pos_order.py:0
+msgid "Cancelled when the session was closed."
+msgstr "გაუქმდა სესიის დახურვისას."
+
+#. module: pos_platform_order_wolt
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_wolt.view_platform_order_entity_form_inherit
+msgid "Orders waiting for import"
+msgstr "იმპორტის მომლოდინე შეკვეთები"
+
+#. module: pos_platform_order_wolt
+#. odoo-python
+#: code:addons/pos_platform_order_wolt/models/pos_order.py:0
+msgid ""
+"Wolt reports this order as %s: Odoo cancelled it without payment when the "
+"session was closed."
+msgstr ""
+"Wolt-ში ამ შეკვეთის სტატუსია %s: სესიის დახურვისას Odoo-მ ის გადახდის "
+"გარეშე გააუქმა."

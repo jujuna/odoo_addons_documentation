@@ -1,0 +1,946 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="view_rs_waybill_form" model="ir.ui.view">
+        <field name="name">rs.waybill.form</field>
+        <field name="model">rs.waybill</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_submit_edit_to_rs" type="object"
+                            string="Activate Adjustment" class="btn-primary"
+                            icon="cloud_upload"
+                            invisible="not context.get('edit_mode')"
+                            confirm="Submit these changes to RS.ge? The current version will be archived as an adjustment."/>
+                    <button special="cancel"
+                            string="Cancel Adjustment" class="btn-secondary"
+                            invisible="not context.get('edit_mode')"/>
+                    <button name="action_print_pdf" type="object"
+                            string="Print PDF" class="btn-outline-secondary"
+                            icon="print"
+                            invisible="not context.get('edit_mode')"/>
+
+                    <button name="action_update_rs_status" type="object" string="Update" class="btn-outline-primary"
+                            icon="refresh"
+                            invisible="not rs_internal_id or state == 'draft' or context.get('edit_mode')">
+                        <span class="oe_stat_text">Update</span>
+                    </button>
+                    <button name="action_open_live_rs_view" type="object" string="Live RS View"
+                            class="btn-outline-danger" icon="my_location"
+                            invisible="not rs_internal_id or state == 'draft' or context.get('edit_mode')"/>
+                    <button name="action_delete_template" type="object"
+                            string="Delete Template" class="btn-outline-danger rsw-right"
+                            confirm="Delete this template from RS.GE?"
+                            invisible="not is_template or context.get('edit_mode')"/>
+
+                    <button name="action_save_to_rs" type="object" class="btn-outline-primary"
+                            icon="cloud_upload"
+                            invisible="state in ('active', 'completed', 'cancelled') or waybill_status == '8' or is_template or waybill_direction == 'buyer' or (parent_waybill_id and rs_internal_id) or context.get('edit_mode')">
+                        <span class="oe_stat_text">Save</span>
+                    </button>
+
+                    <button name="action_open_parent_waybill" type="object" class="btn-outline-secondary rsw-right"
+                            icon="arrow_upward"
+                            invisible="not parent_waybill_id or context.get('edit_mode')">
+                        <span class="oe_stat_text">Main Waybill</span>
+                    </button>
+                    <button name="action_subwaybill_complete" type="object" class="btn-success rsw-right"
+                            icon="lock"
+                            invisible="not parent_waybill_id or state in ('completed', 'cancelled') or context.get('edit_mode')">
+                        <span class="oe_stat_text">Sub-Waybill Complete</span>
+                    </button>
+
+                    <button name="action_send_rs_waybill" type="object" class="btn-outline-success"
+                            icon="send"
+                            invisible="is_template or waybill_direction == 'buyer' or state in ('active','completed','cancelled')
+                                         or waybill_type == '3' or transport_type == '7' or parent_waybill_id or context.get('edit_mode')">
+                        <span class="oe_stat_text">Activate</span>
+                    </button>
+
+                    <button name="action_send_carrier_waybill" type="object" class="btn-primary"
+                            icon="local_shipping"
+                            invisible="is_template or waybill_direction != 'seller' or
+                                         transport_type != '7' or state in ('active','completed','cancelled') or waybill_status == '8' or context.get('edit_mode')">
+                        <span class="oe_stat_text">Send to Transporter</span>
+                    </button>
+
+                    <button name="action_create_remainder_waybill" type="object" class="btn-outline-primary rsw-right"
+                            icon="deployed_code"
+                            invisible="waybill_type != '4' or state != 'active' or parent_waybill_id or remainder_origin_id or is_template or waybill_direction == 'buyer' or context.get('edit_mode')">
+                        <span class="oe_stat_text">Remainder Waybill</span>
+                    </button>
+
+                    <button name="action_close_waybill" type="object" class="btn-primary rsw-right rsw-complete"
+                            icon="lock"
+                            confirm="Complete this waybill?"
+                            invisible="is_template or waybill_direction == 'buyer' or state in
+                                         ('completed', 'cancelled') or (waybill_type != '3' and state != 'active') or
+                                         (waybill_type != '3' and not rs_internal_id) or transport_type == '7' or parent_waybill_id or context.get('edit_mode')">
+                        <span class="oe_stat_text">Complete</span>
+                    </button>
+
+                    <button name="action_refuse_waybill" type="object" class="btn-outline-warning"
+                            icon="block"
+                            invisible="is_template or waybill_direction == 'buyer' or not rs_internal_id or state in ('draft', 'cancelled') or (state == 'completed' and (waybill_type != '4' or parent_waybill_id)) or (transport_type == '7' and (not waybill_status or waybill_status == '0')) or context.get('edit_mode')"
+                            confirm="Cancel this waybill on RS.GE?">
+                        <span class="oe_stat_text">Cancel</span>
+                    </button>
+
+                    <button name="action_edit_waybill" type="object" class="btn-outline-secondary"
+                            icon="edit_square"
+                            invisible="waybill_direction != 'seller' or is_template or
+                                       state not in ('active', 'completed') or not rs_internal_id or waybill_status == '8' or rs_goods_pending_snapshot or context.get('edit_mode')">
+                        <span class="oe_stat_text">Adjustment</span>
+                    </button>
+
+                    <!-- Delete hidden on draft per request. Restore by uncommenting.
+                    <button name="action_delete_waybill" type="object" class="btn-outline-danger rsw-right"
+                            icon="delete"
+                            invisible="is_template or not rs_internal_id or waybill_direction != 'seller' or state != 'draft' or transport_type == '7' or parent_waybill_id or context.get('edit_mode')"
+                            confirm="Delete this waybill on RS.GE?">
+                        <span class="oe_stat_text">Delete</span>
+                    </button>
+                    -->
+
+                    <button name="action_confirm_waybill" type="object" class="btn-success rsw-right"
+                            icon="check"
+                            invisible="is_template or waybill_direction != 'seller' or waybill_type != '1' or
+                                         state not in ('active','completed') or is_confirmed == '1' or parent_waybill_id or context.get('edit_mode')"
+                            confirm="Confirm this waybill?">
+                        <span class="oe_stat_text">Received</span>
+                    </button>
+
+                    <button name="action_reject_waybill" type="object" class="btn-outline-danger"
+                            icon="close"
+                            invisible="is_template or waybill_direction != 'seller' or waybill_type != '1' or
+                                         state not in ('active','completed') or is_confirmed != '0' or context.get('edit_mode')"
+                            confirm="Reject this waybill?">
+                        <span class="oe_stat_text">Reject</span>
+                    </button>
+
+                    <button name="action_confirm_waybill" type="object" class="btn-success"
+                            icon="check"
+                            invisible="is_template or waybill_direction != 'seller' or waybill_type != '2' or
+                                         state != 'active' or is_confirmed not in ('2','-1') or context.get('edit_mode')"
+                            confirm="Confirm this waybill?">
+                        <span class="oe_stat_text">Received</span>
+                    </button>
+
+                    <button name="action_confirm_waybill" type="object" class="btn-outline-success"
+                            icon="check"
+                            invisible="is_template or waybill_direction != 'buyer' or waybill_type != '1' or
+                                         state == 'cancelled' or (is_confirmed == '1' and not is_buyer_reconfirm_needed) or (state == 'completed' and is_confirmed == '0') or unresolved_count or context.get('edit_mode')"
+                            confirm="Confirm this waybill?">
+                        <span class="oe_stat_text">Received</span>
+                    </button>
+
+                    <button name="action_reject_waybill" type="object" class="btn-outline-danger rsw-right"
+                            icon="close"
+                            invisible="is_template or waybill_direction != 'buyer' or waybill_type != '1'
+                                         or state != 'active' or (is_confirmed != '0' and not is_buyer_reconfirm_needed) or context.get('edit_mode')"
+                            confirm="Reject this waybill?">
+                        <span class="oe_stat_text">Reject</span>
+                    </button>
+
+                    <button name="action_refuse_waybill" type="object" class="btn-outline-warning rsw-right"
+                            icon="block"
+                            invisible="is_template or waybill_direction != 'buyer' or waybill_type != '1' or state == 'cancelled' or context.get('edit_mode')"
+                            confirm="Cancel this waybill on RS.GE?">
+                        <span class="oe_stat_text">Cancel</span>
+                    </button>
+
+                    <button name="action_close_waybill" type="object" class="btn-outline-success"
+                            icon="lock"
+                            invisible="is_template or waybill_direction != 'buyer' or waybill_type != '1' or state != 'active' or context.get('edit_mode')"
+                            confirm="Complete this waybill?">
+                        <span class="oe_stat_text">Complete</span>
+                    </button>
+
+                    <button name="action_confirm_waybill" type="object" class="btn-outline-success"
+                            icon="check"
+                            invisible="is_template or waybill_direction != 'buyer' or waybill_type not in ('2','3','4') or (is_confirmed == '1' and not is_buyer_reconfirm_needed) or unresolved_count or rs_needs_purchase_pick or context.get('edit_mode')"
+                            confirm="Confirm this waybill?">
+                        <span class="oe_stat_text">Received</span>
+                    </button>
+
+                    <button name="action_reject_waybill" type="object" class="btn-outline-danger rsw-right"
+                            icon="close"
+                            invisible="is_template or waybill_direction != 'buyer' or waybill_type not in ('2','3','4') or (is_confirmed != '0' and not is_buyer_reconfirm_needed) or context.get('edit_mode')"
+                            confirm="Reject this waybill?">
+                        <span class="oe_stat_text">Reject</span>
+                    </button>
+
+                    <button name="action_confirm_waybill" type="object" class="btn-outline-success"
+                            icon="check"
+                            invisible="is_template or waybill_direction != 'buyer' or waybill_type != '5' or (is_confirmed == '1' and not is_buyer_reconfirm_needed) or unresolved_count or context.get('edit_mode')"
+                            confirm="Confirm this waybill?">
+                        <span class="oe_stat_text">Received</span>
+                    </button>
+
+                    <button name="action_save_transporter" string="Save" type="object"
+                            class="btn-primary"
+                            invisible="is_template or (waybill_direction != 'transporter' and not is_our_carrier) or state != 'draft' or context.get('edit_mode')"/>
+                    <button name="action_active_transporter" string="Activate" type="object"
+                            class="btn-primary"
+                            invisible="is_template or (waybill_direction != 'transporter' and not is_our_carrier) or state != 'draft' or context.get('edit_mode')"/>
+                    <button name="action_save_transporter" string="Edit" type="object"
+                            class="btn-outline-secondary"
+                            invisible="is_template or (waybill_direction != 'transporter' and not is_our_carrier) or state not in ('active','completed') or context.get('edit_mode')"/>
+                    <button name="action_close_transporter" string="Complete" type="object"
+                            class="btn-success"
+                            invisible="is_template or (waybill_direction != 'transporter' and not is_our_carrier) or state != 'active' or context.get('edit_mode')"/>
+                </header>
+
+                <sheet>
+                    <field name="is_template" invisible="1"/>
+                    <field name="rs_template_id" invisible="1"/>
+                    <field name="is_locked" invisible="1"/>
+                    <field name="is_buyer_reconfirm_needed" invisible="1"/>
+                    <field name="pending_return_json" invisible="1"/>
+                    <field name="pending_goods_json" invisible="1"/>
+                    <field name="is_our_carrier" invisible="1"/>
+
+                    <div class="alert alert-warning rounded-1 mb-2" role="alert"
+                         invisible="not is_buyer_reconfirm_needed or waybill_direction == 'buyer'">
+                        <strong>Edited after the customer confirmed it.</strong>
+                        RS.GE reset the confirmation: the customer has to confirm it again.
+                        This note goes away when they do.
+                    </div>
+
+                    <field name="rs_needs_resave" invisible="1"/>
+                    <div class="alert alert-warning rounded-1 mb-2 d-flex align-items-center justify-content-between"
+                         role="alert" invisible="not rs_needs_resave or state != 'draft'">
+                        <span>
+                            <strong>Changed in Odoo, not yet on RS.GE.</strong>
+                            The delivery's operation type changed. Check the waybill, then save it.
+                        </span>
+                        <button name="action_save_to_rs" type="object" class="btn-warning"
+                                string="Save to RS.GE"/>
+                    </div>
+
+                    <field name="pending_vendor_short_json" invisible="1"/>
+                    <div class="alert alert-warning rounded-1 mb-2 d-flex align-items-center justify-content-between"
+                         role="alert" invisible="not pending_vendor_short_json">
+                        <span>
+                            <strong>The vendor lowered this waybill after you received it:</strong>
+                            <field name="rs_vendor_short_summary" readonly="1" nolabel="1" class="d-inline"/>.
+                            Does the vendor still owe this?
+                        </span>
+                        <span class="d-flex gap-2">
+                            <button name="action_vendor_expect_later" type="object"
+                                    class="btn-warning" string="Expect later"/>
+                            <button name="action_vendor_reduce_order" type="object"
+                                    class="btn-secondary" string="Reduce the order"/>
+                        </span>
+                    </div>
+
+                    <div class="alert alert-danger rounded-1 mb-2 d-flex align-items-center justify-content-between"
+                         role="alert" invisible="not rs_post_commit_error or rs_goods_pending_snapshot or context.get('edit_mode')">
+                        <span>
+                            <strong>Part of this waybill's work in Odoo did not complete.</strong>
+                            <field name="rs_post_commit_error" readonly="1" nolabel="1" class="d-inline"/>
+                            It is retried automatically; fix the cause and click Retry to do it now.
+                        </span>
+                        <button name="action_retry_local_steps" type="object" class="btn-danger" string="Retry"/>
+                    </div>
+
+                    <field name="rs_adjustment_error" invisible="1"/>
+                    <div class="alert alert-warning rounded-1 mb-2 d-flex align-items-center justify-content-between"
+                         role="alert" invisible="not rs_adjustment_error or context.get('edit_mode')">
+                        <span>
+                            <strong>An Adjustment was not sent to RS.GE.</strong>
+                            <field name="rs_adjustment_error" readonly="1" nolabel="1" class="d-inline"/>
+                            Odoo shows your changes; RS.GE still has the waybill as it was.
+                        </span>
+                        <span class="d-flex gap-2">
+                            <button name="action_edit_waybill" type="object"
+                                    class="btn-warning" string="Submit again"/>
+                            <button name="action_discard_adjustment" type="object"
+                                    class="btn-secondary" string="Discard Adjustment"
+                                    confirm="Put the waybill back as it is on RS.GE? Your unsent changes are lost."/>
+                        </span>
+                    </div>
+
+                    <field name="rs_goods_pending_snapshot" invisible="1"/>
+                    <div class="alert alert-danger rounded-1 mb-2 d-flex align-items-center justify-content-between"
+                         role="alert" invisible="not rs_goods_pending_snapshot">
+                        <span>
+                            <strong>A goods change made on RS.GE is not applied to the delivery.</strong>
+                            Nothing was changed. <field name="rs_post_commit_error" readonly="1" nolabel="1" class="d-inline"/>
+                        </span>
+                        <button name="action_retry_rs_goods_change" type="object"
+                                class="btn-danger" string="Retry"/>
+                    </div>
+
+                    <div class="alert alert-warning rounded-1 mb-2 d-flex align-items-center justify-content-between"
+                         role="alert" invisible="not pending_return_json">
+                        <span>
+                            <strong>Goods are no longer with the customer.</strong>
+                            They were lowered on this waybill or came back on a return.
+                            Say what happens with them and with the order.
+                        </span>
+                        <button name="action_reconcile_pending_return" type="object"
+                                class="btn-warning" string="Reconcile Delivery"/>
+                    </div>
+
+                    <div class="alert alert-warning rounded-1 mb-2"
+                         role="alert" invisible="not pending_goods_json">
+                        <strong>Vendor changed goods on this waybill.</strong>
+                        Click <em>Receive</em> to apply the change to the PO and receipt,
+                        or <em>Reject</em> to decline.
+                    </div>
+
+                    <field name="rs_needs_return_origin" invisible="1"/>
+                    <field name="return_origin_candidate_ids" invisible="1"/>
+                    <div class="alert alert-warning rounded-1 mb-2" role="alert"
+                         invisible="not rs_needs_return_origin">
+                        <strong>Which delivery are these goods coming back from?</strong>
+                        Pick it so the sales order counts the return.
+                        <div class="d-flex align-items-center gap-2 mt-2">
+                            <field name="return_origin_picking_id" class="w-50"
+                                   domain="[('id', 'in', return_origin_candidate_ids)]"
+                                   options="{'no_create': True}"
+                                   placeholder="Delivery or sales order number…"/>
+                            <button name="action_create_return_from_origin" type="object"
+                                    string="Create Return" class="btn-primary"
+                                    invisible="not return_origin_picking_id"/>
+                            <button name="action_create_plain_return" type="object"
+                                    string="No Original Delivery" class="btn-secondary"
+                                    confirm="Create a plain receipt? The sales order will not count this return."/>
+                        </div>
+                    </div>
+
+                    <field name="rs_needs_purchase_pick" invisible="1"/>
+                    <field name="purchase_candidate_ids" invisible="1"/>
+                    <div class="alert alert-warning rounded-1 mb-2" role="alert"
+                         invisible="not rs_needs_purchase_pick">
+                        <strong>Which purchase order are these goods for?</strong>
+                        Several open orders of this vendor hold these products.
+                        <div class="d-flex align-items-center gap-2 mt-2">
+                            <field name="purchase_pick_id" class="w-50"
+                                   domain="[('id', 'in', purchase_candidate_ids)]"
+                                   options="{'no_create': True}"
+                                   placeholder="Purchase order number…"/>
+                            <button name="action_link_purchase" type="object"
+                                    string="Link" class="btn-primary"
+                                    invisible="not purchase_pick_id"/>
+                            <button name="action_create_purchase_from_waybill" type="object"
+                                    string="New Purchase Order" class="btn-secondary"
+                                    confirm="Create a new purchase order from this waybill instead?"/>
+                        </div>
+                    </div>
+
+                    <div name="button_box" position="inside">
+                        <field name="state" invisible="1"/>
+
+                        <div class="rsw-headstatus rsw-seg" invisible="waybill_direction != 'buyer'">
+                            <span class="badge rounded-1 border text-secondary fs-6" invisible="state != 'draft'">Draft</span>
+                            <span class="badge rounded-1 border text-info fs-6" invisible="state != 'active'">Active</span>
+                            <span class="badge rounded-1 border text-success fs-6" invisible="state != 'completed'">Completed</span>
+                            <span class="badge rounded-1 border text-danger fs-6" invisible="state != 'cancelled'">Cancelled</span>
+                            <span class="badge rounded-1 border text-info fs-6" invisible="state not in ('active','completed') or is_confirmed != '0'">Awaiting Confirmation</span>
+                            <span class="badge rounded-1 border text-success fs-6" invisible="state not in ('active','completed') or is_confirmed != '1'">Confirmed by Buyer</span>
+                            <span class="badge rounded-1 border text-danger fs-6" invisible="state not in ('active','completed') or is_confirmed != '2'">Rejected by Buyer</span>
+                            <span class="badge rounded-1 border text-warning fs-6" invisible="state not in ('active','completed') or is_confirmed != '-1'">Refused by Buyer</span>
+                            <span class="badge rounded-1 border text-secondary fs-6" invisible="state != 'cancelled' or is_confirmed != '1'">Was Confirmed</span>
+                            <span class="badge rounded-1 border text-secondary fs-6" invisible="state != 'cancelled' or is_confirmed != '2'">Was Rejected</span>
+                            <span class="badge rounded-1 border text-secondary fs-6" invisible="state != 'cancelled' or is_confirmed != '-1'">Was Refused</span>
+                        </div>
+
+                        <div class="rsw-headstatus rsw-seg" invisible="waybill_direction != 'seller'">
+                            <span class="badge rounded-1 border text-secondary fs-6" invisible="state != 'draft'">Draft</span>
+                            <span class="badge rounded-1 border text-info fs-6" invisible="state != 'active'">Active</span>
+                            <span class="badge rounded-1 border text-success fs-6" invisible="state != 'completed'">Completed</span>
+                            <span class="badge rounded-1 border text-danger fs-6" invisible="state != 'cancelled'">Cancelled</span>
+                            <span class="badge rounded-1 border text-info fs-6" invisible="state not in ('active','completed') or is_confirmed != '0'">Buyer Hasn't Confirmed</span>
+                            <span class="badge rounded-1 border text-success fs-6" invisible="state not in ('active','completed') or is_confirmed != '1'">Buyer Confirmed</span>
+                            <span class="badge rounded-1 border text-danger fs-6" invisible="state not in ('active','completed') or is_confirmed != '2'">Buyer Rejected</span>
+                            <span class="badge rounded-1 border text-warning fs-6" invisible="state not in ('active','completed') or is_confirmed != '-1'">Buyer Refused</span>
+                        </div>
+
+                        <button name="action_view_adjustments" type="object"
+                                class="oe_stat_button" icon="history"
+                                invisible="not rs_internal_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Adjustments</span>
+                            </div>
+                        </button>
+                    </div>
+
+
+                    <div class="rsw-tab">
+
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="oe_title">
+                                <label for="rs_waybill_number" string="Waybill Number"/>
+                                <h1>
+                                    <field name="rs_waybill_number" placeholder="From RS.GE"/>
+                                </h1>
+                                <label for="buyer_contact_email" string="Recipient Email"/>
+                                <div class="d-flex align-items-center gap-2">
+                                    <field name="buyer_contact_email" widget="many2one" options="{'no_create': 1}"
+                                           domain="[('email', '!=', False)]"/>
+                                    <span invisible="not buyer_contact_email" class="text-muted">
+                                        <field name="buyer_contact_email_address" widget="email" readonly="1"
+                                                  invisible="not buyer_contact_email"/>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="text-muted small">
+                                <div invisible="not rs_internal_id">
+                                    <span>ID: </span>
+                                    <field name="rs_internal_id" nolabel="1" options="{'enable_formatting': False}"/>
+                                </div>
+                                <div class="mt-1 d-grid gap-1">
+                                    <!-- Create from Template hidden per request. Restore by uncommenting.
+                                    <button name="action_create_from_template" type="object"
+                                            string="Create from Template" class="btn-sm btn-secondary"
+                                            icon="content_copy"
+                                            invisible="is_template or state != 'draft' or parent_waybill_id"/>
+                                    -->
+                                    <button name="action_save_as_template" type="object"
+                                            string="Save as Template" class="btn-sm btn-secondary"
+                                            icon="bookmark"
+                                            invisible="is_template or state != 'draft' or parent_waybill_id"/>
+                                    <button name="action_print_pdf" type="object"
+                                            string="Print PDF" class="btn-sm btn-secondary"
+                                            icon="print"
+                                            invisible="not rs_internal_id or state == 'draft'"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rsw-card">
+                        <h5 class="rsw-title"><i class="oi" data-icon="info"/>Main Information</h5>
+                        <div class="rsw-row">
+                            <div class="rsw-field">
+                                <span class="rsw-label">Waybill Type</span>
+                                <div class="rsw-value">
+                                    <field name="waybill_type" nolabel="1" readonly="state != 'draft'"/>
+                                </div>
+                            </div>
+                            <div class="rsw-field">
+                                <span class="rsw-label">Category</span>
+                                <div class="rsw-value">
+                                    <field name="category" nolabel="1" readonly="1"/>
+                                </div>
+                            </div>
+                            <div class="rsw-field">
+                                <span class="rsw-label">Activation Date</span>
+                                <div class="rsw-value">
+                                    <field name="activation_date" nolabel="1" readonly="1"/>
+                                </div>
+                            </div>
+                            <div class="rsw-field">
+                                <span class="rsw-label">Medicine</span>
+                                <div class="rsw-value">
+                                    <field name="is_medicine" nolabel="1" readonly="is_locked or context.get('edit_mode')"/>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+
+                        <div invisible="not waybill_type">
+
+                            <div class="rsw-card rsw-required">
+                                <h5 class="rsw-title"><i class="oi" data-icon="badge"/>Seller Information</h5>
+                                <div class="rsw-row">
+                                    <div class="rsw-field">
+                                        <span class="rsw-label">Identification Number</span>
+                                        <div class="rsw-value">
+                                            <field name="seller_tin" nolabel="1"/>
+                                        </div>
+                                    </div>
+                                    <div class="rsw-field">
+                                        <span class="rsw-label">Seller Name/Surname</span>
+                                        <div class="rsw-value">
+                                            <field name="seller_name" nolabel="1"/>
+                                        </div>
+                                    </div>
+                                    <div class="rsw-field" invisible="parent_waybill_id">
+                                        <span class="rsw-label">Transport Start Address</span>
+                                        <div class="rsw-value">
+                                            <field name="start_address" nolabel="1" readonly="is_locked"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="rsw-card rsw-required" invisible="not parent_waybill_id or waybill_type != '1'">
+                                <h5 class="rsw-title"><i class="oi" data-icon="swap_horiz"/>Internal Transfer</h5>
+                                <div class="rsw-row">
+                                    <div class="rsw-field">
+                                        <span class="rsw-label">From</span>
+                                        <div class="rsw-value">
+                                            <field name="source_warehouse_id" nolabel="1" readonly="is_locked or context.get('edit_mode')"/>
+                                        </div>
+                                    </div>
+                                    <div class="rsw-field">
+                                        <span class="rsw-label">To</span>
+                                        <div class="rsw-value">
+                                            <field name="dest_warehouse_id" nolabel="1" readonly="is_locked or context.get('edit_mode')"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="rsw-card" invisible="waybill_type == '3' or parent_waybill_id">
+                                <h5 class="rsw-title"><i class="oi" data-icon="signpost"/>Transport Type</h5>
+                                <div class="rsw-row">
+                                    <div class="rsw-field">
+                                        <span class="rsw-label">Transport Type</span>
+                                        <div class="rsw-value">
+                                            <field name="transport_type" nolabel="1" readonly="is_locked or context.get('edit_mode')"/>
+                                        </div>
+                                    </div>
+                                    <div class="rsw-field" invisible="waybill_type != '1'">
+                                        <span class="rsw-label">From</span>
+                                        <div class="rsw-value">
+                                            <field name="source_warehouse_id" nolabel="1" readonly="is_locked or context.get('edit_mode')"/>
+                                        </div>
+                                    </div>
+                                    <div class="rsw-field" invisible="waybill_type != '1'">
+                                        <span class="rsw-label">To</span>
+                                        <div class="rsw-value">
+                                            <field name="dest_warehouse_id" nolabel="1" readonly="is_locked or context.get('edit_mode')"/>
+                                        </div>
+                                    </div>
+                                    <div class="rsw-field" invisible="transport_type != '4'">
+                                        <span class="rsw-label">Other Transport</span>
+                                        <div class="rsw-value">
+                                            <field name="other_transport" nolabel="1" readonly="is_locked or context.get('edit_mode')"/>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="rsw-row" invisible="waybill_type != '1'">
+                                    <div class="rsw-field" style="flex: 0 1 33%;">
+                                        <span class="rsw-label">Delivery Address</span>
+                                        <div class="rsw-value">
+                                            <field name="end_address" nolabel="1" readonly="is_locked or context.get('edit_mode')"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="rsw-card" invisible="transport_type != '7'">
+                                    <h5 class="rsw-title"><i class="oi" data-icon="business"/>Carrier Information</h5>
+                                    <div class="rsw-row">
+                                        <div class="rsw-field">
+                                            <span class="rsw-label">Carrier TIN</span>
+                                            <div class="rsw-value">
+                                                <field name="transporter_tin" nolabel="1" readonly="is_locked or context.get('edit_mode')"
+                                                       required="transport_type == '7' and waybill_direction == 'seller'"/>
+                                            </div>
+                                        </div>
+                                        <div class="rsw-field">
+                                            <span class="rsw-label">Carrier Name</span>
+                                            <div class="rsw-value">
+                                                <field name="transporter_name" nolabel="1" readonly="is_locked or context.get('edit_mode')"
+                                                       required="transport_type == '7' and waybill_direction == 'seller'"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="rsw-card rsw-required" invisible="transport_type not in ('1', '6', '7', '8') or parent_waybill_id">
+                                <h5 class="rsw-title"><i class="oi" data-icon="local_shipping"/>Driver Information</h5>
+                                <div class="rsw-row">
+                                    <div class="rsw-field">
+                                        <span class="rsw-label">Driver TIN</span>
+                                        <div class="rsw-value">
+                                            <field name="driver_partner_id" nolabel="1" readonly="is_locked or context.get('edit_mode')" options="{'no_create_edit': True}" placeholder="Choose or type a TIN"
+                                                   invisible="is_locked or context.get('edit_mode') or (transport_type == '7' and not is_our_carrier)"/>
+                                            <field name="driver_tin" nolabel="1" readonly="1" force_save="1"
+                                                   invisible="not (is_locked or context.get('edit_mode') or (transport_type == '7' and not is_our_carrier))"/>
+                                        </div>
+                                    </div>
+                                    <div class="rsw-field">
+                                        <span class="rsw-label">Driver Name/Surname</span>
+                                        <div class="rsw-value">
+                                            <field name="driver_name" nolabel="1" force_save="1" readonly="is_locked or context.get('edit_mode') or (transport_type == '7' and not is_our_carrier) or not driver_is_foreigner"/>
+                                        </div>
+                                    </div>
+                                    <div class="rsw-field">
+                                        <span class="rsw-label">Car Plate</span>
+                                        <div class="rsw-value">
+                                            <field name="vehicle_id" nolabel="1" readonly="is_locked or context.get('edit_mode')" options="{'no_create': True}" placeholder="Choose a plate"
+                                                   invisible="is_locked or context.get('edit_mode') or (transport_type == '7' and not is_our_carrier)"/>
+                                            <field name="car_number" nolabel="1" readonly="1" force_save="1"
+                                                   invisible="not (is_locked or context.get('edit_mode') or (transport_type == '7' and not is_our_carrier))"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="rsw-row">
+                                    <div class="rsw-field">
+                                        <span class="rsw-label">Trailer</span>
+                                        <div class="rsw-value">
+                                            <field name="trailer" nolabel="1" readonly="is_locked or context.get('edit_mode') or (transport_type == '7' and not is_our_carrier)"/>
+                                        </div>
+                                    </div>
+                                    <div class="rsw-field">
+                                        <span class="rsw-label">Driver is Foreigner</span>
+                                        <div class="rsw-value">
+                                            <field name="driver_is_foreigner" nolabel="1" readonly="is_locked or context.get('edit_mode') or (transport_type == '7' and not is_our_carrier)" widget="boolean_toggle"/>
+                                        </div>
+                                    </div>
+                                    <div class="rsw-field">
+                                        <span class="rsw-label">Transport Cost</span>
+                                        <div class="rsw-value">
+                                            <field name="transport_cost" nolabel="1" readonly="is_locked or context.get('edit_mode')"/>
+                                        </div>
+                                    </div>
+                                    <div class="rsw-field" invisible="waybill_type == '1' and transport_type != '6'">
+                                        <span class="rsw-label">Transport Cost Payer</span>
+                                        <div class="rsw-value">
+                                            <field name="transport_cost_payer" nolabel="1" readonly="is_locked or context.get('edit_mode')"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="rsw-card rsw-required"
+                                 invisible="waybill_type in ('1', '4') and waybill_direction != 'buyer' and not (waybill_type == '4' and parent_waybill_id)">
+                                <h5 class="rsw-title"><i class="oi" data-icon="person"/>Buyer Information</h5>
+                                <div class="rsw-row">
+                                    <div class="rsw-field">
+                                        <span class="rsw-label">Buyer</span>
+                                        <div class="rsw-value">
+                                            <field name="buyer_id" nolabel="1" readonly="is_locked"
+/>
+                                        </div>
+                                    </div>
+                                    <div class="rsw-field">
+                                        <span class="rsw-label" invisible="citizen">Identification Number</span>
+                                        <span class="rsw-label" invisible="not citizen">Passport Number</span>
+                                        <div class="rsw-value">
+                                            <field name="buyer_tin" nolabel="1" readonly="is_locked"/>
+                                        </div>
+                                    </div>
+                                    <div class="rsw-field" invisible="buyer_id">
+                                        <span class="rsw-label">Buyer Name</span>
+                                        <div class="rsw-value">
+                                            <field name="buyer_name" nolabel="1" readonly="is_locked"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="rsw-row">
+                                    <div class="rsw-field" invisible="waybill_type == '3'">
+                                        <span class="rsw-label">Delivery Address</span>
+                                        <div class="rsw-value">
+                                            <field name="end_address" nolabel="1" readonly="is_locked or context.get('edit_mode')"/>
+                                        </div>
+                                    </div>
+                                    <div class="rsw-field">
+                                        <span class="rsw-label">Buyer is Foreigner</span>
+                                        <div class="rsw-value">
+                                            <field name="citizen" nolabel="1" widget="boolean_toggle" readonly="is_locked"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <field name="unresolved_count" invisible="1"/>
+                            <div class="alert alert-warning d-flex align-items-center justify-content-between" role="alert" invisible="not unresolved_count">
+                                <div>
+                                    <i class="oi me-2" data-icon="warning" title="warning"/>
+                                    <field name="unresolved_count" nolabel="1" class="fw-bold"/>
+                                    goods line(s) need a product or a unit.
+                                </div>
+                                <button name="action_open_mapping_wizard" type="object" string="Resolve Now" class="btn-warning"/>
+                            </div>
+                            <div class="rsw-card rsw-goods-card">
+                            <h5 class="rsw-title"><i class="oi" data-icon="inventory_2"/>Goods</h5>
+                            <notebook invisible="parent_waybill_id">
+                                <page string="Goods" name="goods_normal">
+                                    <field name="goods_line_ids" readonly="is_locked">
+                                        <list editable="bottom" decoration-warning="unresolved or uom_review">
+                                            <field name="sequence" widget="handle"/>
+                                            <field name="unresolved" column_invisible="1"/>
+                                            <field name="is_excise_line" column_invisible="1"/>
+                                            <field name="external_name" string="Seller's Product Name" readonly="1" optional="hide"/>
+                                            <field name="external_barcode" string="Seller's Product Code" readonly="1" optional="hide"/>
+                                            <field name="bar_code" string="Goods Code" column_invisible="parent.is_medicine == '1'"/>
+                                            <field name="bar_code" string="Medicament Registry Code" column_invisible="parent.is_medicine != '1'"/>
+                                            <field name="product_id" string="Product"
+                                                     domain="[('is_excise', '=', False)]"
+                                                     context="{'default_name': external_name, 'default_barcode': external_barcode}"/>
+                                            <field name="name" string="Name" optional="hide"/>
+                                            <field name="uom_review" column_invisible="1"/>
+                                            <field name="allowed_uom_ids" column_invisible="1"/>
+                                            <field name="uom_id" string="Unit" options="{'no_create': True}"
+                                                   domain="[('id', 'in', allowed_uom_ids)]"
+                                                   readonly="parent.waybill_direction == 'buyer'"/>
+                                            <field name="unit_name" string="RS Unit"
+                                                   readonly="parent.waybill_direction != 'buyer'"
+                                                   decoration-danger="uom_review"/>
+                                            <field name="quantity"/>
+                                            <field name="unit_price"/>
+                                            <field name="amount" readonly="1"/>
+                                            <field name="vat_type"/>
+                                            <field name="extra_quantity" optional="hide"/>
+                                            <field name="remainder_quantity" column_invisible="parent.waybill_type != '4' and not parent.parent_waybill_id"/>
+                                            <field name="remainder_amount" column_invisible="parent.waybill_type != '4' and not parent.parent_waybill_id"/>
+                                        </list>
+                                    </field>
+                                </page>
+                                <page string="Excise" name="goods_excise">
+                                    <field name="excise_line_ids" readonly="is_locked">
+                                        <list editable="bottom" decoration-warning="unresolved or uom_review">
+                                            <field name="sequence" widget="handle"/>
+                                            <field name="unresolved" column_invisible="1"/>
+                                            <field name="is_excise_line" column_invisible="1"/>
+                                            <field name="external_name" string="Seller's Product Name" readonly="1" optional="hide"/>
+                                            <field name="external_barcode" string="Seller's Product Code" readonly="1" optional="hide"/>
+                                            <field name="bar_code" string="Goods Code"/>
+                                            <field name="product_id" string="Product"
+                                                     domain="[('is_excise', '=', True)]"
+                                                     context="{'default_name': external_name, 'default_barcode': external_barcode, 'default_is_excise': True}"/>
+                                            <field name="name" string="Name" optional="hide"/>
+                                            <field name="uom_review" column_invisible="1"/>
+                                            <field name="allowed_uom_ids" column_invisible="1"/>
+                                            <field name="uom_id" string="Unit" options="{'no_create': True}"
+                                                   domain="[('id', 'in', allowed_uom_ids)]"
+                                                   readonly="parent.waybill_direction == 'buyer'"/>
+                                            <field name="unit_name" string="RS Unit"
+                                                   readonly="parent.waybill_direction != 'buyer'"
+                                                   decoration-danger="uom_review"/>
+                                            <field name="quantity"/>
+                                            <field name="unit_price"/>
+                                            <field name="amount" readonly="1"/>
+                                            <field name="vat_type"/>
+                                            <field name="extra_quantity" optional="hide"/>
+                                        </list>
+                                    </field>
+                                </page>
+                            </notebook>
+
+                            <field name="line_ids" invisible="not parent_waybill_id" readonly="is_locked">
+                                <list editable="bottom" create="false" delete="false">
+                                    <field name="parent_remaining" column_invisible="1"/>
+                                    <field name="bar_code" string="Goods Code" readonly="1"/>
+                                    <field name="product_id" string="Product" readonly="1"/>
+                                    <field name="name" string="Name" readonly="1" optional="hide"/>
+                                    <field name="uom_id" string="Unit" readonly="1"/>
+                                    <field name="unit_name" string="RS Unit" readonly="1" optional="hide"/>
+                                    <field name="quantity"/>
+                                    <field name="unit_price" readonly="1"/>
+                                    <field name="amount" readonly="1"/>
+                                    <field name="vat_type" readonly="1"/>
+                                    <field name="remainder_quantity" readonly="1"/>
+                                    <field name="remainder_amount" readonly="1"/>
+                                </list>
+                            </field>
+
+                            <group class="oe_subtotal_footer">
+                                <field name="full_amount" readonly="1"/>
+                            </group>
+                            </div>
+
+                            <div class="rsw-card" invisible="waybill_type != '4' or parent_waybill_id or not sub_waybill_ids">
+                                <h5 class="rsw-title"><i class="oi" data-icon="account_tree"/>Sub-Waybills</h5>
+                                <field name="sub_waybill_ids" nolabel="1">
+                                    <list editable="bottom" create="false" delete="false"
+                                          decoration-danger="state == 'cancelled'">
+                                        <field name="rs_waybill_number" string="Sub-Waybill" readonly="1"/>
+                                        <field name="buyer_tin" string="Recipient TIN" readonly="1"/>
+                                        <field name="buyer_name" string="Recipient Name" readonly="1"/>
+                                        <field name="total_quantity" string="Goods Quantity" readonly="1"/>
+                                        <field name="full_amount" string="Amount" readonly="1"/>
+                                        <field name="activation_date" string="Registration Date" readonly="1"/>
+                                        <field name="state" widget="waybill_state_icon" string="" readonly="1"/>
+                                        <button name="action_open_record_form" type="object"
+                                                string="Open" icon="open_in_new" class="btn-link"/>
+                                    </list>
+                                </field>
+                            </div>
+
+                            <div class="d-flex gap-2 mt-3" invisible="waybill_type != '4' or state != 'active' or parent_waybill_id or remainder_origin_id">
+                                <button name="action_create_sub_waybill" type="object"
+                                        string="New Sub-Waybill" class="btn rsw-greyline"/>
+                                <button name="action_create_sub_waybill_internal_trans" type="object"
+                                        string="New Sub-Waybill/Internal Transport" class="btn rsw-greyline"/>
+                            </div>
+
+                            <div class="rsw-card" invisible="waybill_type == '3'">
+                                <h5 class="rsw-title"><i class="oi" data-icon="schedule"/>Transport Start Date Postpone</h5>
+                                <div class="rsw-row">
+                                    <div class="rsw-field">
+                                        <span class="rsw-label">Number, Month and Year</span>
+                                        <div class="rsw-value">
+                                            <field name="trans_postpone_date" nolabel="1" readonly="state != 'draft' or parent_waybill_id"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="rsw-card" invisible="waybill_type == '4' and not parent_waybill_id">
+                                <h5 class="rsw-title"><i class="oi" data-icon="description"/>Additional Information</h5>
+                                <div class="rsw-row">
+                                    <div class="rsw-field">
+                                        <span class="rsw-label">Handed Over By</span>
+                                        <div class="rsw-value">
+                                            <field name="reception_info" nolabel="1" readonly="is_locked"/>
+                                        </div>
+                                    </div>
+                                    <div class="rsw-field">
+                                        <span class="rsw-label">Received By</span>
+                                        <div class="rsw-value">
+                                            <field name="receiver_info" nolabel="1" readonly="is_locked"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="rsw-card" invisible="not parent_waybill_id and (not rs_internal_id or state == 'draft' or waybill_type in ('3', '4'))">
+                                <h5 class="rsw-title"><i class="oi" data-icon="calendar_today"/>Dates</h5>
+                                <div class="rsw-row">
+                                    <div class="rsw-field">
+                                        <span class="rsw-label">Delivery Date</span>
+                                        <div class="rsw-value">
+                                            <field name="delivery_date" nolabel="1" readonly="state in ('completed', 'cancelled')"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="rsw-row">
+                                <div class="rsw-field">
+                                    <span class="rsw-label rsw-label-strong">Note/Comment</span>
+                                    <div class="rsw-value">
+                                        <field name="comment" nolabel="1" readonly="is_locked"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <notebook>
+                                <page string="Status &amp; Technical" name="technical">
+                                    <group>
+                                        <group string="RS Status">
+                                            <field name="waybill_direction"/>
+<!--                                            <field name="waybill_status"/>-->
+<!--                                            <field name="is_confirmed"/>-->
+                                            <field name="customs_status"/>
+                                        </group>
+                                        <group string="Identifiers">
+                                            <field name="rs_internal_id" options="{'enable_formatting': False}"/>
+                                            <field name="payer_type"/>
+                                            <field name="remainder_origin_id" invisible="not remainder_origin_id"/>
+                                        </group>
+                                    </group>
+                                    <group invisible="not rs_post_commit_error">
+                                        <div class="alert alert-warning" role="alert" colspan="2">
+                                            <strong>Part of this operation did not complete — Odoo and RS.GE may disagree.</strong><br/>
+                                            If the unfinished step is on the Odoo side, the drift job retries it
+                                            automatically and this note clears once it succeeds. If it is an RS.GE
+                                            step, retry it from this form.
+                                            <field name="rs_post_commit_error" nolabel="1" readonly="1"/>
+                                        </div>
+                                    </group>
+                                </page>
+                                <page string="Sales Order" name="sales_order" invisible="not sales_order_id">
+                                    <div class="rsw-doc rsw-doc-so">
+                                        <div class="rsw-doc-head">
+                                            <span class="rsw-doc-ico"><i class="oi" data-icon="description" title="Sales Order"/></span>
+                                            <div class="rsw-doc-meta">
+                                                <div class="rsw-doc-num"><field name="sales_order_id" nolabel="1" readonly="1" options="{'no_open': True}"/></div>
+                                                <div class="rsw-doc-sub">Origin sales order</div>
+                                            </div>
+                                            <span class="rsw-doc-pill"><field name="sales_order_state" nolabel="1" readonly="1"/></span>
+                                            <button name="action_open_sales_order" type="object" string="Open"
+                                                    icon="open_in_new" class="rsw-doc-open" invisible="not sales_order_id"/>
+                                        </div>
+                                    </div>
+                                    <div class="rsw-grid">
+                                        <div class="rsw-stat"><span class="rsw-label">Customer</span>
+                                            <div class="rsw-stat-val"><field name="sales_order_partner_id" nolabel="1" readonly="1"/></div></div>
+                                        <div class="rsw-stat"><span class="rsw-label">Salesperson</span>
+                                            <div class="rsw-stat-val"><field name="sales_order_user_id" nolabel="1" readonly="1"/></div></div>
+                                        <div class="rsw-stat"><span class="rsw-label">Order Date</span>
+                                            <div class="rsw-stat-val"><field name="sales_order_date" nolabel="1" readonly="1"/></div></div>
+                                        <div class="rsw-stat"><span class="rsw-label">Delivery Date</span>
+                                            <div class="rsw-stat-val"><field name="sales_order_commitment_date" nolabel="1" readonly="1"/></div></div>
+                                        <div class="rsw-stat"><span class="rsw-label">Untaxed</span>
+                                            <div class="rsw-stat-val rsw-num"><field name="sales_order_amount_untaxed" nolabel="1" readonly="1"/></div></div>
+                                        <div class="rsw-stat"><span class="rsw-label">Taxes</span>
+                                            <div class="rsw-stat-val rsw-num"><field name="sales_order_amount_tax" nolabel="1" readonly="1"/></div></div>
+                                        <div class="rsw-stat"><span class="rsw-label">Total</span>
+                                            <div class="rsw-stat-val rsw-num rsw-total"><field name="sales_order_amount_total" nolabel="1" readonly="1"/></div></div>
+                                        <div class="rsw-stat"><span class="rsw-label">Invoice Status</span>
+                                            <div class="rsw-stat-val"><field name="sales_order_invoice_status" nolabel="1" readonly="1"/></div></div>
+                                    </div>
+                                </page>
+
+                                <page string="Purchase Order" name="purchase_order" invisible="not purchase_id">
+                                    <field name="purchase_currency_id" invisible="1"/>
+                                    <div class="rsw-doc rsw-doc-po">
+                                        <div class="rsw-doc-head">
+                                            <span class="rsw-doc-ico"><i class="oi" data-icon="shopping_cart" title="Purchase Order"/></span>
+                                            <div class="rsw-doc-meta">
+                                                <div class="rsw-doc-num"><field name="purchase_id" nolabel="1" readonly="1" options="{'no_open': True}"/></div>
+                                                <div class="rsw-doc-sub">Source purchase order</div>
+                                            </div>
+                                            <span class="rsw-doc-pill"><field name="purchase_order_state" nolabel="1" readonly="1"/></span>
+                                            <button name="action_open_purchase_order" type="object" string="Open"
+                                                    icon="open_in_new" class="rsw-doc-open" invisible="not purchase_id"/>
+                                        </div>
+                                    </div>
+                                    <div class="rsw-grid">
+                                        <div class="rsw-stat"><span class="rsw-label">Vendor</span>
+                                            <div class="rsw-stat-val"><field name="purchase_order_partner_id" nolabel="1" readonly="1"/></div></div>
+                                        <div class="rsw-stat"><span class="rsw-label">Purchase Rep</span>
+                                            <div class="rsw-stat-val"><field name="purchase_order_user_id" nolabel="1" readonly="1"/></div></div>
+                                        <div class="rsw-stat"><span class="rsw-label">Order Deadline</span>
+                                            <div class="rsw-stat-val"><field name="purchase_order_deadline" nolabel="1" readonly="1"/></div></div>
+                                        <div class="rsw-stat"><span class="rsw-label">Receipt Date</span>
+                                            <div class="rsw-stat-val"><field name="purchase_order_receipt_date" nolabel="1" readonly="1"/></div></div>
+                                        <div class="rsw-stat"><span class="rsw-label">Untaxed</span>
+                                            <div class="rsw-stat-val rsw-num"><field name="purchase_order_amount_untaxed" nolabel="1" readonly="1"/></div></div>
+                                        <div class="rsw-stat"><span class="rsw-label">Total</span>
+                                            <div class="rsw-stat-val rsw-num rsw-total"><field name="purchase_order_amount_total" nolabel="1" readonly="1"/></div></div>
+                                        <div class="rsw-stat"><span class="rsw-label">Receipt Status</span>
+                                            <div class="rsw-stat-val"><field name="purchase_order_receipt_status" nolabel="1" readonly="1"/></div></div>
+                                    </div>
+                                </page>
+
+                                <page string="Delivery/Transfer" name="delivery_move" invisible="not picking_id">
+                                    <div class="rsw-doc rsw-doc-del">
+                                        <div class="rsw-doc-head">
+                                            <span class="rsw-doc-ico"><i class="oi" data-icon="local_shipping" title="Delivery"/></span>
+                                            <div class="rsw-doc-meta">
+                                                <div class="rsw-doc-num"><field name="picking_id" nolabel="1" readonly="1" options="{'no_open': True}"/></div>
+                                                <div class="rsw-doc-sub">Stock transfer</div>
+                                            </div>
+                                            <span class="rsw-doc-pill"><field name="picking_state" nolabel="1" readonly="1"/></span>
+                                            <button name="action_open_picking" type="object" string="Open"
+                                                    icon="open_in_new" class="rsw-doc-open" invisible="not picking_id"/>
+                                        </div>
+                                    </div>
+                                    <div class="rsw-grid">
+                                        <div class="rsw-stat"><span class="rsw-label">Operation Type</span>
+                                            <div class="rsw-stat-val"><field name="picking_operation_type_id" nolabel="1" readonly="1"/></div></div>
+                                        <div class="rsw-stat"><span class="rsw-label">Source Location</span>
+                                            <div class="rsw-stat-val"><field name="picking_location_id" nolabel="1" readonly="1"/></div></div>
+                                        <div class="rsw-stat"><span class="rsw-label">Destination</span>
+                                            <div class="rsw-stat-val"><field name="picking_location_dest_id" nolabel="1" readonly="1"/></div></div>
+                                        <div class="rsw-stat"><span class="rsw-label">Scheduled Date</span>
+                                            <div class="rsw-stat-val"><field name="picking_scheduled_date" nolabel="1" readonly="1"/></div></div>
+                                        <div class="rsw-stat"><span class="rsw-label">Carrier</span>
+                                            <div class="rsw-stat-val"><field name="car_number" nolabel="1" readonly="1"/></div></div>
+                                        <div class="rsw-stat"><span class="rsw-label">Done On</span>
+                                            <div class="rsw-stat-val"><field name="picking_date_done" nolabel="1" readonly="1"/></div></div>
+                                        <div class="rsw-stat"><span class="rsw-label">Backorder</span>
+                                            <div class="rsw-stat-val"><field name="picking_backorder_id" nolabel="1" readonly="1"/></div></div>
+                                    </div>
+                                </page>
+
+
+                            </notebook>
+                        </div>
+                    </div>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+</odoo>

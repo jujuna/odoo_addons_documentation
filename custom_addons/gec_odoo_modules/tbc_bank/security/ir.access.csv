@@ -1,0 +1,15 @@
+id,name,model_id,group_id/id,operation,domain
+access_tbc_connection_user,tbc.connection.user,tbc.connection,tbc_bank.group_tbc_user,r,
+access_tbc_connection_manager,tbc.connection.manager,tbc.connection,tbc_bank.group_tbc_manager,crud,
+rule_tbc_connection_company,TBC Bank Connection: Multi-Company,tbc.connection,,crud,"[('company_id', 'in', company_ids)]"
+access_tbc_approval_user,tbc.approval.user,tbc.approval,tbc_bank.group_tbc_user,r,
+access_tbc_approval_manager,tbc.approval.manager,tbc.approval,tbc_bank.group_tbc_manager,crud,
+rule_tbc_approval_company,TBC Bank Approval: Multi-Company,tbc.approval,,crud,"[('company_id', 'in', company_ids)]"
+access_tbc_api_log_manager,tbc.api.log.manager,tbc.api.log,tbc_bank.group_tbc_manager,r,
+access_tbc_api_log_system,tbc.api.log.system,tbc.api.log,base.group_system,crud,
+rule_tbc_api_log_company,TBC Bank API Log: Multi-Company,tbc.api.log,,crud,"[('company_id', 'in', company_ids)]"
+access_tbc_statement_import_wizard,tbc.statement.import.wizard.user,tbc.statement.import.wizard,tbc_bank.group_tbc_user,crud,"[('create_uid', '=', user.id)]"
+access_tbc_statement_user,tbc.statement.user,tbc.statement,tbc_bank.group_tbc_user,r,
+access_tbc_statement_manager,tbc.statement.manager,tbc.statement,tbc_bank.group_tbc_manager,crud,
+rule_tbc_statement_company,TBC Bank Statement: Multi-Company,tbc.statement,,crud,"[('company_id', 'in', company_ids)]"
+access_tbc_statement_fetch_wizard,tbc.statement.fetch.wizard.user,tbc.statement.fetch.wizard,tbc_bank.group_tbc_user,crud,"[('create_uid', '=', user.id)]"

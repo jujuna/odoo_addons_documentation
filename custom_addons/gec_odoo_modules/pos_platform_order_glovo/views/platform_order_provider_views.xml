@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="platform_order_provider_form_inherit" model="ir.ui.view">
+        <field name="name">platform.order.provider.form.inherit.pos_platform_order_glovo</field>
+        <field name="model">platform.order.provider</field>
+        <field name="inherit_id" ref="pos_platform_order.view_platform_order_provider_form"/>
+        <field name="arch" type="xml">
+            <group name="provider_credentials" position="inside">
+                <group invisible="code != 'glovo'">
+                    <field name="glovo_token"
+                        string="Token"
+                        required="code == 'glovo' and state != 'disabled'"
+                        password="True"/>
+                </group>
+            </group>
+        </field>
+    </record>
+
+</odoo>

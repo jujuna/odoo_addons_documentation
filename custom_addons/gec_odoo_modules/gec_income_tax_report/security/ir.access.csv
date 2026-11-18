@@ -1,0 +1,41 @@
+id,name,model_id,group_id/id,operation,domain
+access_rs_form30_category_user,rs.form30.category user,rs.form30.category,base.group_user,r,
+access_rs_form30_category_manager,rs.form30.category manager,rs.form30.category,account.group_account_manager,cru,
+access_rs_form30_income_type_user,rs.form30.income.type user,rs.form30.income.type,base.group_user,r,
+access_rs_form30_income_type_manager,rs.form30.income.type manager,rs.form30.income.type,account.group_account_manager,cru,
+access_rs_form30_rate_rule_user,rs.form30.rate.rule user,rs.form30.rate.rule,base.group_user,r,
+access_rs_form30_rate_rule_manager,rs.form30.rate.rule manager,rs.form30.rate.rule,account.group_account_manager,cru,
+access_rs_form30_declaration_readonly,rs.form30.declaration readonly,rs.form30.declaration,account.group_account_readonly,r,
+access_rs_form30_declaration_user,rs.form30.declaration user,rs.form30.declaration,account.group_account_user,crud,
+rule_rs_form30_declaration_company,rs.ge Form 30 Declaration: multi-company,rs.form30.declaration,,crud,"[('company_id', 'in', company_ids)]"
+access_rs_form30_line_readonly,rs.form30.line readonly,rs.form30.line,account.group_account_readonly,r,
+access_rs_form30_line_user,rs.form30.line user,rs.form30.line,account.group_account_user,crud,
+rule_rs_form30_line_company,rs.ge Form 30 Line: multi-company,rs.form30.line,,crud,"[('company_id', 'in', company_ids)]"
+access_rs_form30_partner_category_read,rs.form30.partner.category read,rs.form30.partner.category,base.group_user,r,
+access_rs_form30_partner_category_account,rs.form30.partner.category account,rs.form30.partner.category,account.group_account_user,crud,
+access_rs_form30_partner_category_contacts,rs.form30.partner.category contacts,rs.form30.partner.category,base.group_partner_manager,crud,
+rule_rs_form30_partner_category_company,Form 30 Category History: partner companies,rs.form30.partner.category,,crud,"['|', '|', ('partner_id.partner_share', '=', False), ('partner_id.company_id', 'parent_of', company_ids), ('partner_id.company_id', '=', False)]"
+access_rs_form30_tax_change_manager,rs.form30.tax.change manager,rs.form30.tax.change,account.group_account_manager,crud,
+access_rs_form30_exempt_usage_read,rs.form30.exempt.usage read,rs.form30.exempt.usage,base.group_user,r,
+access_rs_form30_exempt_usage_account,rs.form30.exempt.usage account,rs.form30.exempt.usage,account.group_account_user,crud,
+access_rs_form30_car_engine_user,rs.form30.car.engine user,rs.form30.car.engine,base.group_user,r,
+access_rs_form30_car_engine_manager,rs.form30.car.engine manager,rs.form30.car.engine,account.group_account_manager,cru,
+access_rs_form30_car_line_readonly,rs.form30.car.line readonly,rs.form30.car.line,account.group_account_readonly,r,
+access_rs_form30_car_line_user,rs.form30.car.line user,rs.form30.car.line,account.group_account_user,crud,
+rule_rs_form30_car_line_company,rs.ge Form 30 Annex D Line: multi-company,rs.form30.car.line,,crud,"[('company_id', 'in', company_ids)]"
+access_rs_form30_service_type_user,rs.form30.service.type user,rs.form30.service.type,base.group_user,r,
+access_rs_form30_service_type_manager,rs.form30.service.type manager,rs.form30.service.type,account.group_account_manager,cru,
+access_rs_form30_service_line_readonly,rs.form30.service.line readonly,rs.form30.service.line,account.group_account_readonly,r,
+access_rs_form30_service_line_user,rs.form30.service.line user,rs.form30.service.line,account.group_account_user,crud,
+rule_rs_form30_service_line_company,rs.ge Form 30 Annex E Line: multi-company,rs.form30.service.line,,crud,"[('company_id', 'in', company_ids)]"
+access_rs_form30_summary_cell_user,rs.form30.summary.cell user,rs.form30.summary.cell,base.group_user,r,
+access_rs_form30_summary_cell_manager,rs.form30.summary.cell manager,rs.form30.summary.cell,account.group_account_manager,crud,
+access_rs_form30_summary_line_readonly,rs.form30.summary.line readonly,rs.form30.summary.line,account.group_account_readonly,r,
+access_rs_form30_summary_line_user,rs.form30.summary.line user,rs.form30.summary.line,account.group_account_user,crud,
+rule_rs_form30_summary_line_company,rs.ge Form 30 Main Part: multi-company,rs.form30.summary.line,,crud,"[('company_id', 'in', company_ids)]"
+access_rs_form30_explain_user,rs.form30.explain user,rs.form30.explain,account.group_account_readonly,crud,
+access_rs_form30_account_rule_user,rs.form30.account.rule user,rs.form30.account.rule,base.group_user,r,
+access_rs_form30_account_rule_manager,rs.form30.account.rule manager,rs.form30.account.rule,account.group_account_manager,crud,
+rule_rs_form30_account_rule_company,Form 30 Account Rule: multi-company,rs.form30.account.rule,,crud,"[('company_id', 'parent_of', company_ids)]"
+access_rs_form30_set_withholding_tax_user,rs.form30.set.withholding.tax user,rs.form30.set.withholding.tax,account.group_account_user,crud,
+rule_rs_form30_set_withholding_tax_own,Set Withholding Tax: own records only,rs.form30.set.withholding.tax,,crud,"[('create_uid', '=', user.id)]"

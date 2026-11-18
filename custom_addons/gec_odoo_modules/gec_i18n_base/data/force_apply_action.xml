@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- An upgrade skips records that already have ka_GE or are noupdate (the Apps list); this forces our files in. -->
+    <record id="action_gec_force_georgian" model="ir.actions.server">
+        <field name="name">Apply Georgian Translations (GEC)</field>
+        <field name="model_id" ref="base.model_res_lang"/>
+        <field name="state">code</field>
+        <field name="code">action = env['res.lang'].action_gec_force_georgian()</field>
+    </record>
+
+    <menuitem id="menu_gec_force_georgian"
+              name="Apply Georgian Translations (GEC)"
+              parent="base.menu_translation"
+              action="action_gec_force_georgian"
+              groups="base.group_system"
+              sequence="90"/>
+</odoo>

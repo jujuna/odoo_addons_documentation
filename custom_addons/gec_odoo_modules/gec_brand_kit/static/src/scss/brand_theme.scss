@@ -1,0 +1,123 @@
+// Brand frames for the "Strong" and "Very strong" kit styles. $gec-brand-style and $gec-brand-accent
+// exist only while a kit is applied (generated variables file), so without a kit nothing is emitted.
+// Data areas keep the view background; in dark mode only lines and the top bar carry the brand.
+//
+// Every color is read from these CSS variables, set here to the kit colors. A module with its own
+// colors sets them on its app or screens and the frames follow (gec_bank for TBC/BOG, rs_waybill):
+//   --gec-app-primary  headers, stripes, current status step, list headers
+//   --gec-app-on-primary  text on a solid primary (current status step, Very strong list headers)
+//   --gec-app-accent   thin highlight lines (top bar, page header, tabs, home cards)
+//   --gec-app-action   kanban card line
+//   --gec-app-navbar   top bar background (white entries on it)
+@if variable-exists(gec-brand-style) and $gec-brand-style != standard {
+    $-bright: $o-webclient-color-scheme != dark;
+    $-bold: $gec-brand-style == bold;
+    $-tint: if($-bold, 16%, 10%);
+
+    .o_web_client {
+        --gec-app-primary: #{$o-brand-primary};
+        --gec-app-accent: #{$gec-brand-accent};
+        --gec-app-action: #{$o-action};
+        --gec-app-navbar: #{$o-navbar-background};
+        --gec-app-navbar-text: #FFFFFF;
+        --gec-app-on-primary: #FFFFFF;
+
+        // Top bar: entry colors come from the navbar variables; these are the enterprise CSS
+        // variables that would otherwise stay grey on the brand color.
+        .o_main_navbar {
+            --NavBar-entry-color--active: #FFFFFF;
+            --NavBar-entry-borderColor-active: transparent;
+            --NavBar-entry-backgroundColor--active: #{rgba(#FFFFFF, .16)};
+            --NavBar-entry-backgroundColor--hover: #{rgba(#FFFFFF, .12)};
+            --NavBar-entry-backgroundColor--focus: #{rgba(#FFFFFF, .12)};
+            --NavBar-menuToggle-color: #FFFFFF;
+            background: var(--gec-app-navbar);
+            box-shadow: inset 0 -3px 0 var(--gec-app-accent);
+
+            .o_menu_brand {
+                color: var(--gec-app-navbar-text);
+            }
+        }
+
+        // Page header (breadcrumbs, buttons, search)
+        .o_control_panel {
+            border-bottom: 2px solid color-mix(in srgb, var(--gec-app-accent) 60%, transparent);
+            @if $-bright {
+                background-color: color-mix(in srgb, var(--gec-app-primary) #{$-tint}, #{$o-view-background-color});
+
+                .o_last_breadcrumb_item {
+                    color: var(--gec-app-primary);
+                    font-weight: 600;
+                }
+            }
+        }
+
+        // Lists
+        .o_list_renderer .o_list_table > thead > tr > th {
+            border-bottom: 2px solid var(--gec-app-primary);
+            @if $-bright and $-bold {
+                --#{$prefix}table-bg: var(--gec-app-primary);
+                background-color: var(--gec-app-primary);
+                color: var(--gec-app-on-primary);
+            } @else if $-bright {
+                --#{$prefix}table-bg: color-mix(in srgb, var(--gec-app-primary) 14%, #{$o-view-background-color});
+                background-color: color-mix(in srgb, var(--gec-app-primary) 14%, #{$o-view-background-color});
+                color: var(--gec-app-primary);
+            }
+        }
+
+        // Kanban cards
+        .o_kanban_renderer .o_kanban_record:not(.o_kanban_ghost):not(.o-kanban-button-new) {
+            border-top: 3px solid var(--gec-app-action);
+        }
+        @if $-bright and $-bold {
+            .o_kanban_renderer {
+                background-color: color-mix(in srgb, var(--gec-app-primary) 6%, #{$o-webclient-background-color});
+            }
+        }
+
+        // Forms: sheet accent, tabs, status bar
+        .o_form_view {
+            .o_form_sheet {
+                border-top: 4px solid var(--gec-app-primary);
+            }
+            @if $-bright and $-bold {
+                .o_form_sheet_bg {
+                    background-color: color-mix(in srgb, var(--gec-app-primary) 8%, #{$o-webclient-background-color});
+                }
+            }
+        }
+        .o_notebook .o_notebook_headers .nav-link.active {
+            --Notebook__link-border-top-color--active: var(--gec-app-accent);
+            border-top-width: 3px;
+            font-weight: 600;
+            @if $-bright {
+                color: var(--gec-app-primary);
+            }
+        }
+        .o_field_statusbar > .o_statusbar_status .o_arrow_button.o_arrow_button_current:not(.d-none) {
+            --#{$prefix}btn-disabled-bg: var(--gec-app-primary);
+            --#{$prefix}btn-disabled-border-color: var(--gec-app-primary);
+            --#{$prefix}btn-bg: var(--gec-app-primary);
+            --#{$prefix}btn-disabled-color: var(--gec-app-on-primary);
+            --#{$prefix}btn-color: var(--gec-app-on-primary);
+            color: var(--gec-app-on-primary);
+        }
+
+        // Home menu cards of gec_home_menu (no effect when that module is not installed)
+        .o_gec_home_menu .o_gec_hm_card {
+            background-color: rgba($o-view-background-color, .85);
+            -webkit-backdrop-filter: blur(.4rem);
+            backdrop-filter: blur(.4rem);
+            border-top: 3px solid var(--gec-app-accent);
+            box-shadow: 0 .5rem 1.5rem rgba(#000000, .12);
+
+            .o_gec_hm_title {
+                font-weight: 600;
+                @if $-bright {
+                    color: var(--gec-app-primary);
+                }
+            }
+        }
+    }
+}

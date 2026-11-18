@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_gec_allocation_rule_list" model="ir.ui.view">
+        <field name="name">gec.allocation.rule.list</field>
+        <field name="model">gec.allocation.rule</field>
+        <field name="arch" type="xml">
+            <list string="Allocation Rules">
+                <field name="sequence" widget="handle"/>
+                <field name="step" optional="show"/>
+                <field name="name"/>
+                <field name="source_plan_id"/>
+                <field name="source_component_id"/>
+                <field name="target_plan_id"/>
+                <field name="driver"/>
+                <field name="activity_id" optional="show"/>
+                <field name="share_mode" optional="hide"/>
+                <field name="resource_share" optional="hide"/>
+                <field name="only_untagged" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_gec_allocation_rule_form" model="ir.ui.view">
+        <field name="name">gec.allocation.rule.form</field>
+        <field name="model">gec.allocation.rule</field>
+        <field name="arch" type="xml">
+            <form string="Allocation Rule">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Overhead → Business Line"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Allocate from">
+                            <field name="active" invisible="1"/>
+                            <field name="step"/>
+                            <field name="source_plan_id" options="{'no_create': True}"/>
+                            <field name="source_account_ids" widget="many2many_tags"
+                                   options="{'no_create': True}"/>
+                            <field name="source_component_id"/>
+                            <field name="source_gl_account_ids" widget="many2many_tags"
+                                   options="{'no_create': True}"/>
+                            <div class="alert alert-warning mb-0" role="alert" colspan="2"
+                                 invisible="not gec_source_warning">
+                                <field name="gec_source_warning" nolabel="1"/>
+                            </div>
+                        </group>
+                        <group string="Allocate onto">
+                            <field name="target_plan_id" options="{'no_create': True}"
+                                   domain="[('id', '!=', source_plan_id)]"/>
+                            <field name="target_account_ids" widget="many2many_tags"
+                                   options="{'no_create': True}"/>
+                            <field name="only_untagged"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                    <group string="Driver">
+                        <group>
+                            <field name="driver"/>
+                            <field name="share_mode"
+                                   invisible="driver != 'activity'"/>
+                            <!-- Shown for every driver: two rules spreading one pool across plans each take all of it
+                                 unless the shares add up. -->
+                            <field name="resource_share"
+                                   string="Share of Pool (%)"/>
+                        </group>
+                        <group>
+                            <field name="activity_id"
+                                   invisible="driver != 'activity'"
+                                   required="driver == 'activity'"
+                                   options="{'no_quick_create': True}"/>
+                            <field name="activity_driver_label" string="Driver Unit"
+                                   invisible="driver != 'activity'"/>
+                            <field name="activity_capacity" string="Practical Capacity"
+                                   invisible="driver != 'activity' or activity_capacity == 0"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="alert"
+                         invisible="driver != 'activity'">
+                        Two-stage costing. <b>Stage 1</b> decides how much of the pool
+                        belongs to this activity — either declared below, or measured from
+                        timesheets that carry an Activity. <b>Stage 2</b> is the activity's
+                        counted quantities. Create one rule per activity over the same pool;
+                        shares totalling under 100% leave the remainder on the source, and
+                        over 100% is refused.
+                    </div>
+                    <field name="line_ids" invisible="driver != 'manual'">
+                        <list string="Manual Percentages" editable="bottom">
+                            <field name="account_id" options="{'no_create': True}"/>
+                            <field name="percentage" sum="Total"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_gec_allocation_rule_search" model="ir.ui.view">
+        <field name="name">gec.allocation.rule.search</field>
+        <field name="model">gec.allocation.rule</field>
+        <field name="arch" type="xml">
+            <search string="Allocation Rules">
+                <field name="name"/>
+                <field name="source_plan_id"/>
+                <field name="target_plan_id"/>
+                <filter name="filter_inactive" string="Archived" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter name="group_source_plan" string="Source Plan"
+                            context="{'group_by': 'source_plan_id'}"/>
+                    <filter name="group_target_plan" string="Target Plan"
+                            context="{'group_by': 'target_plan_id'}"/>
+                    <filter name="group_driver" string="Driver" context="{'group_by': 'driver'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_gec_allocation_rule" model="ir.actions.act_window">
+        <field name="name">Cost Allocation Rules</field>
+        <field name="res_model">gec.allocation.rule</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define a cost allocation rule</p>
+            <p>
+                A rule moves cost from one analytic plan onto another — typically
+                personnel and overhead from the cost centre plan onto the business
+                line plan — using a driver such as revenue share or headcount.
+                Leave the target accounts empty and the rule keeps working when
+                new analytic accounts are added.
+            </p>
+        </field>
+    </record>
+
+</odoo>

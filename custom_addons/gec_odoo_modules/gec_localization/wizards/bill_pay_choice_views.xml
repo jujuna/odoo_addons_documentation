@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <record id="view_gec_bill_pay_choice_form" model="ir.ui.view">
+    <field name="name">gec.bill.pay.choice.form</field>
+    <field name="model">gec.bill.pay.choice</field>
+    <field name="arch" type="xml">
+      <form string="Pay">
+        <field name="move_ids" invisible="1"/>
+        <field name="company_id" invisible="1"/>
+        <field name="currency_id" invisible="1"/>
+        <field name="can_pay_both" invisible="1"/>
+        <group>
+          <field name="pay_choice" widget="radio"/>
+        </group>
+        <group>
+          <group invisible="pay_choice != 'both'">
+            <field name="journal_id" options="{'no_create': True}" required="pay_choice == 'both'"/>
+            <field name="payment_method_line_id" options="{'no_create': True}" required="pay_choice == 'both'"/>
+            <field name="payment_date"/>
+          </group>
+          <group>
+            <field name="vendor_amount" string="Vendor" invisible="pay_choice == 'tax'"/>
+            <field name="tax_amount" string="State Treasury" invisible="pay_choice == 'vendor'"/>
+          </group>
+        </group>
+        <div class="alert alert-warning" role="alert" invisible="pay_choice != 'both' or can_pay_both">
+          <field name="pay_both_note" nolabel="1"/>
+        </div>
+        <footer>
+          <button name="action_confirm" type="object" string="Create Payments" class="btn-primary"
+                  invisible="pay_choice != 'both'"/>
+          <button name="action_confirm" type="object" string="Continue" class="btn-primary"
+                  invisible="pay_choice == 'both'"/>
+          <button string="Discard" class="btn-secondary" special="cancel"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+
+</odoo>

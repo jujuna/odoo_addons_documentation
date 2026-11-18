@@ -1,0 +1,549 @@
+# Georgian translation of the Odoo addon documents_hr_payroll, kept in gec_i18n_productivity.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-18 17:49+0000\n"
+"PO-Revision-Date: 2026-09-30 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian (ka_GE)\n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#. module: documents_hr_payroll
+#. odoo-python
+#: code:addons/documents_hr_payroll/wizard/payslip_send_mail.py:0
+msgid "%(payslips)s payslip(s), sent to %(employees)s employee(s)"
+msgstr "%(payslips)s ხელფასის უწყისი გაეგზავნა %(employees)s თანამშრომელს"
+
+#. module: documents_hr_payroll
+#: model_terms:ir.ui.view,arch_db:documents_hr_payroll.documents_hr_payroll_resend_payslip_template
+msgid ", <br/><br/>Please find the following payslip(s):<br/><br/>"
+msgstr ", <br/><br/>გთხოვთ, იხილოთ შემდეგი ხელფასის უწყის(ებ)ი:<br/><br/>"
+
+#. module: documents_hr_payroll
+#: model_terms:ir.ui.view,arch_db:documents_hr_payroll.documents_hr_payroll_resend_payslip_template
+msgid ""
+"<br/>\n"
+"            Have a nice day,<br/>\n"
+"            The HR Team"
+msgstr ""
+"<br/>\n"
+"            გისურვებთ სასიამოვნო დღეს,<br/>\n"
+"            HR გუნდი"
+
+#. module: documents_hr_payroll
+#: model:mail.template,body_html:documents_hr_payroll.mail_template_new_payslip
+msgid ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; margin:0px auto;\"><tbody>\n"
+"        <t t-set=\"document_access_link\" t-value=\"object.document_access_url\"/>\n"
+"        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;\">\n"
+"            Dear <t t-out=\"object.employee_id.name\"/>, a new payslip is available for you.<br/><br/>\n"
+"            <t t-if=\"object.employee_id.user_id\">Please find the PDF in your employee portal.<br/><br/></t>\n"
+"            <div t-if=\"document_access_link\" style=\"text-align: center; padding: 16px 0px 16px 0px; font-size: 14px;\">\n"
+"                <a t-attf-href=\"{{ document_access_link }}\" target=\"_blank\" style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
+"                    Your Payslip\n"
+"                </a>\n"
+"            </div>\n"
+"            Have a nice day,<br/>\n"
+"            The HR Team\n"
+"        </td></tr>\n"
+"    </tbody></table>\n"
+"                "
+msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; margin:0px auto;\"><tbody>\n"
+"        <t t-set=\"document_access_link\" t-value=\"object.document_access_url\"/>\n"
+"        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;\">\n"
+"            ძვირფასო <t t-out=\"object.employee_id.name\"/>, a new payslip is available for you.<br/><br/>\n"
+"            <t t-if=\"object.employee_id.user_id\">Please find the PDF in your employee portal.<br/><br/></t>\n"
+"            <div t-if=\"document_access_link\" style=\"text-align: center; padding: 16px 0px 16px 0px; font-size: 14px;\">\n"
+"                <a t-attf-href=\"{{ document_access_link }}\" target=\"_blank\" style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
+"                    Your Payslip\n"
+"                </a>\n"
+"            </div>\n"
+"            Have a nice day,<br/>\n"
+"            The HR Team\n"
+"        </td></tr>\n"
+"    </tbody></table>\n"
+"                "
+
+#. module: documents_hr_payroll
+#. odoo-python
+#: code:addons/documents_hr_payroll/models/hr_payslip.py:0
+msgid "A payslip should be validated or paid to be sent to the employee."
+msgstr "ხელფასის უწყისი თანამშრომელს გასაგზავნად უნდა იყოს დამოწმებული ან გადახდილი."
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__body_html
+msgid "Body"
+msgstr "შიგთავსი"
+
+#. module: documents_hr_payroll
+#: model:ir.model,name:documents_hr_payroll.model_res_company
+msgid "Company"
+msgstr "კომპანია"
+
+#. module: documents_hr_payroll
+#: model:ir.model,name:documents_hr_payroll.model_res_config_settings
+msgid "Config Settings"
+msgstr "კონფიგურაციის პარამეტრები"
+
+#. module: documents_hr_payroll
+#: model_terms:ir.ui.view,arch_db:documents_hr_payroll.payroll_overwrite_employee_declaration_view_form
+msgid "Confirm"
+msgstr "დადასტურება"
+
+#. module: documents_hr_payroll
+#: model:ir.model,name:documents_hr_payroll.model_payroll_overwrite_employee_declaration
+msgid "Confirm Overwrite Employee Declaration"
+msgstr "თანამშრომლის დეკლარაციის გადაწერის დადასტურება"
+
+#. module: documents_hr_payroll
+#: model:hr.payroll.warning,button_name:documents_hr_payroll.hr_payroll_warning_employee_without_contact
+msgid "Create Contacts"
+msgstr "კონტაქტების შექმნა"
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__create_uid model:ir.model.fields,field_description:documents_hr_payroll.field_payroll_overwrite_employee_declaration__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__create_date model:ir.model.fields,field_description:documents_hr_payroll.field_payroll_overwrite_employee_declaration__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__custom_comment
+msgid "Custom Comment"
+msgstr "მორგებული კომენტარი"
+
+#. module: documents_hr_payroll
+#: model_terms:ir.ui.view,arch_db:documents_hr_payroll.documents_hr_payroll_resend_payslip_template
+msgid "Dear"
+msgstr "ძვირფასო"
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields,field_description:documents_hr_payroll.field_payroll_overwrite_employee_declaration__declaration_ids
+msgid "Declarations"
+msgstr "დეკლარაციები"
+
+#. module: documents_hr_payroll
+#: model_terms:ir.ui.view,arch_db:documents_hr_payroll.payroll_overwrite_employee_declaration_view_form
+msgid "Discard"
+msgstr "უარყოფა"
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields,field_description:documents_hr_payroll.field_documents_document__display_name model:ir.model.fields,field_description:documents_hr_payroll.field_hr_employee__display_name model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payroll_declaration_mixin__display_name model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payroll_employee_declaration__display_name model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip__display_name model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_run__display_name model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__display_name model:ir.model.fields,field_description:documents_hr_payroll.field_payroll_overwrite_employee_declaration__display_name model:ir.model.fields,field_description:documents_hr_payroll.field_res_company__display_name model:ir.model.fields,field_description:documents_hr_payroll.field_res_config_settings__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: documents_hr_payroll
+#: model:ir.model,name:documents_hr_payroll.model_documents_document model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payroll_employee_declaration__document_id
+msgid "Document"
+msgstr "დოკუმენტი"
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip__document_access_url
+msgid "Document Access Url"
+msgstr "დოკუმენტზე წვდომის Url"
+
+#. module: documents_hr_payroll
+#. odoo-python
+#: code:addons/documents_hr_payroll/models/hr_payroll_declaration_mixin.py:0
+msgid "Documents"
+msgstr "დოკუმენტები"
+
+#. module: documents_hr_payroll
+#: model:ir.module.module,shortdesc:base.module_documents_hr_payroll
+msgid "Documents - Payroll"
+msgstr "დოკუმენტები - ხელფასები"
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payroll_declaration_mixin__documents_count
+msgid "Documents Count"
+msgstr "დოკუმენტების რაოდენობა"
+
+#. module: documents_hr_payroll
+#: model:ir.model,name:documents_hr_payroll.model_hr_employee
+msgid "Employee"
+msgstr "თანამშრომელი"
+
+#. module: documents_hr_payroll
+#. odoo-python
+#: code:addons/documents_hr_payroll/models/hr_payslip.py:0
+msgid ""
+"Employee's private or work email must be set to use \"Send By Email\" function:\n"
+"%s"
+msgstr ""
+"„ელფოსტით გაგზავნის“ ფუნქციის გამოსაყენებლად თანამშრომლის პირადი ან სამსახურის ელფოსტა უნდა იყოს მითითებული:\n"
+"%s"
+
+#. module: documents_hr_payroll
+#: model_terms:ir.ui.view,arch_db:documents_hr_payroll.payroll_overwrite_employee_declaration_view_form
+msgid "File Name"
+msgstr "ფაილის სახელი"
+
+#. module: documents_hr_payroll
+#. odoo-python
+#: code:addons/documents_hr_payroll/models/hr_payroll_employee_declaration.py:0 model_terms:ir.ui.view,arch_db:documents_hr_payroll.payroll_overwrite_employee_declaration_view_form
+msgid "File(s) already exist"
+msgstr "ფაილ(ებ)ი უკვე არსებობს"
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields,help:documents_hr_payroll.field_res_company__documents_hr_payroll_group_id model:ir.model.fields,help:documents_hr_payroll.field_res_config_settings__documents_hr_payroll_group_id
+msgid "Group given editor access on the Employees and Payroll folders created from now on. Changing it does not affect the existing folders."
+msgstr "ჯგუფი, რომელიც რედაქტორის წვდომას მიიღებს ამიერიდან შექმნილ თანამშრომლებისა და ხელფასების საქაღალდეებზე. მისი შეცვლა არსებულ საქაღალდეებზე არ მოქმედებს."
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_employee__hr_employee_payroll_folder_id
+msgid "HR Employee Payroll Folder"
+msgstr "HR თანამშრომლის ხელფასების საქაღალდე"
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields,field_description:documents_hr_payroll.field_documents_document__id model:ir.model.fields,field_description:documents_hr_payroll.field_hr_employee__id model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payroll_declaration_mixin__id model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payroll_employee_declaration__id model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip__id model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_run__id model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__id model:ir.model.fields,field_description:documents_hr_payroll.field_payroll_overwrite_employee_declaration__id model:ir.model.fields,field_description:documents_hr_payroll.field_res_company__id model:ir.model.fields,field_description:documents_hr_payroll.field_res_config_settings__id
+msgid "ID"
+msgstr "ID"
+
+#. module: documents_hr_payroll
+#. odoo-python
+#: code:addons/documents_hr_payroll/models/documents_document.py:0
+msgid "Impossible to delete an employee \"Payroll\" folder"
+msgstr "თანამშრომლის \"ხელფასები\" საქაღალდის წაშლა შეუძლებელია"
+
+#. module: documents_hr_payroll
+#: model:hr.payroll.warning,description:documents_hr_payroll.hr_payroll_warning_employee_without_contact
+msgid "It will not be possible to send payslips to the employee"
+msgstr "თანამშრომლისთვის ხელფასის უწყისების გაგზავნა შეუძლებელი იქნება"
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__write_uid model:ir.model.fields,field_description:documents_hr_payroll.field_payroll_overwrite_employee_declaration__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__write_date model:ir.model.fields,field_description:documents_hr_payroll.field_payroll_overwrite_employee_declaration__write_date
+msgid "Last Updated on"
+msgstr "ბოლოს განახლდა"
+
+#. module: documents_hr_payroll
+#: model:hr.payroll.warning,name:documents_hr_payroll.hr_payroll_warning_employee_without_contact
+msgid "Missing Contact Information"
+msgstr "საკონტაქტო ინფორმაცია აკლია"
+
+#. module: documents_hr_payroll
+#. odoo-python
+#: code:addons/documents_hr_payroll/wizard/payroll_overwrite_employee_declaration.py:0
+msgid "Overwrite confirmed. Files will be posted shortly."
+msgstr "გადაწერა დადასტურებულია. ფაილები მალე განთავსდება."
+
+#. module: documents_hr_payroll
+#. odoo-python
+#: code:addons/documents_hr_payroll/models/hr_payroll_employee_declaration.py:0
+msgid "PDFs will be posted in Documents shortly"
+msgstr "PDF-ები მალე განთავსდება დოკუმენტებში"
+
+#. module: documents_hr_payroll
+#: model:ir.model,name:documents_hr_payroll.model_hr_payslip_run
+msgid "Pay Run"
+msgstr "ხელფასის გაშვება"
+
+#. module: documents_hr_payroll
+#: model:ir.model,name:documents_hr_payroll.model_hr_payslip
+msgid "Pay Slip"
+msgstr "ხელფასის უწყისი"
+
+#. module: documents_hr_payroll
+#. odoo-python
+#: code:addons/documents_hr_payroll/models/hr_employee.py:0
+msgid "Payroll"
+msgstr "ხელფასები"
+
+#. module: documents_hr_payroll
+#. odoo-python
+#: code:addons/documents_hr_payroll/models/res_company.py:0
+msgid "Payroll (%(company_name)s)"
+msgstr "ხელფასები (%(company_name)s)"
+
+#. module: documents_hr_payroll
+#: model_terms:ir.ui.view,arch_db:documents_hr_payroll.res_config_settings_view_form
+msgid "Payroll Access Group"
+msgstr "ხელფასების წვდომის ჯგუფი"
+
+#. module: documents_hr_payroll
+#: model:ir.model,name:documents_hr_payroll.model_hr_payroll_declaration_mixin
+msgid "Payroll Declaration Mixin"
+msgstr "ხელფასების დეკლარაციის mixin"
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields,field_description:documents_hr_payroll.field_res_company__documents_hr_payroll_group_id model:ir.model.fields,field_description:documents_hr_payroll.field_res_config_settings__documents_hr_payroll_group_id
+msgid "Payroll Documents Default Group"
+msgstr "ხელფასების დოკუმენტების ნაგულისხმევი ჯგუფი"
+
+#. module: documents_hr_payroll
+#: model:ir.model,name:documents_hr_payroll.model_hr_payroll_employee_declaration
+msgid "Payroll Employee Declaration"
+msgstr "ხელფასების თანამშრომლის დეკლარაცია"
+
+#. module: documents_hr_payroll
+#: model:mail.template,name:documents_hr_payroll.mail_template_new_declaration
+msgid "Payroll: New Declaration"
+msgstr "ხელფასები: ახალი დეკლარაცია"
+
+#. module: documents_hr_payroll
+#: model:mail.template,name:documents_hr_payroll.mail_template_new_payslip
+msgid "Payroll: New Payslip Document"
+msgstr "ხელფასები: ხელფასის უწყისის ახალი დოკუმენტი"
+
+#. module: documents_hr_payroll
+#. odoo-python
+#: code:addons/documents_hr_payroll/wizard/payslip_send_mail.py:0
+msgid "Payslip %(date_from)s - %(date_to)s"
+msgstr "ხელფასის უწყისი %(date_from)s - %(date_to)s"
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__payslip_ids
+msgid "Payslips"
+msgstr "ხელფასის უწყისები"
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payroll_employee_declaration__pdf_to_post
+msgid "Pdf To Post"
+msgstr "განსათავსებელი PDF"
+
+#. module: documents_hr_payroll
+#. odoo-javascript
+#: code:addons/documents_hr_payroll/static/src/backend_components/cog_menu/hr_payroll_post_pdfs_cog_menu.xml:0
+msgid "Post PDFs"
+msgstr "PDF-ების განთავსება"
+
+#. module: documents_hr_payroll
+#. odoo-javascript
+#: code:addons/documents_hr_payroll/static/src/views/employee_declaration_list/documents_hr_payroll_employee_declaration_list_controller.xml:0
+msgid "Post Reports ("
+msgstr "ანგარიშების განთავსება ("
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields.selection,name:documents_hr_payroll.selection__hr_payroll_employee_declaration__state__pdf_posted
+msgid "Posted PDF"
+msgstr "განთავსებული PDF"
+
+#. module: documents_hr_payroll
+#: model_terms:ir.ui.view,arch_db:documents_hr_payroll.hr_payslip_send_mail_view_form
+msgid "Preview"
+msgstr "წინასწარი ნახვა"
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields.selection,name:documents_hr_payroll.selection__hr_payroll_employee_declaration__state__pdf_to_post
+msgid "Queued PDF posting"
+msgstr "PDF-ის განთავსება რიგში"
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip_send_mail__employee_ids
+msgid "Recipients"
+msgstr "მიმღებები"
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payslip__document_count
+msgid "Related Document Count"
+msgstr "დაკავშირებული დოკუმენტების რაოდენობა"
+
+#. module: documents_hr_payroll
+#. odoo-python
+#: code:addons/documents_hr_payroll/models/hr_employee.py:0
+msgid "Resend All Employee's Payslips"
+msgstr "თანამშრომლის ყველა ხელფასის უწყისის ხელახლა გაგზავნა"
+
+#. module: documents_hr_payroll
+#: model:ir.actions.server,name:documents_hr_payroll.ir_actions_server_send_payslip_by_employee_by_email
+msgid "Resend All Payslips"
+msgstr "ყველა ხელფასის უწყისის ხელახლა გაგზავნა"
+
+#. module: documents_hr_payroll
+#: model:ir.actions.server,name:documents_hr_payroll.ir_actions_server_send_payslip_by_email model_terms:ir.ui.view,arch_db:documents_hr_payroll.view_hr_payslip_form_inherit_documents
+msgid "Send By Email"
+msgstr "ელფოსტით გაგზავნა"
+
+#. module: documents_hr_payroll
+#. odoo-python
+#: code:addons/documents_hr_payroll/models/hr_employee.py:0 code:addons/documents_hr_payroll/models/hr_payslip.py:0
+msgid "Send Email"
+msgstr "ელფოსტის გაგზავნა"
+
+#. module: documents_hr_payroll
+#. odoo-python
+#: code:addons/documents_hr_payroll/models/hr_payslip.py:0
+msgid "Send Payslip By Email"
+msgstr "ხელფასის უწყისის ელფოსტით გაგზავნა"
+
+#. module: documents_hr_payroll
+#: model_terms:ir.ui.view,arch_db:documents_hr_payroll.hr_payslip_send_mail_view_form
+msgid "Send Payslips"
+msgstr "ხელფასის უწყისების გაგზავნა"
+
+#. module: documents_hr_payroll
+#: model:ir.model,name:documents_hr_payroll.model_hr_payslip_send_mail
+msgid "Send payslips to Employee by email"
+msgstr "ხელფასის უწყისების გაგზავნა თანამშრომლისთვის ელფოსტით"
+
+#. module: documents_hr_payroll
+#: model:mail.template,description:documents_hr_payroll.mail_template_new_payslip
+msgid "Sent to employee to notify them about their new payslip"
+msgstr "ეგზავნება თანამშრომელს ახალი ხელფასის უწყისის შესახებ შესატყობინებლად"
+
+#. module: documents_hr_payroll
+#. odoo-python
+#: code:addons/documents_hr_payroll/models/hr_payslip.py:0
+msgid "Some payslips could not be resend as they do not have related document"
+msgstr "ზოგიერთი ხელფასის უწყისი ვერ გაიგზავნა ხელახლა, რადგან დაკავშირებული დოკუმენტი არ აქვს"
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields,field_description:documents_hr_payroll.field_hr_payroll_employee_declaration__state
+msgid "State"
+msgstr "მდგომარეობა"
+
+#. module: documents_hr_payroll
+#: model:ir.module.module,summary:base.module_documents_hr_payroll
+msgid "Store employee payslips in the Document app"
+msgstr "თანამშრომლის ხელფასის უწყისების შენახვა დოკუმენტების აპლიკაციაში"
+
+#. module: documents_hr_payroll
+#: model_terms:ir.ui.view,arch_db:documents_hr_payroll.payroll_overwrite_employee_declaration_view_form
+msgid "The following file(s) already exist. Do you want to overwrite them?"
+msgstr "შემდეგი ფაილ(ებ)ი უკვე არსებობს. გსურთ მათი გადაწერა?"
+
+#. module: documents_hr_payroll
+#. odoo-python
+#: code:addons/documents_hr_payroll/wizard/payslip_send_mail.py:0
+msgid "The payslip has been sent to the employee by email."
+msgstr "ხელფასის უწყისი თანამშრომელს ელფოსტით გაეგზავნა."
+
+#. module: documents_hr_payroll
+#. odoo-python
+#: code:addons/documents_hr_payroll/models/hr_employee.py:0
+msgid "There is no valid payslip to send to the employee."
+msgstr "თანამშრომელთან გასაგზავნი ვარგისი ხელფასის უწყისი არ არის."
+
+#. module: documents_hr_payroll
+#: model_terms:ir.ui.view,arch_db:documents_hr_payroll.hr_payslip_send_mail_view_form
+msgid "Write your custom message here..."
+msgstr "დაწერეთ თქვენი მორგებული შეტყობინება აქ..."
+
+#. module: documents_hr_payroll
+#. odoo-python
+#: code:addons/documents_hr_payroll/models/hr_employee.py:0 code:addons/documents_hr_payroll/models/hr_payslip.py:0
+msgid "You can not send the documents link to the employee."
+msgstr "დოკუმენტების ბმულს თანამშრომელს ვერ გაუგზავნით."
+
+#. module: documents_hr_payroll
+#: model:mail.template,subject:documents_hr_payroll.mail_template_new_payslip
+msgid "{{ object.employee_id.name }}, a new payslip is available for you"
+msgstr "{{ object.employee_id.name }}, თქვენთვის ხელმისაწვდომია ახალი ხელფასის უწყისი"
+
+#. module: documents_hr_payroll
+#. odoo-python
+#: code:addons/documents_hr_payroll/models/hr_payslip.py:0
+msgid "%s Payslip(s) correctly sent."
+msgstr "%s ხელფასის უწყისი წარმატებით გაიგზავნა."
+
+#. module: documents_hr_payroll
+#: model:mail.template,body_html:documents_hr_payroll.mail_template_new_declaration
+msgid ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; margin:0px auto;\"><tbody>\n"
+"        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;\">\n"
+"            Dear <t t-esc=\"object.name\"/>, a new declaration file is available for you.<br/><br/>\n"
+"            Please find the PDF in your employee portal.<br/><br/>\n"
+"            Have a nice day,<br/>\n"
+"            The HR Team\n"
+"        </td></tr>\n"
+"    </tbody></table>\n"
+"                "
+msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; margin:0px auto;\"><tbody>\n"
+"        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;\">\n"
+"            ძვირფასო <t t-esc=\"object.name\"/>, a new declaration file is available for you.<br/><br/>\n"
+"            Please find the PDF in your employee portal.<br/><br/>\n"
+"            Have a nice day,<br/>\n"
+"            The HR Team\n"
+"        </td></tr>\n"
+"    </tbody></table>\n"
+"                "
+
+#. module: documents_hr_payroll
+#: model:ir.model,name:documents_hr_payroll.model_res_company
+msgid "Companies"
+msgstr "კომპანიები"
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields,field_description:documents_hr_payroll.field_res_company__documents_hr_payslips_tags
+msgid "Documents Hr Payslips Tags"
+msgstr "დოკუმენტების HR ხელფასის უწყისების ტეგები"
+
+#. module: documents_hr_payroll
+#: model:hr.payroll.dashboard.warning,name:documents_hr_payroll.hr_payroll_dashboard_warning_employee_without_contact
+msgid "Employees Without Contacts"
+msgstr "თანამშრომლები კონტაქტების გარეშე"
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields,help:documents_hr_payroll.field_res_company__worker_payroll_folder_id
+msgid "Folder used when an employee with no user exists in the company, to store their payroll documents in a centralized place."
+msgstr "საქაღალდე, რომელიც გამოიყენება, როცა კომპანიაში მომხმარებლის გარეშე თანამშრომელი არსებობს, რომ მისი სახელფასო დოკუმენტები ერთ ცენტრალიზებულ ადგილას ინახებოდეს."
+
+#. module: documents_hr_payroll
+#. odoo-javascript
+#: code:addons/documents_hr_payroll/static/src/views/employee_declaration_list/documents_hr_payroll_employee_declaration_list_controller.xml:0
+msgid "PDFs"
+msgstr "PDF-ები"
+
+#. module: documents_hr_payroll
+#. odoo-python
+#: code:addons/documents_hr_payroll/models/hr_payroll_employee_declaration.py:0
+msgid "PDFs are gonna be posted in Documents shortly"
+msgstr "PDF-ები მალე განთავსდება დოკუმენტებში"
+
+#. module: documents_hr_payroll
+#. odoo-python
+#: code:addons/documents_hr_payroll/models/res_company.py:0
+msgid "Payroll %s"
+msgstr "ხელფასები %s"
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields,field_description:documents_hr_payroll.field_res_config_settings__documents_hr_payslips_tags
+msgid "Payslip"
+msgstr "ხელფასის უწყისი"
+
+#. module: documents_hr_payroll
+#: model:documents.tag,name:documents_hr_payroll.documents_tag_payslips
+msgid "Payslips (HR)"
+msgstr "ხელფასის უწყისები (HR)"
+
+#. module: documents_hr_payroll
+#. odoo-python
+#: code:addons/documents_hr_payroll/models/hr_employee.py:0
+msgid "Payslips successfully sent to the employee."
+msgstr "ხელფასის უწყისები წარმატებით გაიგზავნა თანამშრომელთან."
+
+#. module: documents_hr_payroll
+#. odoo-javascript
+#: code:addons/documents_hr_payroll/static/src/views/employee_declaration_list/documents_hr_payroll_employee_declaration_list_controller.xml:0
+msgid "Post"
+msgstr "გატარება"
+
+#. module: documents_hr_payroll
+#. odoo-python
+#: code:addons/documents_hr_payroll/models/hr_payslip.py:0
+msgid "The payslip has been re-sent to the employee."
+msgstr "ხელფასის უწყისი ხელახლა გაიგზავნა თანამშრომელთან."
+
+#. module: documents_hr_payroll
+#: model:ir.model.fields,field_description:documents_hr_payroll.field_res_company__worker_payroll_folder_id
+msgid "Worker Payroll Folder"
+msgstr "მუშის სახელფასო საქაღალდე"
+
+#. module: documents_hr_payroll
+#: model:mail.template,subject:documents_hr_payroll.mail_template_new_declaration
+msgid "{{ object.name }}, a new declaration file is available for you"
+msgstr "{{ object.name }}, თქვენთვის ხელმისაწვდომია ახალი დეკლარაციის ფაილი"

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="hotel_rms.PickupHeatmap">
+        <div class="o_rms_heatmap">
+            <div class="o_rms_hm_grid">
+                <span/>
+                <span t-foreach="this.weekdays" t-as="weekday" t-key="weekday" class="o_rms_hm_head" t-out="weekday"/>
+                <t t-foreach="this.weeks" t-as="week" t-key="week.key">
+                    <span class="o_rms_hm_week" t-out="week.label"/>
+                    <t t-foreach="week.cells" t-as="cell" t-key="cell_index">
+                        <span t-if="!cell"/>
+                        <button t-else="" type="button" t-att-class="cell.cls" t-att-data-tooltip="cell.tooltip"
+                                t-att-aria-label="cell.tooltip" t-on-click="() => this.props.onNightClick(cell.date)">
+                            <span class="o_rms_hm_day" t-out="cell.day"/>
+                            <span class="o_rms_hm_num" t-out="cell.text"/>
+                        </button>
+                    </t>
+                </t>
+            </div>
+            <div class="o_rms_legend_items o_rms_hm_legend">
+                <span t-foreach="this.legend" t-as="item" t-key="item_index" class="o_rms_legend_item">
+                    <span t-attf-class="o_rms_swatch {{ item.cls }}"/><t t-out="item.label"/>
+                </span>
+                <span class="o_rms_hm_caption">Rooms gained in the last 7 days</span>
+            </div>
+        </div>
+    </t>
+</templates>

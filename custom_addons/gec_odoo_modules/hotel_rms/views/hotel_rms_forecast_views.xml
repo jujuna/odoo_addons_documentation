@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hotel_rms_forecast_view_list" model="ir.ui.view">
+        <field name="name">hotel.rms.forecast.list</field>
+        <field name="model">hotel.rms.forecast</field>
+        <field name="arch" type="xml">
+            <list create="0" delete="0" edit="0">
+                <field name="stay_date"/>
+                <field name="property_id" optional="hide"/>
+                <field name="run_date" optional="hide"/>
+                <field name="lead_days" optional="hide"/>
+                <field name="capacity" optional="hide"/>
+                <field name="otb_rooms"/>
+                <field name="expected_otb" optional="hide"/>
+                <field name="forecast_rooms" optional="hide"/>
+                <field name="otb_occ" column_invisible="True"/>
+                <field name="forecast_occ" string="Forecast occupancy" widget="rms_occupancy"/>
+                <field name="pace" optional="hide"/>
+                <field name="method" optional="hide"/>
+                <field name="confidence_level" widget="badge" decoration-danger="confidence_level == 'low'"
+                       decoration-warning="confidence_level == 'medium'"
+                       decoration-success="confidence_level == 'high'"/>
+                <field name="actual_rooms" optional="hide"/>
+                <field name="error_pts" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hotel_rms_forecast_view_graph" model="ir.ui.view">
+        <field name="name">hotel.rms.forecast.graph</field>
+        <field name="model">hotel.rms.forecast</field>
+        <field name="arch" type="xml">
+            <graph type="line" string="Forecast occupancy">
+                <field name="stay_date" interval="day"/>
+                <field name="otb_occ" type="measure"/>
+                <field name="forecast_occ" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="hotel_rms_forecast_view_pivot" model="ir.ui.view">
+        <field name="name">hotel.rms.forecast.pivot</field>
+        <field name="model">hotel.rms.forecast</field>
+        <field name="arch" type="xml">
+            <pivot string="Forecast accuracy" disable_linking="1">
+                <field name="lead_days" type="row"/>
+                <field name="stay_date" interval="month" type="col"/>
+                <field name="error_pts" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="hotel_rms_forecast_view_search" model="ir.ui.view">
+        <field name="name">hotel.rms.forecast.search</field>
+        <field name="model">hotel.rms.forecast</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="property_id"/>
+                <field name="stay_date"/>
+                <filter name="current" string="Current forecast" domain="[('is_current', '=', True)]"/>
+                <separator/>
+                <filter name="lead_7" string="7 days before" domain="[('lead_days', '=', 7)]"/>
+                <filter name="lead_30" string="30 days before" domain="[('lead_days', '=', 30)]"/>
+                <separator/>
+                <filter name="past_nights" string="Past nights" domain="[('has_actual', '=', True)]"/>
+                <group>
+                    <filter name="group_property" string="Hotel" context="{'group_by': 'property_id'}"/>
+                    <filter name="group_stay_month" string="Night" context="{'group_by': 'stay_date:month'}"/>
+                    <filter name="group_method" string="Method" context="{'group_by': 'method'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hotel_rms_forecast" model="ir.actions.act_window">
+        <field name="name">Forecast</field>
+        <field name="res_model">hotel.rms.forecast</field>
+        <field name="view_mode">graph,list</field>
+        <field name="context">{'search_default_current': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No forecast yet</p>
+            <p>Import your bookings and press Run now on the hotel: the engine forecasts the occupancy of every night.</p>
+        </field>
+    </record>
+
+    <record id="action_hotel_rms_forecast_accuracy" model="ir.actions.act_window">
+        <field name="name">Forecast accuracy</field>
+        <field name="res_model">hotel.rms.forecast</field>
+        <field name="view_mode">pivot,list</field>
+        <field name="context">{'search_default_past_nights': 1, 'search_default_lead_7': 1, 'search_default_lead_30': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No forecast can be checked yet</p>
+            <p>A forecast is checked when its night has passed: how far was it from the rooms that were really booked?</p>
+        </field>
+    </record>
+</odoo>

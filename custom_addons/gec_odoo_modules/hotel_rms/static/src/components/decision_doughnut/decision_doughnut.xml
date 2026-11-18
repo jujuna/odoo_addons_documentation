@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="hotel_rms.DecisionDoughnut">
+        <div class="o_rms_chart o_rms_doughnut">
+            <canvas t-ref="this.chart.ref"/>
+            <div t-if="this.props.centre" class="o_rms_doughnut_centre">
+                <div class="o_rms_doughnut_value" t-out="this.props.centre"/>
+                <div class="o_rms_muted" t-out="this.props.centreNote"/>
+            </div>
+        </div>
+    </t>
+</templates>

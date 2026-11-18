@@ -1,0 +1,18 @@
+id,name,model_id,group_id/id,operation,domain
+access_business_process_user,Process viewers: published processes,business.process,bpmn_process_management.group_process_user,r,"[('state', '=', 'published')]"
+access_business_process_manager,Process managers: all processes,business.process,bpmn_process_management.group_process_manager,crud,
+access_business_process_element_user,Process elements: published processes,business.process.element,bpmn_process_management.group_process_user,r,"[('process_id.state', '=', 'published')]"
+access_business_process_element_manager,Process elements: managers,business.process.element,bpmn_process_management.group_process_manager,crud,
+access_business_process_import_manager,Process import wizard,business.process.import,bpmn_process_management.group_process_manager,crud,
+rule_process_company,Business process: multi-company,business.process,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+rule_element_company,Business process element: multi-company,business.process.element,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+access_business_process_tag_user,Process tags: read,business.process.tag,bpmn_process_management.group_process_user,r,
+access_business_process_tag_manager,Process tags: managers,business.process.tag,bpmn_process_management.group_process_manager,crud,
+access_business_process_kpi_user,Process indicators: published processes,business.process.kpi,bpmn_process_management.group_process_user,r,"[('process_id.state', '=', 'published')]"
+access_business_process_kpi_manager,Process indicators: managers,business.process.kpi,bpmn_process_management.group_process_manager,crud,
+access_business_process_ack_user,Read confirmations: own ones,business.process.ack,bpmn_process_management.group_process_user,r,"[('user_id', '=', user.id)]"
+access_business_process_ack_manager,Read confirmations: managers,business.process.ack,bpmn_process_management.group_process_manager,rd,
+rule_kpi_company,Process indicator: multi-company,business.process.kpi,,crud,"['|', ('process_id.company_id', '=', False), ('process_id.company_id', 'in', company_ids)]"
+rule_ack_company,Process read confirmation: multi-company,business.process.ack,,crud,"['|', ('process_id.company_id', '=', False), ('process_id.company_id', 'in', company_ids)]"
+access_business_process_editor_manager,Diagram presence: managers,business.process.editor,bpmn_process_management.group_process_manager,r,
+access_business_process_publish_manager,Process publish wizard,business.process.publish,bpmn_process_management.group_process_manager,crud,

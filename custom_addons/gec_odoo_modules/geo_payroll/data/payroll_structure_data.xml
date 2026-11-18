@@ -1,0 +1,893 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="structure_type_geo_monthly" model="hr.payroll.structure.type">
+            <field name="name">GEO Monthly Pay</field>
+            <field name="wage_type">monthly</field>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="structure_type_geo_hourly" model="hr.payroll.structure.type">
+            <field name="name">GEO Hourly Pay</field>
+            <field name="wage_type">hourly</field>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="structure_type_geo_daily" model="hr.payroll.structure.type">
+            <field name="name">GEO Daily Pay</field>
+            <field name="wage_type">daily</field>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="structure_type_geo_unit" model="hr.payroll.structure.type">
+            <field name="name">GEO Unit Pay</field>
+            <field name="wage_type">unit</field>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+
+        <record id="structure_geo_monthly" model="hr.payroll.structure">
+            <field name="name">GEO Monthly Salary</field>
+            <field name="sequence">5</field>
+            <field name="type_id" ref="structure_type_geo_monthly"/>
+            <field name="country_id" ref="base.ge"/>
+            <field name="rule_ids" eval="[]"/>
+            <field name="use_worked_day_lines" eval="True"/>
+        </record>
+        <record id="structure_geo_hourly" model="hr.payroll.structure">
+            <field name="name">GEO Hourly Salary</field>
+            <field name="type_id" ref="structure_type_geo_hourly"/>
+            <field name="country_id" ref="base.ge"/>
+            <field name="rule_ids" eval="[]"/>
+            <field name="use_worked_day_lines" eval="True"/>
+        </record>
+        <record id="structure_geo_daily" model="hr.payroll.structure">
+            <field name="name">GEO Daily Salary</field>
+            <field name="type_id" ref="structure_type_geo_daily"/>
+            <field name="country_id" ref="base.ge"/>
+            <field name="rule_ids" eval="[]"/>
+            <field name="use_worked_day_lines" eval="True"/>
+        </record>
+        <record id="structure_geo_unit" model="hr.payroll.structure">
+            <field name="name">GEO Unit Salary</field>
+            <field name="type_id" ref="structure_type_geo_unit"/>
+            <field name="country_id" ref="base.ge"/>
+            <field name="rule_ids" eval="[]"/>
+            <field name="use_worked_day_lines" eval="True"/>
+        </record>
+
+        <record id="structure_type_geo_monthly" model="hr.payroll.structure.type">
+            <field name="default_struct_id" ref="structure_geo_monthly"/>
+        </record>
+        <record id="structure_type_geo_hourly" model="hr.payroll.structure.type">
+            <field name="default_struct_id" ref="structure_geo_hourly"/>
+        </record>
+        <record id="structure_type_geo_daily" model="hr.payroll.structure.type">
+            <field name="default_struct_id" ref="structure_geo_daily"/>
+        </record>
+        <!-- structure_type_geo_unit gets default_struct_id from the <function> at the end of this file:
+             a second noupdate record with the same xmlid is skipped on upgrade. -->
+
+    </data>
+
+    <!-- Archived copies, noupdate: an upgrade never rewrites them (a rewrite would collide with the shared rules); the function below
+         archives them once. Kept for the payslip lines that reference them. -->
+    <data noupdate="1">
+
+        <record id="rule_geo_hourly_basic" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(5, 0, 0)]"/>
+            <field name="name">Basic Salary</field>
+            <field name="sequence">1</field>
+            <field name="code">BASIC</field>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = 0.0 if payslip.gec_uses_timesheet_hourly_base() else payslip._get_basic_salary()
+categories['BASIC'] = result</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_daily_basic" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
+            <field name="name">Daily Work (from Logs)</field>
+            <field name="sequence">2</field>
+            <field name="code">DAILY_BASIC</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('daily_basic')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('daily_basic')
+explanation_info = payslip.gec_component_explanation('daily_basic')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_timesheet_basic" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
+            <field name="name">Timesheet Hours (Basic)</field>
+            <field name="sequence">3</field>
+            <field name="code">TIMESHEET_BASIC</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('timesheet_basic')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('timesheet_basic')
+explanation_info = payslip.gec_component_explanation('timesheet_basic')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_unit_basic" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
+            <field name="name">Unit Work (from Logs)</field>
+            <field name="sequence">4</field>
+            <field name="code">UNIT_BASIC</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('unit_basic')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('unit_basic')
+explanation_info = payslip.gec_component_explanation('unit_basic')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_worklog_ot" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Overtime Work Logs</field>
+            <field name="sequence">25</field>
+            <field name="code">WORKLOG_OT</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('worklog_ot')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('worklog_ot')
+explanation_info = payslip.gec_component_explanation('worklog_ot')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_worklog_daily" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Daily Work Logs</field>
+            <field name="sequence">26</field>
+            <field name="code">WORKLOG_DAILY</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('worklog_daily')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('worklog_daily')
+explanation_info = payslip.gec_component_explanation('worklog_daily')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_timesheet_extra" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Timesheet Hours</field>
+            <field name="sequence">27</field>
+            <field name="code">TIMESHEET_EXTRA</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('timesheet_extra')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('timesheet_extra')
+explanation_info = payslip.gec_component_explanation('timesheet_extra')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_unit_extra" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Unit Work Logs</field>
+            <field name="sequence">28</field>
+            <field name="code">UNIT_EXTRA</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('unit_extra')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('unit_extra')
+explanation_info = payslip.gec_component_explanation('unit_extra')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_gross" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.GROSS')])]"/>
+            <field name="name">Gross</field>
+            <field name="sequence">100</field>
+            <field name="code">GROSS</field>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories['BASIC'] + categories['ALW']</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_pension_ee" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
+            <field name="name">Pension Employee Contribution</field>
+            <field name="sequence">120</field>
+            <field name="code">PENSION_EE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = employee.pension_fund_member</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+result = -((categories['GROSS'] - categories['BIK']) * pension_rate)
+            </field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_pit" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
+            <field name="name">Income Tax</field>
+            <field name="sequence">140</field>
+            <field name="code">PIT</field>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+pit_rate = payslip._rule_parameter('gec_ge_pit_rate') / 100
+taxable = payslip.gec_pit_taxable_gross(categories['GROSS'])
+pension = max(taxable - categories['BIK'], 0.0) * pension_rate if employee.pension_fund_member else 0.0
+result = -((taxable - pension) * pit_rate)
+explanation_info = payslip.gec_pit_explanation(categories['GROSS'], taxable, pension, -result)
+            </field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="partner_id" ref="partner_state_treasury"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_pension_er" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Pension Company Contribution</field>
+            <field name="sequence">160</field>
+            <field name="code">PENSION_ER</field>
+            <field name="appears_on_employee_cost_dashboard" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = employee.pension_fund_member</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employer'] / 100
+result = (categories['GROSS'] - categories['BIK']) * pension_rate
+            </field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_net" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.NET')])]"/>
+            <field name="name">Net Salary</field>
+            <field name="sequence">200</field>
+            <field name="code">NET</field>
+            <field name="appears_on_employee_cost_dashboard" eval="True"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories['BASIC'] + categories['ALW'] + categories['DED'] + categories['ADV']
+explanation_info = payslip.gec_net_explanation(categories['BASIC'] + categories['ALW'], -categories['DED'], categories['ADV'], result)</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="employee_move_line" eval="True"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+
+        <record id="rule_geo_daily_basic" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(5, 0, 0)]"/>
+            <field name="name">Basic Salary</field>
+            <field name="sequence">1</field>
+            <field name="code">BASIC</field>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = payslip._get_basic_salary()
+categories['BASIC'] = result</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_daily_basic" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
+            <field name="name">Daily Work (from Logs)</field>
+            <field name="sequence">2</field>
+            <field name="code">DAILY_BASIC</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('daily_basic')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('daily_basic')
+explanation_info = payslip.gec_component_explanation('daily_basic')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_timesheet_basic" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
+            <field name="name">Timesheet Hours (Basic)</field>
+            <field name="sequence">3</field>
+            <field name="code">TIMESHEET_BASIC</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('timesheet_basic')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('timesheet_basic')
+explanation_info = payslip.gec_component_explanation('timesheet_basic')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_unit_basic" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
+            <field name="name">Unit Work (from Logs)</field>
+            <field name="sequence">4</field>
+            <field name="code">UNIT_BASIC</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('unit_basic')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('unit_basic')
+explanation_info = payslip.gec_component_explanation('unit_basic')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_worklog_ot" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Overtime Work Logs</field>
+            <field name="sequence">25</field>
+            <field name="code">WORKLOG_OT</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('worklog_ot')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('worklog_ot')
+explanation_info = payslip.gec_component_explanation('worklog_ot')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_worklog_daily" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Daily Work Logs</field>
+            <field name="sequence">26</field>
+            <field name="code">WORKLOG_DAILY</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('worklog_daily')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('worklog_daily')
+explanation_info = payslip.gec_component_explanation('worklog_daily')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_timesheet_extra" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Timesheet Hours</field>
+            <field name="sequence">27</field>
+            <field name="code">TIMESHEET_EXTRA</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('timesheet_extra')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('timesheet_extra')
+explanation_info = payslip.gec_component_explanation('timesheet_extra')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_unit_extra" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Unit Work Logs</field>
+            <field name="sequence">28</field>
+            <field name="code">UNIT_EXTRA</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('unit_extra')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('unit_extra')
+explanation_info = payslip.gec_component_explanation('unit_extra')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_gross" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.GROSS')])]"/>
+            <field name="name">Gross</field>
+            <field name="sequence">100</field>
+            <field name="code">GROSS</field>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories['BASIC'] + categories['ALW']</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_pension_ee" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
+            <field name="name">Pension Employee Contribution</field>
+            <field name="sequence">120</field>
+            <field name="code">PENSION_EE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = employee.pension_fund_member</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+result = -((categories['GROSS'] - categories['BIK']) * pension_rate)
+            </field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_pit" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
+            <field name="name">Income Tax</field>
+            <field name="sequence">140</field>
+            <field name="code">PIT</field>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+pit_rate = payslip._rule_parameter('gec_ge_pit_rate') / 100
+taxable = payslip.gec_pit_taxable_gross(categories['GROSS'])
+pension = max(taxable - categories['BIK'], 0.0) * pension_rate if employee.pension_fund_member else 0.0
+result = -((taxable - pension) * pit_rate)
+explanation_info = payslip.gec_pit_explanation(categories['GROSS'], taxable, pension, -result)
+            </field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="partner_id" ref="partner_state_treasury"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_pension_er" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Pension Company Contribution</field>
+            <field name="sequence">160</field>
+            <field name="code">PENSION_ER</field>
+            <field name="appears_on_employee_cost_dashboard" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = employee.pension_fund_member</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employer'] / 100
+result = (categories['GROSS'] - categories['BIK']) * pension_rate
+            </field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_net" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.NET')])]"/>
+            <field name="name">Net Salary</field>
+            <field name="sequence">200</field>
+            <field name="code">NET</field>
+            <field name="appears_on_employee_cost_dashboard" eval="True"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories['BASIC'] + categories['ALW'] + categories['DED'] + categories['ADV']
+explanation_info = payslip.gec_net_explanation(categories['BASIC'] + categories['ALW'], -categories['DED'], categories['ADV'], result)</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="employee_move_line" eval="True"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+
+        <record id="rule_geo_unit_basic" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(5, 0, 0)]"/>
+            <field name="name">Basic Salary</field>
+            <field name="sequence">1</field>
+            <field name="code">BASIC</field>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = 0.0
+categories['BASIC'] = result</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_daily_basic" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
+            <field name="name">Daily Work (from Logs)</field>
+            <field name="sequence">2</field>
+            <field name="code">DAILY_BASIC</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('daily_basic')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('daily_basic')
+explanation_info = payslip.gec_component_explanation('daily_basic')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_timesheet_basic" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
+            <field name="name">Timesheet Hours (Basic)</field>
+            <field name="sequence">3</field>
+            <field name="code">TIMESHEET_BASIC</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('timesheet_basic')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('timesheet_basic')
+explanation_info = payslip.gec_component_explanation('timesheet_basic')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_unit_basic" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
+            <field name="name">Unit Work (from Logs)</field>
+            <field name="sequence">4</field>
+            <field name="code">UNIT_BASIC</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('unit_basic')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('unit_basic')
+explanation_info = payslip.gec_component_explanation('unit_basic')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_worklog_ot" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Overtime Work Logs</field>
+            <field name="sequence">25</field>
+            <field name="code">WORKLOG_OT</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('worklog_ot')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('worklog_ot')
+explanation_info = payslip.gec_component_explanation('worklog_ot')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_worklog_daily" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Daily Work Logs</field>
+            <field name="sequence">26</field>
+            <field name="code">WORKLOG_DAILY</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('worklog_daily')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('worklog_daily')
+explanation_info = payslip.gec_component_explanation('worklog_daily')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_timesheet_extra" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Timesheet Hours</field>
+            <field name="sequence">27</field>
+            <field name="code">TIMESHEET_EXTRA</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('timesheet_extra')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('timesheet_extra')
+explanation_info = payslip.gec_component_explanation('timesheet_extra')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_unit_extra" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Unit Work Logs</field>
+            <field name="sequence">28</field>
+            <field name="code">UNIT_EXTRA</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('unit_extra')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('unit_extra')
+explanation_info = payslip.gec_component_explanation('unit_extra')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_gross" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.GROSS')])]"/>
+            <field name="name">Gross</field>
+            <field name="sequence">100</field>
+            <field name="code">GROSS</field>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories['BASIC'] + categories['ALW']</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_pension_ee" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
+            <field name="name">Pension Employee Contribution</field>
+            <field name="sequence">120</field>
+            <field name="code">PENSION_EE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = employee.pension_fund_member</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+result = -((categories['GROSS'] - categories['BIK']) * pension_rate)
+            </field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_pit" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
+            <field name="name">Income Tax</field>
+            <field name="sequence">140</field>
+            <field name="code">PIT</field>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+pit_rate = payslip._rule_parameter('gec_ge_pit_rate') / 100
+taxable = payslip.gec_pit_taxable_gross(categories['GROSS'])
+pension = max(taxable - categories['BIK'], 0.0) * pension_rate if employee.pension_fund_member else 0.0
+result = -((taxable - pension) * pit_rate)
+explanation_info = payslip.gec_pit_explanation(categories['GROSS'], taxable, pension, -result)
+            </field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="partner_id" ref="partner_state_treasury"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_pension_er" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Pension Company Contribution</field>
+            <field name="sequence">160</field>
+            <field name="code">PENSION_ER</field>
+            <field name="appears_on_employee_cost_dashboard" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = employee.pension_fund_member</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employer'] / 100
+result = (categories['GROSS'] - categories['BIK']) * pension_rate
+            </field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_net" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.NET')])]"/>
+            <field name="name">Net Salary</field>
+            <field name="sequence">200</field>
+            <field name="code">NET</field>
+            <field name="appears_on_employee_cost_dashboard" eval="True"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories['BASIC'] + categories['ALW'] + categories['DED'] + categories['ADV']
+explanation_info = payslip.gec_net_explanation(categories['BASIC'] + categories['ALW'], -categories['DED'], categories['ADV'], result)</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="employee_move_line" eval="True"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+
+    </data>
+
+    <!-- Salary rules are updatable so corrections ship on upgrade; structures and types above stay noupdate. -->
+    <data noupdate="0">
+
+        <function model="hr.salary.rule" name="_gec_archive_rule_copies"/>
+
+        <!-- BASIC rules have no category and set categories['BASIC'] themselves: core pre-fills it
+             from attendance only, so adding to it would count attendance twice and miss paid leave. -->
+        <record id="rule_geo_monthly_basic" model="hr.salary.rule">
+            <field name="category_ids" eval="[(5, 0, 0)]"/>
+            <field name="name">Basic Salary</field>
+            <field name="sequence">1</field>
+            <field name="code">BASIC</field>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = 0.0 if payslip.wage_type == 'unit' or payslip.gec_uses_timesheet_hourly_base() else payslip._get_basic_salary()
+categories['BASIC'] = result</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_daily_basic" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
+            <field name="name">Daily Work (from Logs)</field>
+            <field name="sequence">2</field>
+            <field name="code">DAILY_BASIC</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('daily_basic')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('daily_basic')
+explanation_info = payslip.gec_component_explanation('daily_basic')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_timesheet_basic" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
+            <field name="name">Timesheet Hours (Basic)</field>
+            <field name="sequence">3</field>
+            <field name="code">TIMESHEET_BASIC</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('timesheet_basic')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('timesheet_basic')
+explanation_info = payslip.gec_component_explanation('timesheet_basic')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_unit_basic" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.BASIC')])]"/>
+            <field name="name">Unit Work (from Logs)</field>
+            <field name="sequence">4</field>
+            <field name="code">UNIT_BASIC</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('unit_basic')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('unit_basic')
+explanation_info = payslip.gec_component_explanation('unit_basic')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_worklog_ot" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Overtime Work Logs</field>
+            <field name="sequence">25</field>
+            <field name="code">WORKLOG_OT</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('worklog_ot')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('worklog_ot')
+explanation_info = payslip.gec_component_explanation('worklog_ot')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_worklog_daily" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Daily Work Logs</field>
+            <field name="sequence">26</field>
+            <field name="code">WORKLOG_DAILY</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('worklog_daily')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('worklog_daily')
+explanation_info = payslip.gec_component_explanation('worklog_daily')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_timesheet_extra" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Timesheet Hours</field>
+            <field name="sequence">27</field>
+            <field name="code">TIMESHEET_EXTRA</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('timesheet_extra')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('timesheet_extra')
+explanation_info = payslip.gec_component_explanation('timesheet_extra')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_unit_extra" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Unit Work Logs</field>
+            <field name="sequence">28</field>
+            <field name="code">UNIT_EXTRA</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = payslip.gec_component_total('unit_extra')</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result, result_qty = payslip.gec_component_line_vals('unit_extra')
+explanation_info = payslip.gec_component_explanation('unit_extra')</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_gross" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.GROSS')])]"/>
+            <field name="name">Gross</field>
+            <field name="sequence">100</field>
+            <field name="code">GROSS</field>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories['BASIC'] + categories['ALW']</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_pension_ee" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
+            <field name="name">Pension Employee Contribution</field>
+            <field name="sequence">120</field>
+            <field name="code">PENSION_EE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = employee.pension_fund_member</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+result = -(categories['GROSS'] * pension_rate)
+            </field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_pit" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
+            <field name="name">Income Tax</field>
+            <field name="sequence">140</field>
+            <field name="code">PIT</field>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pit_rate = payslip._rule_parameter('gec_ge_pit_rate') / 100
+pension = -result_rules['PENSION_EE']['total']
+advance_pension = result_rules['ADV_PEE_PRE']['total']
+taxable = payslip.gec_pit_taxable_gross(categories['GROSS'], pension, advance_pension)
+result = -(taxable * pit_rate)
+explanation_info = payslip.gec_pit_explanation(categories['GROSS'], taxable, pension, -result, advance_pension)
+            </field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="partner_id" ref="partner_state_treasury"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_pension_er" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Pension Company Contribution</field>
+            <field name="sequence">160</field>
+            <field name="code">PENSION_ER</field>
+            <field name="appears_on_employee_cost_dashboard" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = employee.pension_fund_member</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employer'] / 100
+result = categories['GROSS'] * pension_rate
+            </field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_net" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.NET')])]"/>
+            <field name="name">Net Salary</field>
+            <field name="sequence">200</field>
+            <field name="code">NET</field>
+            <field name="appears_on_employee_cost_dashboard" eval="True"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories['BASIC'] + categories['ALW'] + categories['DED'] + categories['ADV']
+explanation_info = payslip.gec_net_explanation(categories['BASIC'] + categories['ALW'], -categories['DED'], categories['ADV'], result)</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="employee_move_line" eval="True"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+
+        <!-- Runs on install and every upgrade; fills only an empty default, never a customer's choice. -->
+        <function model="hr.payroll.structure.type" name="_gec_set_missing_default_struct"
+                  eval="[[ref('structure_type_geo_unit')], ref('structure_geo_unit')]"/>
+
+        <!-- Runs on install and every upgrade; skips companies not on the "ge" chart. -->
+        <function model="account.chart.template" name="_gec_configure_ge_payroll_accounts"/>
+
+        <!-- Runs on install and every upgrade; retires Odoo's own Georgian structure where it is present. -->
+        <function model="hr.payroll.structure.type" name="_gec_retire_core_ge_structure"/>
+
+    </data>
+</odoo>

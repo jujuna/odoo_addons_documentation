@@ -1,0 +1,102 @@
+// Mock screen of the Brand Kit live preview (brand_preview.js). Mirrors brand_theme.scss with local --gp-* colors.
+.o_gec_brand_preview {
+    border: $border-width solid $border-color;
+    border-radius: $border-radius-lg;
+    overflow: hidden;
+    background: var(--gp-background);
+    color: var(--gp-text);
+    font-size: .8125rem;
+
+    .o_gec_bp_navbar {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: .5rem .75rem;
+        background: color-mix(in srgb, var(--gp-background) 92%, #000000);
+        color: var(--gp-text);
+
+        .o_gec_bp_apps { color: var(--gp-primary); font-weight: 700; }
+        .o_gec_bp_app { font-weight: 600; }
+    }
+    .o_gec_bp_body { background: var(--gp-background); }
+    .o_gec_bp_cp {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: .5rem .75rem;
+        .o_gec_bp_crumb { font-size: 1rem; }
+    }
+    .o_gec_bp_btn {
+        display: inline-block;
+        padding: .2rem .6rem;
+        border-radius: $border-radius;
+        background: var(--gp-action);
+        color: #FFFFFF;
+        font-weight: 500;
+    }
+    .o_gec_bp_content { padding: 0 .75rem .75rem; display: grid; gap: .75rem; }
+    .o_gec_bp_list {
+        width: 100%;
+        background: var(--gp-surface);
+        border-collapse: collapse;
+        th, td { padding: .35rem .5rem; border-bottom: 1px solid color-mix(in srgb, var(--gp-text) 12%, transparent); }
+        th { font-weight: 600; }
+    }
+    .o_gec_bp_sheet {
+        background: var(--gp-surface);
+        border: 1px solid color-mix(in srgb, var(--gp-text) 12%, transparent);
+        border-radius: $border-radius;
+        padding: .75rem;
+    }
+    .o_gec_bp_title { font-size: 1.25rem; font-weight: 700; }
+    .o_gec_bp_text { margin: .25rem 0 .5rem; }
+    .o_gec_bp_status { display: inline-flex; gap: 2px; }
+    .o_gec_bp_step {
+        padding: .15rem .5rem;
+        border-radius: $border-radius;
+        opacity: .7;
+    }
+    .o_gec_bp_step_current {
+        opacity: 1;
+        font-weight: 600;
+        background: color-mix(in srgb, var(--gp-action) 15%, transparent);
+    }
+    .o_gec_bp_tabs { display: flex; gap: .25rem; border-bottom: 1px solid color-mix(in srgb, var(--gp-text) 15%, transparent); }
+    .o_gec_bp_tab { padding: .3rem .6rem; border-top: 3px solid transparent; }
+    .o_gec_bp_tab_active { font-weight: 600; }
+
+    // "Strong" and "Very strong": the frames of brand_theme.scss
+    &.o_gec_bp_strong, &.o_gec_bp_bold {
+        .o_gec_bp_navbar {
+            background: var(--gp-navbar);
+            color: #FFFFFF;
+            box-shadow: inset 0 -3px 0 var(--gp-accent);
+            .o_gec_bp_apps { color: #FFFFFF; }
+        }
+        .o_gec_bp_cp {
+            background: color-mix(in srgb, var(--gp-primary) 10%, var(--gp-surface));
+            border-bottom: 2px solid color-mix(in srgb, var(--gp-accent) 60%, transparent);
+            .o_gec_bp_crumb { color: var(--gp-primary); font-weight: 600; }
+        }
+        .o_gec_bp_list th {
+            background: color-mix(in srgb, var(--gp-primary) 14%, var(--gp-surface));
+            color: var(--gp-primary);
+            border-bottom: 2px solid var(--gp-primary);
+        }
+        .o_gec_bp_sheet { border-top: 4px solid var(--gp-primary); }
+        .o_gec_bp_step_current { background: var(--gp-primary); color: #FFFFFF; }
+        .o_gec_bp_tab_active { border-top-color: var(--gp-accent); color: var(--gp-primary); }
+    }
+    &.o_gec_bp_bold {
+        .o_gec_bp_cp { background: color-mix(in srgb, var(--gp-primary) 16%, var(--gp-surface)); }
+        .o_gec_bp_list th { background: var(--gp-primary); color: #FFFFFF; }
+        .o_gec_bp_content { background: color-mix(in srgb, var(--gp-primary) 8%, var(--gp-background)); padding-top: .75rem; }
+    }
+    // dark mode: like brand_theme.scss, no tints, only the top bar and lines
+    &.o_gec_bp_dark {
+        .o_gec_bp_cp, &.o_gec_bp_bold .o_gec_bp_cp { background: transparent; .o_gec_bp_crumb { color: var(--gp-text); } }
+        .o_gec_bp_list th, &.o_gec_bp_bold .o_gec_bp_list th { background: var(--gp-surface); color: var(--gp-text); }
+        &.o_gec_bp_bold .o_gec_bp_content { background: transparent; }
+        .o_gec_bp_tab_active { color: var(--gp-text); }
+    }
+}

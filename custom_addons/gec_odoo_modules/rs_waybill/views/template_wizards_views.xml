@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+  <odoo>
+
+      <record id="view_rs_waybill_template_save_wizard_form" model="ir.ui.view">
+          <field name="name">rs.waybill.template.save.wizard.form</field>
+          <field name="model">rs.waybill.template.save.wizard</field>
+          <field name="arch" type="xml">
+              <form string="Save as Template">
+                  <group>
+                      <field name="waybill_id" invisible="1"/>
+                      <field name="name" placeholder="e.g. Daily Tbilisi delivery"/>
+                  </group>
+                  <footer>
+                      <button name="action_save" type="object"
+                              string="Save" class="btn-primary"/>
+                      <button string="Cancel" class="btn-secondary"
+                              special="cancel"/>
+                  </footer>
+              </form>
+          </field>
+      </record>
+
+      <record id="view_rs_waybill_template_picker_wizard_form" model="ir.ui.view">
+          <field name="name">rs.waybill.template.picker.wizard.form</field>
+          <field name="model">rs.waybill.template.picker.wizard</field>
+          <field name="arch" type="xml">
+              <form string="Create from Template">
+                  <group>
+                      <field name="template_id"/>
+                  </group>
+                  <footer>
+                      <button name="action_load" type="object"
+                              string="Load" class="btn-primary"/>
+                      <button string="Cancel" class="btn-secondary"
+                              special="cancel"/>
+                  </footer>
+              </form>
+          </field>
+      </record>
+
+  </odoo>

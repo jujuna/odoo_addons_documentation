@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_bsc_board" model="ir.actions.report">
+        <field name="name">Board Pack</field>
+        <field name="model">bsc.scorecard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bsc_strategy.report_bsc_board</field>
+        <field name="binding_model_id" ref="model_bsc_scorecard"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Board Pack - %s' % (object.name)</field>
+    </record>
+
+    <template id="report_bsc_board">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2><span t-field="doc.name"/></h2>
+                        <p class="text-muted">
+                            Cycle <span t-field="doc.date_from"/> - <span t-field="doc.date_to"/>.
+                            Strategy owner: <span t-field="doc.responsible_id"/>.
+                        </p>
+
+                        <t t-set="period" t-value="doc.current_period_id"/>
+
+                        <div class="row mt-4 mb-4">
+                            <div class="col-4">
+                                <strong>Scorecard index</strong><br/>
+                                <span style="font-size: 28px;"><t t-out="round(doc.score, 1)"/>%</span>
+                            </div>
+                            <div class="col-4">
+                                <strong>Status</strong><br/>
+                                <span t-field="doc.status"/>
+                            </div>
+                            <div class="col-4">
+                                <strong>Period</strong><br/>
+                                <t t-out="period.name or '-'"/><br/>
+                                <t t-if="period">
+                                    Completion <t t-out="round(period.completion_rate, 1)"/>%
+                                    (<t t-out="period.filled_count"/> of
+                                    <t t-out="period.measurement_count"/> reported)
+                                </t>
+                            </div>
+                        </div>
+
+                        <h4>Perspectives</h4>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Perspective</th>
+                                    <th class="text-end">Objectives</th>
+                                    <th class="text-end">Weight</th>
+                                    <th class="text-end">Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="doc.get_perspective_summary()" t-as="row">
+                                    <td><t t-out="row['name']"/></td>
+                                    <td class="text-end"><t t-out="row['objective_count']"/></td>
+                                    <td class="text-end"><t t-out="round(row['weight'], 1)"/>%</td>
+                                    <td class="text-end">
+                                        <t t-if="row['has_data']"><t t-out="round(row['score'], 1)"/>%</t>
+                                        <t t-if="not row['has_data']">no data</t>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Objectives off track</h4>
+                        <t t-set="red_objectives"
+                           t-value="doc.objective_ids.filtered(lambda o: o.status == 'red')"/>
+                        <p t-if="not red_objectives" class="text-muted">
+                            Nothing is off track this period.
+                        </p>
+                        <table class="table table-sm" t-if="red_objectives">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Objective</th>
+                                    <th>Owner</th>
+                                    <th class="text-end">Score</th>
+                                    <th>Reported reason</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="red_objectives" t-as="objective">
+                                    <td><span t-field="objective.code"/></td>
+                                    <td><span t-field="objective.name"/></td>
+                                    <td><span t-field="objective.owner_id"/></td>
+                                    <td class="text-end"><t t-out="round(objective.score, 1)"/>%</td>
+                                    <td>
+                                        <t t-set="reasons" t-value="period.measurement_ids.filtered(lambda m: m.objective_id == objective and m.status == 'red').mapped('comment') if period else []"/>
+                                        <t t-out="'; '.join([r for r in reasons if r]) or objective.qualitative_note or '-'"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4 t-if="period">Measurements - <t t-out="period.name"/></h4>
+                        <table class="table table-sm" t-if="period">
+                            <thead>
+                                <tr>
+                                    <th>Perspective</th>
+                                    <th>KPI</th>
+                                    <th>Unit</th>
+                                    <th class="text-end">Target</th>
+                                    <th class="text-end">Actual</th>
+                                    <th class="text-end">Achievement</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="period.measurement_ids" t-as="measurement">
+                                    <td><span t-field="measurement.perspective_id.name"/></td>
+                                    <td><span t-field="measurement.kpi_id.name"/></td>
+                                    <td><span t-field="measurement.uom_name"/></td>
+                                    <td class="text-end"><span t-field="measurement.target_value"/></td>
+                                    <td class="text-end">
+                                        <span t-if="measurement.actual_value_set"
+                                              t-field="measurement.actual_value"/>
+                                        <t t-if="not measurement.actual_value_set">not reported</t>
+                                    </td>
+                                    <td class="text-end"><t t-out="round(measurement.achievement, 1)"/>%</td>
+                                    <td><span t-field="measurement.status"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Initiative portfolio</h4>
+                        <p t-if="not doc.initiative_ids" class="text-muted">
+                            No initiatives recorded. Objectives with no initiative behind
+                            them are intentions, not strategy.
+                        </p>
+                        <table class="table table-sm" t-if="doc.initiative_ids">
+                            <thead>
+                                <tr>
+                                    <th>Initiative</th>
+                                    <th>Stage</th>
+                                    <th>Owner</th>
+                                    <th>Due</th>
+                                    <th class="text-end">Planned</th>
+                                    <th class="text-end">Actual</th>
+                                    <th class="text-end">Progress</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="doc.initiative_ids" t-as="initiative">
+                                    <td><span t-field="initiative.name"/></td>
+                                    <td><span t-field="initiative.stage_id.name"/></td>
+                                    <td><span t-field="initiative.owner_id"/></td>
+                                    <td><span t-field="initiative.date_end"/></td>
+                                    <td class="text-end"><span t-field="initiative.budget_planned"/></td>
+                                    <td class="text-end"><span t-field="initiative.budget_actual"/></td>
+                                    <td class="text-end"><t t-out="round(initiative.progress, 0)"/>%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Strategy map hypotheses</h4>
+                        <t t-set="links" t-value="doc.objective_ids.link_out_ids"/>
+                        <p t-if="not links" class="text-muted">
+                            No cause-effect links recorded yet.
+                        </p>
+                        <table class="table table-sm" t-if="links">
+                            <thead>
+                                <tr>
+                                    <th>Cause</th>
+                                    <th>Effect</th>
+                                    <th>Hypothesis</th>
+                                    <th>Belief</th>
+                                    <th>Validated</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="links" t-as="link">
+                                    <td><span t-field="link.source_id.name"/></td>
+                                    <td><span t-field="link.target_id.name"/></td>
+                                    <td><span t-field="link.hypothesis"/></td>
+                                    <td><span t-field="link.strength"/></td>
+                                    <td><t t-out="'yes' if link.validated else 'not yet'"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="gec_payroll_timesheet_waiver_view_form" model="ir.ui.view">
+        <field name="name">gec.payroll.timesheet.waiver.form</field>
+        <field name="model">gec.payroll.timesheet.waiver</field>
+        <field name="arch" type="xml">
+            <form string="Waive Payroll Pay">
+                <p class="text-muted">
+                    Payroll will never pay the waived timesheets. Use this before changing an employee
+                    from pay by timesheets to another pay scheme.
+                    Only a payroll manager can waive or restore them.
+                </p>
+                <group>
+                    <field name="reason"/>
+                </group>
+                <field name="line_ids" readonly="1">
+                    <list>
+                        <field name="date"/>
+                        <field name="employee_id"/>
+                        <field name="project_id"/>
+                        <field name="name"/>
+                        <field name="unit_amount" widget="timesheet_uom" sum="Total"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_waive" type="object" string="Waive Pay"
+                            class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_gec_payroll_timesheet_waiver" model="ir.actions.act_window">
+        <field name="name">Waive Payroll Pay</field>
+        <field name="res_model">gec.payroll.timesheet.waiver</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="analytic.model_account_analytic_line"/>
+        <field name="binding_view_types">list,form</field>
+        <field name="group_ids" eval="[(4, ref('hr_payroll.group_hr_payroll_manager'))]"/>
+    </record>
+
+    <record id="action_gec_payroll_timesheet_restore" model="ir.actions.server">
+        <field name="name">Restore Payroll Pay</field>
+        <field name="model_id" ref="analytic.model_account_analytic_line"/>
+        <field name="binding_model_id" ref="analytic.model_account_analytic_line"/>
+        <field name="binding_view_types">list,form</field>
+        <field name="group_ids" eval="[(4, ref('hr_payroll.group_hr_payroll_manager'))]"/>
+        <field name="state">code</field>
+        <field name="code">records.action_gec_restore_payroll_pay()</field>
+    </record>
+
+    <record id="gec_timesheet_line_tree_waiver" model="ir.ui.view">
+        <field name="name">account.analytic.line.list.gec.waiver</field>
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_tree"/>
+        <field name="arch" type="xml">
+            <field name="unit_amount" position="after">
+                <field name="work_log_id" optional="hide"/>
+                <field name="gec_payroll_waived_at" string="Pay Waived" optional="hide"
+                       groups="hr_payroll.group_hr_payroll_user"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="gec_timesheet_line_form_waiver" model="ir.ui.view">
+        <field name="name">account.analytic.line.form.gec.waiver</field>
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_form"/>
+        <field name="arch" type="xml">
+            <field name="name" position="before">
+                <field name="work_log_id" invisible="not work_log_id"/>
+                <group groups="hr_payroll.group_hr_payroll_user"
+                       invisible="not gec_payroll_waived_at">
+                    <field name="gec_payroll_waived_at" readonly="1"/>
+                    <field name="gec_payroll_waived_by_id" readonly="1"/>
+                    <field name="gec_payroll_waive_reason" readonly="1"/>
+                </group>
+            </field>
+        </field>
+    </record>
+</odoo>

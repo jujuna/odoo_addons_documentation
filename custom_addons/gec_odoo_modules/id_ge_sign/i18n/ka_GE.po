@@ -1,0 +1,642 @@
+# Georgian (ka_GE) translation of the GEC module id_ge_sign.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-02 07:24+0000\n"
+"PO-Revision-Date: 2026-10-02 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian (ka_GE)\n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#. module: id_ge_sign
+#. odoo-python
+#: code:addons/id_ge_sign/models/sign_request_item.py:0
+msgid "This signing attempt already completed with another PDF."
+msgstr "ხელმოწერის ეს მცდელობა უკვე დასრულდა სხვა დოკუმენტით."
+
+#. module: id_ge_sign
+#. odoo-python
+#: code:addons/id_ge_sign/models/sign_request_item.py:0
+msgid "The returned PDF must contain a new signature."
+msgstr "დაბრუნებული PDF უნდა შეიცავდეს ახალ ხელმოწერას."
+
+#. module: id_ge_sign
+#. odoo-python
+#: code:addons/id_ge_sign/models/sign_request_item.py:0
+msgid "The signed PDF exceeds the allowed signature size."
+msgstr "ხელმოწერილი PDF-ის ზომა აჭარბებს ხელმოწერისთვის დაშვებულ ზღვარს."
+
+#. module: id_ge_sign
+#. odoo-python
+#: code:addons/id_ge_sign/models/ir_config_parameter.py:0
+msgid "Set valid PEM certificates for Georgian ID signing."
+msgstr "პირადობის ელექტრონული მოწმობის სანდო სერტიფიკატის პარამეტრი უნდა შეიცავდეს ვალიდურ PEM სერტიფიკატებს."
+
+#. module: id_ge_sign
+#: model:ir.module.module,description:base.module_id_ge_sign
+msgid ""
+"\n"
+"Adds \"Georgian ID Card\" as an extra authentication step on a Sign role. When a\n"
+"signer validates, Odoo renders the document and launches the Georgian ID Card\n"
+"Universal Program (geoeid-unitool://). The desktop app downloads the PDF, stamps\n"
+"its own visible signature block (signer name and personal number from the card),\n"
+"produces the PAdES signature and uploads the finished, signed PDF back to Odoo\n"
+"(document mode). Odoo verifies the embedded signature, records the certificate\n"
+"identity (name, personal number, serial, expiry) and stores the signed PDF as\n"
+"the completed document.\n"
+"\n"
+"Scope: one PDF per request, with regular signers first and Georgian ID Card\n"
+"signers stacked afterward as PAdES Baseline-B signatures. Verification uses\n"
+"cryptography + asn1crypto (already in Odoo), no extra Python dependency. LT/LTA\n"
+"and server-side TSA/OCSP validation are out of scope of this version (see\n"
+"documentations/id_ge_sign.md).\n"
+"\n"
+"Standard Odoo Sign is untouched: every other role/auth method keeps working and\n"
+"uninstalling this module restores stock behaviour.\n"
+msgstr ""
+"\n"
+"ამატებს „პირადობის ელექტრონულ მოწმობას“ ხელმოწერის როლზე ავთენტიფიკაციის დამატებით საფეხურად.\n"
+"როდესაც ხელმომწერი ადასტურებს, Odoo ამზადებს დოკუმენტს და უშვებს პირადობის ელექტრონული მოწმობის\n"
+"Universal Program-ს (geoeid-unitool://). დესკტოპის აპლიკაცია ჩამოტვირთავს PDF-ს, ასვამს მასზე\n"
+"საკუთარ ხილულ ხელმოწერის ბლოკს (ხელმომწერის სახელი და პირადი ნომერი ბარათიდან),\n"
+"ქმნის PAdES ხელმოწერას და დასრულებულ, ხელმოწერილ PDF-ს უკან ტვირთავს Odoo-ში\n"
+"(დოკუმენტის რეჟიმი). Odoo ამოწმებს ჩაშენებულ ხელმოწერას, აღრიცხავს სერტიფიკატის\n"
+"მონაცემებს (სახელი, პირადი ნომერი, სერიული ნომერი, მოქმედების ვადა) და ხელმოწერილ PDF-ს\n"
+"ინახავს დასრულებულ დოკუმენტად.\n"
+"\n"
+"ფარგლები: ერთი PDF თითო მოთხოვნაზე; ჯერ ხელს აწერენ ჩვეულებრივი ხელმომწერები, შემდეგ კი\n"
+"პირადობის ელექტრონული მოწმობით ხელმომწერები, თანმიმდევრული PAdES Baseline-B ხელმოწერებით. გადამოწმებისთვის\n"
+"გამოიყენება cryptography + asn1crypto (უკვე არის Odoo-ში), დამატებითი Python დამოკიდებულება არ სჭირდება. LT/LTA\n"
+"და სერვერის მხარეს TSA/OCSP ვალიდაცია ამ ვერსიის ფარგლებს მიღმაა (იხ.\n"
+"documentations/id_ge_sign.md).\n"
+"\n"
+"სტანდარტული Odoo Sign უცვლელი რჩება: ყველა სხვა როლი და ავთენტიფიკაციის მეთოდი კვლავ მუშაობს, ხოლო\n"
+"ამ მოდულის დეინსტალაცია სტანდარტულ ქცევას აღადგენს.\n"
+
+#. module: id_ge_sign
+#. odoo-python
+#: code:addons/id_ge_sign/models/sign_request_item.py:0
+msgid "%(partner)s signed with a Georgian ID Card (Qualified Electronic Signature)."
+msgstr "%(partner)s-მა ხელი მოაწერა პირადობის ელექტრონული მოწმობით (კვალიფიციური ელექტრონული ხელმოწერა)."
+
+#. module: id_ge_sign
+#. odoo-python
+#: code:addons/id_ge_sign/models/sign_request_item.py:0
+msgid "%(partner)s signed with a Georgian ID Card (electronic signature; certificate chain not verified)."
+msgstr "%(partner)s-მა ხელი მოაწერა პირადობის ელექტრონული მოწმობით (ელექტრონული ხელმოწერა; სერტიფიკატების ჯაჭვი არ არის გადამოწმებული)."
+
+#. module: id_ge_sign
+#. odoo-javascript
+#: code:addons/id_ge_sign/static/src/dialogs/geoeid_signer_dialog.xml:0
+msgid "(or"
+msgstr "(ან"
+
+#. module: id_ge_sign
+#. odoo-javascript
+#: code:addons/id_ge_sign/static/src/dialogs/geoeid_signer_dialog.xml:0
+msgid ""
+"). This requires a desktop computer\n"
+"                        with a card reader and the Georgian ID Card application installed."
+msgstr ""
+"). ამისთვის საჭიროა სტაციონარული კომპიუტერი\n"
+"                        ბარათის წამკითხველით და დაინსტალირებული პირადობის ელექტრონული მოწმობის აპლიკაციით."
+
+#. module: id_ge_sign
+#: model_terms:ir.ui.view,arch_db:id_ge_sign.sign_request_logs_user_geoeid
+msgid ""
+"<small>\n"
+"                            Each signature above is cryptographically bound to the document with the\n"
+"                            signatory's Georgian ID Card (PAdES) and can be validated in any compliant\n"
+"                            PDF reader. A signature counts as a <b>Qualified Electronic Signature</b>\n"
+"                            only when its certificate chained to a configured trusted (PSDA) anchor\n"
+"                            (\"chain verified\"). Rows marked \"chain not verified\" were cryptographically\n"
+"                            validated, but the issuer was not checked against a trust anchor.\n"
+"                        </small>"
+msgstr "<small> ზემოთ მოცემული თითოეული ხელმოწერა კრიპტოგრაფიულად არის დაკავშირებული დოკუმენტთან ხელმომწერის პირადობის ელექტრონული მოწმობით (PAdES) და მისი ვალიდაცია შესაძლებელია ნებისმიერ თავსებად PDF წამკითხველში. ხელმოწერა <b>კვალიფიციურ ელექტრონულ ხელმოწერად</b> ითვლება მხოლოდ მაშინ, როცა მისი სერტიფიკატი უკავშირდება კონფიგურირებულ სანდო (PSDA) ძირეულ სერტიფიკატს (\"ჯაჭვი გადამოწმებულია\"). \"ჯაჭვი არ არის გადამოწმებული\" ნიშნით აღნიშნული სტრიქონები კრიპტოგრაფიულად ვალიდირებულია, თუმცა გამცემი სანდო ძირეულ სერტიფიკატთან არ შემოწმებულა. </small>"
+
+#. module: id_ge_sign
+#. odoo-python
+#: code:addons/id_ge_sign/models/sign_request_item.py:0
+msgid "A trusted certificate chain is required for this signature."
+msgstr "ამ ხელმოწერისთვის საჭიროა სერტიფიკატების სანდო ჯაჭვი."
+
+#. module: id_ge_sign
+#. odoo-javascript
+#: code:addons/id_ge_sign/static/src/dialogs/geoeid_signer_dialog.xml:0
+msgid "Always allow"
+msgstr "ყოველთვის დაშვება"
+
+#. module: id_ge_sign
+#: model:ir.model.fields.selection,name:id_ge_sign.selection__sign_request_item__geoeid_state__launched
+msgid "App launched"
+msgstr "აპლიკაცია გაშვებულია"
+
+#. module: id_ge_sign
+#: model_terms:ir.ui.view,arch_db:id_ge_sign.res_config_settings_view_form
+msgid "Application language"
+msgstr "აპლიკაციის ენა"
+
+#. module: id_ge_sign
+#: model_terms:ir.ui.view,arch_db:id_ge_sign.sign_request_logs_user_geoeid
+msgid "Assurance"
+msgstr "სანდოობის დონე"
+
+#. module: id_ge_sign
+#: model:ir.model.fields,field_description:id_ge_sign.field_sign_item_role__auth_method
+msgid "Authentication"
+msgstr "ავთენტიფიკაცია"
+
+#. module: id_ge_sign
+#: model_terms:ir.ui.view,arch_db:id_ge_sign.sign_request_logs_user_geoeid
+msgid "CN=..."
+msgstr "CN=..."
+
+#. module: id_ge_sign
+#. odoo-javascript
+#: code:addons/id_ge_sign/static/src/dialogs/geoeid_signer_dialog.xml:0
+msgid "Cancel"
+msgstr "გაუქმება"
+
+#. module: id_ge_sign
+#: model_terms:ir.ui.view,arch_db:id_ge_sign.sign_request_logs_user_geoeid
+msgid "Certificate"
+msgstr "სერტიფიკატი"
+
+#. module: id_ge_sign
+#. odoo-python
+#: code:addons/id_ge_sign/models/sign_request_item.py:0
+msgid "Certificate: %(subject)s<br/>Personal number: %(pn)s<br/>Serial: %(serial)s, valid until %(until)s (%(trusted)s)"
+msgstr "სერტიფიკატი: %(subject)s<br/>პირადი ნომერი: %(pn)s<br/>სერიული ნომერი: %(serial)s, მოქმედებს %(until)s-მდე (%(trusted)s)"
+
+#. module: id_ge_sign
+#: model_terms:ir.ui.view,arch_db:id_ge_sign.sign_request_logs_user_geoeid
+msgid "Chain not verified"
+msgstr "ჯაჭვი არ არის გადამოწმებული"
+
+#. module: id_ge_sign
+#: model:ir.model,name:id_ge_sign.model_res_config_settings
+msgid "Config Settings"
+msgstr "კონფიგურაციის პარამეტრები"
+
+#. module: id_ge_sign
+#: model:ir.model,name:id_ge_sign.model_res_partner
+msgid "Contact"
+msgstr "კონტაქტი"
+
+#. module: id_ge_sign
+#. odoo-javascript
+#: code:addons/id_ge_sign/static/src/dialogs/geoeid_signer_dialog.js:0
+msgid "Could not check the signing status. Please try again."
+msgstr "ხელმოწერის სტატუსის შემოწმება ვერ მოხერხდა. გთხოვთ, სცადოთ ხელახლა."
+
+#. module: id_ge_sign
+#. odoo-javascript
+#: code:addons/id_ge_sign/static/src/dialogs/geoeid_signer_dialog.js:0
+msgid "Could not reach Odoo to start Georgian ID Card signing."
+msgstr "პირადობის ელექტრონული მოწმობით ხელმოწერის დასაწყებად Odoo-სთან დაკავშირება ვერ მოხერხდა."
+
+#. module: id_ge_sign
+#. odoo-javascript
+#: code:addons/id_ge_sign/static/src/dialogs/geoeid_signer_dialog.js:0
+msgid "Could not start Georgian ID Card signing."
+msgstr "პირადობის ელექტრონული მოწმობით ხელმოწერის დაწყება ვერ მოხერხდა."
+
+#. module: id_ge_sign
+#: model:ir.model.fields,field_description:id_ge_sign.field_res_config_settings__display_name model:ir.model.fields,field_description:id_ge_sign.field_res_partner__display_name model:ir.model.fields,field_description:id_ge_sign.field_sign_item_role__display_name model:ir.model.fields,field_description:id_ge_sign.field_sign_request__display_name model:ir.model.fields,field_description:id_ge_sign.field_sign_request_item__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: id_ge_sign
+#: model:ir.model.fields.selection,name:id_ge_sign.selection__res_config_settings__geoeid_language__en
+msgid "English"
+msgstr "ინგლისური"
+
+#. module: id_ge_sign
+#: model:ir.model.fields.selection,name:id_ge_sign.selection__sign_request_item__geoeid_state__failed
+msgid "Failed"
+msgstr "ვერ შესრულდა"
+
+#. module: id_ge_sign
+#: model:ir.model.fields,help:id_ge_sign.field_sign_item_role__auth_method
+msgid "Force the signatory to identify using a second authentication method"
+msgstr "ხელმომწერისგან იდენტიფიკაციის მოთხოვნა ავთენტიფიკაციის მეორე მეთოდით"
+
+#. module: id_ge_sign
+#: model:ir.model.fields,field_description:id_ge_sign.field_sign_request_item__geoeid_cert_common_name
+msgid "Geoeid Cert Common Name"
+msgstr "eID სერტიფიკატის საერთო სახელი"
+
+#. module: id_ge_sign
+#: model:ir.model.fields,field_description:id_ge_sign.field_sign_request_item__geoeid_cert_not_after
+msgid "Geoeid Cert Not After"
+msgstr "eID სერტიფიკატის მოქმედების ბოლო თარიღი"
+
+#. module: id_ge_sign
+#: model:ir.model.fields,field_description:id_ge_sign.field_sign_request_item__geoeid_cert_personal_number
+msgid "Geoeid Cert Personal Number"
+msgstr "eID სერტიფიკატის პირადი ნომერი"
+
+#. module: id_ge_sign
+#: model:ir.model.fields,field_description:id_ge_sign.field_sign_request_item__geoeid_cert_serial
+msgid "Geoeid Cert Serial"
+msgstr "eID სერტიფიკატის სერიული ნომერი"
+
+#. module: id_ge_sign
+#: model:ir.model.fields,field_description:id_ge_sign.field_sign_request_item__geoeid_cert_subject
+msgid "Geoeid Cert Subject"
+msgstr "eID სერტიფიკატის სუბიექტი"
+
+#. module: id_ge_sign
+#: model:ir.model.fields,field_description:id_ge_sign.field_sign_request_item__geoeid_cert_trusted
+msgid "Geoeid Cert Trusted"
+msgstr "eID სერტიფიკატი სანდოა"
+
+#. module: id_ge_sign
+#: model:ir.model.fields,field_description:id_ge_sign.field_sign_request_item__geoeid_error
+msgid "Geoeid Error"
+msgstr "eID შეცდომა"
+
+#. module: id_ge_sign
+#: model:ir.model.fields,field_description:id_ge_sign.field_sign_request_item__geoeid_signed_on
+msgid "Geoeid Signed On"
+msgstr "eID ხელმოწერის თარიღი"
+
+#. module: id_ge_sign
+#: model:ir.model.fields,field_description:id_ge_sign.field_sign_request_item__geoeid_state
+msgid "Geoeid State"
+msgstr "eID სტატუსი"
+
+#. module: id_ge_sign
+#: model:ir.model.fields,field_description:id_ge_sign.field_sign_request_item__geoeid_token
+msgid "Geoeid Token"
+msgstr "eID ტოკენი"
+
+#. module: id_ge_sign
+#: model:ir.model.fields,field_description:id_ge_sign.field_sign_request_item__geoeid_token_expiry
+msgid "Geoeid Token Expiry"
+msgstr "eID ტოკენის ვადა"
+
+#. module: id_ge_sign
+#: model:ir.model.fields.selection,name:id_ge_sign.selection__res_config_settings__geoeid_language__ka
+msgid "Georgian"
+msgstr "ქართული"
+
+#. module: id_ge_sign
+#: model:ir.model.fields,field_description:id_ge_sign.field_res_config_settings__geoeid_language
+msgid "Georgian ID App Language"
+msgstr "პირადობის მოწმობის აპლიკაციის ენა"
+
+#. module: id_ge_sign
+#. odoo-javascript
+#. odoo-python
+#: code:addons/id_ge_sign/models/sign_item_role.py:0
+#: code:addons/id_ge_sign/static/src/dialogs/geoeid_signer_dialog.xml:0 model:ir.model.fields.selection,name:id_ge_sign.selection__sign_item_role__auth_method__geoeid
+msgid "Georgian ID Card"
+msgstr "პირადობის ელექტრონული მოწმობა"
+
+#. module: id_ge_sign
+#: model_terms:ir.ui.view,arch_db:id_ge_sign.sign_request_logs_user_geoeid
+msgid "Georgian ID Card Signatures"
+msgstr "ხელმოწერები პირადობის ელექტრონული მოწმობით"
+
+#. module: id_ge_sign
+#. odoo-python
+#: code:addons/id_ge_sign/controllers/geoeid.py:0
+msgid "Georgian ID Card signer"
+msgstr "პირადობის ელექტრონული მოწმობით ხელმომწერი"
+
+#. module: id_ge_sign
+#. odoo-python
+#: code:addons/id_ge_sign/models/sign_request_item.py:0
+msgid "Georgian ID Card signing supports a single document per request."
+msgstr "პირადობის ელექტრონული მოწმობით ხელმოწერა თითო მოთხოვნაზე მხოლოდ ერთ დოკუმენტს უჭერს მხარს."
+
+#. module: id_ge_sign
+#: model:ir.model.fields,field_description:id_ge_sign.field_res_config_settings__id model:ir.model.fields,field_description:id_ge_sign.field_res_partner__id model:ir.model.fields,field_description:id_ge_sign.field_sign_item_role__id model:ir.model.fields,field_description:id_ge_sign.field_sign_request__id model:ir.model.fields,field_description:id_ge_sign.field_sign_request_item__id
+msgid "ID"
+msgstr "ID"
+
+#. module: id_ge_sign
+#: model_terms:ir.ui.view,arch_db:id_ge_sign.sign_request_logs_user_geoeid
+msgid "John Smith"
+msgstr "John Smith"
+
+#. module: id_ge_sign
+#: model_terms:ir.ui.view,arch_db:id_ge_sign.res_config_settings_view_form
+msgid "Let signatories sign with their Georgian ID Card (Qualified Electronic Signature)"
+msgstr "ხელმომწერებს მიეცით საშუალება, ხელი მოაწერონ პირადობის ელექტრონული მოწმობით (კვალიფიციური ელექტრონული ხელმოწერა)"
+
+#. module: id_ge_sign
+#. odoo-python
+#: code:addons/id_ge_sign/models/sign_request_item.py:0
+msgid "No signed document was returned."
+msgstr "ხელმოწერილი დოკუმენტი არ დაბრუნებულა."
+
+#. module: id_ge_sign
+#: model:ir.model.fields.selection,name:id_ge_sign.selection__sign_request_item__geoeid_state__idle
+msgid "Not started"
+msgstr "არ დაწყებულა"
+
+#. module: id_ge_sign
+#. odoo-javascript
+#: code:addons/id_ge_sign/static/src/dialogs/geoeid_signer_dialog.xml:0
+msgid "Open"
+msgstr "გახსნა"
+
+#. module: id_ge_sign
+#. odoo-javascript
+#: code:addons/id_ge_sign/static/src/dialogs/geoeid_signer_dialog.xml:0
+msgid "Open the application again"
+msgstr "აპლიკაციის ხელახლა გახსნა"
+
+#. module: id_ge_sign
+#. odoo-javascript
+#: code:addons/id_ge_sign/static/src/dialogs/geoeid_signer_dialog.xml:0
+msgid "PIN3"
+msgstr "PIN3"
+
+#. module: id_ge_sign
+#: model_terms:ir.ui.view,arch_db:id_ge_sign.sign_request_logs_user_geoeid
+msgid "Personal Number"
+msgstr "პირადი ნომერი"
+
+#. module: id_ge_sign
+#. odoo-javascript
+#: code:addons/id_ge_sign/static/src/dialogs/geoeid_signer_dialog.xml:0
+msgid "Preparing the document for signing..."
+msgstr "დოკუმენტი ხელმოსაწერად მზადდება..."
+
+#. module: id_ge_sign
+#: model_terms:ir.ui.view,arch_db:id_ge_sign.sign_request_logs_user_geoeid
+msgid "Qualified (chain verified)"
+msgstr "კვალიფიციური (ჯაჭვი გადამოწმებულია)"
+
+#. module: id_ge_sign
+#: model:ir.model.fields,help:id_ge_sign.field_res_config_settings__geoeid_require_trusted_chain
+msgid "Reject a signature whose certificate does not chain to the trust anchor. Set the PSDA issuing certificate chain (PEM) in System Parameters under the key id_ge_sign.trust_anchor, then enable this in production."
+msgstr "უარყოფს ხელმოწერას, რომლის სერტიფიკატიც არ უკავშირდება სანდო ძირეულ სერტიფიკატს. მიუთითეთ PSDA-ის გამცემი სერტიფიკატების ჯაჭვი (PEM) სისტემის პარამეტრებში, გასაღებით id_ge_sign.trust_anchor, შემდეგ კი ჩართეთ ეს პარამეტრი საწარმოო გარემოში."
+
+#. module: id_ge_sign
+#: model:ir.model.fields,field_description:id_ge_sign.field_res_config_settings__geoeid_require_trusted_chain
+msgid "Require Trusted Certificate Chain"
+msgstr "სერტიფიკატების სანდო ჯაჭვის მოთხოვნა"
+
+#. module: id_ge_sign
+#: model:ir.actions.act_window,name:id_ge_sign.sign_item_role_action model:ir.ui.menu,name:id_ge_sign.sign_item_role_menu
+msgid "Roles"
+msgstr "როლები"
+
+#. module: id_ge_sign
+#: model_terms:ir.ui.view,arch_db:id_ge_sign.sign_request_logs_user_geoeid
+msgid "Serial"
+msgstr "სერიული ნომერი"
+
+#. module: id_ge_sign
+#: model_terms:ir.ui.view,arch_db:id_ge_sign.res_config_settings_view_form
+msgid ""
+"Set the PSDA issuing certificate chain (PEM, including the\n"
+"                            issuing intermediate) in\n"
+"                            Settings &gt; Technical &gt; System Parameters, key\n"
+"                            <code>id_ge_sign.trust_anchor</code>."
+msgstr "მიუთითეთ PSDA-ის გამცემი სერტიფიკატების ჯაჭვი (PEM, გამცემი შუალედური სერტიფიკატის ჩათვლით) აქ: პარამეტრები &gt; ტექნიკური &gt; სისტემის პარამეტრები, გასაღები <code>id_ge_sign.trust_anchor</code>."
+
+#. module: id_ge_sign
+#. odoo-python
+#: code:addons/id_ge_sign/controllers/geoeid.py:0
+msgid "Shared"
+msgstr "საზიარო"
+
+#. module: id_ge_sign
+#: model:ir.module.module,summary:base.module_id_ge_sign
+msgid "Sign Odoo Sign documents with the Georgian ID Card (id.ge) as a Qualified Electronic Signature"
+msgstr "Odoo Sign-ის დოკუმენტებზე ხელის მოწერა პირადობის ელექტრონული მოწმობით (id.ge) კვალიფიციური ელექტრონული ხელმოწერის სახით"
+
+#. module: id_ge_sign
+#. odoo-javascript
+#: code:addons/id_ge_sign/static/src/dialogs/geoeid_signer_dialog.js:0 model_terms:ir.ui.view,arch_db:id_ge_sign.res_config_settings_view_form
+msgid "Sign with Georgian ID Card"
+msgstr "ხელმოწერა პირადობის ელექტრონული მოწმობით"
+
+#. module: id_ge_sign
+#: model:ir.module.module,shortdesc:base.module_id_ge_sign
+msgid "Sign with Georgian ID Card (QES)"
+msgstr "ხელმოწერა პირადობის ელექტრონული მოწმობით (QES)"
+
+#. module: id_ge_sign
+#: model_terms:ir.ui.view,arch_db:id_ge_sign.sign_request_logs_user_geoeid
+msgid "Signatory"
+msgstr "ხელმომწერი"
+
+#. module: id_ge_sign
+#: model:ir.model,name:id_ge_sign.model_sign_item_role
+msgid "Signature Item Role"
+msgstr "ხელმოწერის ელემენტის როლი"
+
+#. module: id_ge_sign
+#: model:ir.model,name:id_ge_sign.model_sign_request
+msgid "Signature Request"
+msgstr "ხელმოწერის მოთხოვნა"
+
+#. module: id_ge_sign
+#: model:ir.model,name:id_ge_sign.model_sign_request_item
+msgid "Signature Request Item"
+msgstr "ხელმოწერის მოთხოვნის ელემენტი"
+
+#. module: id_ge_sign
+#: model:ir.model.fields.selection,name:id_ge_sign.selection__sign_request_item__geoeid_state__signed
+msgid "Signed by card"
+msgstr "ბარათით ხელმოწერილია"
+
+#. module: id_ge_sign
+#. odoo-javascript
+#: code:addons/id_ge_sign/static/src/dialogs/geoeid_signer_dialog.js:0
+msgid "Signing failed. Please try again."
+msgstr "ხელმოწერა ვერ მოხერხდა. გთხოვთ, სცადოთ ხელახლა."
+
+#. module: id_ge_sign
+#. odoo-javascript
+#: code:addons/id_ge_sign/static/src/dialogs/geoeid_signer_dialog.xml:0
+msgid "The"
+msgstr "აპლიკაცია"
+
+#. module: id_ge_sign
+#. odoo-python
+#: code:addons/id_ge_sign/models/sign_request_item.py:0
+msgid "The certificate personal number does not match the signer."
+msgstr "სერტიფიკატში მითითებული პირადი ნომერი ხელმომწერის პირად ნომერს არ ემთხვევა."
+
+#. module: id_ge_sign
+#. odoo-python
+#: code:addons/id_ge_sign/models/sign_request_item.py:0
+msgid "The signed document could not be added to the request."
+msgstr "ხელმოწერილი დოკუმენტის მოთხოვნაში დამატება ვერ მოხერხდა."
+
+#. module: id_ge_sign
+#: model:ir.model.fields,help:id_ge_sign.field_sign_request_item__geoeid_cert_trusted
+msgid "The signing certificate chained to a configured trust anchor. Only then is the signature a Qualified Electronic Signature."
+msgstr "ხელმოწერის სერტიფიკატი უკავშირდება კონფიგურირებულ სანდო ძირეულ სერტიფიკატს (trust anchor). მხოლოდ ამ შემთხვევაში ითვლება ხელმოწერა კვალიფიციურ ელექტრონულ ხელმოწერად."
+
+#. module: id_ge_sign
+#. odoo-python
+#: code:addons/id_ge_sign/models/sign_request_item.py:0
+msgid "This signing session is no longer active."
+msgstr "ხელმოწერის ეს სესია აღარ არის აქტიური."
+
+#. module: id_ge_sign
+#. odoo-javascript
+#: code:addons/id_ge_sign/static/src/dialogs/geoeid_signer_dialog.js:0
+msgid "Timed out waiting for the signature. Please try again."
+msgstr "ხელმოწერის მოლოდინის დრო ამოიწურა. გთხოვთ, სცადოთ ხელახლა."
+
+#. module: id_ge_sign
+#. odoo-javascript
+#: code:addons/id_ge_sign/static/src/dialogs/geoeid_signer_dialog.xml:0
+msgid "Try again"
+msgstr "სცადეთ ხელახლა"
+
+#. module: id_ge_sign
+#: model_terms:ir.ui.view,arch_db:id_ge_sign.sign_request_logs_user_geoeid
+msgid "Valid Until"
+msgstr "მოქმედების ვადა"
+
+#. module: id_ge_sign
+#. odoo-javascript
+#: code:addons/id_ge_sign/static/src/dialogs/geoeid_signer_dialog.xml:0
+msgid "Waiting for the signature..."
+msgstr "ველოდებით ხელმოწერას..."
+
+#. module: id_ge_sign
+#. odoo-javascript
+#: code:addons/id_ge_sign/static/src/dialogs/geoeid_signer_dialog.xml:0
+msgid ""
+"Your browser may ask for permission to open the Georgian ID Card application.\n"
+"                        Choose"
+msgstr ""
+"ბრაუზერმა შეიძლება ნებართვა მოითხოვოს პირადობის ელექტრონული მოწმობის აპლიკაციის გასახსნელად.\n"
+"                        აირჩიეთ"
+
+#. module: id_ge_sign
+#: model_terms:ir.ui.view,arch_db:id_ge_sign.sign_request_logs_user_geoeid
+msgid "a1b2c3"
+msgstr "a1b2c3"
+
+#. module: id_ge_sign
+#. odoo-javascript
+#: code:addons/id_ge_sign/static/src/dialogs/geoeid_signer_dialog.xml:0
+msgid ""
+"application should now open.\n"
+"                        Enter your"
+msgstr ""
+"ახლა უნდა გაიხსნას.\n"
+"                        შეიყვანეთ თქვენი"
+
+#. module: id_ge_sign
+#. odoo-python
+#: code:addons/id_ge_sign/models/sign_request_item.py:0
+msgid "chain not verified"
+msgstr "ჯაჭვი არ არის გადამოწმებული"
+
+#. module: id_ge_sign
+#. odoo-javascript
+#: code:addons/id_ge_sign/static/src/dialogs/geoeid_signer_dialog.xml:0
+msgid "in the application to sign the document."
+msgstr "აპლიკაციაში დოკუმენტზე ხელის მოსაწერად."
+
+#. module: id_ge_sign
+#: model_terms:ir.ui.view,arch_db:id_ge_sign.sign_request_logs_user_geoeid
+msgid "john@example.com"
+msgstr "john@example.com"
+
+#. module: id_ge_sign
+#. odoo-python
+#: code:addons/id_ge_sign/models/sign_request_item.py:0
+msgid "n/a"
+msgstr "არ არის"
+
+#. module: id_ge_sign
+#. odoo-python
+#: code:addons/id_ge_sign/models/sign_request_item.py:0
+msgid "trusted chain"
+msgstr "სანდო ჯაჭვი"
+
+#. module: id_ge_sign
+#: model:ir.model.fields,field_description:id_ge_sign.field_sign_request__geoeid_public_attempt
+msgid "Geoeid Public Attempt"
+msgstr "Geoeid საჯარო მცდელობა"
+
+#. module: id_ge_sign
+#: model:ir.model.fields,field_description:id_ge_sign.field_sign_request_item__geoeid_signed_digest
+msgid "Geoeid Signed Digest"
+msgstr "Geoeid ხელმოწერილი ჰეში"
+
+#. module: id_ge_sign
+#. odoo-python
+#: code:addons/id_ge_sign/models/sign_request_item.py:0
+msgid "%(holder)s signed with a Georgian ID Card (certificate chain verified, revocation not checked)."
+msgstr "%(holder)s-მა ხელი მოაწერა პირადობის ელექტრონული მოწმობით (სერტიფიკატების ჯაჭვი გადამოწმებულია, გაუქმების სტატუსი არ შემოწმებულა)."
+
+#. module: id_ge_sign
+#. odoo-python
+#: code:addons/id_ge_sign/models/sign_request_item.py:0
+msgid "%(holder)s signed with a Georgian ID Card on the link sent to %(partner)s (certificate chain verified, revocation not checked)."
+msgstr "%(holder)s-მა ხელი მოაწერა პირადობის ელექტრონული მოწმობით (ბმულის ადრესატი: %(partner)s; სერტიფიკატების ჯაჭვი გადამოწმებულია, გაუქმების სტატუსი არ შემოწმებულა)."
+
+#. module: id_ge_sign
+#: model_terms:ir.ui.view,arch_db:id_ge_sign.sign_request_logs_user_geoeid
+msgid ""
+"<small>\n"
+"                            Each signature above is cryptographically bound to the document with the\n"
+"                            signatory's Georgian ID Card (PAdES) and can be validated in any compliant\n"
+"                            PDF reader. \"Chain verified\" means the signing certificate was issued by a\n"
+"                            certificate authority saved as trust anchor; Odoo does not check whether the\n"
+"                            certificate was revoked. Rows marked \"Chain not verified\" were cryptographically\n"
+"                            validated, but their issuer was not checked.\n"
+"                        </small>"
+msgstr "<small> ზემოთ მოცემული თითოეული ხელმოწერა კრიპტოგრაფიულად არის დაკავშირებული დოკუმენტთან ხელმომწერის პირადობის ელექტრონული მოწმობით (PAdES) და მისი ვალიდაცია შესაძლებელია ნებისმიერ თავსებად PDF წამკითხველში. „ჯაჭვი გადამოწმებულია“ ნიშნავს, რომ ხელმოწერის სერტიფიკატი გასცა სერტიფიცირების ორგანომ, რომლის სერტიფიკატიც სანდოდ არის შენახული; Odoo არ ამოწმებს, გაუქმებულია თუ არა სერტიფიკატი. „ჯაჭვი არ არის გადამოწმებული“ ნიშნით აღნიშნული სტრიქონები კრიპტოგრაფიულად ვალიდირებულია, თუმცა მათი სერტიფიკატის გამცემი არ შემოწმებულა. </small>"
+
+#. module: id_ge_sign
+#. odoo-python
+#: code:addons/id_ge_sign/models/sign_request_item.py:0
+msgid "Certificate: %(subject)s<br/>Personal number: %(pn)s<br/>Serial: %(serial)s, valid until %(until)s"
+msgstr "სერტიფიკატი: %(subject)s<br/>პირადი ნომერი: %(pn)s<br/>სერიული ნომერი: %(serial)s, მოქმედებს %(until)s-მდე"
+
+#. module: id_ge_sign
+#: model_terms:ir.ui.view,arch_db:id_ge_sign.sign_request_logs_user_geoeid
+msgid "Chain verified (revocation not checked)"
+msgstr "ჯაჭვი გადამოწმებულია (გაუქმების სტატუსი არ შემოწმებულა)"
+
+#. module: id_ge_sign
+#. odoo-python
+#: code:addons/id_ge_sign/models/sign_request_item.py:0
+msgid "Signing with the Georgian ID Card is not set up yet. Please contact the sender of this document."
+msgstr "პირადობის ელექტრონული მოწმობით ხელმოწერა ჯერ არ არის მზად. გთხოვთ, დაუკავშირდეთ ამ დოკუმენტის გამომგზავნს."
+
+#. module: id_ge_sign
+#: model:ir.model,name:id_ge_sign.model_ir_config_parameter
+msgid "System Parameter"
+msgstr "სისტემის პარამეტრი"
+
+#. module: id_ge_sign
+#. odoo-python
+#: code:addons/id_ge_sign/models/sign_request_item.py:0
+msgid "The Georgian ID Card signature of %(partner)s was refused: %(reason)s"
+msgstr "პირადობის ელექტრონული მოწმობით ხელმოწერა უარყოფილია. ხელმომწერი: %(partner)s. მიზეზი: %(reason)s"
+
+#. module: id_ge_sign
+#. odoo-javascript
+#: code:addons/id_ge_sign/static/src/dialogs/geoeid_signer_dialog.js:0
+msgid "The ID card signature was not accepted. Try again with your own ID card, or ask the sender for a new link."
+msgstr "ხელმოწერა პირადობის ელექტრონული მოწმობით არ იქნა მიღებული. სცადეთ ხელახლა საკუთარი პირადობის მოწმობით ან სთხოვეთ გამომგზავნს ახალი ბმული."
+
+#. module: id_ge_sign
+#: model_terms:ir.ui.view,arch_db:id_ge_sign.res_config_settings_view_form
+msgid ""
+"Card signatures are checked against the state's certificates (GEO Signing CA, id.ge), which come with this module.\n"
+"                            When id.ge publishes a new one, turn on developer mode and add its PEM text after the others in\n"
+"                            Settings &gt; Technical &gt; Parameters &gt; System Parameters, key <code>id_ge_sign.trust_anchor</code>."
+msgstr "პირადობის ელექტრონული მოწმობით შესრულებული ხელმოწერები მოწმდება სახელმწიფო სერტიფიკატების მიხედვით (GEO Signing CA, id.ge), რომლებიც ამ მოდულს მოყვება. როცა id.ge ახალ სერტიფიკატს გამოაქვეყნებს, გააქტიურეთ დეველოპერის რეჟიმი და დაამატეთ მისი PEM ტექსტი არსებული სერტიფიკატების შემდეგ აქ: პარამეტრები &gt; ტექნიკური &gt; პარამეტრები &gt; სისტემის პარამეტრები, გასაღები <code>id_ge_sign.trust_anchor</code>."

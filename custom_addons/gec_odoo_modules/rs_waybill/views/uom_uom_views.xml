@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_uom_uom_form_inherit_rs" model="ir.ui.view">
+        <field name="name">uom.uom.form.inherit.rs</field>
+        <field name="model">uom.uom</field>
+        <field name="inherit_id" ref="uom.uom_uom_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="rs_unit_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_uom_uom_tree_inherit_rs" model="ir.ui.view">
+        <field name="name">uom.uom.tree.inherit.rs</field>
+        <field name="model">uom.uom</field>
+        <field name="inherit_id" ref="uom.uom_uom_view_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="rs_unit_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

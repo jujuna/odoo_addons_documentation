@@ -1,0 +1,3201 @@
+# Georgian translation of the Odoo addon ai, kept in gec_i18n_base.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-25 17:47+0000\n"
+"PO-Revision-Date: 2026-09-30 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian (ka_GE)\n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_preview_records
+msgid ""
+"\n"
+"            # Prepares preview metadata for records to display as rich cards in the chat.\n"
+"\n"
+"            ## Call this ONLY when the user wants to see the records themselves -\n"
+"            e.g., \"show me...\", \"list...\", \"find...\", \"recommend/suggest...?\", anything in this context, or when\n"
+"            it is useful to preview the search results to let the user choose among them before taking another action.\n"
+"            Based on the context, you can decide basically when the records are the answer themselves.\n"
+"\n"
+"            ## Do NOT call it when:\n"
+"            - The records are intermediate data feeding another tool call\n"
+"            (update, create, building arguments).\n"
+"            - The user asked a question that the records merely answer\n"
+"            (counts, yes/no, totals, \"who is...\", \"when is...\"). Reply with\n"
+"            the answer in text; do not preview the records behind it.\n"
+"\n"
+"            Returns `preview_metadata`: the authoritative final values (computed\n"
+"            prices, currency, links). Base your reply on these, never on raw values\n"
+"            from earlier search results.\n"
+"\n"
+"            ## Your reply:\n"
+"            ### Rich cards/ records'previews appear automatically below your message. Because the previews already show the record details:\n"
+"            - Keep your ENTIRE reply to a single short sentence (e.g., \"Here are the things you can buy:\")\n"
+"            - Do NOT list record names, descriptions, prices, or any other details - the previews handle this\n"
+"            - Do NOT use bullet points or numbered lists and NEVER List the search results in your reply, even if there are only a few. The previews will show all the necessary records in a clear format.\n"
+"\n"
+"            ## Models with rich preview cards are currently:\n"
+"            - Products (`product.template`, `product.product`), Appointments (`appointment.type`), Events (`event.event`),\n"
+"            Blog Posts (`blog.post`), Courses (`slide.channel`), Lessons/Slides (`slide.slide`), and Jobs (`hr.job`).\n"
+"            - All other record previews are rendered as regular record links.\n"
+"        "
+msgstr ""
+"\n"
+"            # ამზადებს ჩანაწერების გადახედვის მეტამონაცემებს ჩატში გაფართოებულ ბარათებად საჩვენებლად.\n"
+"\n"
+"            ## გამოიძახეთ ის მხოლოდ მაშინ, როდესაც მომხმარებელს თავად ჩანაწერების ნახვა სურს -\n"
+"            მაგ., \"მაჩვენე...\", \"ჩამოთვალე...\", \"იპოვე...\", \"მირჩიე/შემომთავაზე...?\", ნებისმიერი რამ ამ კონტექსტში, ან როდესაც\n"
+"            სასარგებლოა ძიების შედეგების გადახედვა, რომ მომხმარებელმა სხვა ქმედებამდე მათ შორის აირჩიოს.\n"
+"            კონტექსტიდან გამომდინარე, შეგიძლიათ გადაწყვიტოთ, როდის არის თავად ჩანაწერები პასუხი.\n"
+"\n"
+"            ## არ გამოიძახოთ ის, როდესაც:\n"
+"            - ჩანაწერები შუალედური მონაცემებია, რომლებიც სხვა ხელსაწყოს გამოძახებას აწვდის\n"
+"            (განახლება, შექმნა, არგუმენტების აგება).\n"
+"            - მომხმარებელმა დასვა კითხვა, რომელსაც ჩანაწერები მხოლოდ პასუხობს\n"
+"            (რაოდენობები, დიახ/არა, ჯამები, \"ვინ არის...\", \"როდის არის...\"). უპასუხეთ\n"
+"            ტექსტით; ნუ აჩვენებთ მის უკან მდგომი ჩანაწერების გადახედვას.\n"
+"\n"
+"            აბრუნებს `preview_metadata`-ს: სარწმუნო საბოლოო მნიშვნელობებს (გამოთვლილ\n"
+"            ფასებს, ვალუტას, ბმულებს). პასუხი დააფუძნეთ მათზე და არასდროს - დაუმუშავებელ მნიშვნელობებზე\n"
+"            ძიების წინა შედეგებიდან.\n"
+"\n"
+"            ## თქვენი პასუხი:\n"
+"            ### გაფართოებული ბარათები/ჩანაწერების გადახედვები ავტომატურად ჩანს თქვენი შეტყობინების ქვემოთ. რადგან გადახედვები უკვე აჩვენებს ჩანაწერის დეტალებს:\n"
+"            - თქვენი მთელი პასუხი შეზღუდეთ ერთი მოკლე წინადადებით (მაგ., \"აი, რისი ყიდვა შეგიძლიათ:\")\n"
+"            - არ ჩამოთვალოთ ჩანაწერების სახელები, აღწერები, ფასები ან სხვა დეტალები - ამას გადახედვები უზრუნველყოფს\n"
+"            - არ გამოიყენოთ მარკირებული ან დანომრილი სიები და არასდროს ჩამოთვალოთ ძიების შედეგები თქვენს პასუხში, მაშინაც კი, თუ ისინი სულ რამდენიმეა. გადახედვები ყველა საჭირო ჩანაწერს მკაფიო ფორმატში აჩვენებს.\n"
+"\n"
+"            ## გაფართოებული გადახედვის ბარათები ამჟამად აქვს შემდეგ მოდელებს:\n"
+"            - პროდუქტები (`product.template`, `product.product`), შეხვედრების დაჯავშნა (`appointment.type`), ღონისძიებები (`event.event`),\n"
+"            ბლოგპოსტები (`blog.post`), კურსები (`slide.channel`), გაკვეთილები/სლაიდები (`slide.slide`) და ვაკანსიები (`hr.job`).\n"
+"            - ჩანაწერების ყველა სხვა გადახედვა ჩვეულებრივი ჩანაწერის ბმულებად გამოისახება.\n"
+"        "
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_adjust_search
+msgid ""
+"\n"
+"            Adjusts the UI to change to edit the search filters, groupbys, view type, ...\n"
+"            The current view, active filters, facets, ... are given in the \"Current View\" section of the context message.\n"
+"        "
+msgstr ""
+"\n"
+"            არეგულირებს ინტერფეისს ძიების ფილტრების, დაჯგუფებების, ხედის ტიპის, ... შესაცვლელად.\n"
+"            მიმდინარე ხედი, აქტიური ფილტრები, ფასეტები, ... მოცემულია კონტექსტური შეტყობინების \"Current View\" განყოფილებაში.\n"
+"        "
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_compute_date
+msgid ""
+"\n"
+"            Computes exact date/datetime values for relative date expressions. Can traverse years, quarters, months, weeks, and days, and anchor to specific weekdays or times.\n"
+"\n"
+"            **Returns**:\n"
+"            - Date fields: 'YYYY-MM-DD' (in user timezone)\n"
+"            - Datetime fields: 'YYYY-MM-DD HH:MM:SS' (in UTC)\n"
+"\n"
+"            **Core Concepts**:\n"
+"\n"
+"            1. **Operations**: Sequential transformations applied to current time\n"
+"               - navigate: Move through time periods\n"
+"                 * Required: type=\"navigate\", period (minute/hour/day/week/month/quarter/year), offset (negative=past, positive=future)\n"
+"                 * Optional: boundary ('start' or 'end' of period)\n"
+"               - find_previous: Search backward for specific weekday\n"
+"                 * Required: type=\"find_previous\", weekday (0-6)\n"
+"                 * Note: boundary not supported - use pin for time adjustment\n"
+"               - find_next: Search forward for specific weekday\n"
+"                 * Required: type=\"find_next\", weekday (0-6)\n"
+"                 * Note: boundary not supported - use pin for time adjustment\n"
+"\n"
+"            2. **Pin**: Final anchoring to specific position (applied after all operations)\n"
+"               - day: Lock to specific day (integer 1-31) or weekday occurrence (object with weekday 0-6, occurrence 1-5)\n"
+"               - time: Set specific time ('HH:MM' or 'HH:MM:SS')\n"
+"\n"
+"            **Examples**:\n"
+"\n"
+"            # \"Yesterday at midnight\"\n"
+"            {\"operations\": [{\"type\": \"navigate\", \"period\": \"day\", \"offset\": -1, \"boundary\": \"start\"}]}\n"
+"\n"
+"            # \"Next Friday at 5 PM\"\n"
+"            {\"operations\": [{\"type\": \"find_next\", \"weekday\": 4}], \"pin\": {\"time\": \"17:00\"}}\n"
+"\n"
+"            # \"Start of last week\"\n"
+"            {\"operations\": [{\"type\": \"navigate\", \"period\": \"week\", \"offset\": -1, \"boundary\": \"start\"}]}\n"
+"\n"
+"            # \"First Monday of last month\"\n"
+"            {\"operations\": [{\"type\": \"navigate\", \"period\": \"month\", \"offset\": -1, \"boundary\": \"start\"}], \"pin\": {\"day\": {\"weekday\": 0, \"occurrence\": 1}}}\n"
+"\n"
+"            # \"3rd week of 2 quarters ago\"\n"
+"            {\"operations\": [{\"type\": \"navigate\", \"period\": \"quarter\", \"offset\": -2, \"boundary\": \"start\"}, {\"type\": \"navigate\", \"period\": \"week\", \"offset\": 2, \"boundary\": \"start\"}]}\n"
+"\n"
+"            # \"Last Monday at 5 PM\"\n"
+"            {\"operations\": [{\"type\": \"find_previous\", \"weekday\": 0}], \"pin\": {\"time\": \"17:00\"}}\n"
+"\n"
+"            # \"5 days into last month\"\n"
+"            {\"operations\": [{\"type\": \"navigate\", \"period\": \"month\", \"offset\": -1, \"boundary\": \"start\"}, {\"type\": \"navigate\", \"period\": \"day\", \"offset\": 5}]}\n"
+"\n"
+"            # \"2nd week of 3 years ago\"\n"
+"            {\"operations\": [{\"type\": \"navigate\", \"period\": \"year\", \"offset\": -3, \"boundary\": \"start\"}, {\"type\": \"navigate\", \"period\": \"week\", \"offset\": 1, \"boundary\": \"start\"}]}\n"
+"\n"
+"            # \"10 days before end of last quarter\"\n"
+"            {\"operations\": [{\"type\": \"navigate\", \"period\": \"quarter\", \"offset\": -1, \"boundary\": \"end\"}, {\"type\": \"navigate\", \"period\": \"day\", \"offset\": -10}]}\n"
+"\n"
+"            Note: Weekday values are 0=Monday through 6=Sunday. Weeks start Monday (ISO 8601).\n"
+"        "
+msgstr ""
+"\n"
+"            ითვლის ზუსტ თარიღის/თარიღისა და დროის მნიშვნელობებს ფარდობითი თარიღის გამოსახულებებისთვის. შეუძლია წლების, კვარტალების, თვეების, კვირებისა და დღეების გავლა და კონკრეტულ კვირის დღეებზე ან დროზე მიბმა.\n"
+"\n"
+"            **აბრუნებს**:\n"
+"            - თარიღის ველები: 'YYYY-MM-DD' (მომხმარებლის დროის სარტყელში)\n"
+"            - თარიღისა და დროის ველები: 'YYYY-MM-DD HH:MM:SS' (UTC-ში)\n"
+"\n"
+"            **ძირითადი ცნებები**:\n"
+"\n"
+"            1. **ოპერაციები**: მიმდინარე დროზე თანმიმდევრულად გამოყენებული გარდაქმნები\n"
+"               - navigate: დროის პერიოდებში გადაადგილება\n"
+"                 * სავალდებულო: type=\"navigate\", period (minute/hour/day/week/month/quarter/year), offset (უარყოფითი=წარსული, დადებითი=მომავალი)\n"
+"                 * არასავალდებულო: boundary (პერიოდის 'start' ან 'end')\n"
+"               - find_previous: კონკრეტული კვირის დღის ძიება წარსულის მიმართულებით\n"
+"                 * სავალდებულო: type=\"find_previous\", weekday (0-6)\n"
+"                 * შენიშვნა: boundary არ არის მხარდაჭერილი - დროის კორექტირებისთვის გამოიყენეთ pin\n"
+"               - find_next: კონკრეტული კვირის დღის ძიება მომავლის მიმართულებით\n"
+"                 * სავალდებულო: type=\"find_next\", weekday (0-6)\n"
+"                 * შენიშვნა: boundary არ არის მხარდაჭერილი - დროის კორექტირებისთვის გამოიყენეთ pin\n"
+"\n"
+"            2. **Pin**: საბოლოო მიბმა კონკრეტულ პოზიციაზე (გამოიყენება ყველა ოპერაციის შემდეგ)\n"
+"               - day: მიბმა კონკრეტულ დღეზე (მთელი რიცხვი 1-31) ან კვირის დღის გამეორებაზე (ობიექტი, რომელსაც აქვს weekday 0-6 და occurrence 1-5)\n"
+"               - time: კონკრეტული დროის დაყენება ('HH:MM' ან 'HH:MM:SS')\n"
+"\n"
+"            **მაგალითები**:\n"
+"\n"
+"            # \"გუშინ, შუაღამეს\"\n"
+"            {\"operations\": [{\"type\": \"navigate\", \"period\": \"day\", \"offset\": -1, \"boundary\": \"start\"}]}\n"
+"\n"
+"            # \"მომავალ პარასკევს, 17:00-ზე\"\n"
+"            {\"operations\": [{\"type\": \"find_next\", \"weekday\": 4}], \"pin\": {\"time\": \"17:00\"}}\n"
+"\n"
+"            # \"გასული კვირის დასაწყისი\"\n"
+"            {\"operations\": [{\"type\": \"navigate\", \"period\": \"week\", \"offset\": -1, \"boundary\": \"start\"}]}\n"
+"\n"
+"            # \"გასული თვის პირველი ორშაბათი\"\n"
+"            {\"operations\": [{\"type\": \"navigate\", \"period\": \"month\", \"offset\": -1, \"boundary\": \"start\"}], \"pin\": {\"day\": {\"weekday\": 0, \"occurrence\": 1}}}\n"
+"\n"
+"            # \"2 კვარტალის წინ, მე-3 კვირა\"\n"
+"            {\"operations\": [{\"type\": \"navigate\", \"period\": \"quarter\", \"offset\": -2, \"boundary\": \"start\"}, {\"type\": \"navigate\", \"period\": \"week\", \"offset\": 2, \"boundary\": \"start\"}]}\n"
+"\n"
+"            # \"გასულ ორშაბათს, 17:00-ზე\"\n"
+"            {\"operations\": [{\"type\": \"find_previous\", \"weekday\": 0}], \"pin\": {\"time\": \"17:00\"}}\n"
+"\n"
+"            # \"გასული თვის დაწყებიდან 5 დღის შემდეგ\"\n"
+"            {\"operations\": [{\"type\": \"navigate\", \"period\": \"month\", \"offset\": -1, \"boundary\": \"start\"}, {\"type\": \"navigate\", \"period\": \"day\", \"offset\": 5}]}\n"
+"\n"
+"            # \"3 წლის წინ, მე-2 კვირა\"\n"
+"            {\"operations\": [{\"type\": \"navigate\", \"period\": \"year\", \"offset\": -3, \"boundary\": \"start\"}, {\"type\": \"navigate\", \"period\": \"week\", \"offset\": 1, \"boundary\": \"start\"}]}\n"
+"\n"
+"            # \"გასული კვარტალის დასრულებამდე 10 დღით ადრე\"\n"
+"            {\"operations\": [{\"type\": \"navigate\", \"period\": \"quarter\", \"offset\": -1, \"boundary\": \"end\"}, {\"type\": \"navigate\", \"period\": \"day\", \"offset\": -10}]}\n"
+"\n"
+"            შენიშვნა: კვირის დღის მნიშვნელობებია 0=ორშაბათიდან 6=კვირამდე. კვირა ორშაბათს იწყება (ISO 8601).\n"
+"        "
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_get_menus
+msgid ""
+"\n"
+"            For each menu accessible to the current user, this tool returns the menu id and complete name, the related action id, action type and action explanation\n"
+"            the available view types and default view type and the model of the view.\n"
+"        "
+msgstr ""
+"\n"
+"            მიმდინარე მომხმარებლისთვის ხელმისაწვდომი თითოეული მენიუსთვის ეს ხელსაწყო აბრუნებს მენიუს id-ს და სრულ სახელს, დაკავშირებული ქმედების id-ს, მოქმედების ტიპს და ქმედების განმარტებას,\n"
+"            ხედის ხელმისაწვდომ ტიპებს, ნაგულისხმევ ხედის ტიპს და ხედის მოდელს.\n"
+"        "
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_read_binary_content
+msgid ""
+"\n"
+"            Read the content of attachments, images, or any binary field for any record.\n"
+"        "
+msgstr ""
+"\n"
+"            წაიკითხეთ დანართების, სურათების ან ნებისმიერი ჩანაწერის ნებისმიერი ბინარული ველის შიგთავსი.\n"
+"        "
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_open_menu_graph
+msgid ""
+"\n"
+"            Redirects the UI to the Graph view of the given menu\n"
+"            Ideal for trends, comparisons, distributions, visual KPIs.\n"
+"        "
+msgstr ""
+"\n"
+"            გადაამისამართებს ინტერფეისს მოცემული მენიუს გრაფიკის ხედზე\n"
+"            იდეალურია ტენდენციების, შედარებების, განაწილებებისა და ვიზუალური KPI-ებისთვის.\n"
+"        "
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_open_menu_kanban
+msgid ""
+"\n"
+"            Redirects the UI to the Kanban view of the given menu.\n"
+"            Ideal for: stage/status visualization, pipeline views, task boards, workflow management\n"
+"        "
+msgstr ""
+"\n"
+"            გადაამისამართებს ინტერფეისს მოცემული მენიუს kanban ხედზე.\n"
+"            იდეალურია: ეტაპების/სტატუსების ვიზუალიზაციისთვის, პაიპლაინის ხედებისთვის, დავალებების დაფებისთვის, სამუშაო პროცესების მართვისთვის\n"
+"        "
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_open_menu_list
+msgid ""
+"\n"
+"            Redirects the UI to the List view of a given menu.\n"
+"            Ideal when the user needs to review, filter, sort or export data\n"
+"        "
+msgstr ""
+"\n"
+"            გადაამისამართებს ინტერფეისს მოცემული მენიუს სიის ხედზე.\n"
+"            იდეალურია, როდესაც მომხმარებელს მონაცემების გადახედვა, გაფილტვრა, დალაგება ან ექსპორტი სჭირდება\n"
+"        "
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_open_menu_pivot
+msgid ""
+"\n"
+"            Redirects the UI to the Pivot view of the given menu.\n"
+"            Ideal for \"Reporting\" app menus, \"Top N\" queries, rankings, cross-tabulation, performance metrics, aggregate measures.\n"
+"        "
+msgstr ""
+"\n"
+"            გადაამისამართებს ინტერფეისს მოცემული მენიუს pivot ხედზე.\n"
+"            იდეალურია აპლიკაციების \"ანგარიშგება\" მენიუებისთვის, \"Top N\" მოთხოვნებისთვის, რეიტინგებისთვის, ჯვარედინი ცხრილებისთვის, შესრულების მეტრიკებისთვის, აგრეგირებული საზომებისთვის.\n"
+"        "
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_get_menu_details
+msgid ""
+"\n"
+"            Retrieves detailed information for the given menu ids, including the action_id, the technical model name, the default filters and groupings, the domain, and the search view details (list of searchable fields, available filters and grouping options).\n"
+"            Use it before opening a view.\n"
+"        "
+msgstr ""
+"\n"
+"            იღებს დეტალურ ინფორმაციას მოცემული მენიუს id-ებისთვის, მათ შორის action_id-ს, მოდელის ტექნიკურ სახელს, ნაგულისხმევ ფილტრებსა და დაჯგუფებებს, დომენს და ძიების ხედის დეტალებს (ძებნადი ველების სია, ხელმისაწვდომი ფილტრები და დაჯგუფების ვარიანტები).\n"
+"            გამოიყენეთ ის ხედის გახსნამდე.\n"
+"        "
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_compute_report_measures
+msgid ""
+"\n"
+"            Retrieves numeric fields (measures) available for aggregation in pivot/graph views.\n"
+"            It must be called before opening a pivot or a graph menu to get the menu's available measures\n"
+"        "
+msgstr ""
+"\n"
+"            იღებს pivot/გრაფიკის ხედებში აგრეგაციისთვის ხელმისაწვდომ რიცხვით ველებს (საზომებს).\n"
+"            ის უნდა გამოიძახოთ pivot ან გრაფიკის მენიუს გახსნამდე, რომ მიიღოთ მენიუს ხელმისაწვდომი საზომები\n"
+"        "
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_get_fields
+msgid ""
+"\n"
+"            Retrieves the searchable fields for the given model that can be used in domain filters and grouping.\n"
+"            Essential for building valid domains. Only the fields returned by this tool can be used in domains.\n"
+"            Essential for updating records.\n"
+"        "
+msgstr ""
+"\n"
+"            იღებს მოცემული მოდელის ძებნად ველებს, რომელთა გამოყენებაც შესაძლებელია დომენის ფილტრებსა და დაჯგუფებაში.\n"
+"            აუცილებელია სწორი დომენების შესაქმნელად. დომენებში შეიძლება გამოიყენოთ მხოლოდ ამ ხელსაწყოს მიერ დაბრუნებული ველები.\n"
+"            აუცილებელია ჩანაწერების განახლებისთვის.\n"
+"        "
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_get_models
+msgid ""
+"\n"
+"            Returns all Odoo models (excluding transient and abstract models) accessible to the current user, with their technical name and description.\n"
+"            Use this tool to identify the correct technical model name before searching, creating, or updating records.\n"
+"        "
+msgstr ""
+"\n"
+"            აბრუნებს მიმდინარე მომხმარებლისთვის ხელმისაწვდომ Odoo-ს ყველა მოდელს (დროებითი და აბსტრაქტული მოდელების გარდა) მათი ტექნიკური სახელითა და აღწერით.\n"
+"            გამოიყენეთ ეს ხელსაწყო მოდელის სწორი ტექნიკური სახელის დასადგენად ჩანაწერების ძიებამდე, შექმნამდე ან განახლებამდე.\n"
+"        "
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_run_view_action
+msgid ""
+"\n"
+"            Runs to open views of type `ir.actions.client` and `ir.actions.report` in an Odoo database.\n"
+"        "
+msgstr ""
+"\n"
+"            ეშვება Odoo-ს ბაზაში `ir.actions.client` და `ir.actions.report` ტიპის ხედების გასახსნელად.\n"
+"        "
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_search
+msgid ""
+"\n"
+"            Search for records and their values in the database.\n"
+"            Ideal for \"Do I have...\", \"Is there any\", \"What is the name of\", searching for relations, ...\n"
+"            Returns {records, total_count} and a pagination hint when more rows remain; by default only display_name is fetched (pass `fields` for more) and at most 50 rows (max 200) are returned.\n"
+"        "
+msgstr ""
+"\n"
+"            მოძებნეთ ჩანაწერები და მათი მნიშვნელობები ბაზაში.\n"
+"            იდეალურია კითხვებისთვის \"მაქვს თუ არა...\", \"არის თუ არა რაიმე\", \"რა არის ... სახელი\", კავშირების მოსაძებნად, ...\n"
+"            აბრუნებს {records, total_count} მონაცემებს და გვერდებად დაყოფის მინიშნებას, როცა მეტი სტრიქონი რჩება; ნაგულისხმევად იღება მხოლოდ display_name (მეტისთვის გადაეცით `fields`) და ბრუნდება მაქსიმუმ 50 სტრიქონი (მაქს. 200).\n"
+"        "
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_read_group
+msgid ""
+"\n"
+"            Search for records to group them by specific values and perform aggregate calculations like sums, averages, or counts. Use this tool when users ask for totals, statistics, or data distributions across different categories.\n"
+"        "
+msgstr ""
+"\n"
+"            მოძებნეთ ჩანაწერები, რათა დააჯგუფოთ ისინი კონკრეტული მნიშვნელობების მიხედვით და შეასრულოთ აგრეგირებული გამოთვლები, როგორიცაა ჯამები, საშუალოები ან რაოდენობები. გამოიყენეთ ეს ხელსაწყო, როდესაც მომხმარებლები ითხოვენ ჯამებს, სტატისტიკას ან მონაცემების განაწილებას სხვადასხვა კატეგორიის მიხედვით.\n"
+"        "
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_ask_user_question
+msgid ""
+"\n"
+"            Use this tool when you want the user to choose a direction or action so that their selection determines what you do next. This includes\n"
+"            presenting ideas, suggestions, recommendations, alternatives, improvements, or next actions for the user to select. It presents clickable options instead\n"
+"            of listing choices in prose. When recommending improvements, ALWAYS make each recommendation a selectable action with this tool; do not give a prose list and then offer to apply it.\n"
+"            ## RULES\n"
+"            - Ask one focused question that resolves one decision, with 2-4 options.\n"
+"            - Each option must be a direct answer or action for that question. If you need several unrelated pieces of information,\n"
+"            ask one question per information instead of combining the questions into a single option list.\n"
+"            - The question itself must be a complete, standalone question - full question sentence, clear on its own without relying on the\n"
+"            preceding text for grammar or meaning. Not a fragment or label (e.g. \"Which lighting style should the scene use?\" not \"Lighting style:\").\n"
+"            - Each option must stand alone as a specific action; understandable and actionable without rereading the question (e.g. \"Use warm\n"
+"            ambient lighting,\" not \"Lighting atmosphere\" or \"Yes\"). Options must be mutually exclusive unless combining them is meaningful, in\n"
+"            which case set multi_select to true so users can pick more than one, but never add a collective or catch-all option (e.g. \"All of\n"
+"            the above,\" \"None,\" \"Combination of these,\" \"Mix of options\"), since multi_select already lets users select every option individually.\n"
+"            - Never pad the list with a no-op choice (\"Skip,\" \"Not now,\" \"Maybe later\"): the user can skip the question, and can\n"
+"            type an unlisted answer when allow_free_text is true.\n"
+"            - The options are the answer itself, not labels for an answer you will expand afterwards. If you would follow the\n"
+"            user's selection by writing out the content behind every label anyway, you are not asking a question - just write the answer.\n"
+"            - Never add an \"Other\" / \"Something else\" / \"Custom\" choice - a free-text alternative is already offered automatically when\n"
+"            allow_free_text is true (see below), and none is offered at all when it's false.\n"
+"            - Use a direct answer or action when the answer is already known from context, a reasonable default is clear, or another tool\n"
+"            already handles its own confirmation flow. Ask in plain text when fewer than two meaningful options exist.\n"
+"            - Do not ask about minor field choices when creating or updating records. Use a reasonable default unless it affects what the user asked for.\n"
+"            - Never ask a question the user's latest message already answered. If they ask for a given number of ideas, options, or\n"
+"            strategies, provide exactly that many. Use this tool only when they need to choose or apply one or more of them; otherwise answer directly.\n"
+"            ## MULTISELECT\n"
+"            - Set multi_select to true only when the user may choose more than one answer/action to this one question and each option is independently meaningful on its own.\n"
+"            - An option that bundles several independently applicable actions together (e.g. \"Apply the copy and layout refinements\") is a sign you\n"
+"            collapsed choices that should be separate: split each independent action into its own option and set multi_select to true, instead of\n"
+"            forcing an all-or-nothing pick.\n"
+"            - multi_select is one flag for the whole list: only set it true if every option is independently selectable. If any\n"
+"            option is mutually exclusive with the rest, leave it false.\n"
+"            - Any combination of options must remain coherent: if selecting two of them together would conflict or not make\n"
+"            sense, they don't belong in the same list.\n"
+"            ## ALLOW_FREE_TEXT\n"
+"            - Explicitly set allow_free_text to true in most tool calls, so the user can provide an unlisted answer.\n"
+"            - Set it to false only for a complete, fixed set of valid answers - e.g. a plain yes/no question,\n"
+"            picking a record from a fixed set of search/lookup results, or choosing from a constant enum where every\n"
+"            valid value is already listed. In these cases nothing outside the listed choices is a valid answer.\n"
+"            ## USER ANSWER\n"
+"            - The user's answer is confirmation to proceed with whatever you are doing. When the question was asked mainly to get information needed to execute an action,\n"
+"            act on the answer immediately; don't just restate the choice and wait for a separate \"apply it,\" \"do it,\" or \"confirm\" message.\n"
+"            - Your next turn must be constrained by the selection, move forward with only what was selected.\n"
+"            - Only ask a follow-up question if a *new* piece of information is genuinely still missing.\n"
+"        "
+msgstr ""
+"\n"
+"            გამოიყენეთ ეს ხელსაწყო, როდესაც გსურთ, რომ მომხმარებელმა აირჩიოს მიმართულება ან ქმედება და მისმა არჩევანმა განსაზღვროს, რას გააკეთებთ შემდეგ. ეს მოიცავს\n"
+"            მომხმარებლისთვის ასარჩევად იდეების, შემოთავაზებების, რეკომენდაციების, ალტერნატივების, გაუმჯობესებების ან შემდეგი ქმედებების წარდგენას. ის დაწკაპუნებად ვარიანტებს აჩვენებს\n"
+"            არჩევანის ტექსტად ჩამოთვლის ნაცვლად. გაუმჯობესებების რეკომენდაციისას ᲧᲝᲕᲔᲚᲗᲕᲘᲡ აქციეთ თითოეული რეკომენდაცია ამ ხელსაწყოთი ასარჩევ ქმედებად; ნუ ჩამოწერთ ტექსტურ სიას, რომლის გამოყენებასაც შემდეგ შესთავაზებთ.\n"
+"            ## წესები\n"
+"            - დასვით ერთი ფოკუსირებული კითხვა, რომელიც ერთ გადაწყვეტილებას წყვეტს, 2-4 ვარიანტით.\n"
+"            - თითოეული ვარიანტი უნდა იყოს ამ კითხვაზე პირდაპირი პასუხი ან ქმედება. თუ რამდენიმე ერთმანეთთან დაუკავშირებელი ინფორმაცია გჭირდებათ,\n"
+"            თითოეულ ინფორმაციაზე ცალკე კითხვა დასვით, ნაცვლად იმისა, რომ კითხვები ვარიანტების ერთ სიაში გააერთიანოთ.\n"
+"            - თავად კითხვა უნდა იყოს სრული, დამოუკიდებელი კითხვა - სრული კითხვითი წინადადება, თავისთავად გასაგები, ისე, რომ გრამატიკისა და მნიშვნელობისთვის\n"
+"            წინა ტექსტს არ ეყრდნობოდეს. არა ფრაგმენტი ან ეტიკეტი (მაგ. \"განათების რომელი სტილი უნდა გამოიყენოს სცენამ?\" და არა \"განათების სტილი:\").\n"
+"            - თითოეული ვარიანტი უნდა იყოს დამოუკიდებელი, კონკრეტული ქმედება; გასაგები და შესასრულებელი კითხვის ხელახლა წაკითხვის გარეშე (მაგ. \"გამოიყენეთ თბილი\n"
+"            გარემოს განათება,\" და არა \"განათების ატმოსფერო\" ან \"დიახ\"). ვარიანტები ერთმანეთს უნდა გამორიცხავდეს, გარდა იმ შემთხვევისა, როდესაც მათი გაერთიანება აზრიანია; ასეთ\n"
+"            შემთხვევაში multi_select-ს მიანიჭეთ true, რომ მომხმარებლებმა ერთზე მეტის არჩევა შეძლონ, მაგრამ არასოდეს დაამატოთ შემაჯამებელი ან ყოვლისმომცველი ვარიანტი (მაგ. \"ყველა\n"
+"            ზემოთ ჩამოთვლილი,\" \"არცერთი,\" \"ამათი კომბინაცია,\" \"ვარიანტების ნაზავი\"), რადგან multi_select უკვე აძლევს მომხმარებლებს თითოეული ვარიანტის ცალ-ცალკე არჩევის საშუალებას.\n"
+"            - არასოდეს შეავსოთ სია უმოქმედო ვარიანტით (\"გამოტოვება,\" \"ახლა არა,\" \"იქნებ მოგვიანებით\"): მომხმარებელს შეუძლია კითხვის გამოტოვება და\n"
+"            ჩამოუთვლელი პასუხის აკრეფა, როდესაც allow_free_text-ის მნიშვნელობაა true.\n"
+"            - ვარიანტები თავად პასუხია და არა ეტიკეტები პასუხისთვის, რომელსაც შემდეგ გაშლით. თუ მომხმარებლის\n"
+"            არჩევანის შემდეგ ყველა ეტიკეტის მიღმა არსებულ შინაარსს მაინც დაწერდით, თქვენ კითხვას არ სვამთ - უბრალოდ დაწერეთ პასუხი.\n"
+"            - არასოდეს დაამატოთ ვარიანტი \"სხვა\" / \"რაიმე სხვა\" / \"მორგებული\" - თავისუფალი ტექსტის ალტერნატივა უკვე ავტომატურად შეითავაზება, როდესაც\n"
+"            allow_free_text-ის მნიშვნელობაა true (იხ. ქვემოთ), ხოლო როდესაც false-ია, არანაირი ალტერნატივა არ შეითავაზება.\n"
+"            - გამოიყენეთ პირდაპირი პასუხი ან ქმედება, როდესაც პასუხი კონტექსტიდან უკვე ცნობილია, გონივრული ნაგულისხმევი მნიშვნელობა აშკარაა, ან სხვა ხელსაწყო\n"
+"            უკვე თავად მართავს დადასტურების პროცესს. კითხვა უბრალო ტექსტით დასვით, როდესაც ორზე ნაკლები აზრიანი ვარიანტი არსებობს.\n"
+"            - ნუ იკითხავთ ველების უმნიშვნელო არჩევანზე ჩანაწერების შექმნის ან განახლებისას. გამოიყენეთ გონივრული ნაგულისხმევი მნიშვნელობა, თუ ეს არ მოქმედებს იმაზე, რაც მომხმარებელმა მოითხოვა.\n"
+"            - არასოდეს დასვათ კითხვა, რომელსაც მომხმარებლის ბოლო შეტყობინება უკვე პასუხობს. თუ მომხმარებელი იდეების, ვარიანტების ან\n"
+"            სტრატეგიების გარკვეულ რაოდენობას ითხოვს, მიაწოდეთ ზუსტად ამდენი. ეს ხელსაწყო გამოიყენეთ მხოლოდ მაშინ, როდესაც მას მათგან ერთის ან რამდენიმის არჩევა ან გამოყენება სჭირდება; წინააღმდეგ შემთხვევაში პირდაპირ უპასუხეთ.\n"
+"            ## მრავალჯერადი არჩევა\n"
+"            - multi_select-ს true მიანიჭეთ მხოლოდ მაშინ, როდესაც მომხმარებელს შეუძლია ამ ერთ კითხვაზე ერთზე მეტი პასუხის/ქმედების არჩევა და თითოეულ ვარიანტს დამოუკიდებლად აქვს აზრი.\n"
+"            - ვარიანტი, რომელიც რამდენიმე დამოუკიდებლად გამოსაყენებელ ქმედებას აერთიანებს (მაგ. \"ტექსტისა და განლაგების დახვეწის გამოყენება\"), იმის ნიშანია, რომ\n"
+"            გააერთიანეთ არჩევანი, რომელიც ცალ-ცალკე უნდა ყოფილიყო: თითოეული დამოუკიდებელი ქმედება ცალკე ვარიანტად გამოყავით და multi_select-ს მიანიჭეთ true, იმის ნაცვლად, რომ\n"
+"            იძულებით აარჩევინოთ ყველაფერი ან არაფერი.\n"
+"            - multi_select ერთი ალამია მთელი სიისთვის: true მიანიჭეთ მხოლოდ მაშინ, თუ თითოეული ვარიანტი დამოუკიდებლად ასარჩევია. თუ რომელიმე\n"
+"            ვარიანტი დანარჩენებს გამორიცხავს, დატოვეთ false.\n"
+"            - ვარიანტების ნებისმიერი კომბინაცია თანმიმდევრული უნდა დარჩეს: თუ მათგან ორის ერთად არჩევა კონფლიქტს გამოიწვევს ან\n"
+"            აზრს დაკარგავს, ისინი ერთ სიაში არ უნდა იყოს.\n"
+"            ## ALLOW_FREE_TEXT\n"
+"            - ხელსაწყოს გამოძახებების უმეტესობაში allow_free_text-ს ცალსახად მიანიჭეთ true, რომ მომხმარებელმა ჩამოუთვლელი პასუხის მიწოდება შეძლოს.\n"
+"            - false მიანიჭეთ მხოლოდ სწორი პასუხების სრული, ფიქსირებული ნაკრებისთვის - მაგ. უბრალო კითხვა დიახ/არა,\n"
+"            ჩანაწერის არჩევა ძიების/მოძიების შედეგების ფიქსირებული ნაკრებიდან, ან არჩევა მუდმივი enum-იდან, სადაც ყველა\n"
+"            სწორი მნიშვნელობა უკვე ჩამოთვლილია. ამ შემთხვევებში ჩამოთვლილი ვარიანტების გარდა არაფერი არ არის სწორი პასუხი.\n"
+"            ## მომხმარებლის პასუხი\n"
+"            - მომხმარებლის პასუხი იმის დადასტურებაა, რომ გააგრძელოთ ის, რასაც აკეთებთ. როდესაც კითხვა ძირითადად ქმედების შესასრულებლად საჭირო ინფორმაციის მისაღებად დაისვა,\n"
+"            დაუყოვნებლივ იმოქმედეთ პასუხის მიხედვით; ნუ გაიმეორებთ არჩევანს და ნუ დაელოდებით ცალკე შეტყობინებას \"გამოიყენე,\" \"გააკეთე,\" ან \"დაადასტურე\".\n"
+"            - თქვენი შემდეგი პასუხი არჩეულით უნდა შემოიფარგლოს; გააგრძელეთ მხოლოდ იმით, რაც აირჩიეს.\n"
+"            - დამატებითი კითხვა დასვით მხოლოდ მაშინ, თუ ინფორმაციის *ახალი* ნაწილი ნამდვილად კვლავ აკლია.\n"
+"        "
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_ai_generate_image
+msgid ""
+"\n"
+"Never use this tool preemptively. Use it once the user asks explicitly to generate an image and provide the details of the scene. only use it when the user asks explicitly to generate an image.\n"
+"Aspect Ratio: If the user does not explicitly specify an aspect ratio, default to a 1:1 (square) image format. Only use a different aspect ratio when the user clearly requests it.\n"
+"        "
+msgstr ""
+"\n"
+"არასდროს გამოიყენოთ ეს ხელსაწყო წინასწარ. გამოიყენეთ ის მაშინ, როდესაც მომხმარებელი პირდაპირ მოითხოვს სურათის გენერირებას და მიუთითებს სცენის დეტალებს. გამოიყენეთ ის მხოლოდ მაშინ, როდესაც მომხმარებელი პირდაპირ მოითხოვს სურათის გენერირებას.\n"
+"პროპორცია: თუ მომხმარებელი პროპორციას პირდაპირ არ მიუთითებს, ნაგულისხმევად გამოიყენეთ სურათის 1:1 (კვადრატი) ფორმატი. სხვა პროპორცია გამოიყენეთ მხოლოდ მაშინ, როდესაც მომხმარებელი ამას მკაფიოდ მოითხოვს.\n"
+"        "
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/utils/ai_utils.py:0
+msgid "%(nb_records)s records (%(record_model)s)"
+msgstr "%(nb_records)s ჩანაწერი (%(record_model)s)"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/composer_patch.js:0
+msgid "%(send_text)s (Enter)"
+msgstr "%(send_text)s (Enter)"
+
+#. module: ai
+#: model_terms:ai.prompt.button,prompt:ai.ai_prompt_enhance_image
+msgid ""
+"1. If an image is provided:\n"
+"    - Ask the user what changes they would like to make. \n"
+"    - Provide a few concise example options inspired by the image (e.g., lighting, time of day, motion blur, color temperature, background, etc.). \n"
+"    - The response must be **a list of 3 recommended changes**.\n"
+"    - Keep it **very concise and direct**.\n"
+"        \n"
+"2. If no image is provided:\n"
+"    - Ask the user to provide an image.\n"
+"    - Ask them to mention the enhancements they would like.\n"
+"\n"
+"Example (image provided):\n"
+"    What changes would you like to make to this image?\n"
+"    - time of day.\n"
+"    - motion blur amount.\n"
+"    - background style.\n"
+"Example (no image):\n"
+"    Please provide an image and tell me what enhancement you would like to see in the image."
+msgstr ""
+"1. თუ სურათი მოწოდებულია:\n"
+"    - ჰკითხეთ მომხმარებელს, რა ცვლილებების შეტანა სურს.\n"
+"    - შესთავაზეთ სურათით შთაგონებული რამდენიმე მოკლე სანიმუშო ვარიანტი (მაგ., განათება, დღე-ღამის დრო, მოძრაობის გაბუნდოვნება, ფერის ტემპერატურა, ფონი და ა.შ.).\n"
+"    - პასუხი უნდა იყოს **3 რეკომენდებული ცვლილების სია**.\n"
+"    - იყავით **ძალიან მოკლე და პირდაპირი**.\n"
+"\n"
+"2. თუ სურათი არ არის მოწოდებული:\n"
+"    - სთხოვეთ მომხმარებელს სურათის მოწოდება.\n"
+"    - სთხოვეთ, მიუთითოს სასურველი გაუმჯობესებები.\n"
+"\n"
+"მაგალითი (სურათი მოწოდებულია):\n"
+"    რა ცვლილებების შეტანა გსურთ ამ სურათში?\n"
+"    - დღე-ღამის დრო.\n"
+"    - მოძრაობის გაბუნდოვნების ხარისხი.\n"
+"    - ფონის სტილი.\n"
+"მაგალითი (სურათის გარეშე):\n"
+"    გთხოვთ, მომაწოდოთ სურათი და მითხრათ, რა გაუმჯობესების ნახვა გსურთ სურათზე."
+
+#. module: ai
+#: model_terms:ir.ui.view,arch_db:ai.ir_actions_server_view_form
+msgid "<i class=\"oi text-warning me-2\" data-icon=\"warning\" invisible=\"not ai_tool_show_warning\" aria-hidden=\"true\" title=\"The AI will not be limited by the groups defined on tools\"/>"
+msgstr "<i class=\"oi text-warning me-2\" data-icon=\"warning\" invisible=\"not ai_tool_show_warning\" aria-hidden=\"true\" title=\"AI არ შეიზღუდება ხელსაწყოებზე განსაზღვრული ჯგუფებით\"/>"
+
+#. module: ai
+#: model_terms:ir.ui.view,arch_db:ai.ai_log_action
+msgid "<span>with arguments</span>"
+msgstr "<span>არგუმენტებით</span>"
+
+#. module: ai
+#: model:ir.model.constraint,message:ai.constraint_ai_composer_unique_agent_interface_model
+msgid "A rule with this Action and Model combination already exists."
+msgstr "ამ მოქმედებისა და მოდელის კომბინაციით წესი უკვე არსებობს."
+
+#. module: ai
+#: model:ir.model.constraint,message:ai.constraint_ai_session_complete_child_wait
+msgid "A session waiting for a child must retain its pending tool call."
+msgstr "შვილობილი სესიის მოლოდინში მყოფმა სესიამ უნდა შეინარჩუნოს ხელსაწყოს მოლოდინში მყოფი გამოძახება."
+
+#. module: ai
+#: model:ir.model.fields,help:ai.field_ai_agent__skill_ids
+msgid "A skill includes instructions and tools that guide Odoo AI in helping the user complete their tasks."
+msgstr "უნარი მოიცავს ინსტრუქციებსა და ხელსაწყოებს, რომლებიც Odoo AI-ს უკარნახებს, როგორ დაეხმაროს მომხმარებელს დავალებების შესრულებაში."
+
+#. module: ai
+#: model:ir.model.constraint,message:ai.constraint_ai_session_complete_interaction_wait
+msgid "A waiting AI interaction must retain its continuation data."
+msgstr "მოლოდინში მყოფმა AI ინტერაქციამ უნდა შეინარჩუნოს გაგრძელების მონაცემები."
+
+#. module: ai
+#: model:ir.model.constraint,message:ai.constraint_ai_web_page_url_uniq
+msgid "A web page for this URL already exists."
+msgstr "ამ URL-ისთვის ვებგვერდი უკვე არსებობს."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/core/html_editor/file_selector/file_selector_control_panel_patch.xml:0 code:addons/ai/static/src/discuss/messaging_menu_model_patch.js:0 code:addons/ai/static/src/editor/embedded_components/plugins/voice_transcription_plugin.js:0 code:addons/ai/static/src/editor/plugins/chatgpt_plugin.js:0 code:addons/ai/static/src/file_viewer/file_viewer.xml:0 code:addons/ai/static/src/web/systray_action.xml:0 model:ir.model.fields.selection,name:ai.selection__ir_actions_server__state__ai model:ir.module.module,shortdesc:base.module_ai
+msgid "AI"
+msgstr "AI"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ir_actions_server__ai_action_prompt model:ir.model.fields,field_description:ai.field_ir_cron__ai_action_prompt
+msgid "AI Action Prompt"
+msgstr "AI მოქმედების მოთხოვნა"
+
+#. module: ai
+#: model:ir.model,name:ai.model_ai_agent
+msgid "AI Agent"
+msgstr "AI აგენტი"
+
+#. module: ai
+#: model:ir.model,name:ai.model_ai_agent_source
+msgid "AI Agent Source"
+msgstr "AI აგენტის წყარო"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_web_page__ai_sources_ids model:ir.model.fields,field_description:ai.field_ir_attachment__ai_sources_ids
+msgid "AI Agent Sources"
+msgstr "AI აგენტის წყაროები"
+
+#. module: ai
+#: model:ir.model.constraint,message:ai.constraint_discuss_channel_ai_channel_type_check
+msgid "AI Agent can only be set for ai_chat or livechat channels."
+msgstr "AI აგენტის მითითება შესაძლებელია მხოლოდ ai_chat ან livechat არხებისთვის."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
+msgid "AI Chat Settings"
+msgstr "AI ჩატის პარამეტრები"
+
+#. module: ai
+#: model:ir.model,name:ai.model_ai_embedding_mixin
+msgid "AI Embedding Mixin"
+msgstr "AI ემბედინგის მიქსინი"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_cron_embed_records_ir_actions_server
+msgid "AI Embedding: Create records embedding"
+msgstr "AI ჩაშენება: ჩანაწერების ჩაშენების შექმნა"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_cron_generate_embedding_ir_actions_server
+msgid "AI Embedding: Generate Embeddings"
+msgstr "AI ჩაშენება: ჩაშენებების გენერირება"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_cron_update_deprecated_embedding_models_ir_actions_server
+msgid "AI Embedding: Update deprecated embedding models"
+msgstr "AI ჩაშენება: ჩაშენების მოძველებული მოდელების განახლება"
+
+#. module: ai
+#: model:ir.model,name:ai.model_ai_attachment_vacuum
+msgid "AI Generated Attachments that aren't used and should be autovacuumed"
+msgstr "AI-ით გენერირებული დანართები, რომლებიც არ გამოიყენება და ავტომატურად უნდა გასუფთავდეს"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_prompt/ai_field_selector_plugin.js:0
+msgid "AI Prompt Tools"
+msgstr "AI მოთხოვნის ხელსაწყოები"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ir_actions_server__ai_tool_schema model:ir.model.fields,field_description:ai.field_ir_cron__ai_tool_schema
+msgid "AI Schema"
+msgstr "AI სქემა"
+
+#. module: ai
+#: model:ir.model,name:ai.model_ai_session
+msgid "AI Session"
+msgstr "AI სესია"
+
+#. module: ai
+#: model:ir.model,name:ai.model_ai_session_event
+msgid "AI Session Event"
+msgstr "AI სესიის მოვლენა"
+
+#. module: ai
+#: model:ir.model,name:ai.model_ai_tool
+msgid "AI Tool"
+msgstr "AI ხელსაწყო"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ir_actions_server__ai_tool_description model:ir.model.fields,field_description:ai.field_ir_cron__ai_tool_description
+msgid "AI Tool Description"
+msgstr "AI ხელსაწყოს აღწერა"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ir_actions_server__ai_tool_name model:ir.model.fields,field_description:ai.field_ir_cron__ai_tool_name
+msgid "AI Tool Name"
+msgstr "AI ხელსაწყოს სახელი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ir_actions_server__ai_tool_thinking_text model:ir.model.fields,field_description:ai.field_ir_cron__ai_tool_thinking_text
+msgid "AI Tool Thinking Text"
+msgstr "AI ხელსაწყოს ფიქრის ტექსტი"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_adjust_search
+msgid "AI Tool: Adjust Search"
+msgstr "AI ხელსაწყო: ძიების კორექტირება"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_compute_date
+msgid "AI Tool: Compute Date"
+msgstr "AI ხელსაწყო: თარიღის გამოთვლა"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_compute_report_measures
+msgid "AI Tool: Compute Report Measures"
+msgstr "AI ხელსაწყო: ანგარიშის საზომების გამოთვლა"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_continue_session
+msgid "AI Tool: Continue Session"
+msgstr "AI ხელსაწყო: სესიის გაგრძელება"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_create_records
+msgid "AI Tool: Create Records"
+msgstr "AI ხელსაწყო: ჩანაწერების შექმნა"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_ai_generate_image
+msgid "AI Tool: Generate an Image"
+msgstr "AI ხელსაწყო: სურათის გენერირება"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_get_fields
+msgid "AI Tool: Get Fields"
+msgstr "AI ხელსაწყო: ველების მიღება"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_get_menu_details
+msgid "AI Tool: Get Menu Details"
+msgstr "AI ხელსაწყო: მენიუს დეტალების მიღება"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_get_menus
+msgid "AI Tool: Get Menus"
+msgstr "AI ხელსაწყო: მენიუების მიღება"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_get_models
+msgid "AI Tool: Get Models"
+msgstr "AI ხელსაწყო: მოდელების მიღება"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_load_skills
+msgid "AI Tool: Load Skills"
+msgstr "AI ხელსაწყო: უნარების ჩატვირთვა"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_open_menu_graph
+msgid "AI Tool: Open Menu Graph"
+msgstr "AI ხელსაწყო: მენიუს გრაფიკის ხედის გახსნა"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_open_menu_kanban
+msgid "AI Tool: Open Menu Kanban"
+msgstr "AI ხელსაწყო: მენიუს kanban ხედის გახსნა"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_open_menu_list
+msgid "AI Tool: Open Menu List"
+msgstr "AI ხელსაწყო: მენიუს სიის ხედის გახსნა"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_open_menu_pivot
+msgid "AI Tool: Open Menu Pivot"
+msgstr "AI ხელსაწყო: მენიუს pivot ხედის გახსნა"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_preview_records
+msgid "AI Tool: Prepare Record Previews"
+msgstr "AI ხელსაწყო: ჩანაწერების გადახედვების მომზადება"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_read_binary_content
+msgid "AI Tool: Read Binary Content"
+msgstr "AI ხელსაწყო: ბინარული შიგთავსის წაკითხვა"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_read_group
+msgid "AI Tool: Read group"
+msgstr "AI ხელსაწყო: დაჯგუფებული წაკითხვა"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_run_view_action
+msgid "AI Tool: Run view action"
+msgstr "AI ხელსაწყო: ხედის ქმედების გაშვება"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_search
+msgid "AI Tool: Search"
+msgstr "AI ხელსაწყო: ძიება"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_start_session
+msgid "AI Tool: Start Session"
+msgstr "AI ხელსაწყო: სესიის დაწყება"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_update_records
+msgid "AI Tool: Update Records"
+msgstr "AI ხელსაწყო: ჩანაწერების განახლება"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_ai_web_search
+msgid "AI Tool: Web Search"
+msgstr "AI ხელსაწყო: ინტერნეტში ძიება"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/plugins/chatgpt_plugin.js:0 model:ir.model.fields,field_description:ai.field_ai_skill__tool_ids
+msgid "AI Tools"
+msgstr "AI ხელსაწყოები"
+
+#. module: ai
+#: model:ir.model,name:ai.model_ai_web_page
+msgid "AI Web Page"
+msgstr "AI ვებგვერდი"
+
+#. module: ai
+#: model:ir.model,name:ai.model_ai_web_scraper_batch
+msgid "AI Web Scraper Batch"
+msgstr "AI ვებსკრეიპერის პაკეტი"
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_cron_run_web_scraper_ir_actions_server
+msgid "AI Web Scraper: Run Batches"
+msgstr "AI ვებსაიტის შიგთავსის ამოღება: ჯგუფების გაშვება"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__discuss_channel__channel_type__ai_chat
+msgid "AI chat"
+msgstr "AI ჩატი"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.js:0 code:addons/ai/static/src/editor/embedded_components/plugins/voice_transcription_plugin.js:0
+msgid "AI is listening..."
+msgstr "AI გისმენთ..."
+
+#. module: ai
+#: model:ir.model,name:ai.model_ai_composer
+msgid "AI model configurations (Default Prompt) for text drafting."
+msgstr "AI მოდელის კონფიგურაციები (ნაგულისხმევი მოთხოვნა) ტექსტის შესადგენად."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_agent.py:0
+msgid "AI not reachable, AI Agent not found."
+msgstr "AI მიუწვდომელია, AI აგენტი ვერ მოიძებნა."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/controllers/thread.py:0
+msgid "AI session expired. Please start a new session."
+msgstr "AI სესიის ვადა ამოიწურა. გთხოვთ, დაიწყოთ ახალი სესია."
+
+#. module: ai
+#: model:ir.actions.server,name:ai.ir_actions_server_ask_user_question
+msgid "AI: Ask User Question"
+msgstr "AI: მომხმარებლისთვის კითხვის დასმა"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.js:0
+msgid "Access error"
+msgstr "წვდომის შეცდომა"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_composer__interface_key model_terms:ir.ui.view,arch_db:ai.ai_log_action
+msgid "Action"
+msgstr "მოქმედება"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ir_actions_server.py:0
+msgid "Action \"%(action)s\" done."
+msgstr "ქმედება \"%(action)s\" შესრულდა."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.xml:0
+msgid "Actions"
+msgstr "ქმედებები"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent__active model:ir.model.fields,field_description:ai.field_ai_agent_source__is_active model:ir.model.fields,field_description:ai.field_ai_session__active
+msgid "Active"
+msgstr "აქტიური"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ir_actions_server.py:0
+msgid "Activity created for %(user)s."
+msgstr "აქტივობა შეიქმნა %(user)s-ისთვის."
+
+#. module: ai
+#. odoo-javascript
+#. odoo-python
+#: code:addons/ai/static/src/ai_json_schema/ai_json_schema.xml:0 code:addons/ai/utils/ai_utils.py:0
+msgid "Add"
+msgstr "დამატება"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/utils/ai_utils.py:0
+msgid "Add \"%(record_name)s\""
+msgstr "\"%(record_name)s\"-ის დამატება"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/embedded_components/plugins/voice_transcription_plugin.js:0
+msgid "Add notes about your upcoming meeting"
+msgstr "დაამატეთ შენიშვნები თქვენი მომავალი შეხვედრის შესახებ"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent_source__agent_id model:ir.model.fields,field_description:ai.field_ai_composer__ai_agent_id model:ir.model.fields,field_description:ai.field_ai_session__agent_id model:ir.model.fields,field_description:ai.field_res_partner__agent_ids model:ir.model.fields,field_description:ai.field_res_users__agent_ids
+msgid "Agent"
+msgstr "აგენტი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent__name
+msgid "Agent Name"
+msgstr "აგენტის სახელი"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "Aggregated records in %s"
+msgstr "აგრეგირებულია ჩანაწერები %s-ში"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_discuss_channel__ai_agent_id
+msgid "Ai Agent"
+msgstr "AI აგენტი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__ai_composer_id
+msgid "Ai Composer"
+msgstr "AI შემდგენელი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session_event__ai_session_id model:ir.model.fields,field_description:ai.field_discuss_channel__ai_session_ids
+msgid "Ai Session"
+msgstr "AI სესია"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ir_actions_server__ai_tool_has_schema model:ir.model.fields,field_description:ai.field_ir_cron__ai_tool_has_schema
+msgid "Ai Tool Has Schema"
+msgstr "AI ხელსაწყოს აქვს სქემა"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ir_actions_server__ai_tool_is_candidate model:ir.model.fields,field_description:ai.field_ir_cron__ai_tool_is_candidate
+msgid "Ai Tool Is Candidate"
+msgstr "AI ხელსაწყო კანდიდატია"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ir_actions_server__ai_tool_show_warning model:ir.model.fields,field_description:ai.field_ir_cron__ai_tool_show_warning
+msgid "Ai Tool Show Warning"
+msgstr "AI ხელსაწყოს გაფრთხილების ჩვენება"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent__allowed_agent_ids
+msgid "Allowed Agents"
+msgstr "დაშვებული აგენტები"
+
+#. module: ai
+#: model:ir.model.constraint,message:ai.constraint_ai_session_complete_request_data
+msgid "An active AI exchange must retain its complete model request data."
+msgstr "აქტიურმა AI გაცვლამ უნდა შეინარჩუნოს მოდელის მოთხოვნის სრული მონაცემები."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.js:0
+msgid "An error occurred"
+msgstr "მოხდა შეცდომა"
+
+#. module: ai
+#: model_terms:ai.prompt.button,prompt:ai.ai_prompt_summarize_chatter
+msgid ""
+"Analyze the provided Chatter feed text, stored in the message_ids field\n"
+"Strictly ignore all system-generated text (e.g., status changes, file upload notifications, timestamp logs, field updates).\n"
+"Focus exclusively on human-written messages to extract the core narrative.\n"
+"Produce an executive summary, made of clear bullet points, each of them containing a short sentence\n"
+"Keep bullet points punchy and professional. Do not include generic pleasantries (e.g., \"Hello\", \"Thanks\").\n"
+"\n"
+"Example: \n"
+"- John Doe asked if they could have a discount\n"
+"- Marc Demo explained that the seasonal discount had expired\n"
+"- John answered that in that case, he would have to think about it before signing the deal"
+msgstr ""
+"გააანალიზეთ მიმოწერის ლენტის მოწოდებული ტექსტი, რომელიც ინახება message_ids ველში\n"
+"მკაცრად უგულებელყავით სისტემის მიერ გენერირებული მთელი ტექსტი (მაგ., სტატუსის ცვლილებები, ფაილის ატვირთვის შეტყობინებები, დროის ნიშნულების ჩანაწერები, ველების განახლებები).\n"
+"ყურადღება გაამახვილეთ მხოლოდ ადამიანის დაწერილ შეტყობინებებზე, რომ ამოიღოთ ძირითადი შინაარსი.\n"
+"შექმენით მმართველობითი მიმოხილვა მკაფიო პუნქტების სახით, რომელთაგან თითოეული მოკლე წინადადებას შეიცავს\n"
+"პუნქტები იყოს მოკლე, ზუსტი და პროფესიონალური. ნუ ჩართავთ ზოგად თავაზიან ფრაზებს (მაგ., \"გამარჯობა\", \"მადლობა\").\n"
+"\n"
+"მაგალითი:\n"
+"- John Doe-მ იკითხა, შეეძლოთ თუ არა ფასდაკლების მიღება\n"
+"- Marc Demo-მ განმარტა, რომ სეზონური ფასდაკლება ვადაგასული იყო\n"
+"- John-მა უპასუხა, რომ ამ შემთხვევაში გარიგების გაფორმებამდე ამაზე დაფიქრება მოუწევდა"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_get_fields
+msgid "Analyzing model"
+msgstr "მოდელის ანალიზი"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_session.py:0
+msgid "Approved automatically because auto-approval is enabled for this chat."
+msgstr "ავტომატურად დამტკიცდა, რადგან ამ ჩატისთვის ავტომატური დამტკიცება ჩართულია."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/thread_actions_patch.js:0
+msgid "Are you sure you want to delete this AI chat? All its content will be lost."
+msgstr "დარწმუნებული ხართ, რომ გსურთ ამ AI ჩატის წაშლა? მისი მთელი შიგთავსი დაიკარგება."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/core/web/command_palette.js:0 code:addons/ai/static/src/file_viewer/file_viewer.xml:0 code:addons/ai/static/src/mail_composer_chatgpt.xml:0 code:addons/ai/static/src/web/systray_action.xml:0
+msgid "Ask AI"
+msgstr "AI-სთვის შეკითხვა"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_composer__interface_key__systray_ai_button
+msgid "Ask AI for help"
+msgstr "AI-სთვის დახმარების თხოვნა"
+
+#. module: ai
+#: model:ir.model,name:ai.model_ir_attachment model:ir.model.fields,field_description:ai.field_ai_agent_source__attachment_id model:ir.model.fields,field_description:ai.field_ai_attachment_vacuum__attachment_id
+msgid "Attachment"
+msgstr "დანართი"
+
+#. module: ai
+#: model:ir.model,name:ai.model_ai_embedding
+msgid "Attachment Chunks Embedding"
+msgstr "დანართის ფრაგმენტების ემბედინგი"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
+msgid "Auto-Approve Actions"
+msgstr "ქმედებების ავტომატური დამტკიცება"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__auto_confirm
+msgid "Automatically confirm tool calls for the session"
+msgstr "სესიისთვის ხელსაწყოს გამოძახებების ავტომატური დადასტურება"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_composer__available_prompt_ids
+msgid "Available User Prompts"
+msgstr "მომხმარებლის ხელმისაწვდომი მოთხოვნები"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent__avatar_128
+msgid "Avatar"
+msgstr "ავატარი"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__mail_call_artifact__transcription_state__pending
+msgid "Awaiting transcription"
+msgstr "ტრანსკრიფციის მოლოდინში"
+
+#. module: ai
+#: model:ir.model,name:ai.model_base
+msgid "Base"
+msgstr "ბაზა"
+
+#. module: ai
+#: model:ir.module.module,summary:base.module_ai
+msgid "Base module for AI features"
+msgstr "AI ფუნქციების საბაზისო მოდული"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__uuid
+msgid "Batch UUID"
+msgstr "პაკეტის UUID"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_mail_template__body_html
+msgid "Body"
+msgstr "შიგთავსი"
+
+#. module: ai
+#: model:ir.model.fields,help:ai.field_ai_agent__sequence
+msgid "Built-in agents ship with a sequence below 10 to be listed first; custom agents default after them."
+msgstr "ჩაშენებული აგენტები 10-ზე ნაკლები თანმიმდევრობით მოეწოდება, რომ სიაში პირველები იყვნენ; მორგებული აგენტები ნაგულისხმევად მათ შემდეგ განთავსდება."
+
+#. module: ai
+#: model:ir.model.fields,help:ai.field_ai_skill__is_native_skill
+msgid "Built-in skill with fixed behavior that cannot be edited."
+msgstr "ჩაშენებული უნარი ფიქსირებული ქცევით, რომლის რედაქტირება შეუძლებელია."
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_compute_date
+msgid "Calculating the date range"
+msgstr "თარიღების დიაპაზონის გამოთვლა"
+
+#. module: ai
+#: model:ir.model,name:ai.model_mail_call_artifact
+msgid "Call Artifact"
+msgstr "ზარის არტეფაქტი"
+
+#. module: ai
+#: model:ir.model,name:ai.model_call_transcription_mixin
+msgid "Call Transcription Mixin"
+msgstr "ზარის ტრანსკრიფციის მიქსინი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__callback_model
+msgid "Callback Model"
+msgstr "უკუგამოძახების მოდელი"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_session.py:0
+msgid "Can not enable %(key1)s and %(key2)s at the same time"
+msgstr "%(key1)s და %(key2)s ერთდროულად ვერ ჩაირთვება"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/message_patch.xml:0
+msgid "Cancel"
+msgstr "გაუქმება"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
+msgid "Cancel (%(keyboard_command)s)"
+msgstr "გაუქმება (%(keyboard_command)s)"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__channel_id
+msgid "Channel"
+msgstr "არხი"
+
+#. module: ai
+#: model:ir.model,name:ai.model_discuss_channel_member
+msgid "Channel Member"
+msgstr "არხის წევრი"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/messaging_menu_model_patch.js:0
+msgid "Chat"
+msgstr "ჩატი"
+
+#. module: ai
+#: model:ir.model.fields,help:ai.field_discuss_channel__channel_type
+msgid "Chat is private and unique between 2 persons. Group is private among invited persons. Channel can be freely joined (depending on its configuration)."
+msgstr "ჩატი პირადი და უნიკალურია 2 ადამიანს შორის. ჯგუფი პირადია მოწვეულ პირებს შორის. არხს თავისუფლად შეიძლება შეუერთდეთ (მისი კონფიგურაციის მიხედვით)."
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_web_page__checksum
+msgid "Checksum"
+msgstr "საკონტროლო ჯამი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent_source__child_ids
+msgid "Child Sources"
+msgstr "შვილობილი წყაროები"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_embedding__content
+msgid "Chunk Content"
+msgstr "ფრაგმენტის შიგთავსი"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/client_tools.js:0
+msgid "Close"
+msgstr "დახურვა"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_prompt_button__composer_id
+msgid "Composer"
+msgstr "შემდგენელი"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "Computed a date range for %s"
+msgstr "გამოითვალა თარიღების დიაპაზონი %s-ისთვის"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/ai_user_input_request.xml:0
+msgid "Confirm"
+msgstr "დადასტურება"
+
+#. module: ai
+#: model:ir.model,name:ai.model_res_partner
+msgid "Contact"
+msgstr "კონტაქტი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_web_page__content
+msgid "Content"
+msgstr "შიგთავსი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_mail_compose_message__body model:ir.model.fields,field_description:ai.field_mail_composer_mixin__body
+msgid "Contents"
+msgstr "შიგთავსი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_composer__default_prompt
+msgid "Context"
+msgstr "კონტექსტი"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_continue_session
+msgid "Continuing an agent"
+msgstr "აგენტის გაგრძელება"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_discuss_channel__channel_type
+msgid "Conversation Type"
+msgstr "საუბრის ტიპი"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_composer__interface_key__html_prompt_shortcut
+msgid "Convert a prompt in an email"
+msgstr "ელფოსტაში მოთხოვნის გარდაქმნა"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
+msgid "Convert to text (%(keyboard_command_1)s) or Send (%(keyboard_command_2)s)"
+msgstr "ტექსტად გარდაქმნა (%(keyboard_command_1)s) ან გაგზავნა (%(keyboard_command_2)s)"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/utils/tools_schema/validators.py:0
+msgid "Could you please provide info about '%s' as it is required to process your request"
+msgstr "გთხოვთ, მიუთითოთ ინფორმაცია '%s'-ის შესახებ, რადგან ის აუცილებელია თქვენი მოთხოვნის დასამუშავებლად"
+
+#. module: ai
+#: model:ir.model,website_form_label:ai.model_res_partner
+msgid "Create a Customer"
+msgstr "მომხმარებლის შექმნა"
+
+#. module: ai
+#: model:ir.model,name:ai.model_ai_skill
+msgid "Create a skill that leverages instructions and tools to direct Odoo AI in assisting the user with their tasks."
+msgstr "შექმენით უნარი, რომელიც ინსტრუქციებითა და ხელსაწყოებით წარმართავს Odoo AI-ს, რომ მომხმარებელს დავალებების შესრულებაში დაეხმაროს."
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_create_records
+msgid ""
+"Create records\n"
+"        This tool is used to create new records in the database. It exposes three main parameters:\n"
+"            - explanation: A message to explain the tool call with a question asking for user's CONFIRMATION.\n"
+"            - model_name: the technical name of the model to create records for\n"
+"            - preview_menu_id: the id of a menu to be used to generate a link (used in multiple records creation only)\n"
+"            - values: the list of records to create with their fields values."
+msgstr ""
+"ჩანაწერების შექმნა\n"
+"        ეს ხელსაწყო გამოიყენება ბაზაში ახალი ჩანაწერების შესაქმნელად. ის სამ ძირითად პარამეტრს შეიცავს:\n"
+"            - explanation: შეტყობინება ხელსაწყოს გამოძახების ასახსნელად, კითხვით, რომელიც მომხმარებლის დადასტურებას ითხოვს.\n"
+"            - model_name: იმ მოდელის ტექნიკური სახელი, რომლისთვისაც ჩანაწერები იქმნება\n"
+"            - preview_menu_id: მენიუს id, რომელიც ბმულის გენერირებისთვის გამოიყენება (გამოიყენება მხოლოდ მრავალი ჩანაწერის შექმნისას)\n"
+"            - values: შესაქმნელი ჩანაწერების სია მათი ველების მნიშვნელობებით."
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent__create_uid model:ir.model.fields,field_description:ai.field_ai_agent_source__create_uid model:ir.model.fields,field_description:ai.field_ai_attachment_vacuum__create_uid model:ir.model.fields,field_description:ai.field_ai_composer__create_uid model:ir.model.fields,field_description:ai.field_ai_embedding__create_uid model:ir.model.fields,field_description:ai.field_ai_prompt_button__create_uid model:ir.model.fields,field_description:ai.field_ai_session__create_uid model:ir.model.fields,field_description:ai.field_ai_session_event__create_uid model:ir.model.fields,field_description:ai.field_ai_skill__create_uid model:ir.model.fields,field_description:ai.field_ai_web_page__create_uid model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent__create_date model:ir.model.fields,field_description:ai.field_ai_agent_source__create_date model:ir.model.fields,field_description:ai.field_ai_attachment_vacuum__create_date model:ir.model.fields,field_description:ai.field_ai_composer__create_date model:ir.model.fields,field_description:ai.field_ai_embedding__create_date model:ir.model.fields,field_description:ai.field_ai_prompt_button__create_date model:ir.model.fields,field_description:ai.field_ai_session__create_date model:ir.model.fields,field_description:ai.field_ai_session_event__create_date model:ir.model.fields,field_description:ai.field_ai_skill__create_date model:ir.model.fields,field_description:ai.field_ai_web_page__create_date model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "Created records in %s"
+msgstr "შეიქმნა ჩანაწერები %s-ში"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_create_records
+msgid "Creating some records"
+msgstr "ჩანაწერების შექმნა"
+
+#. module: ai
+#: model:iap.service,unit_name:ai.iap_service_odoo_ai
+msgid "Credits"
+msgstr "კრედიტები"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/utils/ai_utils.py:0
+msgid "Current record"
+msgstr "მიმდინარე ჩანაწერი"
+
+#. module: ai
+#: model:ir.model.fields,help:ai.field_ai_agent__system_prompt
+msgid "Customize to control relevance and formatting."
+msgstr "მოარგეთ რელევანტურობისა და ფორმატირების სამართავად."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_session.py:0
+msgid "Declined by the user. Do not attempt to run this sub-agent again unless explicitly instructed."
+msgstr "მომხმარებელმა უარყო. ამ ქვეაგენტის ხელახლა გაშვებას ნუ ეცდებით, თუ ამის შესახებ პირდაპირი მითითება არ მიიღეთ."
+
+#. module: ai
+#: model:ir.model,name:ai.model_ai_prompt_button
+msgid "Default action prompt that can be attached to AI UI rules for quick access by the user."
+msgstr "ნაგულისხმევი მოქმედების მოთხოვნა, რომელიც შეიძლება მიემაგროს AI ინტერფეისის წესებს მომხმარებლის სწრაფი წვდომისთვის."
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_start_session
+msgid "Delegate a focused task to an allowed agent. Returns its final answer and session ID."
+msgstr "გადაეცით ფოკუსირებული დავალება დაშვებულ აგენტს. აბრუნებს მის საბოლოო პასუხს და სესიის ID-ს."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/thread_actions_patch.js:0
+msgid "Delete AI chat"
+msgstr "AI ჩატის წაშლა"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_json_schema/ai_json_schema.xml:0 model:ir.model.fields,field_description:ai.field_ai_agent__subtitle model:ir.model.fields,field_description:ai.field_ai_skill__description
+msgid "Description"
+msgstr "აღწერა"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/embedded_components/plugins/voice_transcription_plugin.js:0
+msgid "Dictate text or record a meeting"
+msgstr "ტექსტის კარნახი ან შეხვედრის ჩაწერა"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_embedding_mixin__embedding_status__dirty model:ir.model.fields.selection,name:ai.selection__ai_web_page__embedding_status__dirty model:ir.model.fields.selection,name:ai.selection__documents_document__embedding_status__dirty model:ir.model.fields.selection,name:ai.selection__helpdesk_ticket__embedding_status__dirty model:ir.model.fields.selection,name:ai.selection__ir_attachment__embedding_status__dirty model:ir.model.fields.selection,name:ai.selection__knowledge_article__embedding_status__dirty
+msgid "Dirty"
+msgstr "გასაახლებელი"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_model_field_selector/ai_model_field_selector_popover.xml:0 code:addons/ai/static/src/ai_prompt/ai_prompt.xml:0 code:addons/ai/static/src/records_selector_popover/records_selector_popover.xml:0
+msgid "Discard"
+msgstr "უარყოფა"
+
+#. module: ai
+#: model:ir.model,name:ai.model_discuss_channel
+msgid "Discussion Channel"
+msgstr "სადისკუსიო არხი"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/chat_window_patch.xml:0
+msgid "Dismiss"
+msgstr "დახურვა"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent__display_name model:ir.model.fields,field_description:ai.field_ai_agent_source__display_name model:ir.model.fields,field_description:ai.field_ai_attachment_vacuum__display_name model:ir.model.fields,field_description:ai.field_ai_composer__display_name model:ir.model.fields,field_description:ai.field_ai_embedding__display_name model:ir.model.fields,field_description:ai.field_ai_embedding_mixin__display_name model:ir.model.fields,field_description:ai.field_ai_prompt_button__display_name model:ir.model.fields,field_description:ai.field_ai_session__display_name model:ir.model.fields,field_description:ai.field_ai_session_event__display_name model:ir.model.fields,field_description:ai.field_ai_skill__display_name model:ir.model.fields,field_description:ai.field_ai_tool__display_name model:ir.model.fields,field_description:ai.field_ai_web_page__display_name model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__display_name model:ir.model.fields,field_description:ai.field_call_transcription_mixin__display_name model:ir.model.fields,field_description:ai.field_discuss_call_history__display_name model:ir.model.fields,field_description:ai.field_discuss_channel__display_name model:ir.model.fields,field_description:ai.field_discuss_channel_member__display_name model:ir.model.fields,field_description:ai.field_ir_actions_server__display_name model:ir.model.fields,field_description:ai.field_ir_attachment__display_name model:ir.model.fields,field_description:ai.field_ir_model_fields__display_name model:ir.model.fields,field_description:ai.field_mail_call_artifact__display_name model:ir.model.fields,field_description:ai.field_mail_composer_mixin__display_name model:ir.model.fields,field_description:ai.field_mail_message__display_name model:ir.model.fields,field_description:ai.field_mail_render_mixin__display_name model:ir.model.fields,field_description:ai.field_mail_template__display_name model:ir.model.fields,field_description:ai.field_mail_thread__display_name model:ir.model.fields,field_description:ai.field_res_partner__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_web_scraper_batch__state__done
+msgid "Done"
+msgstr "დასრულდა"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__mail_call_artifact__transcription_state__done
+msgid "Done transcribing"
+msgstr "ტრანსკრიფცია დასრულდა"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_json_schema/ai_json_schema.xml:0
+msgid "Edit"
+msgstr "რედაქტირება"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_prompt/ai_prompt.xml:0
+msgid "Edit Prompt"
+msgstr "მოთხოვნის რედაქტირება"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/plugins/chatgpt_plugin.js:0
+msgid "Editor"
+msgstr "რედაქტორი"
+
+#. module: ai
+#: model:ir.model,name:ai.model_mail_template
+msgid "Email Template"
+msgstr "ელფოსტის შაბლონი"
+
+#. module: ai
+#: model:ir.model,name:ai.model_mail_thread
+msgid "Email Thread"
+msgstr "ელფოსტის ძაფი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent__embedding_model model:ir.model.fields,field_description:ai.field_ai_embedding__embedding_model
+msgid "Embedding Model"
+msgstr "ემბედინგის მოდელი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_embedding_mixin__embedding_status model:ir.model.fields,field_description:ai.field_ai_web_page__embedding_status model:ir.model.fields,field_description:ai.field_ir_attachment__embedding_status
+msgid "Embedding Status"
+msgstr "ემბედინგის სტატუსი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_embedding__embedding_vector
+msgid "Embedding Vector"
+msgstr "ემბედინგის ვექტორი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_embedding__embedding_error
+msgid "Embedding error"
+msgstr "ემბედინგის შეცდომა"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__enable_resources_only
+msgid "Enable resource restriction for the session"
+msgstr "სესიისთვის რესურსების შეზღუდვის ჩართვა"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__enable_think_longer
+msgid "Enable think longer option for the session"
+msgstr "სესიისთვის ხანგრძლივი ფიქრის ვარიანტის ჩართვა"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__enable_web_search
+msgid "Enable web search capability for the session"
+msgstr "სესიისთვის ვებძიების შესაძლებლობის ჩართვა"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "Enabled Skill %s"
+msgstr "ჩართულია უნარი %s"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "Enabled Skills %s"
+msgstr "ჩართულია უნარები %s"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__error
+msgid "Error"
+msgstr "შეცდომა"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent_source__error_details
+msgid "Error Details"
+msgstr "შეცდომის დეტალები"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__mail_call_artifact__transcription_state__error
+msgid "Error, could not transcribe"
+msgstr "შეცდომა, ტრანსკრიფცია ვერ მოხერხდა"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__event_ids
+msgid "Event"
+msgstr "ღონისძიება"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_agent_source__status__failed model:ir.model.fields.selection,name:ai.selection__ai_embedding_mixin__embedding_status__failed model:ir.model.fields.selection,name:ai.selection__ai_web_page__embedding_status__failed model:ir.model.fields.selection,name:ai.selection__ai_web_scraper_batch__state__failed model:ir.model.fields.selection,name:ai.selection__documents_document__embedding_status__failed model:ir.model.fields.selection,name:ai.selection__helpdesk_ticket__embedding_status__failed model:ir.model.fields.selection,name:ai.selection__ir_attachment__embedding_status__failed model:ir.model.fields.selection,name:ai.selection__knowledge_article__embedding_status__failed
+msgid "Failed"
+msgstr "ვერ შესრულდა"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ir_attachment.py:0
+msgid "Failed to extract content from the attachment. Content must be at least 10 character long."
+msgstr "დანართიდან შიგთავსის ამოღება ვერ მოხერხდა. შიგთავსი უნდა შედგებოდეს მინიმუმ 10 სიმბოლოსგან."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_web_page.py:0 code:addons/ai/models/ai_web_scraper_batch.py:0
+msgid "Failed to fetch the content of this URL."
+msgstr "ამ URL-ის შიგთავსის მიღება ვერ მოხერხდა."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_web_page.py:0
+msgid "Failed to process the content of this URL."
+msgstr "ამ URL-ის შიგთავსის დამუშავება ვერ მოხერხდა."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_web_page.py:0
+msgid "Failed to process this URL."
+msgstr "ამ URL-ის დამუშავება ვერ მოხერხდა."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_web_page.py:0
+msgid "Failed to retrieve web page content. Content must be at least 10 characters long."
+msgstr "ვებგვერდის შიგთავსის მიღება ვერ მოხერხდა. შიგთავსი უნდა შედგებოდეს მინიმუმ 10 სიმბოლოსგან."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_web_scraper_batch.py:0
+msgid "Failed to submit this URL for processing."
+msgstr "ამ URL-ის დასამუშავებლად გაგზავნა ვერ მოხერხდა."
+
+#. module: ai
+#: model:ir.model,name:ai.model_ir_model_fields
+msgid "Field"
+msgstr "ველი"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_prompt/ai_field_selector_plugin.js:0
+msgid "Field Selector"
+msgstr "ველის ამრჩევი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ir_model_fields__ttype
+msgid "Field Type"
+msgstr "ველის ტიპი"
+
+#. module: ai
+#: model:ir.model.fields,help:ai.field_ai_session__state
+msgid "Field that can be used to store data between tool calls"
+msgstr "ველი, რომელშიც შესაძლებელია მონაცემების შენახვა ხელსაწყოს გამოძახებებს შორის"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_agent_source__type__binary
+msgid "File"
+msgstr "ფაილი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent_source__file_size
+msgid "File Size"
+msgstr "ფაილის ზომა"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/messaging_menu_patch.xml:0
+msgid "Filters"
+msgstr "ფილტრები"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_get_menu_details
+msgid "Finding the best view"
+msgstr "საუკეთესო ხედის მოძიება"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/core/html_editor/file_selector/file_selector_control_panel_patch.xml:0
+msgid "Generate Image with AI"
+msgstr "სურათის გენერირება AI-ით"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_composer__interface_key__media_dialog
+msgid "Generate images inside the media manager"
+msgstr "სურათების გენერირება მედიის მენეჯერში"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/plugins/chatgpt_plugin.js:0
+msgid "Generate or transform content with AI"
+msgstr "შიგთავსის გენერირება ან გარდაქმნა AI-ით"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "Generated image %s"
+msgstr "დაგენერირებულია სურათი %s"
+
+#. module: ai
+#: model_terms:ai.prompt.button,prompt:ai.ai_prompt_customer_new_jersey
+msgid ""
+"Get a list of contacts in New Jersey. Output: Properly formatted list where each item is of the form \"Name (Email)\"\n"
+"Efficiency Note: Search on model res.partner via state_id.name and retrieve the name and email fields. Use the provided field names and don't search for the fields of res.partner model."
+msgstr ""
+"მიიღეთ კონტაქტების სია New Jersey-ში. შედეგი: სწორად დაფორმატებული სია, სადაც თითოეულ ელემენტს აქვს ფორმა \"სახელი (ელფოსტა)\"\n"
+"ეფექტიანობის შენიშვნა: მოძებნეთ res.partner მოდელში state_id.name-ის მეშვეობით და ამოიღეთ name და email ველები. გამოიყენეთ მოწოდებული ველების სახელები და ნუ მოძებნით res.partner მოდელის ველებს."
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_composer__interface_key__file_viewer_ai_button
+msgid "Get help on a file attachment"
+msgstr "დახმარება ფაილის დანართთან დაკავშირებით"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_composer__interface_key__chatter_ai_button
+msgid "Get help on a record"
+msgstr "დახმარება ჩანაწერთან დაკავშირებით"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_load_skills
+msgid "Getting ready"
+msgstr "მზადება"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_embedding__has_embedding_generation_failed
+msgid "Has Embedding Generation Failed"
+msgstr "ემბედინგის გენერირება ვერ მოხერხდა"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_mail_call_artifact__has_media_output
+msgid "Has Media Output"
+msgstr "აქვს მედიაგამოსავალი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_discuss_call_history__has_transcript
+msgid "Has Transcript"
+msgstr "აქვს ტრანსკრიპტი"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/thread_patch.js:0
+msgid "Hello, what can I help you with?"
+msgstr "გამარჯობა, რით შემიძლია დაგეხმაროთ?"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_composer__hide_model_selection
+msgid "Hide Model Selection"
+msgstr "მოდელის არჩევის დამალვა"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_composer__hide_prompt_button_page
+msgid "Hide Prompt Button Page"
+msgstr "მოთხოვნის ღილაკის გვერდის დამალვა"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent__id model:ir.model.fields,field_description:ai.field_ai_agent_source__id model:ir.model.fields,field_description:ai.field_ai_attachment_vacuum__id model:ir.model.fields,field_description:ai.field_ai_composer__id model:ir.model.fields,field_description:ai.field_ai_embedding__id model:ir.model.fields,field_description:ai.field_ai_embedding_mixin__id model:ir.model.fields,field_description:ai.field_ai_prompt_button__id model:ir.model.fields,field_description:ai.field_ai_session__id model:ir.model.fields,field_description:ai.field_ai_session_event__id model:ir.model.fields,field_description:ai.field_ai_skill__id model:ir.model.fields,field_description:ai.field_ai_tool__id model:ir.model.fields,field_description:ai.field_ai_web_page__id model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__id model:ir.model.fields,field_description:ai.field_call_transcription_mixin__id model:ir.model.fields,field_description:ai.field_discuss_call_history__id model:ir.model.fields,field_description:ai.field_discuss_channel__id model:ir.model.fields,field_description:ai.field_discuss_channel_member__id model:ir.model.fields,field_description:ai.field_ir_actions_server__id model:ir.model.fields,field_description:ai.field_ir_attachment__id model:ir.model.fields,field_description:ai.field_ir_model_fields__id model:ir.model.fields,field_description:ai.field_mail_call_artifact__id model:ir.model.fields,field_description:ai.field_mail_composer_mixin__id model:ir.model.fields,field_description:ai.field_mail_message__id model:ir.model.fields,field_description:ai.field_mail_render_mixin__id model:ir.model.fields,field_description:ai.field_mail_template__id model:ir.model.fields,field_description:ai.field_mail_thread__id model:ir.model.fields,field_description:ai.field_res_partner__id
+msgid "ID"
+msgstr "ID"
+
+#. module: ai
+#: model_terms:ai.prompt.button,prompt:ai.ai_prompt_generate_an_image
+msgid ""
+"If a reference image is available, treat it as the strict visual anchor for the subject only. If no reference image exists,\n"
+"use the textual description and available context to precisely define the subject's appearance. Your task is to generate a high-fidelity,\n"
+"visually explicit image that reinterprets the same subject within a new, contextually meaningful scenario."
+msgstr ""
+"თუ საცნობარო სურათი ხელმისაწვდომია, მიიჩნიეთ ის მკაცრ ვიზუალურ საყრდენად მხოლოდ ობიექტისთვის. თუ საცნობარო სურათი არ არსებობს,\n"
+"გამოიყენეთ ტექსტური აღწერა და ხელმისაწვდომი კონტექსტი ობიექტის გარეგნობის ზუსტად განსასაზღვრად. თქვენი ამოცანაა, დააგენერიროთ მაღალი სიზუსტის,\n"
+"ვიზუალურად მკაფიო სურათი, რომელიც იმავე ობიექტს ახლებურად წარმოაჩენს ახალ, კონტექსტურად აზრიან სცენარში."
+
+#. module: ai
+#: model:ir.model.fields,help:ai.field_ai_agent__restrict_to_sources
+msgid "If checked, the agent will only respond based on the provided sources."
+msgstr "თუ მონიშნულია, აგენტი მხოლოდ მოწოდებულ წყაროებზე დაყრდნობით უპასუხებს."
+
+#. module: ai
+#: model:ir.model.fields,help:ai.field_ai_agent_source__is_active
+msgid "If the source is active, it will be used in the RAG context."
+msgstr "თუ წყარო აქტიურია, ის RAG კონტექსტში იქნება გამოყენებული."
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent__image_128
+msgid "Image"
+msgstr "სურათი"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_agent_source__status__incomplete
+msgid "Incomplete"
+msgstr "დაუსრულებელი"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_agent_source__status__indexed model:ir.model.fields.selection,name:ai.selection__ai_embedding_mixin__embedding_status__indexed model:ir.model.fields.selection,name:ai.selection__ai_web_page__embedding_status__indexed model:ir.model.fields.selection,name:ai.selection__documents_document__embedding_status__indexed model:ir.model.fields.selection,name:ai.selection__helpdesk_ticket__embedding_status__indexed model:ir.model.fields.selection,name:ai.selection__ir_attachment__embedding_status__indexed model:ir.model.fields.selection,name:ai.selection__knowledge_article__embedding_status__indexed
+msgid "Indexed"
+msgstr "ინდექსირებული"
+
+#. module: ai
+#: model:ir.model.fields,help:ai.field_mail_call_artifact__is_stt
+msgid "Indicates if this artifact is for Speech-to-Text (STT). If set, the media will be converted to a transcript."
+msgstr "მიუთითებს, არის თუ არა ეს არტეფაქტი მეტყველების ტექსტად გარდაქმნისთვის (STT). თუ მონიშნულია, მედია ტრანსკრიპტად გარდაიქმნება."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_model_field_selector/ai_model_field_selector_popover.xml:0 code:addons/ai/static/src/records_selector_popover/records_selector_popover.xml:0
+msgid "Insert"
+msgstr "ჩასმა"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_prompt/ai_field_selector_plugin.js:0
+msgid "Insert a field"
+msgstr "ველის ჩასმა"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/core/html_editor/prompt_plugin.js:0
+msgid "Insert an AI prompt"
+msgstr "AI მოთხოვნის ჩასმა"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_prompt/ai_records_selector_plugin.js:0
+msgid "Insert records"
+msgstr "ჩანაწერების ჩასმა"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_prompt/ai_prompt_field.js:0
+msgid "Insert records the AI can use with the '/record' command"
+msgstr "ჩასვით ჩანაწერები, რომლებიც AI-ს შეუძლია გამოიყენოს '/record' ბრძანებით"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_skill__instructions model_terms:ir.ui.view,arch_db:ai.ir_actions_server_view_form
+msgid "Instructions"
+msgstr "ინსტრუქციები"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ir_actions_server.py:0
+msgid "Invalid JSON schema (malformed JSON)."
+msgstr "არასწორი JSON სქემა (არასწორი ფორმატის JSON)."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_prompt/ai_records_selector_plugin.js:0
+msgid "Invalid Record"
+msgstr "არასწორი ჩანაწერი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_skill__is_native_skill
+msgid "Is Native Skill"
+msgstr "ჩაშენებული უნარია"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_mail_call_artifact__is_stt
+msgid "Is STT Artifact"
+msgstr "STT არტეფაქტია"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_composer__is_system_default
+msgid "Is the rule a system default or user created"
+msgstr "წესი სისტემის ნაგულისხმევია თუ მომხმარებლის შექმნილი"
+
+#. module: ai
+#: model:ir.model.fields,help:ai.field_ir_actions_server__ai_tool_schema model:ir.model.fields,help:ai.field_ir_cron__ai_tool_schema
+msgid "JSON containing the values that can be returned by the LLM along with their properties (type, length, ...)"
+msgstr "JSON, რომელიც შეიცავს LLM-ის მიერ დასაბრუნებელ მნიშვნელობებს მათ თვისებებთან ერთად (ტიპი, სიგრძე, ...)"
+
+#. module: ai
+#: model_terms:ir.ui.view,arch_db:ai.ir_actions_server_view_form
+msgid "JSON schema for the parameters of the action (leave empty if no arguments are needed)"
+msgstr "მოქმედების პარამეტრების JSON სქემა (დატოვეთ ცარიელი, თუ არგუმენტები საჭირო არ არის)"
+
+#. module: ai
+#: model:ir.model,name:ai.model_discuss_call_history
+msgid "Keep the call history"
+msgstr "ზარების ისტორიის შენახვა"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.xml:0 model:ir.model.fields,field_description:ai.field_ai_prompt_button__lang
+msgid "Language"
+msgstr "ენა"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent__write_uid model:ir.model.fields,field_description:ai.field_ai_agent_source__write_uid model:ir.model.fields,field_description:ai.field_ai_attachment_vacuum__write_uid model:ir.model.fields,field_description:ai.field_ai_composer__write_uid model:ir.model.fields,field_description:ai.field_ai_embedding__write_uid model:ir.model.fields,field_description:ai.field_ai_prompt_button__write_uid model:ir.model.fields,field_description:ai.field_ai_session__write_uid model:ir.model.fields,field_description:ai.field_ai_session_event__write_uid model:ir.model.fields,field_description:ai.field_ai_skill__write_uid model:ir.model.fields,field_description:ai.field_ai_web_page__write_uid model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent__write_date model:ir.model.fields,field_description:ai.field_ai_agent_source__write_date model:ir.model.fields,field_description:ai.field_ai_attachment_vacuum__write_date model:ir.model.fields,field_description:ai.field_ai_composer__write_date model:ir.model.fields,field_description:ai.field_ai_embedding__write_date model:ir.model.fields,field_description:ai.field_ai_prompt_button__write_date model:ir.model.fields,field_description:ai.field_ai_session__write_date model:ir.model.fields,field_description:ai.field_ai_session_event__write_date model:ir.model.fields,field_description:ai.field_ai_skill__write_date model:ir.model.fields,field_description:ai.field_ai_web_page__write_date model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__write_date
+msgid "Last Updated on"
+msgstr "ბოლო განახლების თარიღი"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/composer_patch.js:0
+msgid "Listening…"
+msgstr "მოსმენა…"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_chat_launcher_service.js:0
+msgid "Log Note"
+msgstr "შენიშვნის ჩაწერა"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/message_actions_patch.js:0
+msgid "Log as Note"
+msgstr "შენიშვნად ჩაწერა"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "Looked up fields on %s"
+msgstr "მოძიებულია %s-ის ველები"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__loop_state
+msgid "Loop State"
+msgstr "ციკლის მდგომარეობა"
+
+#. module: ai
+#: model:ir.model,name:ai.model_mail_composer_mixin
+msgid "Mail Composer Mixin"
+msgstr "ფოსტის შემდგენლის მიქსინი"
+
+#. module: ai
+#: model:ir.model,name:ai.model_mail_render_mixin
+msgid "Mail Render Mixin"
+msgstr "ფოსტის რენდერის Mixin"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_json_schema/ai_json_schema.xml:0
+msgid "Max Length"
+msgstr "მაქსიმალური სიგრძე"
+
+#. module: ai
+#: model:ir.model,name:ai.model_mail_message
+msgid "Message"
+msgstr "შეტყობინება"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__message_body_suffix
+msgid "Message Body Suffix"
+msgstr "შეტყობინების ტექსტის სუფიქსი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent_source__mimetype
+msgid "Mime Type"
+msgstr "MIME ტიპი"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/utils/tools_schema/validators.py:0
+msgid "Missing definition for %(name)s"
+msgstr "%(name)s-ის განსაზღვრება აკლია"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_composer__focused_model_id model:ir.model.fields,field_description:ai.field_ai_session__res_model
+msgid "Model"
+msgstr "მოდელი"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/messaging_menu_patch.xml:0
+msgid "My Recent Chats"
+msgstr "ჩემი ბოლო ჩატები"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_json_schema/ai_json_schema.xml:0 model:ir.model.fields,field_description:ai.field_ai_agent_source__name
+msgid "Name"
+msgstr "სახელი"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_skill.py:0
+msgid "Native skills cannot be created."
+msgstr "სტანდარტული უნარები ვერ შეიქმნება."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_skill.py:0
+msgid "Native skills cannot be deleted."
+msgstr "სტანდარტული უნარები ვერ წაიშლება."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_skill.py:0
+msgid "Native skills cannot be modified."
+msgstr "სტანდარტული უნარები ვერ შეიცვლება."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/chat_window_patch.xml:0
+msgid "New chat started."
+msgstr "ახალი ჩატი დაიწყო."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/messaging_menu_model_patch.js:0
+msgid "No AI Chats yet."
+msgstr "AI ჩატები ჯერ არ არის."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/utils/ai_fields_tools.py:0
+msgid "No allowed values are provided in the prompt."
+msgstr "მოთხოვნაში დაშვებული მნიშვნელობები მითითებული არ არის."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_agent_source.py:0
+msgid "No attached sources found for this source folder."
+msgstr "ამ წყაროს საქაღალდისთვის დართული წყაროები ვერ მოიძებნა."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_web_page.py:0
+msgid "No text content could be extracted from this URL."
+msgstr "ამ URL-დან ტექსტური შიგთავსის ამოღება ვერ მოხერხდა."
+
+#. module: ai
+#: model_terms:ir.ui.view,arch_db:ai.ai_log_action
+msgid "No tool was executed."
+msgstr "არცერთი ხელსაწყო არ შესრულებულა."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/utils/ai_utils.py:0
+msgid "No, I want something else"
+msgstr "არა, სხვა რამ მინდა"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/utils/ai_utils.py:0
+msgid "None"
+msgstr "არცერთი"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_session.py:0 code:addons/ai/utils/ai_utils.py:0
+msgid "Not enough credits to use Odoo AI"
+msgstr "არასაკმარისი კრედიტი Odoo AI-ის გამოსაყენებლად"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_agent_source.py:0
+msgid "Not enough credits to use Odoo AI."
+msgstr "არასაკმარისი კრედიტი Odoo AI-ის გამოსაყენებლად."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/embedded_components/core/readonly_voice_transcription.xml:0 code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.xml:0
+msgid "Notes"
+msgstr "შენიშვნები"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__turn_notifications
+msgid "Notifications collected during a turn, that will be shown after the final response"
+msgstr "სვლის განმავლობაში შეგროვებული შეტყობინებები, რომლებიც საბოლოო პასუხის შემდეგ გამოჩნდება"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_session.py:0
+msgid "Number of successive API calls exceeded, please try again with a more precise request."
+msgstr "თანმიმდევრული API გამოძახებების რაოდენობა გადაჭარბებულია, გთხოვთ, სცადოთ ხელახლა უფრო ზუსტი მოთხოვნით."
+
+#. module: ai
+#: model:iap.service,description:ai.iap_service_odoo_ai model:iap.service,name:ai.iap_service_odoo_ai
+msgid "Odoo AI"
+msgstr "Odoo AI"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_agent_source.py:0
+msgid "Odoo AI failed to index this source."
+msgstr "Odoo AI-მ ამ წყაროს ინდექსირება ვერ შეძლო."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_session.py:0
+msgid "Odoo AI is currently unreachable. Please try again later."
+msgstr "Odoo AI ამჟამად მიუწვდომელია. გთხოვთ, სცადოთ მოგვიანებით."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_agent_source.py:0
+msgid "Only administrators can create sources from URLs."
+msgstr "URL-ებიდან წყაროების შექმნა მხოლოდ ადმინისტრატორებს შეუძლიათ."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_session.py:0
+msgid "Only internal users can view tool parameters."
+msgstr "ხელსაწყოს პარამეტრების ნახვა მხოლოდ შიდა მომხმარებლებს შეუძლიათ."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/file_viewer/file_viewer.js:0
+msgid "Oops, AI cannot process videos!"
+msgstr "უი, AI ვიდეოებს ვერ ამუშავებს!"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/utils/ai_fields_tools.py:0
+msgid "Oops, an unexpected error occurred."
+msgstr "უი, მოულოდნელი შეცდომა მოხდა."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_session.py:0
+msgid "Oops, it looks like our AI is unreachable"
+msgstr "უი, როგორც ჩანს, ჩვენი AI მიუწვდომელია"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/utils/ai_fields_tools.py:0
+msgid "Oops, the connection failed."
+msgstr "უი, კავშირი ვერ დამყარდა."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/utils/ai_fields_tools.py:0
+msgid "Oops, the request timed out."
+msgstr "უი, მოთხოვნის დრო ამოიწურა."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/utils/ai_fields_tools.py:0
+msgid "Oops, the response could not be processed."
+msgstr "უი, პასუხის დამუშავება ვერ მოხერხდა."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ir_actions_server.py:0
+msgid "Oops, the tool name is incorrect. The tool name must only contain letters (a–z, A–Z), digits (0–9), or underscores (_), and be at most 64 characters long."
+msgstr "უი, ხელსაწყოს სახელი არასწორია. ხელსაწყოს სახელი უნდა შეიცავდეს მხოლოდ ასოებს (a–z, A–Z), ციფრებს (0–9) ან ქვედა ტირეებს (_) და არ უნდა აღემატებოდეს 64 სიმბოლოს."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "Opened %s"
+msgstr "გაიხსნა %s"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "Opened the graph view for %s"
+msgstr "გაიხსნა %s-ის გრაფიკის ხედი"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "Opened the kanban view for %s"
+msgstr "გაიხსნა %s-ის kanban ხედი"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "Opened the list view for %s"
+msgstr "გაიხსნა %s-ის სიის ხედი"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "Opened the pivot view for %s"
+msgstr "გაიხსნა %s-ის pivot ხედი"
+
+#. module: ai
+#: model:ir.model.fields,help:ai.field_ai_prompt_button__lang
+msgid "Optional translation language (ISO code) to select when sending out an email. If not set, the main partner's language will be used. This should usually be a placeholder expression that provides the appropriate language, e.g. {{ object.partner_id.lang }}."
+msgstr "არასავალდებულო თარგმანის ენა (ISO კოდი) ელ-ფოსტის გაგზავნისას ასარჩევად. თუ არ არის მითითებული, გამოყენებული იქნება მთავარი პარტნიორის ენა. ეს ჩვეულებრივ უნდა იყოს ჩანაცვლების გამოსახულება, რომელიც შესაბამის ენას იძლევა, მაგ. {{ object.partner_id.lang }}."
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent_source__parent_path
+msgid "Parent Path"
+msgstr "მშობელი გზა"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__parent_session_id
+msgid "Parent Session"
+msgstr "მშობელი სესია"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent_source__parent_id
+msgid "Parent Source"
+msgstr "მშობელი წყარო"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent__partner_id
+msgid "Partner"
+msgstr "პარტნიორი"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_open_menu_graph
+msgid "Preparing your Graph view"
+msgstr "თქვენი გრაფიკის ხედის მომზადება"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_open_menu_kanban
+msgid "Preparing your Kanban view"
+msgstr "თქვენი kanban ხედის მომზადება"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_open_menu_list
+msgid "Preparing your List view"
+msgstr "თქვენი სიის ხედის მომზადება"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_open_menu_pivot
+msgid "Preparing your Pivot view"
+msgstr "თქვენი pivot ხედის მომზადება"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_update_records
+msgid "Preparing your update"
+msgstr "თქვენი განახლების მომზადება"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_run_view_action
+msgid "Preparing your view"
+msgstr "თქვენი ხედის მომზადება"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_json_schema/ai_json_schema.xml:0
+msgid "Pretty Edit"
+msgstr "ვიზუალური რედაქტირება"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_preview_records
+msgid "Previewing records"
+msgstr "ჩანაწერების გადახედვა"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_agent_source__status__processing model:ir.model.fields.selection,name:ai.selection__ai_embedding_mixin__embedding_status__processing model:ir.model.fields.selection,name:ai.selection__ai_web_page__embedding_status__processing model:ir.model.fields.selection,name:ai.selection__documents_document__embedding_status__processing model:ir.model.fields.selection,name:ai.selection__helpdesk_ticket__embedding_status__processing model:ir.model.fields.selection,name:ai.selection__ir_attachment__embedding_status__processing model:ir.model.fields.selection,name:ai.selection__knowledge_article__embedding_status__processing
+msgid "Processing"
+msgstr "მუშავდება"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.xml:0
+msgid "Processing..."
+msgstr "მუშავდება..."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/core/html_editor/prompt_plugin.js:0 model:ir.model.fields,field_description:ai.field_ai_prompt_button__prompt model_terms:ir.ui.view,arch_db:ai.ir_actions_server_view_form
+msgid "Prompt"
+msgstr "მოთხოვნა"
+
+#. module: ai
+#: model:ir.model.fields,help:ai.field_ir_actions_server__ai_action_prompt model:ir.model.fields,help:ai.field_ir_cron__ai_action_prompt
+msgid "Prompt used by \"AI\" action"
+msgstr "\"AI\" მოქმედების მიერ გამოყენებული მოთხოვნა"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_read_binary_content
+msgid "Reading binary content"
+msgstr "ბინარული შიგთავსის წაკითხვა"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_session__loop_state__ready
+msgid "Ready"
+msgstr "მზადაა"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/records_selector_popover/records_selector_popover.xml:0
+msgid "Record"
+msgstr "ჩანაწერი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_embedding_mixin__embedding_ids model:ir.model.fields,field_description:ai.field_ai_web_page__embedding_ids model:ir.model.fields,field_description:ai.field_ir_attachment__embedding_ids
+msgid "Record embedding ids"
+msgstr "ჩანაწერის ემბედინგის ID-ები"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_prompt/ai_records_selector_plugin.js:0
+msgid "Records Selector"
+msgstr "ჩანაწერების ამრჩევი"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "Refined the search on %s"
+msgstr "დაზუსტდა ძიება %s-ში"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_adjust_search
+msgid "Refining search filters"
+msgstr "ძიების ფილტრების დაზუსტება"
+
+#. module: ai
+#: model_terms:ai.prompt.button,prompt:ai.ai_prompt_regenerate_image
+msgid ""
+"Regenerate the previous image while ensuring the result is clearly and unmistakably different from the last generated version.\n"
+"The new image must not be a minor variation or near-duplicate.\n"
+"\n"
+"Introduce substantial visual changes—such as composition, perspective, camera angle, framing, lighting conditions, color palette,\n"
+"environment, and overall mood—to guarantee originality and clear separation from the prior image.\n"
+"\n"
+"All visual changes must be contextually meaningful and directly related to the subject's real-world purpose or use case.\n"
+"The surrounding environment, mood, and visual treatment should actively demonstrate how the subject is used, experienced,\n"
+"or interacted with, rather than placing it in an arbitrary, decorative, or unrelated setting.\n"
+"\n"
+"Critically, the core subject of the image must remain exactly the same as the subject established in the ongoing\n"
+"conversation with the user. Preserve all defining characteristics. Do not invent, replace, reinterpret, or shift\n"
+"the subject. Do not introduce new primary objects, characters, themes, or narrative elements that were not already\n"
+"part of the subject.\n"
+"\n"
+"The objective is to reimagine the same subject in a fresh, functionally grounded visual scenario—not to create a new\n"
+"subject, fabricate continuity, or add unrelated elements. The subject must remain the dominant focal point of the image\n"
+"at all times."
+msgstr ""
+"ხელახლა დააგენერირეთ წინა სურათი ისე, რომ შედეგი ნათლად და უეჭველად განსხვავდებოდეს ბოლოს დაგენერირებული ვერსიისგან.\n"
+"ახალი სურათი არ უნდა იყოს მცირე ვარიაცია ან თითქმის დუბლიკატი.\n"
+"\n"
+"შეიტანეთ არსებითი ვიზუალური ცვლილებები — მაგალითად, კომპოზიცია, პერსპექტივა, კამერის კუთხე, კადრირება, განათების პირობები, ფერთა პალიტრა,\n"
+"გარემო და საერთო განწყობა — რათა უზრუნველყოთ ორიგინალურობა და წინა სურათისგან მკაფიო განსხვავება.\n"
+"\n"
+"ყველა ვიზუალური ცვლილება კონტექსტურად აზრიანი უნდა იყოს და პირდაპირ უკავშირდებოდეს ობიექტის რეალურ დანიშნულებას ან გამოყენების შემთხვევას.\n"
+"გარემომ, განწყობამ და ვიზუალურმა გადაწყვეტამ აქტიურად უნდა აჩვენოს, როგორ გამოიყენება ობიექტი, როგორ აღიქმება\n"
+"ან როგორ ურთიერთქმედებენ მასთან, ნაცვლად იმისა, რომ ის შემთხვევით, დეკორატიულ ან შეუსაბამო გარემოში მოთავსდეს.\n"
+"\n"
+"რაც მთავარია, სურათის ძირითადი ობიექტი ზუსტად იგივე უნდა დარჩეს, რაც მომხმარებელთან მიმდინარე\n"
+"საუბარში დადგინდა. შეინარჩუნეთ ყველა განმსაზღვრელი მახასიათებელი. არ მოიგონოთ, არ ჩაანაცვლოთ, არ გადაიაზროთ და არ შეცვალოთ\n"
+"ობიექტი. არ შემოიტანოთ ახალი ძირითადი საგნები, პერსონაჟები, თემები ან ნარატიული ელემენტები, რომლებიც უკვე\n"
+"არ იყო ობიექტის ნაწილი.\n"
+"\n"
+"მიზანია იმავე ობიექტის ხელახლა წარმოსახვა ახალ, ფუნქციურად დასაბუთებულ ვიზუალურ სცენარში — და არა ახალი\n"
+"ობიექტის შექმნა, უწყვეტობის გაყალბება ან შეუსაბამო ელემენტების დამატება. ობიექტი სურათის მთავარ ფოკუსურ წერტილად უნდა დარჩეს\n"
+"ყოველთვის."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/utils/ai_utils.py:0
+msgid "Remove \"%(record_name)s\""
+msgstr "\"%(record_name)s\"-ის მოცილება"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/utils/ai_utils.py:0
+msgid "Remove all"
+msgstr "ყველას ამოღება"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_prompt_button__render_model
+msgid "Rendering Model"
+msgstr "რენდერინგის მოდელი"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/utils/ai_utils.py:0
+msgid "Replace all by %(new_relations)s"
+msgstr "ყველას ჩანაცვლება %(new_relations)s-ით"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__request_context
+msgid "Request Context"
+msgstr "მოთხოვნის კონტექსტი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__request_guest_id
+msgid "Request Guest"
+msgstr "მომთხოვნი სტუმარი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__request_payload
+msgid "Request Payload"
+msgstr "მოთხოვნის დატვირთვა"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__request_round
+msgid "Request Round"
+msgstr "მოთხოვნის რაუნდი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__request_round_limit
+msgid "Request Round Limit"
+msgstr "მოთხოვნის რაუნდების ლიმიტი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__request_user_id
+msgid "Request User"
+msgstr "მომთხოვნი მომხმარებელი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__request_uuid
+msgid "Request Uuid"
+msgstr "მოთხოვნის UUID"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__request_webhook_secret
+msgid "Request Webhook Secret"
+msgstr "მოთხოვნის ვებჰუკის საიდუმლო"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_json_schema/ai_json_schema.xml:0
+msgid "Required"
+msgstr "სავალდებულო"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__res_id
+msgid "Res"
+msgstr "Res"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/composer_actions_patch.js:0 model:ir.model.fields,field_description:ai.field_ai_agent__restrict_to_sources
+msgid "Restrict to Sources"
+msgstr "წყაროებით შეზღუდვა"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__resume_token
+msgid "Resume Token"
+msgstr "გაგრძელების ტოკენი"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/chat_window_patch.xml:0
+msgid "Resume previous chat"
+msgstr "წინა ჩატის გაგრძელება"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "Retrieved available measures for %s"
+msgstr "მიღებულია %s-ის ხელმისაწვდომი საზომები"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "Retrieved menu details"
+msgstr "მიღებულია მენიუს დეტალები"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "Retrieved menus"
+msgstr "მიღებულია მენიუები"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "Retrieved models"
+msgstr "მიღებულია მოდელები"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_load_skills
+msgid "Retrieves detailed information about skills, given a list of ids."
+msgstr "იღებს დეტალურ ინფორმაციას უნარების შესახებ ID-ების მოცემული სიის მიხედვით."
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_get_menus
+msgid "Retrieving menus"
+msgstr "მენიუების მიღება"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_get_models
+msgid "Retrieving models"
+msgstr "მოდელების მიღება"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_composer__interface_key__html_field_text_select
+msgid "Rewrite content"
+msgstr "შიგთავსის გადაწერა"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_composer__name
+msgid "Rule Name"
+msgstr "წესის სახელი"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_prompt/ai_prompt.xml:0
+msgid "Save"
+msgstr "შენახვა"
+
+#. module: ai
+#: model:ir.model.fields,help:ai.field_ai_agent_source__web_page_id
+msgid "Scraped web page this source's content is fetched from, when the source type is 'url'."
+msgstr "ამოკითხული ვებგვერდი, საიდანაც ამ წყაროს შიგთავსი მიიღება, როდესაც წყაროს ტიპია 'url'."
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__result
+msgid "Scraper Result"
+msgstr "სკრეიპერის შედეგი"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "Searched records in %s"
+msgstr "მოძიებულია ჩანაწერები %s-ში"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "Searched the web: %s"
+msgstr "ინტერნეტში მოძიებულია: %s"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_search
+msgid "Searching the database"
+msgstr "ბაზაში ძიება"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_ai_web_search
+msgid "Searching the web"
+msgstr "ინტერნეტში ძიება"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/records_selector_popover/records_selector_popover.xml:0
+msgid "Select a records"
+msgstr "აირჩიეთ ჩანაწერები"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_compute_report_measures
+msgid "Selecting the best measure"
+msgstr "საუკეთესო საზომის შერჩევა"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
+msgid "Send (%(keyboard_command)s)"
+msgstr "გაგზავნა (%(keyboard_command)s)"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_chat_launcher_service.js:0
+msgid "Send Message"
+msgstr "შეტყობინების გაგზავნა"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_continue_session
+msgid "Send another message to an idle direct child, retaining its conversation."
+msgstr "გაუგზავნეთ კიდევ ერთი შეტყობინება უმოქმედო პირდაპირ შვილობილ სესიას, მისი საუბრის შენარჩუნებით."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/message_actions_patch.js:0
+msgid "Send as Message"
+msgstr "შეტყობინებად გაგზავნა"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent__sequence model:ir.model.fields,field_description:ai.field_ai_embedding__sequence model:ir.model.fields,field_description:ai.field_ai_prompt_button__sequence
+msgid "Sequence"
+msgstr "მიმდევრობა"
+
+#. module: ai
+#: model:ir.model,name:ai.model_ir_actions_server
+msgid "Server Action"
+msgstr "სერვერის მოქმედება"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.xml:0
+msgid "Share by email"
+msgstr "ელფოსტით გაზიარება"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.js:0
+msgid "Share transcript summary"
+msgstr "ტრანსკრიპტის შეჯამების გაზიარება"
+
+#. module: ai
+#: model_terms:ir.ui.view,arch_db:ai.ir_actions_server_view_form
+msgid "Short explanation of what this does"
+msgstr "მოკლე განმარტება იმისა, თუ რას აკეთებს ეს"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
+msgid "Show Steps"
+msgstr "ნაბიჯების ჩვენება"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__show_agent_steps
+msgid "Show agent steps"
+msgstr "აგენტის ნაბიჯების ჩვენება"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent__skill_ids
+msgid "Skills"
+msgstr "უნარები"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/ai_user_input_request.xml:0
+msgid "Skip"
+msgstr "გამოტოვება"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_session.py:0 model:ir.model.fields.selection,name:ai.selection__ai_agent_source__status__skipped
+msgid "Skipped"
+msgstr "გამოტოვებული"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_agent_source.py:0
+msgid "Some of the attached sources of this folder failed to be processed."
+msgstr "ამ საქაღალდის ზოგიერთი დართული წყაროს დამუშავება ვერ მოხერხდა."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/ai_user_input_request.xml:0
+msgid "Something else"
+msgstr "სხვა რამ"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent_source__is_folder
+msgid "Source is a folder"
+msgstr "წყარო საქაღალდეა"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent__sources_ids
+msgid "Sources"
+msgstr "წყაროები"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.xml:0
+msgid "Start"
+msgstr "დაწყება"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.xml:0
+msgid "Start Recording"
+msgstr "ჩაწერის დაწყება"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/embedded_components/plugins/voice_transcription_plugin.js:0
+msgid "Start recording to get a real-time transcript of the conversation"
+msgstr "დაიწყეთ ჩაწერა, რომ საუბრის ტრანსკრიპტი რეალურ დროში მიიღოთ"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_start_session
+msgid "Starting an agent"
+msgstr "აგენტის გაშვება"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__state model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__state
+msgid "State"
+msgstr "შტატი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent_source__status
+msgid "Status"
+msgstr "სტატუსი"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/thread_patch.xml:0
+msgid "Steps taken"
+msgstr "შესრულებული ნაბიჯები"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.xml:0
+msgid "Stop"
+msgstr "დასრულება"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.xml:0
+msgid "Stop Recording"
+msgstr "ჩაწერის შეწყვეტა"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__submitted_on
+msgid "Submission Date"
+msgstr "წარდგენის თარიღი"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_web_scraper_batch__state__submitted
+msgid "Submitted"
+msgstr "წარდგენილი"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/embedded_components/core/readonly_voice_transcription.xml:0 code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.xml:0
+msgid "Summary"
+msgstr "შეჯამება"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_composer__interface_key__voice_transcription_component
+msgid "Summary Buttons for Voice Transcription Component"
+msgstr "ხმოვანი ტრანსკრიფციის კომპონენტის შეჯამების ღილაკები"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent__is_system_agent
+msgid "System Agent"
+msgstr "სისტემური აგენტი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent__system_prompt
+msgid "System Prompt"
+msgstr "სისტემური მოთხოვნა"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_agent.py:0
+msgid "System agents cannot be deleted."
+msgstr "სისტემური აგენტები ვერ წაიშლება."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_composer.py:0
+msgid "System default prompts cannot be removed."
+msgstr "სისტემის ნაგულისხმევი მოთხოვნები ვერ წაიშლება."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/plugins/chatgpt_plugin.js:0
+msgid "Text Selection"
+msgstr "ტექსტის მონიშვნა"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/controllers/thread.py:0
+msgid "The AI is already responding in this chat."
+msgstr "AI ამ ჩატში უკვე პასუხობს."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/controllers/thread.py:0
+msgid "The AI is still waiting for its agents."
+msgstr "AI ჯერ კიდევ ელოდება თავის აგენტებს."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/controllers/thread.py:0
+msgid "The AI prompt message was not found."
+msgstr "AI მოთხოვნის შეტყობინება ვერ მოიძებნა."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_session.py:0
+msgid "The AI used too many successive tool rounds. Please try a more precise request."
+msgstr "AI-მ ხელსაწყოების ზედმეტად ბევრი თანმიმდევრული რაუნდი გამოიყენა. გთხოვთ, სცადოთ უფრო ზუსტი მოთხოვნა."
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_embedding__res_id
+msgid "The ID of a linked record."
+msgstr "დაკავშირებული ჩანაწერის ID."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ir_actions_server.py:0
+msgid "The action '%s' cannot be used as an AI tool."
+msgstr "ქმედება '%s' ვერ გამოიყენება AI ხელსაწყოდ."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ir_actions_server.py:0
+msgid "The action '%s' must have an AI Tool Name when used as an AI tool."
+msgstr "ქმედებას '%s' AI ხელსაწყოდ გამოყენებისას უნდა ჰქონდეს AI ხელსაწყოს სახელი."
+
+#. module: ai
+#: model:ir.model.constraint,message:ai.constraint_ai_session_valid_request_round
+msgid "The active AI request round must be within its exchange limit."
+msgstr "აქტიური AI მოთხოვნის რაუნდი გაცვლის ლიმიტს არ უნდა აღემატებოდეს."
+
+#. module: ai
+#: model:ir.model.constraint,message:ai.constraint_ai_session_request_uuid_unique
+msgid "The active IAP request UUID must be unique."
+msgstr "აქტიური IAP მოთხოვნის UUID უნიკალური უნდა იყოს."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_agent_source.py:0
+msgid "The attached sources could not be processed."
+msgstr "დართული წყაროების დამუშავება ვერ მოხერხდა."
+
+#. module: ai
+#: model:ir.model.fields,help:ai.field_ai_composer__name
+msgid "The identifier for the interface component to agent rule"
+msgstr "ინტერფეისის კომპონენტისა და აგენტის დამაკავშირებელი წესის იდენტიფიკატორი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_embedding__res_model
+msgid "The model of a linked record"
+msgstr "დაკავშირებული ჩანაწერის მოდელი"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_json_schema/ai_json_schema.js:0
+msgid "The name should be unique"
+msgstr "სახელი უნიკალური უნდა იყოს"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_agent.py:0
+msgid "The partner linked to an AI agent can't be changed"
+msgstr "AI აგენტთან დაკავშირებული პარტნიორი ვერ შეიცვლება"
+
+#. module: ai
+#: model:ir.model.fields,help:ai.field_ai_prompt_button__prompt
+msgid "The prompt that will be sent to the AI when the button is clicked"
+msgstr "მოთხოვნა, რომელიც AI-ს გაეგზავნება ღილაკზე დაწკაპუნებისას"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_session.py:0
+msgid "The record linked to the session was not found."
+msgstr "სესიასთან დაკავშირებული ჩანაწერი ვერ მოიძებნა."
+
+#. module: ai
+#: model:ir.model.fields,help:ai.field_ai_prompt_button__name
+msgid "The text shown on the button"
+msgstr "ღილაკზე ნაჩვენები ტექსტი"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/utils/tools_schema/validators.py:0
+msgid "The type of the parameter '%(name)s' is incorrect. It should be '%(expected_param_type)s'."
+msgstr "პარამეტრის '%(name)s' ტიპი არასწორია. ის უნდა იყოს '%(expected_param_type)s'."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/utils/tools_schema/validators.py:0
+msgid "The value '%(value)s' of the parameter '%(name)s' doesn't match the expected pattern '%(expected_pattern)s'."
+msgstr "პარამეტრის '%(name)s' მნიშვნელობა '%(value)s' არ ემთხვევა მოსალოდნელ ნიმუშს '%(expected_pattern)s'."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/utils/tools_schema/validators.py:0
+msgid "The value of parameter '%(name)s' doesn't match any of the expected schemas."
+msgstr "პარამეტრის '%(name)s' მნიშვნელობა არცერთ მოსალოდნელ სქემას არ ემთხვევა."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/utils/tools_schema/validators.py:0
+msgid "The value of the parameter '%(name)s' must be at least %(minimum)s."
+msgstr "პარამეტრის '%(name)s' მნიშვნელობა უნდა იყოს მინიმუმ %(minimum)s."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_session.py:0
+msgid "The web grounding option is not supported with tools. Use the web search skill instead."
+msgstr "ვებზე დაფუძნების პარამეტრი ხელსაწყოებთან ერთად არ არის მხარდაჭერილი. სამაგიეროდ გამოიყენეთ ინტერნეტში ძიების უნარი."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "These attachments are not available to this session."
+msgstr "ეს დანართები ამ სესიისთვის მიუწვდომელია."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
+msgid "Think Longer"
+msgstr "უფრო ხანგრძლივი ფიქრი"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/thread_patch.xml:0
+msgid "Thinking"
+msgstr "ფიქრი"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_session.py:0
+msgid "This AI confirmation choice is no longer available."
+msgstr "AI დადასტურების ეს არჩევანი აღარ არის ხელმისაწვდომი."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/controllers/thread.py:0
+msgid "This AI interaction is not available."
+msgstr "ეს AI ურთიერთქმედება მიუწვდომელია."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_session.py:0
+msgid "This AI question response is not valid."
+msgstr "AI-ის კითხვაზე ეს პასუხი არასწორია."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_web_scraper_batch.py:0
+msgid "This URL took too long to process and timed out after %(hours)d hours."
+msgstr "ამ URL-ის დამუშავებას ძალიან დიდი დრო დასჭირდა და %(hours)d საათის შემდეგ დროის ლიმიტი ამოიწურა."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ir_actions_server.py:0
+msgid "This action cannot be executed by an AI."
+msgstr "ამ ქმედებას AI ვერ შეასრულებს."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ir_actions_server.py:0
+msgid "This action is interactive and cannot be executed by the agent."
+msgstr "ეს ქმედება ინტერაქტიულია და აგენტი მას ვერ შეასრულებს."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "This agent cannot run in the current context."
+msgstr "ეს აგენტი მიმდინარე კონტექსტში ვერ გაეშვება."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/discuss_channel_model_patch.js:0
+msgid "This session's AI agent has been deleted."
+msgstr "ამ სესიის AI აგენტი წაიშალა."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_json_schema/ai_json_schema.xml:0
+msgid "Those parameters will be passed as global variables of the actions."
+msgstr "ეს პარამეტრები მოქმედებებს გლობალური ცვლადების სახით გადაეცემა."
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__timeout_at
+msgid "Timeout At"
+msgstr "ვადის ამოწურვის დრო"
+
+#. module: ai
+#: model_terms:ir.ui.view,arch_db:ai.mail_template_view_form
+msgid "Tip: Write /field to insert values or /prompt to integrate AI-generated dynamic content!"
+msgstr "რჩევა: ჩაწერეთ /field მნიშვნელობების ჩასასმელად ან /prompt AI-ით გენერირებული დინამიკური შინაარსის ჩასართავად!"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_prompt_button__name model:ir.model.fields,field_description:ai.field_ai_skill__name
+msgid "Title"
+msgstr "სათაური"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_web_scraper_batch__state__to_submit
+msgid "To Submit"
+msgstr "წარსადგენი"
+
+#. module: ai
+#: model_terms:ir.ui.view,arch_db:ai.ir_actions_server_view_form
+msgid "To return a result to the AI agent, do <code>ai['result'] = ...</code>"
+msgstr "AI აგენტისთვის შედეგის დასაბრუნებლად ჩაწერეთ <code>ai['result'] = ...</code>"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session__pending_tool_call
+msgid "Tool call waiting on the client"
+msgstr "კლიენტის მოლოდინში მყოფი ხელსაწყოს გამოძახება"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ir_actions_server__ai_tool_ids model:ir.model.fields,field_description:ai.field_ir_cron__ai_tool_ids
+msgid "Tools"
+msgstr "ხელსაწყოები"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/composer_patch.xml:0
+msgid "Transcribing..."
+msgstr "მიმდინარეობს ტრანსკრიფცია..."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/embedded_components/core/readonly_voice_transcription.xml:0 code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.xml:0 code:addons/ai/static/src/views/fields/discuss_call_history_indicators/discuss_call_history_indicators_field_patch.js:0
+msgid "Transcript"
+msgstr "ტრანსკრიპტი"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_mail_call_artifact__transcript
+msgid "Transcript (VTT)"
+msgstr "ტრანსკრიპტი (VTT)"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_mail_call_artifact__transcription_state
+msgid "Transcription State"
+msgstr "ტრანსკრიფციის მდგომარეობა"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/composer_patch.js:0
+msgid "Transcription failed."
+msgstr "ტრანსკრიფცია ვერ მოხერხდა."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/client_tools.js:0
+msgid "Tried to switch to %s but the app is no longer in an action window."
+msgstr "%s-ზე გადართვის მცდელობისას აღმოჩნდა, რომ აპლიკაცია აღარ არის მოქმედების ფანჯარაში."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/message_actions_patch.js:0
+msgid "Try again"
+msgstr "სცადეთ ხელახლა"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_json_schema/ai_json_schema.xml:0 model:ir.model.fields,field_description:ai.field_ai_agent_source__type model:ir.model.fields,field_description:ai.field_ai_skill__type model:ir.model.fields,field_description:ai.field_ir_actions_server__state model:ir.model.fields,field_description:ai.field_ir_cron__state
+msgid "Type"
+msgstr "ტიპი"
+
+#. module: ai
+#: model:ir.model.fields,help:ai.field_ir_actions_server__state model:ir.model.fields,help:ai.field_ir_cron__state
+msgid ""
+"Type of server action. The following values are available:\n"
+"- 'Update a Record': update the values of a record\n"
+"- 'Create Activity': create an activity (Discuss)\n"
+"- 'Send Email': post a message, a note or send an email (Discuss)\n"
+"- 'Send SMS': send SMS, log them on documents (SMS)- 'Add/Remove Followers': add or remove followers to a record (Discuss)\n"
+"- 'Create Record': create a new record with new values\n"
+"- 'Execute Code': a block of Python code that will be executed\n"
+"- 'Send Webhook Notification': send a POST request to an external system, also known as a Webhook\n"
+"- 'Multi Actions': define an action that triggers several other server actions\n"
+msgstr ""
+"სერვერის მოქმედების ტიპი. ხელმისაწვდომია შემდეგი მნიშვნელობები:\n"
+"- 'ჩანაწერის განახლება': ჩანაწერის მნიშვნელობების განახლება\n"
+"- 'აქტივობის შექმნა': აქტივობის შექმნა (Discuss)\n"
+"- 'ელფოსტის გაგზავნა': შეტყობინების ან შენიშვნის გამოქვეყნება ან ელფოსტის გაგზავნა (Discuss)\n"
+"- 'SMS-ის გაგზავნა': SMS-ის გაგზავნა, მათი აღრიცხვა დოკუმენტებზე (SMS)- 'გამომწერების დამატება/წაშლა': ჩანაწერისთვის გამომწერების დამატება ან წაშლა (Discuss)\n"
+"- 'ჩანაწერის შექმნა': ახალი ჩანაწერის შექმნა ახალი მნიშვნელობებით\n"
+"- 'კოდის შესრულება': Python კოდის ბლოკი, რომელიც შესრულდება\n"
+"- 'Webhook შეტყობინების გაგზავნა': POST მოთხოვნის გაგზავნა გარე სისტემაში, ასევე ცნობილი როგორც Webhook\n"
+"- 'მრავალი მოქმედება': მოქმედების განსაზღვრა, რომელიც რამდენიმე სხვა სერვერის მოქმედებას ააქტიურებს\n"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_agent_source__type__url
+msgid "URL"
+msgstr "URL"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_web_scraper_batch__url_payloads
+msgid "URL Payloads"
+msgstr "URL დატვირთვები"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.js:0
+msgid "Unable to start the recording."
+msgstr "ჩაწერის დაწყება ვერ მოხერხდა."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/client_tools.js:0
+msgid "Unable to switch view"
+msgstr "ხედის გადართვა ვერ მოხერხდა"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/messaging_menu_model_patch.js:0
+msgid "Unread"
+msgstr "წაუკითხავი"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_session.py:0
+msgid "Unrecognized AI session configuration key: %(key)s"
+msgstr "AI სესიის კონფიგურაციის ამოუცნობი გასაღები: %(key)s"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_update_records
+msgid ""
+"Update records\n"
+"        This tool is used to update existing records of the database. It exposes three main parameters:\n"
+"            - explanation: A message to explain the tool call with a question asking for user's CONFIRMATION.\n"
+"            - preview_menus: a list of menus to open per models comprised in the list of updates.\n"
+"            - updates: the list of records to update with their fields values."
+msgstr ""
+"ჩანაწერების განახლება\n"
+"        ეს ხელსაწყო გამოიყენება ბაზის არსებული ჩანაწერების განახლებისთვის. ის სამ ძირითად პარამეტრს შეიცავს:\n"
+"            - explanation: შეტყობინება ხელსაწყოს გამოძახების ასახსნელად, კითხვით, რომელიც მომხმარებლის დადასტურებას ითხოვს.\n"
+"            - preview_menus: გასახსნელი მენიუების სია განახლებების სიაში შემავალი თითოეული მოდელისთვის.\n"
+"            - updates: განსაახლებელი ჩანაწერების სია მათი ველების მნიშვნელობებით."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "Updated records"
+msgstr "განახლებული ჩანაწერები"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_web_page__url
+msgid "Url"
+msgstr "URL"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/message_actions_patch.js:0
+msgid "Use This"
+msgstr "ამის გამოყენება"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "Use an allowed agent or an idle direct child session."
+msgstr "გამოიყენეთ დაშვებული აგენტი ან უმოქმედო პირდაპირი შვილობილი სესია."
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ir_actions_server__use_in_ai model:ir.model.fields,field_description:ai.field_ir_cron__use_in_ai
+msgid "Use in AI"
+msgstr "AI-ში გამოყენება"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/message_actions_patch.js:0
+msgid "Use this"
+msgstr "ამის გამოყენება"
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_description:ai.ir_actions_server_ai_web_search
+msgid "Use this tool to delegate research to a specialized search agent."
+msgstr "გამოიყენეთ ეს ხელსაწყო კვლევის სპეციალიზებულ საძიებო აგენტზე დელეგირებისთვის."
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent_source__user_has_access
+msgid "User Has Access"
+msgstr "მომხმარებელს აქვს წვდომა"
+
+#. module: ai
+#: model:ir.model.fields,help:ai.field_ir_actions_server__ai_tool_thinking_text model:ir.model.fields,help:ai.field_ir_cron__ai_tool_thinking_text
+msgid "Value used as thinking message during the agent loop processing."
+msgstr "მნიშვნელობა, რომელიც გამოიყენება ფიქრის შეტყობინებად აგენტის ციკლის დამუშავებისას."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
+msgid "Voice Message (%(keyboard_command)s)"
+msgstr "ხმოვანი შეტყობინება (%(keyboard_command)s)"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/embedded_components/core/readonly_voice_transcription.xml:0 code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.xml:0
+msgid "Voice Recording"
+msgstr "ხმის ჩანაწერი"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/embedded_components/plugins/voice_transcription_plugin.js:0
+msgid "Voice Transcript"
+msgstr "ხმის ტრანსკრიპტი"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_session__loop_state__waiting_answer
+msgid "Waiting for Answer"
+msgstr "პასუხის მოლოდინში"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_session__loop_state__waiting_child
+msgid "Waiting for Child Session"
+msgstr "შვილობილი სესიის მოლოდინში"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_session__loop_state__waiting_client_result
+msgid "Waiting for Client Result"
+msgstr "კლიენტის შედეგის მოლოდინში"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_session__loop_state__waiting_confirmation
+msgid "Waiting for Confirmation"
+msgstr "დადასტურების მოლოდინში"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_session__loop_state__waiting_external_result
+msgid "Waiting for External Result"
+msgstr "გარე შედეგის მოლოდინში"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_session__loop_state__waiting_model
+msgid "Waiting for Model"
+msgstr "მოდელის მოლოდინში"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_session.py:0
+msgid "Waiting for an external result…"
+msgstr "გარე შედეგის მოლოდინში…"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_agent_source__web_page_id
+msgid "Web Page"
+msgstr "ვებგვერდი"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/composer_actions_patch.js:0
+msgid "Web Search"
+msgstr "ვებძიება"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_web_scraper_batch.py:0
+msgid "Web scraping did not finish before the timeout."
+msgstr "ვებსაიტის შიგთავსის ამოღება დროის ლიმიტის ამოწურვამდე ვერ დასრულდა."
+
+#. module: ai
+#: model:ir.actions.server,ai_tool_thinking_text:ai.ir_actions_server_ai_generate_image
+msgid "Working on your picture"
+msgstr "თქვენს სურათზე მუშაობა"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/message_patch.xml:0
+msgid "Working..."
+msgstr "მიმდინარეობს მუშაობა..."
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_composer__interface_key__mail_composer
+msgid "Write an email"
+msgstr "ელფოსტის დაწერა"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ai_composer__interface_key__html_field_record
+msgid "Write in an HTML field"
+msgstr "HTML ველში წერა"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/utils/tools_schema/validators.py:0
+msgid "Wrong value %(value)s, should be in: %(enum)s"
+msgstr "არასწორი მნიშვნელობა %(value)s, უნდა იყოს ერთ-ერთი: %(enum)s"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/utils/ai_utils.py:0
+msgid "Yes, always approve in this chat"
+msgstr "დიახ, ამ ჩატში ყოველთვის დაამტკიცეთ"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/utils/ai_utils.py:0
+msgid "Yes, do it"
+msgstr "დიახ, შეასრულეთ"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/editor/embedded_components/core/voice_transcription.js:0
+msgid "You must allow the access to your microphone to start the recording. Try refreshing the page and start again."
+msgstr "ჩაწერის დასაწყებად საჭიროა მიკროფონზე წვდომის დაშვება. სცადეთ გვერდის განახლება და თავიდან დაიწყეთ."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/controllers/thread.py:0
+msgid "Your company access changed while this AI response was running."
+msgstr "AI-ის ამ პასუხის მომზადებისას თქვენი კომპანიის წვდომა შეიცვალა."
+
+#. module: ai
+#: model_terms:ir.ui.view,arch_db:ai.ir_actions_server_view_form
+msgid "ai_tool_name"
+msgstr "ai_tool_name"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_json_schema/ai_json_schema.xml:0
+msgid "eg: New name to write"
+msgstr "მაგ.: ჩასაწერი ახალი სახელი"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_json_schema/ai_json_schema.xml:0
+msgid "eg: ^(\\\\([0-9]{3}\\\\))?[0-9]{3}-[0-9]{4}$"
+msgstr "მაგ.: ^(\\\\([0-9]{3}\\\\))?[0-9]{3}-[0-9]{4}$"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_json_schema/ai_json_schema.xml:0
+msgid "eg: name"
+msgstr "მაგ.: name"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_json_schema/ai_json_schema.xml:0
+msgid "eg: red, blue, green"
+msgstr "მაგ.: წითელი, ლურჯი, მწვანე"
+
+#. module: ai
+#: model_terms:ir.ui.view,arch_db:ai.ai_log_action
+msgid "executed."
+msgstr "შესრულდა."
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/discuss/messaging_menu_patch.xml:0
+msgid "filters active"
+msgstr "ფილტრი აქტიურია"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0 code:addons/ai/tests/test_tool_create_records.py:0
+msgid "has created %s"
+msgstr "შექმნა %s"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "has updated %s"
+msgstr "განაახლა %s"
+
+#. module: ai
+#: model:ir.model.fields,field_description:ai.field_ai_session_event__metadata
+msgid "json representation of the event"
+msgstr "მოვლენის JSON წარმოდგენა"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "multiple records"
+msgstr "მრავალი ჩანაწერი"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_tool.py:0
+msgid "records"
+msgstr "ჩანაწერები"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/views/fields/call_debrief/call_debrief.js:0
+msgid "silence (%(duration)s)"
+msgstr "სიჩუმე (%(duration)s)"
+
+#. module: ai
+#. odoo-javascript
+#: code:addons/ai/static/src/ai_prompt/ai_field_selector_plugin.js:0
+msgid "tag"
+msgstr "ტეგი"
+
+#. module: ai
+#: model:ir.model.fields.selection,name:ai.selection__ir_model_fields__ttype__vector
+msgid "vector"
+msgstr "ვექტორი"
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_session.py:0
+msgid "⛔ Auto-approval deactivated."
+msgstr "⛔ ავტომატური დამტკიცება გამორთულია."
+
+#. module: ai
+#. odoo-python
+#: code:addons/ai/models/ai_session.py:0
+msgid "✅ Auto-approval enabled for this chat."
+msgstr "✅ ამ ჩატისთვის ავტომატური დამტკიცება ჩართულია."

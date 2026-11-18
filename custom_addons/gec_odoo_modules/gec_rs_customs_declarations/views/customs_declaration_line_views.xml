@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_customs_declaration_line_list" model="ir.ui.view">
+        <field name="name">gec.customs.declaration.line.list</field>
+        <field name="model">gec.customs.declaration.line</field>
+        <field name="arch" type="xml">
+            <list string="Customs Declarations" sample="1" default_order="assessment_date desc, assessment_number desc, item_number">
+                <field name="assessment_date"/>
+                <field name="assessment_number"/>
+                <field name="item_number" string="#"/>
+                <field name="regime" optional="show"/>
+                <field name="direction" widget="badge"
+                       decoration-info="direction == 'import'"
+                       decoration-success="direction == 'export'"
+                       decoration-muted="direction == 'unknown'"/>
+                <field name="hs_code" optional="show"/>
+                <field name="goods_description" optional="show"/>
+                <field name="origin_country_id" optional="show"/>
+                <field name="exporter_code" optional="hide"/>
+                <field name="importer_code" optional="hide"/>
+                <field name="exporter_id" optional="hide"/>
+                <field name="importer_id" optional="hide"/>
+                <field name="brutto_weight" optional="hide" sum="Total Brutto"/>
+                <field name="netto_weight" optional="show" sum="Total Netto"/>
+                <field name="supplementary_quantity" optional="hide"/>
+                <field name="supplementary_unit" optional="hide"/>
+                <field name="value_gel" optional="show" sum="Total GEL"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="customs_name" optional="hide"/>
+                <field name="registration_number" optional="hide"/>
+                <field name="registration_date" optional="hide"/>
+                <field name="customs_procedure" optional="hide"/>
+                <field name="fetched_on" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_customs_declaration_line_form" model="ir.ui.view">
+        <field name="name">gec.customs.declaration.line.form</field>
+        <field name="model">gec.customs.declaration.line</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false" delete="false" string="Customs Declaration Line">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="assessment_number" readonly="1"/>
+                            <span> / #</span><field name="item_number" readonly="1" class="oe_inline"/>
+                        </h1>
+                        <h3>
+                            <field name="hs_code" readonly="1" class="oe_inline"/>
+                            <span> — </span>
+                            <field name="goods_description" readonly="1" class="oe_inline"/>
+                        </h3>
+                    </div>
+                    <group>
+                        <group string="Declaration">
+                            <field name="direction" widget="badge"
+                                   decoration-info="direction == 'import'"
+                                   decoration-success="direction == 'export'"/>
+                            <field name="regime"/>
+                            <field name="customs_procedure"/>
+                            <field name="assessment_date"/>
+                            <field name="registration_number"/>
+                            <field name="registration_date"/>
+                        </group>
+                        <group string="Customs Office">
+                            <field name="customs_code"/>
+                            <field name="customs_name"/>
+                        </group>
+                        <group string="Parties">
+                            <field name="exporter_code"/>
+                            <field name="exporter_id"/>
+                            <field name="importer_code"/>
+                            <field name="importer_id"/>
+                        </group>
+                        <group string="Geography">
+                            <field name="sender_country_code"/>
+                            <field name="sender_country_id"/>
+                            <field name="destination_country_code"/>
+                            <field name="destination_country_id"/>
+                            <field name="origin_country_code"/>
+                            <field name="origin_country_id"/>
+                        </group>
+                        <group string="Quantities">
+                            <field name="brutto_weight"/>
+                            <field name="netto_weight"/>
+                            <field name="supplementary_quantity"/>
+                            <field name="supplementary_unit"/>
+                        </group>
+                        <group string="Value">
+                            <field name="value_gel" widget="monetary"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Audit">
+                        <field name="fetched_by_user_id"/>
+                        <field name="fetched_on"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_customs_declaration_line_search" model="ir.ui.view">
+        <field name="name">gec.customs.declaration.line.search</field>
+        <field name="model">gec.customs.declaration.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="assessment_number"/>
+                <field name="registration_number"/>
+                <field name="hs_code"/>
+                <field name="goods_description"/>
+                <field name="exporter_code"/>
+                <field name="importer_code"/>
+                <field name="origin_country_id"/>
+                <separator/>
+                <filter name="filter_imports" string="Imports" domain="[('direction','=','import')]"/>
+                <filter name="filter_exports" string="Exports" domain="[('direction','=','export')]"/>
+                <filter name="filter_unknown" string="Direction Unknown" domain="[('direction','=','unknown')]"/>
+                <separator/>
+                <filter name="filter_this_month" string="This Month"
+                        date="assessment_date" default_period="this_month"/>
+                <filter name="filter_recently_fetched" string="Recently Fetched"
+                        domain="[('fetched_on','&gt;=', (context_today() - relativedelta(days=1)).strftime('%Y-%m-%d'))]"/>
+                <group>
+                    <filter name="group_assessment" string="Declaration" context="{'group_by': 'assessment_number'}"/>
+                    <filter name="group_regime" string="Regime" context="{'group_by': 'regime'}"/>
+                    <filter name="group_direction" string="Direction" context="{'group_by': 'direction'}"/>
+                    <filter name="group_hs_code" string="HS Code" context="{'group_by': 'hs_code'}"/>
+                    <filter name="group_origin" string="Country of Origin" context="{'group_by': 'origin_country_id'}"/>
+                    <filter name="group_customs" string="Customs Office" context="{'group_by': 'customs_name'}"/>
+                    <filter name="group_month" string="Month (Assessment)" context="{'group_by': 'assessment_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_customs_declaration_line" model="ir.actions.act_window">
+        <field name="name">Customs Declarations</field>
+        <field name="res_model">gec.customs.declaration.line</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_customs_declaration_line_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No customs declarations yet.</p>
+            <p>Use <b>Fetch from RS</b> to pull declarations from rs.ge for a date range.</p>
+        </field>
+    </record>
+
+</odoo>

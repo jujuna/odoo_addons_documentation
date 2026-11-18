@@ -1,0 +1,971 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* employee_registry_rs
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-28 08:02+0000\n"
+"PO-Revision-Date: 2026-04-28 08:02+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,help:employee_registry_rs.field_res_country__rs_country_code
+msgid ""
+"3-digit numeric country code used by the Revenue Service Employee Registry "
+"(e.g. 036 for Australia, 040 for Austria). Populated via Settings > RS "
+"Employee Registry > Sync Countries from RS."
+msgstr ""
+"3-ნიშნა ქვეყნის რიცხვითი კოდი, რომელიც გამოიყენება შემოსავლების სამსახურის "
+"დაქირავებულ პირთა რეესტრის მიერ (მაგ. 036 ავსტრალიისთვის, 040 ავსტრიისთვის). "
+"ივსება პარამეტრებით > RS დაქირავებულ პირთა რეესტრი > ქვეყნების სინქრონიზაცია RS-დან."
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.view_employee_form_inherit_employee_registry_rs
+msgid "Activate in RS"
+msgstr "გააქტიურება RS-ში"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields.selection,name:employee_registry_rs.selection__employee_registry_rs_browser__filter_status__1
+#: model:ir.model.fields.selection,name:employee_registry_rs.selection__employee_registry_rs_browser_line__status__1
+#: model:ir.model.fields.selection,name:employee_registry_rs.selection__hr_employee__rs_status__1
+#: model:ir.model.fields.selection,name:employee_registry_rs.selection__hr_employee__rs_target_status__1
+msgid "Active"
+msgstr "აქტიური"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields.selection,name:employee_registry_rs.selection__hr_employee__rs_sync_mode__auto
+msgid "Automatic (follow contract)"
+msgstr "ავტომატური (კონტრაქტის მიხედვით)"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,help:employee_registry_rs.field_hr_employee__rs_sync_mode
+msgid ""
+"Automatic: daily cron syncs status based on contract dates + active flag. "
+"Manual only: cron skips, status changes only via the buttons on this page. "
+"Disabled: this employee is excluded from RS entirely (buttons refuse too)."
+msgstr ""
+"ავტომატური: ყოველდღიური cron ასინქრონებს სტატუსს კონტრაქტის თარიღებისა და აქტიურობის ფლაგის საფუძველზე. "
+"მხოლოდ ხელით: cron გამოტოვებს, სტატუსი იცვლება მხოლოდ ამ გვერდის ღილაკებით. "
+"გათიშული: ეს თანამშრომელი მთლიანად გამორიცხულია RS-დან (ღილაკებიც უარს ამბობენ)."
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser_line__birth_date
+msgid "Birth Date"
+msgstr "დაბადების თარიღი"
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+msgid "Birthday: %(old)s → %(new)s"
+msgstr "დაბადების თარიღი: %(old)s → %(new)s"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser_line__browser_id
+msgid "Browser"
+msgstr "ბრაუზერი"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser__filter_citizenship
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser_line__citizenship
+msgid "Citizenship"
+msgstr "მოქალაქეობა"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.employee_registry_rs_browser_view_form
+msgid "Close"
+msgstr "დახურვა"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_log__company_id
+msgid "Company"
+msgstr "კომპანია"
+
+#. module: employee_registry_rs
+#: model:ir.model,name:employee_registry_rs.model_res_config_settings
+msgid "Config Settings"
+msgstr "კონფიგურაციის პარამეტრები"
+
+#. module: employee_registry_rs
+#: model:ir.model,name:employee_registry_rs.model_res_country
+msgid "Country"
+msgstr "ქვეყანა"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.res_config_settings_view_form_employee_registry_rs
+msgid "Country Codes"
+msgstr "ქვეყნის კოდები"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser_line__create_date_rs
+msgid "Created (RS)"
+msgstr "შექმნილი (RS)"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser__create_uid
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser_line__create_uid
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_log__create_uid
+msgid "Created by"
+msgstr "შექმნა"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser__create_date
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser_line__create_date
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_log__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.res_config_settings_view_form_employee_registry_rs
+msgid "Credentials"
+msgstr "ავტორიზაციის მონაცემები"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.res_config_settings_view_form_employee_registry_rs
+msgid "Daily Sync"
+msgstr "ყოველდღიური სინქრონიზაცია"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields.selection,name:employee_registry_rs.selection__hr_employee__rs_sync_mode__off
+msgid "Disabled"
+msgstr "გათიშული"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser__display_name
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser_line__display_name
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_log__display_name
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_service__display_name
+#: model:ir.model.fields,field_description:employee_registry_rs.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:employee_registry_rs.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:employee_registry_rs.field_res_country__display_name
+msgid "Display Name"
+msgstr "სახელი"
+
+#. module: employee_registry_rs
+#: model:ir.model,name:employee_registry_rs.model_hr_employee
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_log__employee_id
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.employee_registry_rs_log_view_search
+msgid "Employee"
+msgstr "თანამშრომელი"
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+msgid ""
+"Employee %(employee)s belongs to %(company)s: switch to that company before "
+"syncing with RS."
+msgstr ""
+"თანამშრომელი %(employee)s ეკუთვნის კომპანიას %(company)s. RS-თან "
+"სინქრონიზაციამდე გადაერთეთ ამ კომპანიაზე."
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+msgid ""
+"Employee %s has RS Sync Mode set to 'Disabled'. Change it to 'Manual' or "
+"'Automatic' to perform this action."
+msgstr ""
+"თანამშრომლის %s RS სინქრონიზაციის რეჟიმი დაყენებულია 'გათიშული'-ზე. შეცვალეთ "
+"'ხელით' ან 'ავტომატური' ამ მოქმედების შესასრულებლად."
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+msgid "Employee %s has no Identification ID (TIN) set — cannot sync to RS."
+msgstr "თანამშრომელ %s-ს არ აქვს პირადი ნომერი (TIN) მითითებული — RS-თან სინქრონიზაცია შეუძლებელია."
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+msgid "Employee %s has no phone number set — RS requires PHONE."
+msgstr "თანამშრომელ %s-ს არ აქვს მითითებული ტელეფონის ნომერი — RS მოითხოვს PHONE-ს."
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+msgid ""
+"Employee %s has no resolvable RS status. Check that the current version has "
+"contract dates set."
+msgstr ""
+"თანამშრომელ %s-ს არ აქვს დადგენადი RS სტატუსი. შეამოწმეთ რომ მიმდინარე ვერსიას "
+"აქვს კონტრაქტის თარიღები მითითებული."
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_res_config_settings__employee_registry_rs_sync_enabled
+msgid "Enable Daily Sync"
+msgstr "ყოველდღიური სინქრონიზაციის ჩართვა"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_log__endpoint
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.employee_registry_rs_log_view_search
+msgid "Endpoint"
+msgstr "Endpoint"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.employee_registry_rs_log_view_form
+msgid "Error"
+msgstr "შეცდომა"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_log__error_message
+msgid "Error Message"
+msgstr "შეცდომის შეტყობინება"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.employee_registry_rs_log_view_search
+msgid "Failed"
+msgstr "წარუმატებელი"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.res_config_settings_view_form_employee_registry_rs
+msgid ""
+"Fetch RS country codes (3-digit numeric) and match them to Odoo countries by"
+" Georgian name. Uses the currently logged-in user's credentials."
+msgstr ""
+"მოაქვს RS-ის ქვეყნის კოდები (3-ნიშნა რიცხვითი) და უკავშირებს მათ Odoo-ის ქვეყნებს "
+"ქართული სახელის მიხედვით. იყენებს ამჟამად შესული მომხმარებლის ავტორიზაციის მონაცემებს."
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.view_employee_form_inherit_employee_registry_rs
+msgid "Fetch from RS"
+msgstr "RS-დან მოტანა"
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/res_config_settings.py:0
+msgid "Fetched %(total)s countries, matched %(matched)s to Odoo records."
+msgstr "მოტანილია %(total)s ქვეყანა, %(matched)s დაუკავშირდა Odoo-ის ჩანაწერებს."
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.employee_registry_rs_browser_view_form
+msgid "Filters"
+msgstr "ფილტრები"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.view_employee_form_inherit_employee_registry_rs
+msgid ""
+"Force-mark this employee as active (STATUS=1) in the Revenue Service "
+"Employee Registry?"
+msgstr ""
+"იძულებით მოვნიშნოთ ეს თანამშრომელი აქტიურად (STATUS=1) შემოსავლების სამსახურის "
+"დაქირავებულ პირთა რეესტრში?"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.view_employee_form_inherit_employee_registry_rs
+msgid ""
+"Force-mark this employee as suspended (STATUS=-1) in the Revenue Service "
+"Employee Registry?"
+msgstr ""
+"იძულებით მოვნიშნოთ ეს თანამშრომელი შეჩერებულად (STATUS=-1) შემოსავლების სამსახურის "
+"დაქირავებულ პირთა რეესტრში?"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.view_employee_form_inherit_employee_registry_rs
+msgid ""
+"Force-mark this employee as terminated (STATUS=0) in the Revenue Service "
+"Employee Registry?"
+msgstr ""
+"იძულებით მოვნიშნოთ ეს თანამშრომელი გათავისუფლებულად (STATUS=0) შემოსავლების სამსახურის "
+"დაქირავებულ პირთა რეესტრში?"
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+msgid ""
+"Foreign employee %s has country '%s' but no RS country code. RS did not "
+"return a matching code — verify the country name matches the Georgian name "
+"in RS's list, or contact api-support@rs.ge."
+msgstr ""
+"უცხოელ თანამშრომელ %s-ს აქვს ქვეყანა '%s' მაგრამ არ აქვს RS ქვეყნის კოდი. RS-მა "
+"არ დააბრუნა შესაბამისი კოდი — გადაამოწმეთ რომ ქვეყნის სახელი ემთხვევა ქართულ სახელს "
+"RS-ის სიაში, ან დაუკავშირდით api-support@rs.ge-ს."
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+msgid "Foreign employee %s must have a birthday set."
+msgstr "უცხოელ თანამშრომელ %s-ს უნდა ჰქონდეს დაბადების თარიღი მითითებული."
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+msgid "Foreign employee %s must have gender (male or female) set."
+msgstr "უცხოელ თანამშრომელ %s-ს უნდა ჰქონდეს სქესი (მამრობითი ან მდედრობითი) მითითებული."
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser_line__is_foreigner
+msgid "Foreigner"
+msgstr "უცხოელი"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser__filter_fullname
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser_line__fullname
+msgid "Full Name"
+msgstr "სრული სახელი"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields.selection,name:employee_registry_rs.selection__hr_employee__rs_work_type__1
+msgid "Full-time"
+msgstr "სრული განაკვეთი"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser_line__gender_txt
+msgid "Gender"
+msgstr "სქესი"
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+msgid "Gender: %(old)s → %(new)s"
+msgstr "სქესი: %(old)s → %(new)s"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,help:employee_registry_rs.field_employee_registry_rs_browser__filter_citizenship
+msgid ""
+"Georgian country name (e.g. 'საქართველო', 'ავსტრალია'). Comma-separate for "
+"multiple."
+msgstr ""
+"ქვეყნის ქართული სახელი (მაგ. 'საქართველო', 'ავსტრალია'). გამოყავით მძიმეებით "
+"რამდენიმეს მითითებისას."
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser__has_results
+msgid "Has Results"
+msgstr "აქვს შედეგები"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser__id
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser_line__id
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_log__id
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_service__id
+#: model:ir.model.fields,field_description:employee_registry_rs.field_hr_employee__id
+#: model:ir.model.fields,field_description:employee_registry_rs.field_res_config_settings__id
+#: model:ir.model.fields,field_description:employee_registry_rs.field_res_country__id
+msgid "ID"
+msgstr "იდენტიფიკატორი"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,help:employee_registry_rs.field_hr_employee__rs_registry_id
+msgid "ID returned by the Revenue Service after the first successful sync."
+msgstr "ID, რომელიც დააბრუნა შემოსავლების სამსახურმა პირველი წარმატებული სინქრონიზაციის შემდეგ."
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+msgid "Identification ID (TIN): %(old)s → %(new)s"
+msgstr "პირადი ნომერი (TIN): %(old)s → %(new)s"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser_line__in_odoo
+msgid "In Odoo"
+msgstr "Odoo-ში"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser_line__last_change_date
+msgid "Last Change"
+msgstr "ბოლო ცვლილება"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.view_employee_form_inherit_employee_registry_rs
+msgid "Last Error"
+msgstr "ბოლო შეცდომა"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_hr_employee__rs_last_sync_date
+msgid "Last RS Sync"
+msgstr "ბოლო RS სინქრონიზაცია"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_hr_employee__rs_sync_error
+msgid "Last RS Sync Error"
+msgstr "ბოლო RS სინქრონიზაციის შეცდომა"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser__write_uid
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser_line__write_uid
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_log__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser__write_date
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser_line__write_date
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_log__write_date
+msgid "Last Updated on"
+msgstr "ბოლო განახლების თარიღი"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,help:employee_registry_rs.field_hr_employee__rs_status
+msgid "Last status pushed to the Revenue Service."
+msgstr "ბოლო სტატუსი, გაგზავნილი შემოსავლების სამსახურში."
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.employee_registry_rs_browser_view_form
+msgid "Link"
+msgstr "დაკავშირება"
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/employee_registry_rs_browser.py:0
+msgid "Linked Odoo employee %(name)s ↔ RS id %(id)s."
+msgstr "დაკავშირდა Odoo-ის თანამშრომელი %(name)s ↔ RS id %(id)s."
+
+#. module: employee_registry_rs
+#: model:ir.model.fields.selection,name:employee_registry_rs.selection__hr_employee__rs_sync_mode__manual
+msgid "Manual only (buttons)"
+msgstr "მხოლოდ ხელით (ღილაკებით)"
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+msgid "Marked %s employee(s) as active in RS."
+msgstr "%s თანამშრომელი მონიშნულ იქნა აქტიურად RS-ში."
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+msgid "Marked %s employee(s) as suspended in RS."
+msgstr "%s თანამშრომელი მონიშნულ იქნა შეჩერებულად RS-ში."
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+msgid "Marked %s employee(s) as terminated in RS."
+msgstr "%s თანამშრომელი მონიშნულ იქნა გათავისუფლებულად RS-ში."
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.res_config_settings_view_form_employee_registry_rs
+msgid ""
+"Master toggle for the daily sync cron. When off, the cron skips everything."
+msgstr ""
+"ყოველდღიური სინქრონიზაციის cron-ის მთავარი გადამრთველი. როდესაც გამორთულია, "
+"cron ყველაფერს გამოტოვებს."
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser__filter_max_rows
+msgid "Max Rows"
+msgstr "მაქს. რიგების რაოდენობა"
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+msgid "Mobile phone: %(old)s → %(new)s"
+msgstr "მობილური: %(old)s → %(new)s"
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+msgid "Name: %(old)s → %(new)s"
+msgstr "სახელი: %(old)s → %(new)s"
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+msgid "Nationality: %(old)s → %(new)s"
+msgstr "მოქალაქეობა: %(old)s → %(new)s"
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/employee_registry_rs_browser.py:0
+msgid ""
+"No Odoo employee has identification_id = '%s'. Create the employee in Odoo "
+"first, or set their Identification ID to match the RS TIN."
+msgstr ""
+"Odoo-ში არცერთ თანამშრომელს არ აქვს identification_id = '%s'. ჯერ შექმენით "
+"თანამშრომელი Odoo-ში, ან მიუთითეთ მათი პირადი ნომერი ისე, რომ ემთხვეოდეს RS TIN-ს."
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/employee_registry_rs_browser.py:0
+msgid "No matching Odoo employee to link."
+msgstr "ვერ მოიძებნა შესაბამისი Odoo-ის თანამშრომელი დასაკავშირებლად."
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser_line__matching_employee_id
+msgid "Odoo Employee"
+msgstr "Odoo-ის თანამშრომელი"
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+msgid ""
+"Odoo already matches RS. Remote status: %(status)s (%(status_txt)s). Last "
+"change: %(last)s."
+msgstr ""
+"Odoo უკვე ემთხვევა RS-ს. დისტანციური სტატუსი: %(status)s (%(status_txt)s). "
+"ბოლო ცვლილება: %(last)s."
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.employee_registry_rs_browser_view_form
+msgid "Open"
+msgstr "გახსნა"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields.selection,name:employee_registry_rs.selection__hr_employee__rs_work_type__2
+msgid "Part-time"
+msgstr "ნახევარი განაკვეთი"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.res_config_settings_view_form_employee_registry_rs
+msgid ""
+"Per-user credentials are stored on each user. Open Settings > Users > "
+"Preferences > Revenue Service (rs.ge). The user the daily cron runs as must "
+"have RS Username and RS Password filled in."
+msgstr ""
+"ავტორიზაციის მონაცემები ინახება თითოეულ მომხმარებელზე. გახსენით პარამეტრები > "
+"მომხმარებლები > პრეფერენციები > შემოსავლების სამსახური (rs.ge). მომხმარებელს, "
+"რომლის სახელითაც სრულდება ყოველდღიური cron, უნდა ჰქონდეს RS მომხმარებლის სახელი და RS პაროლი შევსებული."
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.res_config_settings_view_form_employee_registry_rs
+msgid ""
+"Per-user credentials live on Settings &gt; Users &gt; Preferences &gt; "
+"Revenue Service (rs.ge)."
+msgstr ""
+"ინდივიდუალური ავტორიზაციის მონაცემები განთავსებულია პარამეტრები &gt; მომხმარებლები &gt; "
+"პრეფერენციები &gt; შემოსავლების სამსახური (rs.ge)."
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser_line__phone
+msgid "Phone"
+msgstr "ტელეფონი"
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+msgid ""
+"Pulled from RS. Updated: %(changes)s.\n"
+"Remote status: %(status)s (%(status_txt)s)."
+msgstr ""
+"მოტანილია RS-დან. განახლდა: %(changes)s.\n"
+"დისტანციური სტატუსი: %(status)s (%(status_txt)s)."
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.view_employee_form_inherit_employee_registry_rs
+msgid "Push the computed target status (derived from contract) to RS."
+msgstr "გამოთვლილი სამიზნე სტატუსის (კონტრაქტიდან მიღებული) გაგზავნა RS-ში."
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.view_employee_form_inherit_employee_registry_rs
+msgid "RS Attributes"
+msgstr "RS ატრიბუტები"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_res_country__rs_country_code
+msgid "RS Country Code"
+msgstr "RS ქვეყნის კოდი"
+
+#. module: employee_registry_rs
+#: model:ir.actions.act_window,name:employee_registry_rs.employee_registry_rs_browser_action
+#: model:ir.ui.menu,name:employee_registry_rs.menu_employee_registry_rs_browser
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.employee_registry_rs_browser_view_form
+msgid "RS Employee Browser"
+msgstr "RS თანამშრომლების ბრაუზერი"
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/employee_registry_rs_browser.py:0
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+#: code:addons/employee_registry_rs/models/res_config_settings.py:0
+#: model:ir.module.module,shortdesc:base.module_employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.res_config_settings_view_form_employee_registry_rs
+msgid "RS Employee Registry"
+msgstr "RS დაქირავებულ პირთა რეესტრი"
+
+#. module: employee_registry_rs
+#: model:ir.model,name:employee_registry_rs.model_employee_registry_rs_service
+msgid "RS Employee Registry API Client"
+msgstr "RS დაქირავებულ პირთა რეესტრის API კლიენტი"
+
+#. module: employee_registry_rs
+#: model:ir.model,name:employee_registry_rs.model_employee_registry_rs_log
+msgid "RS Employee Registry API Log"
+msgstr "RS დაქირავებულ პირთა რეესტრის API ჟურნალი"
+
+#. module: employee_registry_rs
+#: model:ir.model,name:employee_registry_rs.model_employee_registry_rs_browser
+msgid "RS Employee Registry Browser"
+msgstr "RS დაქირავებულ პირთა რეესტრის ბრაუზერი"
+
+#. module: employee_registry_rs
+#: model:ir.model,name:employee_registry_rs.model_employee_registry_rs_browser_line
+msgid "RS Employee Registry Browser — Row"
+msgstr "RS დაქირავებულ პირთა რეესტრის ბრაუზერი — რიგი"
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/employee_registry_rs_service.py:0
+msgid "RS Employee Registry error on %(path)s: [%(id)s] %(text)s"
+msgstr "RS დაქირავებულ პირთა რეესტრის შეცდომა %(path)s-ზე: [%(id)s] %(text)s"
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/employee_registry_rs_service.py:0
+msgid "RS Employee Registry returned a non-JSON response: %s"
+msgstr "RS დაქირავებულ პირთა რეესტრმა დააბრუნა არა-JSON პასუხი: %s"
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/employee_registry_rs_service.py:0
+msgid "RS Employee Registry transport error: %s"
+msgstr "RS დაქირავებულ პირთა რეესტრის ტრანსპორტის შეცდომა: %s"
+
+#. module: employee_registry_rs
+#: model:ir.actions.server,name:employee_registry_rs.ir_cron_employee_registry_rs_sync_ir_actions_server
+msgid "RS Employee Registry: Daily Sync"
+msgstr "RS დაქირავებულ პირთა რეესტრი: ყოველდღიური სინქრონიზაცია"
+
+#. module: employee_registry_rs
+#: model:ir.actions.server,name:employee_registry_rs.ir_cron_employee_registry_rs_log_rotation_ir_actions_server
+msgid "RS Employee Registry: Log Rotation (90 days)"
+msgstr "RS დაქირავებულ პირთა რეესტრი: ჟურნალის როტაცია (90 დღე)"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_hr_employee__rs_is_foreigner
+msgid "RS Foreign Citizen"
+msgstr "RS უცხო ქვეყნის მოქალაქე"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser_line__rs_id
+msgid "RS ID"
+msgstr "RS ID"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_hr_employee__rs_needs_sync
+msgid "RS Needs Sync"
+msgstr "RS საჭიროებს სინქრონიზაციას"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.view_employee_form_inherit_employee_registry_rs
+msgid "RS Registry"
+msgstr "RS რეესტრი"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_hr_employee__rs_registry_id
+msgid "RS Registry ID"
+msgstr "RS რეესტრის ID"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_hr_employee__rs_status
+msgid "RS Status"
+msgstr "RS სტატუსი"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_hr_employee__rs_sync_mode
+msgid "RS Status Sync Mode"
+msgstr "RS სტატუსის სინქრონიზაციის რეჟიმი"
+
+#. module: employee_registry_rs
+#: model:ir.actions.act_window,name:employee_registry_rs.employee_registry_rs_log_action
+#: model:ir.model.fields,field_description:employee_registry_rs.field_hr_employee__rs_log_ids
+#: model:ir.ui.menu,name:employee_registry_rs.menu_employee_registry_rs_log
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.employee_registry_rs_log_view_list
+msgid "RS Sync Log"
+msgstr "RS სინქრონიზაციის ჟურნალი"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.employee_registry_rs_log_view_form
+msgid "RS Sync Log Entry"
+msgstr "RS სინქრონიზაციის ჟურნალის ჩანაწერი"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_hr_employee__rs_target_status
+msgid "RS Target Status"
+msgstr "RS სამიზნე სტატუსი"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_hr_employee__rs_work_type
+msgid "RS Work Type"
+msgstr "RS სამუშაოს ტიპი"
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+msgid ""
+"RS record with id %(id)s no longer exists and no record found for TIN "
+"'%(tin)s'. The record may have been deleted on RS, or the TIN changed. Use "
+"the RS Employee Browser (Employees > Configuration > RS Employee Browser) to"
+" find and link the correct record."
+msgstr ""
+"RS ჩანაწერი id-ით %(id)s აღარ არსებობს და ჩანაწერი ვერ მოიძებნა TIN-ისთვის "
+"'%(tin)s'. ჩანაწერი შეიძლება წაიშალა RS-ში, ან TIN შეიცვალა. გამოიყენეთ "
+"RS თანამშრომლების ბრაუზერი (თანამშრომლები > კონფიგურაცია > RS თანამშრომლების ბრაუზერი) "
+"სწორი ჩანაწერის მოსაძებნად და დასაკავშირებლად."
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+msgid "RS status: %(old)s → %(new)s"
+msgstr "RS სტატუსი: %(old)s → %(new)s"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_log__request_payload
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.employee_registry_rs_log_view_form
+msgid "Request Payload"
+msgstr "მოთხოვნის Payload"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_log__response_payload
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.employee_registry_rs_log_view_form
+msgid "Response Payload"
+msgstr "პასუხის Payload"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser__line_ids
+msgid "Results"
+msgstr "შედეგები"
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/employee_registry_rs_service.py:0
+msgid ""
+"Revenue Service keeps rejecting the token for user '%s' on %s. Verify "
+"credentials and service permissions on rs.ge."
+msgstr ""
+"შემოსავლების სამსახური განაგრძობს ტოკენის უარყოფას მომხმარებლისთვის '%s' %s-ზე. "
+"გადაამოწმეთ ავტორიზაციის მონაცემები და სერვისის უფლებები rs.ge-ზე."
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/employee_registry_rs_service.py:0
+msgid ""
+"Revenue Service keeps returning a system error on %(path)s after %(attempts)s retries: [%(id)s] %(text)s\n"
+"\n"
+"This is typically an RS-side issue — try again later or contact api-support@rs.ge."
+msgstr ""
+"შემოსავლების სამსახური განაგრძობს სისტემური შეცდომის დაბრუნებას %(path)s-ზე %(attempts)s მცდელობის შემდეგ: [%(id)s] %(text)s\n"
+"\n"
+"ეს, ძირითადად, RS-ის მხრიდან პრობლემაა — სცადეთ მოგვიანებით ან დაუკავშირდით api-support@rs.ge-ს."
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/employee_registry_rs_service.py:0
+msgid ""
+"Revenue Service refused the operation: [%(id)s] %(text)s\n"
+"\n"
+"The authenticated user has no permission for %(path)s. Enable the 'დაქირავებულ პირთა რეესტრი' service on the rs.ge account that corresponds to user '%(login)s'."
+msgstr ""
+"შემოსავლების სამსახურმა უარი თქვა ოპერაციაზე: [%(id)s] %(text)s\n"
+"\n"
+"ავთენტიფიცირებულ მომხმარებელს არ აქვს უფლება %(path)s-სთვის. ჩართეთ 'დაქირავებულ პირთა რეესტრი' სერვისი rs.ge-ის ანგარიშზე, რომელიც შეესაბამება მომხმარებელ '%(login)s'-ს."
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.employee_registry_rs_browser_view_form
+msgid "Search RS"
+msgstr "ძიება RS-ში"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser__filter_status
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser_line__status
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_log__status_id
+msgid "Status"
+msgstr "სტატუსი"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser_line__status_txt
+msgid "Status (GE)"
+msgstr "სტატუსი (GE)"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_log__status_text
+msgid "Status Text"
+msgstr "სტატუსის ტექსტი"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,help:employee_registry_rs.field_hr_employee__rs_target_status
+msgid ""
+"Status the employee should have at the Revenue Service, derived from "
+"contract state."
+msgstr ""
+"სტატუსი, რომელიც თანამშრომელს უნდა ჰქონდეს შემოსავლების სამსახურში, "
+"გამომდინარე კონტრაქტის მდგომარეობიდან."
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_log__success
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.employee_registry_rs_log_view_search
+msgid "Success"
+msgstr "წარმატებული"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.view_employee_form_inherit_employee_registry_rs
+msgid "Suspend in RS"
+msgstr "შეჩერება RS-ში"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields.selection,name:employee_registry_rs.selection__employee_registry_rs_browser__filter_status__-1
+#: model:ir.model.fields.selection,name:employee_registry_rs.selection__employee_registry_rs_browser_line__status__-1
+#: model:ir.model.fields.selection,name:employee_registry_rs.selection__hr_employee__rs_status__-1
+#: model:ir.model.fields.selection,name:employee_registry_rs.selection__hr_employee__rs_target_status__-1
+msgid "Suspended"
+msgstr "შეჩერებული"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.res_config_settings_view_form_employee_registry_rs
+msgid "Sync Countries from RS"
+msgstr "ქვეყნების სინქრონიზაცია RS-დან"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.view_employee_form_inherit_employee_registry_rs
+msgid "Sync History"
+msgstr "სინქრონიზაციის ისტორია"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.view_employee_form_inherit_employee_registry_rs
+msgid "Sync Now"
+msgstr "ახლა სინქრონიზაცია"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.view_employee_form_inherit_employee_registry_rs
+msgid "Sync State"
+msgstr "სინქრონიზაციის მდგომარეობა"
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+msgid "Synced %s employee(s) to RS."
+msgstr "%s თანამშრომელი დასინქრონდა RS-თან."
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser__filter_tin
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser_line__tin
+msgid "TIN"
+msgstr "პირადი ნომერი"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.view_employee_form_inherit_employee_registry_rs
+msgid "Terminate in RS"
+msgstr "გათავისუფლება RS-ში"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields.selection,name:employee_registry_rs.selection__employee_registry_rs_browser__filter_status__0
+#: model:ir.model.fields.selection,name:employee_registry_rs.selection__employee_registry_rs_browser_line__status__0
+#: model:ir.model.fields.selection,name:employee_registry_rs.selection__hr_employee__rs_status__0
+#: model:ir.model.fields.selection,name:employee_registry_rs.selection__hr_employee__rs_target_status__0
+msgid "Terminated"
+msgstr "გათავისუფლებული"
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/hr_employee.py:0
+msgid ""
+"This employee has no RS Registry ID and no record exists for TIN '%s'. Sync "
+"the employee first, or use the RS Employee Browser to find and link an "
+"existing record."
+msgstr ""
+"ამ თანამშრომელს არ აქვს RS რეესტრის ID და არცერთი ჩანაწერი არ არსებობს TIN-ისთვის '%s'. "
+"ჯერ დაასინქრონეთ თანამშრომელი, ან გამოიყენეთ RS თანამშრომლების ბრაუზერი არსებული "
+"ჩანაწერის მოსაძებნად და დასაკავშირებლად."
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.view_employee_form_inherit_employee_registry_rs
+msgid "This employee's RS status is out of sync. Target:"
+msgstr "ამ თანამშრომლის RS სტატუსი არ არის სინქრონიზებული. სამიზნე:"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser__total_count
+msgid "Total in RS"
+msgstr "სულ RS-ში"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,help:employee_registry_rs.field_employee_registry_rs_browser__total_count
+msgid ""
+"Total number of records matching the filter on the RS side (may exceed Max "
+"Rows)."
+msgstr ""
+"ფილტრის შესაბამისი ჩანაწერების საერთო რაოდენობა RS-ის მხარეს (შეიძლება აღემატებოდეს "
+"მაქსიმალურ რიგების რაოდენობას)."
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,help:employee_registry_rs.field_res_config_settings__employee_registry_rs_sync_enabled
+msgid "When disabled, the daily cron skips all employees."
+msgstr "გათიშვის შემთხვევაში, ყოველდღიური cron გამოტოვებს ყველა თანამშრომელს."
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,field_description:employee_registry_rs.field_employee_registry_rs_browser_line__work_type_txt
+msgid "Work Type"
+msgstr "სამუშაოს ტიპი"
+
+#. module: employee_registry_rs
+#: model:ir.model.fields,help:employee_registry_rs.field_hr_employee__rs_work_type
+msgid "Work type reported to the Revenue Service."
+msgstr "სამუშაოს ტიპი, შეტყობინებული შემოსავლების სამსახურში."
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.employee_registry_rs_browser_view_form
+msgid "e.g. 01001081142"
+msgstr "მაგ. 01001081142"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.employee_registry_rs_browser_view_form
+msgid "e.g. მარიამ"
+msgstr "მაგ. მარიამ"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.employee_registry_rs_browser_view_form
+msgid "e.g. საქართველო"
+msgstr "მაგ. საქართველო"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.view_employee_form_inherit_employee_registry_rs
+msgid "— Last pushed:"
+msgstr "— ბოლოს გაიგზავნა:"
+
+#. module: employee_registry_rs
+#: model:ir.module.module,description:base.module_employee_registry_rs
+msgid ""
+"\n"
+"Syncs employees with the Georgian Revenue Service Employee Registry (eapi.rs.ge).\n"
+"\n"
+"Each employee's Sync Mode (Automatic, Manual or Disabled) decides who changes their RS\n"
+"status. RS credentials are stored per user through the RS base module.\n"
+"\n"
+"Setup: README.md in the module folder.\n"
+msgstr ""
+"\n"
+"დასაქმებულების სინქრონიზაცია საქართველოს შემოსავლების სამსახურის დაქირავებულ პირთა რეესტრთან (eapi.rs.ge).\n"
+"\n"
+"თითოეული თანამშრომლის სინქრონიზაციის რეჟიმი (ავტომატური, ხელით ან გათიშული) განსაზღვრავს, ვინ ცვლის მის RS\n"
+"სტატუსს. RS-ის ავტორიზაციის მონაცემები თითოეული მომხმარებლისთვის ცალკე ინახება RS-ის საბაზო მოდულის მეშვეობით.\n"
+"\n"
+"გამართვა: README.md მოდულის საქაღალდეში.\n"
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.view_employee_form_inherit_employee_registry_rs
+msgid "Pull data from RS by stored RS id, or by TIN if no id yet."
+msgstr ""
+"მონაცემების ჩამოტვირთვა RS-დან შენახული RS ID-ით, ან პირადი ნომრით, თუ ID "
+"ჯერ არ არის."
+
+#. module: employee_registry_rs
+#: model_terms:ir.ui.view,arch_db:employee_registry_rs.view_employee_form_inherit_employee_registry_rs
+msgid ""
+"Push the current employee data and computed target status (derived from "
+"contract) to RS."
+msgstr ""
+"თანამშრომლის მიმდინარე მონაცემებისა და გამოთვლილი სამიზნე სტატუსის "
+"(კონტრაქტიდან მიღებული) გაგზავნა RS-ში."
+
+#. module: employee_registry_rs
+#: model:ir.module.module,summary:base.module_employee_registry_rs
+msgid "Sync employees with Revenue Service's Employee Registry (eapi.rs.ge)"
+msgstr ""
+"დასაქმებულების სინქრონიზაცია შემოსავლების სამსახურის დაქირავებულ პირთა "
+"რეესტრთან (eapi.rs.ge)"
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/employee_registry_rs_service.py:0
+msgid "Install the RS Base Methods app under Apps: it holds the rs.ge logins this action needs."
+msgstr "დააინსტალირეთ „RS Base Methods“ მენიუდან „აპლიკაციები“: მასში ინახება rs.ge-ის ავტორიზაციის მონაცემები, რომლებიც ამ მოქმედებას სჭირდება."
+
+#. module: employee_registry_rs
+#. odoo-python
+#: code:addons/employee_registry_rs/models/employee_registry_rs_service.py:0
+msgid "Activate the Georgian language first (Settings > Languages): RS.GE countries are matched by their Georgian names."
+msgstr "ჯერ გააქტიურეთ ქართული ენა (პარამეტრები > ენები): RS.GE-ის ქვეყნები Odoo-ს ქვეყნებს ქართული სახელების მიხედვით ემთხვევა."

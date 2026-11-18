@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="ir_cron_wolt_sync" model="ir.cron">
+        <field name="name">Wolt: import queued orders, push item changes, keep tokens alive</field>
+        <field name="model_id" ref="pos_platform_order.model_platform_order_entity"/>
+        <field name="state">code</field>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="code">model._cron_wolt_sync()</field>
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+        <field name="active" eval="True"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,1485 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* tbc_bank
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-02 15:27+0000\n"
+"PO-Revision-Date: 2026-10-02 15:27+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian (ka_GE)\n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#. module: tbc_bank
+#: model:ir.module.module,description:base.module_tbc_bank
+msgid ""
+"\n"
+"Connects Odoo to TBC Bank's Business Integration Services (BIS) API over OAuth2. Imports\n"
+"account movements as bank statement lines for reconciliation, and sends payments and batch\n"
+"payments as TBC transfers with optional maker-checker approval. Salaries are paid through\n"
+"Pay Salaries (gec_payroll_bank), where TBC is one of the banks to choose.\n"
+"\n"
+"Full documentation: README.md and README_DEV.md in the module directory.\n"
+msgstr ""
+"\n"
+"აკავშირებს Odoo-ს TBC ბანკის ბიზნეს-ინტეგრაციის სერვისების (BIS) API-სთან OAuth2-ით. ანგარიშის\n"
+"მოძრაობები შემოაქვს საბანკო ამონაწერის სტრიქონებად შეჯერებისთვის, ხოლო გადახდებსა და პაკეტურ\n"
+"გადახდებს TBC-ში აგზავნის გადარიცხვებად, სურვილისამებრ ორსაფეხურიანი დამტკიცებით. ხელფასები\n"
+"გაიცემა „ხელფასების გადახდიდან“ (gec_payroll_bank), სადაც TBC ერთ-ერთი ასარჩევი ბანკია.\n"
+"\n"
+"სრული დოკუმენტაცია: README.md და README_DEV.md მოდულის საქაღალდეში.\n"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/wizard/tbc_statement_import_wizard.py:0
+msgid ""
+"%s movement(s) still awaiting authorization at TBC were not imported; import"
+" this period again once they are authorized."
+msgstr ""
+"%s ტრანზაქცია ჯერ კიდევ ელოდება ავტორიზაციას TBC-ში და არ დაიმპორტდა; ამ "
+"პერიოდის იმპორტი გაიმეორეთ, როდესაც ისინი ავტორიზდება."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/wizard/tbc_statement_import_wizard.py:0
+msgid "%s new statement line(s) imported."
+msgstr "დაიმპორტდა ამონაწერის %s ახალი სტრიქონი."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid ""
+"%s reset this transfer to pending. A new send will reuse the same request "
+"id."
+msgstr ""
+"%s-მა ეს გადარიცხვა მოლოდინში დააბრუნა. ახალი გაგზავნა იგივე მოთხოვნის "
+"იდენტიფიკატორს გამოიყენებს."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid ""
+"'To Other Bank (GEL / national)' needs a Georgian IBAN; use 'To Other Bank "
+"(Foreign / SWIFT)'."
+msgstr ""
+"„სხვა ბანკში (ლარი / ეროვნული)“ ქართულ IBAN-ს საჭიროებს; გამოიყენეთ „სხვა "
+"ბანკში (უცხოური / SWIFT)“."
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_tbc_connection_form
+msgid "<span class=\"o_stat_text\">API Logs</span>"
+msgstr "<span class=\"o_stat_text\">API ჟურნალები</span>"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid "A treasury transfer must be in GEL."
+msgstr "სახაზინო გადარიცხვა ლარში უნდა იყოს."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid "A treasury transfer needs a %s-digit Treasury Code."
+msgstr "სახაზინო გადარიცხვას სჭირდება %s-ნიშნა ხაზინის კოდი."
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__api_host
+msgid "API Host (override)"
+msgstr "API ჰოსტი (გადაფარვა)"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__log_ids
+#: model:ir.ui.menu,name:tbc_bank.menu_tbc_api_log
+msgid "API Logs"
+msgstr "API ჟურნალები"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__access_token
+msgid "Access Token"
+msgstr "წვდომის ტოკენი"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement__account_number
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement_import_wizard__account_number
+msgid "Account (IBAN)"
+msgstr "ანგარიში (IBAN)"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__message_needaction
+msgid "Action Needed"
+msgstr "საჭიროა მოქმედება"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_approval__active
+msgid "Active"
+msgstr "აქტიური"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_account_payment__tbc_additional_description
+msgid "Additional Description"
+msgstr "დამატებითი აღწერა"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__allow_self_approval
+msgid "Allow Self-Approval"
+msgstr "საკუთარი გადარიცხვის დამტკიცების ნებართვა"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/tbc_connection.py:0
+msgid ""
+"An approver is required when processing mode is 'Approve in Odoo first'."
+msgstr ""
+"როდესაც დამუშავების რეჟიმია „ჯერ დაამტკიცეთ Odoo-ში“, დამამტკიცებლის "
+"მითითება სავალდებულოა."
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_tbc_connection_form
+msgid "Approval"
+msgstr "დამტკიცება"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_account_payment_form_tbc
+msgid "Approve TBC Transfer"
+msgstr "TBC გადარიცხვის დამტკიცება"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_batch_payment_form_tbc
+msgid "Approve TBC Transfers"
+msgstr "TBC გადარიცხვების დამტკიცება"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_account_payment_form_tbc
+msgid "Approved by"
+msgstr "დაამტკიცა"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__approval_id
+msgid "Approver"
+msgstr "დამამტკიცებელი"
+
+#. module: tbc_bank
+#: model:ir.ui.menu,name:tbc_bank.menu_tbc_approval
+msgid "Approvers"
+msgstr "დამამტკიცებლები"
+
+#. module: tbc_bank
+#: model:ir.actions.act_window,name:tbc_bank.action_tbc_approval
+msgid "Approvers & Delegates"
+msgstr "დამამტკიცებლები და დელეგატები"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__message_attachment_count
+msgid "Attachment Count"
+msgstr "დანართების რაოდენობა"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/services/tbc_bank_service.py:0
+msgid "Authentication failed."
+msgstr "ავთენტიფიკაცია ვერ მოხერხდა."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/tbc_connection.py:0
+msgid "Authentication failed: %s"
+msgstr "ავთენტიფიკაცია ვერ მოხერხდა: %s"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_tbc_statement_form
+msgid "Balances (as per TBC)"
+msgstr "ნაშთები (TBC-ის მონაცემებით)"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_tbc_statement_form
+msgid "Balances as reported by TBC Bank — not Odoo's book balance."
+msgstr "ნაშთები TBC ბანკის მონაცემებით — არა Odoo-ს საბუღალტრო ნაშთი."
+
+#. module: tbc_bank
+#: model:ir.model,name:tbc_bank.model_account_batch_payment
+msgid "Batch Payment"
+msgstr "სერიული გადახდა"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_account_payment_form_tbc
+msgid "Beneficiary / SWIFT / Treasury"
+msgstr "მიმღები / SWIFT / ხაზინა"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_account_payment__tbc_beneficiary_address
+msgid "Beneficiary Address"
+msgstr "მიმღების მისამართი"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid "Beneficiary Address is required for a foreign transfer."
+msgstr "უცხოური გადარიცხვისთვის მიმღების მისამართი სავალდებულოა."
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_account_payment__tbc_beneficiary_bank_code
+msgid "Beneficiary Bank (BIC/Code)"
+msgstr "მიმღების ბანკი (BIC/კოდი)"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid "Beneficiary Bank (BIC/Code) is required for a foreign transfer."
+msgstr "უცხოური გადარიცხვისთვის მიმღების ბანკი (BIC/კოდი) სავალდებულოა."
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_account_payment__tbc_beneficiary_bank_name
+msgid "Beneficiary Bank Name"
+msgstr "მიმღების ბანკის დასახელება"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_account_payment__tbc_beneficiary_name
+msgid "Beneficiary Name"
+msgstr "მიმღების სახელი"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid "Beneficiary Name is required for a foreign transfer."
+msgstr "უცხოური გადარიცხვისთვის მიმღების სახელი სავალდებულოა."
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_account_payment__tbc_beneficiary_tax_code
+msgid "Beneficiary Tax Code"
+msgstr "მიმღების საიდენტიფიკაციო კოდი"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_tbc_statement_fetch_wizard_form
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_tbc_statement_import_wizard_form
+msgid "Cancel"
+msgstr "გაუქმება"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_account_payment__tbc_charge_details
+msgid "Charge Details"
+msgstr "საკომისიოს დეტალები"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid "Charge Details must be SHA or OUR for a foreign transfer."
+msgstr "უცხოური გადარიცხვისთვის საკომისიოს დეტალები უნდა იყოს SHA ან OUR."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid "Choose a TBC Transfer Type."
+msgstr "აირჩიეთ TBC გადარიცხვის ტიპი."
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__client_id
+msgid "Client ID"
+msgstr "კლიენტის ID"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/services/tbc_bank_service.py:0
+msgid "Client ID and Client Secret are required."
+msgstr "საჭიროა კლიენტის ID და კლიენტის საიდუმლო."
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__client_secret
+msgid "Client Secret"
+msgstr "კლიენტის საიდუმლო"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement__closing_balance
+msgid "Closing Balance"
+msgstr "საბოლოო ნაშთი"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_api_log__company_id
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_approval__company_id
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__company_id
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement__company_id
+msgid "Company"
+msgstr "კომპანია"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_account_payment_form_tbc
+msgid "Confirm Manually"
+msgstr "ხელით დადასტურება"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_account_payment_form_tbc
+msgid ""
+"Confirmed — the transfer is verified\n"
+"                    ("
+msgstr ""
+"დადასტურებულია — გადარიცხვა შემოწმებულია\n"
+"                    ("
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_api_log__connection_id
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement__connection_id
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_tbc_connection_form
+msgid "Connection"
+msgstr "კავშირი"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/tbc_connection.py:0
+msgid "Connection successful."
+msgstr "კავშირი წარმატებულია."
+
+#. module: tbc_bank
+#: model:ir.ui.menu,name:tbc_bank.menu_tbc_connection
+msgid "Connections"
+msgstr "კავშირები"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid "Could not resolve the transfer yet. Try again shortly."
+msgstr "გადარიცხვის მდგომარეობა ჯერ ვერ დადგინდა. ცოტა ხანში სცადეთ ხელახლა."
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_api_log__create_uid
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_approval__create_uid
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__create_uid
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement__create_uid
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement_fetch_wizard__create_uid
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement_import_wizard__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_api_log__create_date
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_approval__create_date
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__create_date
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement__create_date
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement_fetch_wizard__create_date
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement_import_wizard__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_tbc_connection_form
+msgid "Credentials"
+msgstr "ავტორიზაციის მონაცემები"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement__currency_code
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement_import_wizard__currency_code
+msgid "Currency"
+msgstr "ვალუტა"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/tbc_connection.py:0
+msgid "Daily statement sync failed for %s; see API log."
+msgstr ""
+"ამონაწერის ყოველდღიური სინქრონიზაცია ვერ შესრულდა: %s; იხილეთ API ჟურნალი."
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_approval__delegate_ids
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_tbc_approval_form
+msgid "Delegates"
+msgstr "დელეგატები"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_account_batch_payment__display_name
+#: model:ir.model.fields,field_description:tbc_bank.field_account_journal__display_name
+#: model:ir.model.fields,field_description:tbc_bank.field_account_payment__display_name
+#: model:ir.model.fields,field_description:tbc_bank.field_account_payment_method__display_name
+#: model:ir.model.fields,field_description:tbc_bank.field_account_payment_method_line__display_name
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_api_log__display_name
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_approval__display_name
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__display_name
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_service__display_name
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement__display_name
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement_fetch_wizard__display_name
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement_import_wizard__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_api_log__duration_ms
+msgid "Duration (ms)"
+msgstr "ხანგრძლივობა (მწმ)"
+
+#. module: tbc_bank
+#: model:ir.model.constraint,message:tbc_bank.constraint_tbc_connection_company_uniq
+msgid "Each company can have only one TBC Bank connection."
+msgstr "თითოეულ კომპანიას შეიძლება ჰქონდეს მხოლოდ ერთი კავშირი TBC ბანკთან."
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_api_log__endpoint
+msgid "Endpoint"
+msgstr "ბოლოწერტილი"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__environment
+msgid "Environment"
+msgstr "გარემო"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_api_log__error_message
+msgid "Error Message"
+msgstr "შეცდომის შეტყობინება"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_tbc_statement_fetch_wizard_form
+msgid "Fetch"
+msgstr "მიღება"
+
+#. module: tbc_bank
+#: model:ir.actions.act_window,name:tbc_bank.action_tbc_statement_fetch
+#: model:ir.ui.menu,name:tbc_bank.menu_tbc_statement_fetch
+msgid "Fetch Statement"
+msgstr "ამონაწერის მიღება"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_tbc_statement_fetch_wizard_form
+msgid "Fetch TBC Statement"
+msgstr "TBC ამონაწერის მიღება"
+
+#. module: tbc_bank
+#: model:ir.model,name:tbc_bank.model_tbc_statement_fetch_wizard
+msgid "Fetch TBC Statement for a Period"
+msgstr "TBC ამონაწერის მიღება პერიოდისთვის"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement__fetched_on
+msgid "Fetched On"
+msgstr "მიღების თარიღი"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__message_follower_ids
+msgid "Followers"
+msgstr "გამომწერები"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "გამომწერები (პარტნიორები)"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement__period_from
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement_fetch_wizard__period_from
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement_import_wizard__start_date
+msgid "From"
+msgstr "საიდან"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_api_log__http_status
+msgid "HTTP Status"
+msgstr "HTTP სტატუსი"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__has_message
+msgid "Has Message"
+msgstr "აქვს შეტყობინება"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_account_batch_payment__id
+#: model:ir.model.fields,field_description:tbc_bank.field_account_journal__id
+#: model:ir.model.fields,field_description:tbc_bank.field_account_payment__id
+#: model:ir.model.fields,field_description:tbc_bank.field_account_payment_method__id
+#: model:ir.model.fields,field_description:tbc_bank.field_account_payment_method_line__id
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_api_log__id
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_approval__id
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__id
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_service__id
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement__id
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement_fetch_wizard__id
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement_import_wizard__id
+msgid "ID"
+msgstr "ID"
+
+#. module: tbc_bank
+#: model:ir.model.fields,help:tbc_bank.field_tbc_connection__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "თუ მონიშნულია, ახალი შეტყობინებები საჭიროებს თქვენს ყურადღებას."
+
+#. module: tbc_bank
+#: model:ir.model.fields,help:tbc_bank.field_tbc_connection__message_has_error
+#: model:ir.model.fields,help:tbc_bank.field_tbc_connection__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "თუ მონიშნულია, ზოგიერთ შეტყობინებას მიწოდების შეცდომა აქვს."
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_tbc_statement_import_wizard_form
+msgid "Import"
+msgstr "იმპორტი"
+
+#. module: tbc_bank
+#: model:ir.actions.act_window,name:tbc_bank.action_tbc_statement_import
+#: model:ir.ui.menu,name:tbc_bank.menu_tbc_statement_import
+msgid "Import Statement"
+msgstr "ამონაწერის იმპორტი"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_journal.py:0
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_tbc_statement_import_wizard_form
+msgid "Import TBC Bank Statement"
+msgstr "TBC ბანკის ამონაწერის იმპორტი"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_account_journal_form_tbc
+msgid "Import TBC Statement"
+msgstr "TBC ამონაწერის იმპორტი"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_account_payment__tbc_intermediary_bank_code
+msgid "Intermediary Bank (BIC/Code)"
+msgstr "შუამავალი ბანკი (BIC/კოდი)"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_account_payment__tbc_intermediary_bank_name
+msgid "Intermediary Bank Name"
+msgstr "შუამავალი ბანკის დასახელება"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__message_is_follower
+msgid "Is Follower"
+msgstr "არის გამომწერი"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_account_journal__is_tbc
+#: model:ir.model.fields,field_description:tbc_bank.field_account_payment__is_tbc
+msgid "Is TBC Bank Journal"
+msgstr "არის TBC ბანკის ჟურნალი"
+
+#. module: tbc_bank
+#: model:ir.model,name:tbc_bank.model_account_journal
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement__journal_id
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement_fetch_wizard__journal_id
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement_import_wizard__journal_id
+msgid "Journal"
+msgstr "ჟურნალი"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid "Journal %s has no bank account number (IBAN)."
+msgstr "ჟურნალს %s არ აქვს საბანკო ანგარიშის ნომერი (IBAN)."
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__last_error_message
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_tbc_connection_form
+msgid "Last Error"
+msgstr "ბოლო შეცდომა"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__last_error_code
+msgid "Last Error Code"
+msgstr "ბოლო შეცდომის კოდი"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_api_log__write_uid
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_approval__write_uid
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__write_uid
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement__write_uid
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement_fetch_wizard__write_uid
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement_import_wizard__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_api_log__write_date
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_approval__write_date
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__write_date
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement__write_date
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement_fetch_wizard__write_date
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement_import_wizard__write_date
+msgid "Last Updated on"
+msgstr "ბოლოს განახლდა"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_tbc_connection_form
+msgid "Leave blank for the default host"
+msgstr "ნაგულისხმევი ჰოსტისთვის დატოვეთ ცარიელი"
+
+#. module: tbc_bank
+#: model:ir.model.fields,help:tbc_bank.field_tbc_connection__api_host
+msgid "Leave blank to use the default host for the selected environment."
+msgstr ""
+"დატოვეთ ცარიელი, რომ გამოყენებულ იქნეს არჩეული გარემოს ნაგულისხმევი ჰოსტი."
+
+#. module: tbc_bank
+#: model:ir.model.fields.selection,name:tbc_bank.selection__tbc_statement__snapshot_type__live
+msgid "Live (auto)"
+msgstr "მიმდინარე (ავტომატური)"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__log_retention_days
+msgid "Log Retention (days)"
+msgstr "ჟურნალის შენახვის ვადა (დღე)"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_tbc_connection_form
+msgid "Logging"
+msgstr "ჟურნალირება"
+
+#. module: tbc_bank
+#: model:res.groups,name:tbc_bank.group_tbc_manager
+msgid "Manager"
+msgstr "მენეჯერი"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__message_has_error
+msgid "Message Delivery error"
+msgstr "შეტყობინების მიწოდების შეცდომა"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__message_ids
+msgid "Messages"
+msgstr "შეტყობინებები"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_approval__name
+msgid "Name"
+msgstr "სახელი"
+
+#. module: tbc_bank
+#: model:res.groups.privilege,placeholder:tbc_bank.tbc_privilege
+msgid "No"
+msgstr "არა"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/wizard/tbc_statement_fetch_wizard.py:0
+#: code:addons/tbc_bank/wizard/tbc_statement_import_wizard.py:0
+msgid "No TBC Bank connection is configured for this journal's company."
+msgstr "ამ ჟურნალის კომპანიისთვის TBC ბანკის კავშირი კონფიგურირებული არ არის."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid "No TBC request id on this payment to recover from."
+msgstr "ამ გადახდას არ აქვს TBC მოთხოვნის ID, რომლითაც აღდგენა შეიძლება."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/services/tbc_bank_service.py:0
+msgid "No access token in TBC response."
+msgstr "TBC-ის პასუხში წვდომის ტოკენი არ არის."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_batch_payment.py:0
+msgid "No sendable TBC transfers in this batch."
+msgstr "ამ პაკეტში გასაგზავნი TBC გადარიცხვა არ არის."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid "No transfer id returned by TBC."
+msgstr "TBC-მ გადარიცხვის ID არ დააბრუნა."
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__message_needaction_counter
+msgid "Number of Actions"
+msgstr "ქმედებების რაოდენობა"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__message_has_error_counter
+msgid "Number of errors"
+msgstr "შეცდომების რაოდენობა"
+
+#. module: tbc_bank
+#: model:ir.model.fields,help:tbc_bank.field_tbc_connection__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "ქმედების მომთხოვნი შეტყობინებების რაოდენობა"
+
+#. module: tbc_bank
+#: model:ir.model.fields,help:tbc_bank.field_tbc_connection__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "მიწოდების შეცდომის მქონე შეტყობინებების რაოდენობა"
+
+#. module: tbc_bank
+#: model:ir.model.fields.selection,name:tbc_bank.selection__account_payment__tbc_charge_details__our
+msgid "OUR"
+msgstr "OUR"
+
+#. module: tbc_bank
+#: model:ir.model.fields,help:tbc_bank.field_tbc_connection__allow_self_approval
+msgid ""
+"Off (recommended): the user who created a transfer cannot approve it, so "
+"releasing money always takes two people. Turn it on only if your team has "
+"nobody else to approve."
+msgstr ""
+"გამორთული (რეკომენდებული): გადარიცხვის შემქმნელი მომხმარებელი მას ვერ "
+"დაამტკიცებს, ამიტომ თანხის გაშვებას ყოველთვის ორი ადამიანი სჭირდება. ჩართეთ "
+"მხოლოდ მაშინ, თუ გუნდში დამტკიცება სხვას არავის შეუძლია."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid "Only a failed transfer can be reset to pending."
+msgstr "მოლოდინში დაბრუნება შესაძლებელია მხოლოდ წარუმატებელი გადარიცხვისთვის."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid ""
+"Only a transfer whose send did not finish, or whose outcome is unknown, can "
+"be recovered from TBC."
+msgstr ""
+"TBC-დან აღდგენა შესაძლებელია მხოლოდ იმ გადარიცხვისთვის, რომლის გაგზავნა არ "
+"დასრულდა ან რომლის შედეგიც უცნობია."
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement__opening_balance
+msgid "Opening Balance"
+msgstr "საწყისი ნაშთი"
+
+#. module: tbc_bank
+#: model:ir.model,name:tbc_bank.model_account_payment
+msgid "Payment"
+msgstr "გადახდა"
+
+#. module: tbc_bank
+#: model:ir.model,name:tbc_bank.model_account_payment_method
+msgid "Payment Method"
+msgstr "გადახდის მეთოდი"
+
+#. module: tbc_bank
+#: model:ir.model,name:tbc_bank.model_account_payment_method_line
+msgid "Payment Method Line"
+msgstr "გადახდის მეთოდის სტრიქონი"
+
+#. module: tbc_bank
+#: model:ir.ui.menu,name:tbc_bank.menu_tbc_pending_approval
+msgid "Pending Approval"
+msgstr "დასამტკიცებელი"
+
+#. module: tbc_bank
+#: model:ir.actions.act_window,name:tbc_bank.action_tbc_pending_approval
+msgid "Pending TBC Approval"
+msgstr "TBC დამტკიცების მოლოდინში"
+
+#. module: tbc_bank
+#: model:ir.model.fields.selection,name:tbc_bank.selection__tbc_statement__snapshot_type__period
+msgid "Period (manual)"
+msgstr "პერიოდული (ხელით)"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_approval__approver_id
+msgid "Primary Approver"
+msgstr "ძირითადი დამამტკიცებელი"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__processing_mode
+msgid "Processing Mode"
+msgstr "დამუშავების რეჟიმი"
+
+#. module: tbc_bank
+#: model:ir.model.fields.selection,name:tbc_bank.selection__tbc_connection__environment__production
+msgid "Production"
+msgstr "საწარმოო"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_account_payment_form_tbc
+msgid "Recover from TBC"
+msgstr "TBC-დან აღდგენა"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_account_payment_form_tbc
+msgid "Refresh TBC Status"
+msgstr "TBC სტატუსის განახლება"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_api_log__request_payload
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_tbc_api_log_form
+msgid "Request"
+msgstr "მოთხოვნა"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_account_payment_form_tbc
+msgid "Reset to Pending"
+msgstr "მოლოდინში დაბრუნება"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_api_log__response_payload
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_tbc_api_log_form
+msgid "Response"
+msgstr "პასუხი"
+
+#. module: tbc_bank
+#: model:ir.model.fields,help:tbc_bank.field_tbc_connection__log_retention_days
+msgid ""
+"Routine API log entries older than this are removed by Odoo's daily vacuum, "
+"so the log table cannot grow without bound. Set 0 to keep everything. "
+"Transfer logs are never deleted - they are the audit trail for money "
+"movement."
+msgstr ""
+"ამაზე ძველ რიგით API ჩანაწერებს Odoo-ს ყოველდღიური გასუფთავება შლის, რომ "
+"ჟურნალი უსასრულოდ არ გაიზარდოს. ყველაფრის შესანახად მიუთითეთ 0. "
+"გადარიცხვების ჩანაწერები არასოდეს იშლება — ისინი თანხის მოძრაობის აუდიტის "
+"კვალია."
+
+#. module: tbc_bank
+#: model:ir.model.fields.selection,name:tbc_bank.selection__account_payment__tbc_charge_details__sha
+msgid "SHA"
+msgstr "SHA"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "SMS მიწოდების შეცდომა"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_account_payment_form_tbc
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_batch_payment_form_tbc
+msgid "Send to TBC"
+msgstr "TBC-ში გაგზავნა"
+
+#. module: tbc_bank
+#: model:ir.module.module,summary:base.module_tbc_bank
+msgid "Send transfers and import statements from TBC Bank (BIS) via OAuth2"
+msgstr ""
+"გადარიცხვების გაგზავნა და ამონაწერების იმპორტი TBC ბანკიდან (BIS) OAuth2-ით"
+
+#. module: tbc_bank
+#: model:ir.module.category,description:tbc_bank.module_category_tbc
+msgid "Send transfers and import statements via the TBC Bank BIS API."
+msgstr "გადარიცხვების გაგზავნა და ამონაწერების იმპორტი TBC ბანკის BIS API-ით."
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_account_payment_form_tbc
+msgid ""
+"Sent to TBC — the money has <b>not</b> moved yet. This connection\n"
+"                    is set to <b>Manual confirmation in Internet Banking</b>, so someone\n"
+"                    must still release the transfer in TBC's Internet Bank."
+msgstr ""
+"გაიგზავნა TBC-ში — თანხა ჯერ <b>არ</b> გასულა. ეს კავშირი\n"
+"                    დაყენებულია რეჟიმზე <b>ხელით დადასტურება ინტერნეტ-ბანკში</b>, ამიტომ ვინმემ\n"
+"                    გადარიცხვა ჯერ კიდევ უნდა დაადასტუროს TBC-ის ინტერნეტ-ბანკში."
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_account_payment_form_tbc
+msgid ""
+"Sent to TBC — waiting for the bank statement to confirm the money left.\n"
+"                    If it doesn't appear, use <b>Confirm Manually</b>."
+msgstr ""
+"გაიგზავნა TBC-ში — ველოდებით ბანკის ამონაწერს, რომელიც თანხის გასვლას დაადასტურებს.\n"
+"                    თუ ის არ გამოჩნდა, გამოიყენეთ <b>ხელით დადასტურება</b>."
+
+#. module: tbc_bank
+#: model:ir.model.fields,help:tbc_bank.field_account_payment__tbc_transfer_type
+msgid ""
+"Set from the recipient account; change it only for a treasury transfer or to"
+" correct an unusual case."
+msgstr ""
+"ივსება მიმღების ანგარიშის მიხედვით; შეცვალეთ მხოლოდ სახაზინო გადარიცხვისთვის"
+" ან უჩვეულო შემთხვევის გამოსასწორებლად."
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__state
+msgid "State"
+msgstr "სტატუსი"
+
+#. module: tbc_bank
+#: model:ir.ui.menu,name:tbc_bank.menu_tbc_statement
+msgid "Statements"
+msgstr "ამონაწერები"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_account_payment_form_tbc
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_batch_payment_form_tbc
+msgid "Submit for TBC Approval"
+msgstr "TBC-ს დასამტკიცებლად გაგზავნა"
+
+#. module: tbc_bank
+#: model:ir.actions.act_window,name:tbc_bank.action_tbc_api_log
+msgid "TBC API Logs"
+msgstr "TBC API ჟურნალები"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_journal.py:0
+#: code:addons/tbc_bank/models/account_payment.py:0
+#: code:addons/tbc_bank/models/tbc_connection.py:0
+#: code:addons/tbc_bank/wizard/tbc_statement_import_wizard.py:0
+#: model:ir.module.category,name:tbc_bank.module_category_tbc
+#: model:ir.ui.menu,name:tbc_bank.menu_tbc_root
+#: model:res.groups.privilege,name:tbc_bank.tbc_privilege
+msgid "TBC Bank"
+msgstr "TBC ბანკი"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/wizard/tbc_statement_import_wizard.py:0
+msgid "TBC Bank %(start)s - %(end)s"
+msgstr "TBC ბანკი %(start)s - %(end)s"
+
+#. module: tbc_bank
+#: model:ir.model,name:tbc_bank.model_tbc_api_log
+msgid "TBC Bank API Log"
+msgstr "TBC ბანკის API ჟურნალი"
+
+#. module: tbc_bank
+#: model:ir.model,name:tbc_bank.model_tbc_approval
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_tbc_approval_form
+msgid "TBC Bank Approver"
+msgstr "TBC ბანკის დამამტკიცებელი"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_tbc_approval_list
+msgid "TBC Bank Approvers"
+msgstr "TBC ბანკის დამამტკიცებლები"
+
+#. module: tbc_bank
+#: model:ir.model,name:tbc_bank.model_tbc_connection
+#: model:ir.model.fields,field_description:tbc_bank.field_account_journal__tbc_connection_id
+msgid "TBC Bank Connection"
+msgstr "TBC ბანკის კავშირი"
+
+#. module: tbc_bank
+#: model:ir.module.module,shortdesc:base.module_tbc_bank
+msgid "TBC Bank Integration"
+msgstr "TBC ბანკის ინტეგრაცია"
+
+#. module: tbc_bank
+#: model:ir.model,name:tbc_bank.model_tbc_service
+msgid "TBC Bank REST Client"
+msgstr "TBC ბანკის REST კლიენტი"
+
+#. module: tbc_bank
+#: model:ir.model,name:tbc_bank.model_tbc_statement_import_wizard
+msgid "TBC Bank Statement Import"
+msgstr "TBC ბანკის ამონაწერის იმპორტი"
+
+#. module: tbc_bank
+#: model:ir.model,name:tbc_bank.model_tbc_statement
+msgid "TBC Bank Statement Snapshot"
+msgstr "TBC ბანკის ამონაწერის ანაბეჭდი"
+
+#. module: tbc_bank
+#: model:account.payment.method,name:tbc_bank.account_payment_method_tbc
+msgid "TBC Bank Transfer"
+msgstr "TBC ბანკის გადარიცხვა"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/services/tbc_bank_service.py:0
+msgid "TBC Bank authentication failed: %s"
+msgstr "TBC ბანკში ავთენტიფიკაცია ვერ მოხერხდა: %s"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/services/tbc_bank_service.py:0
+msgid "TBC Bank did not answer in time."
+msgstr "TBC ბანკმა დროულად არ უპასუხა."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/services/tbc_bank_service.py:0
+msgid "TBC Bank error %s: %s"
+msgstr "TBC ბანკის შეცდომა %s: %s"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/services/tbc_bank_service.py:0
+msgid "TBC Bank is unreachable."
+msgstr "TBC ბანკი მიუწვდომელია."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/services/tbc_bank_service.py:0
+msgid ""
+"TBC Bank rejected the integration user (%s). Fix the user in Business "
+"Internet Banking, then ask a TBC Bank manager to use Test Connection."
+msgstr ""
+"TBC ბანკმა ინტეგრაციის მომხმარებელი უარყო (%s). გაასწორეთ მომხმარებელი "
+"ბიზნეს ინტერნეტ-ბანკში, შემდეგ სთხოვეთ TBC ბანკის მენეჯერს, გამოიყენოს "
+"„კავშირის ტესტირება“."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/services/tbc_bank_service.py:0
+msgid "TBC Bank request failed."
+msgstr "TBC ბანკის მოთხოვნა ჩაიშალა."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/services/tbc_bank_service.py:0
+msgid "TBC Bank request timed out. Please try again."
+msgstr "TBC ბანკის მოთხოვნას ვადა გაუვიდა. გთხოვთ, სცადოთ ხელახლა."
+
+#. module: tbc_bank
+#: model:ir.actions.server,name:tbc_bank.cron_tbc_daily_statement_sync_ir_actions_server
+msgid "TBC Bank — Daily statement sync"
+msgstr "TBC ბანკი — ამონაწერის ყოველდღიური სინქრონიზაცია"
+
+#. module: tbc_bank
+#: model:ir.actions.server,name:tbc_bank.cron_tbc_live_statements_ir_actions_server
+msgid "TBC Bank — Live statement snapshots"
+msgstr "TBC ბანკი — ამონაწერის მიმდინარე ანაბეჭდები"
+
+#. module: tbc_bank
+#: model:ir.actions.server,name:tbc_bank.cron_tbc_status_poll_ir_actions_server
+msgid "TBC Bank — Transfer status poll"
+msgstr "TBC ბანკი — გადარიცხვების სტატუსის შემოწმება"
+
+#. module: tbc_bank
+#: model:ir.actions.act_window,name:tbc_bank.action_tbc_connection
+msgid "TBC Connections"
+msgstr "TBC კავშირები"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_account_batch_payment__tbc_processing_mode
+#: model:ir.model.fields,field_description:tbc_bank.field_account_payment__tbc_processing_mode
+msgid "TBC Processing Mode"
+msgstr "TBC დამუშავების რეჟიმი"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/wizard/tbc_statement_fetch_wizard.py:0
+msgid "TBC Statement"
+msgstr "TBC ამონაწერი"
+
+#. module: tbc_bank
+#: model:ir.actions.act_window,name:tbc_bank.action_tbc_statement
+msgid "TBC Statements"
+msgstr "TBC ამონაწერები"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_account_payment__tbc_bank_status
+msgid "TBC Status (raw)"
+msgstr "TBC სტატუსი (დაუმუშავებელი)"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_account_payment_form_tbc
+msgid "TBC Transfer"
+msgstr "TBC გადარიცხვა"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_account_payment__tbc_transfer_type
+msgid "TBC Transfer Type"
+msgstr "TBC გადარიცხვის ტიპი"
+
+#. module: tbc_bank
+#: model:ir.actions.act_window,name:tbc_bank.action_tbc_payment
+msgid "TBC Transfers"
+msgstr "TBC გადარიცხვები"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid ""
+"TBC already had this transfer (id %s); it was not sent twice. Status "
+"refreshed."
+msgstr ""
+"TBC-ს ეს გადარიცხვა უკვე ჰქონდა (ID %s); ორჯერ არ გაგზავნილა. სტატუსი "
+"განახლდა."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid ""
+"TBC already has this transfer (duplicate request). Use Recover from TBC; do "
+"not create a new payment."
+msgstr ""
+"TBC-ს ეს გადარიცხვა უკვე აქვს (დუბლირებული მოთხოვნა). გამოიყენეთ „TBC-დან "
+"აღდგენა“; ახალი გადახდა არ შექმნათ."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid ""
+"TBC already registered this transfer. Use 'Recover from TBC' to load its "
+"status - do not pay it again."
+msgstr ""
+"TBC-მ ეს გადარიცხვა უკვე დაარეგისტრირა. მისი სტატუსის მისაღებად გამოიყენეთ "
+"„TBC-დან აღდგენა“ — ხელახლა არ გადაიხადოთ."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid ""
+"TBC did not confirm the transfer. Use Recover from TBC before resending."
+msgstr ""
+"TBC-მ გადარიცხვა არ დაადასტურა. ხელახლა გაგზავნამდე გამოიყენეთ „TBC-დან "
+"აღდგენა“."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid ""
+"TBC did not confirm this transfer. It may or may not have gone through — use"
+" 'Recover from TBC' before resending."
+msgstr ""
+"TBC-მ ეს გადარიცხვა არ დაადასტურა. შეიძლება შესრულდა, შეიძლება — არა; "
+"ხელახლა გაგზავნამდე გამოიყენეთ „TBC-დან აღდგენა“."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid "TBC has no record of it — safe to resend."
+msgstr "TBC-ს მასზე ჩანაწერი არ აქვს — ხელახლა გაგზავნა უსაფრთხოა."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid "TBC has no record of this transfer. You can resend it."
+msgstr "TBC-ს ამ გადარიცხვაზე ჩანაწერი არ აქვს. შეგიძლიათ, ხელახლა გაგზავნოთ."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/wizard/tbc_statement_import_wizard.py:0
+msgid "TBC movement %s"
+msgstr "TBC ტრანზაქცია %s"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid ""
+"TBC now reports this transfer as %s, but it is already confirmed, so its "
+"state was left unchanged. Check it with TBC."
+msgstr ""
+"TBC ამ გადარიცხვაზე ახლა აბრუნებს სტატუსს „%s“, მაგრამ იგი უკვე "
+"დადასტურებულია, ამიტომ სტატუსი არ შეცვლილა. გადაამოწმეთ TBC-სთან."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment_method_line.py:0
+msgid ""
+"TBC pays payroll only into Georgian IBANs. Pay these recipients another way,"
+" or give them a Georgian account: %s"
+msgstr ""
+"სახელფასო გადახდებს TBC მხოლოდ ქართულ IBAN-ზე ასრულებს. ამ მიმღებებს სხვა "
+"გზით გადაუხადეთ ან მიუთითეთ მათი ქართული ანგარიში: %s"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment_method_line.py:0
+msgid ""
+"TBC pays the State Treasury by a 9-digit Treasury Code. Correct the Treasury"
+" Code of: %s"
+msgstr ""
+"TBC სახელმწიფო ხაზინას 9-ნიშნა სახაზინო კოდით უხდის. შეასწორეთ სახაზინო "
+"კოდი: %s"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/services/tbc_bank_service.py:0
+msgid ""
+"TBC returned more than %(pages)s pages of movements for %(account)s. Import "
+"a shorter period."
+msgstr ""
+"TBC-მ %(account)s-ისთვის ტრანზაქციების %(pages)s-ზე მეტი გვერდი დააბრუნა. "
+"გააკეთეთ უფრო მოკლე პერიოდის იმპორტი."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/services/tbc_bank_service.py:0
+msgid ""
+"TBC sent %(count)s of the %(total)s movements of %(account)s and then "
+"stopped. Nothing was imported; import the period again later."
+msgstr ""
+"TBC-მ ანგარიშის %(account)s %(total)s ტრანზაქციიდან მხოლოდ %(count)s "
+"გამოგზავნა და შეწყვიტა. არაფერი დაიმპორტდა; მოგვიანებით გაიმეორეთ ამ "
+"პერიოდის იმპორტი."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/services/tbc_bank_service.py:0
+msgid "TBC token request timed out."
+msgstr "TBC-დან ტოკენის მოთხოვნის დრო ამოიწურა."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid "TBC transfer"
+msgstr "TBC გადარიცხვა"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid ""
+"TBC transfer %(name)s cannot be sent:\n"
+"%(problems)s"
+msgstr ""
+"TBC გადარიცხვა %(name)s ვერ გაიგზავნება:\n"
+"%(problems)s"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_account_payment__tbc_taxpayer_code
+msgid "Taxpayer Code"
+msgstr "გადასახადის გადამხდელის კოდი"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_account_payment__tbc_taxpayer_name
+msgid "Taxpayer Name"
+msgstr "გადასახადის გადამხდელის სახელი"
+
+#. module: tbc_bank
+#: model:ir.model.fields.selection,name:tbc_bank.selection__tbc_connection__environment__test
+msgid "Test"
+msgstr "ტესტური"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_tbc_connection_form
+msgid "Test Connection"
+msgstr "კავშირის ტესტირება"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/wizard/tbc_statement_fetch_wizard.py:0
+#: code:addons/tbc_bank/wizard/tbc_statement_import_wizard.py:0
+msgid "The 'From' date must be before the 'To' date."
+msgstr "თარიღი „საიდან“ უნდა უსწრებდეს თარიღს „სადამდე“."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid "The amount must be greater than 0."
+msgstr "თანხა 0-ზე მეტი უნდა იყოს."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/wizard/tbc_statement_fetch_wizard.py:0
+#: code:addons/tbc_bank/wizard/tbc_statement_import_wizard.py:0
+msgid "The journal has no bank account number (IBAN)."
+msgstr "ჟურნალს არ აქვს საბანკო ანგარიშის ნომერი (IBAN)."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid ""
+"The recipient account is a TBC account; use 'Within TBC' (or 'To Own "
+"Account')."
+msgstr ""
+"მიმღების ანგარიში TBC-ის ანგარიშია; გამოიყენეთ „TBC-ის შიგნით“ (ან „საკუთარ "
+"ანგარიშზე“)."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid "The recipient account is not a TBC account; use 'To Other Bank'."
+msgstr "მიმღების ანგარიში TBC-ის ანგარიში არ არის; გამოიყენეთ „სხვა ბანკში“."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid "The recipient bank account is missing."
+msgstr "მიმღების საბანკო ანგარიში მითითებული არ არის."
+
+#. module: tbc_bank
+#: model:ir.model.fields,help:tbc_bank.field_account_payment__tbc_bank_status
+msgid "The transfer status exactly as TBC last returned it."
+msgstr "გადარიცხვის სტატუსი ზუსტად ისე, როგორც TBC-მ ბოლოს დააბრუნა."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_batch_payment.py:0
+msgid "This batch is not on a TBC Bank journal."
+msgstr "ეს პაკეტი არ არის TBC ბანკის ჟურნალზე."
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_account_payment_form_tbc
+msgid "This sends a real payment order to TBC Bank. Continue?"
+msgstr "ეს TBC ბანკში რეალურ საგადახდო დავალებას გაგზავნის. გავაგრძელოთ?"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_batch_payment_form_tbc
+msgid "This sends the ready transfers of this batch to TBC Bank. Continue?"
+msgstr ""
+"ეს პაკეტის გასაგზავნად მზა გადარიცხვებს TBC ბანკში გაგზავნის. გავაგრძელოთ?"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_account_payment_form_tbc
+msgid ""
+"This transfer is <b>not confirmed</b>. If it failed, fix the error, use "
+"Reset to Pending and send it again. If its outcome is unknown, use Recover "
+"from TBC - do not create a new payment."
+msgstr ""
+"ეს გადარიცხვა <b>არ არის დადასტურებული</b>. თუ ვერ შესრულდა, გაასწორეთ "
+"შეცდომა, გამოიყენეთ „მოლოდინში დაბრუნება“ და გაგზავნეთ ხელახლა. თუ მისი "
+"შედეგი უცნობია, გამოიყენეთ „TBC-დან აღდგენა“ — ახალი გადახდა არ შექმნათ."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid ""
+"This transfer may still be on its way to TBC (sending started less than %s "
+"minutes ago). Try 'Recover from TBC' again later."
+msgstr ""
+"ეს გადარიცხვა შეიძლება ჯერ კიდევ იგზავნებოდეს TBC-ში (გაგზავნა %s წუთზე "
+"ნაკლები ხნის წინ დაიწყო). „TBC-დან აღდგენა“ მოგვიანებით სცადეთ."
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement__period_to
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement_fetch_wizard__period_to
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement_import_wizard__end_date
+msgid "To"
+msgstr "სადამდე"
+
+#. module: tbc_bank
+#: model:ir.model.fields.selection,name:tbc_bank.selection__account_payment__tbc_transfer_type__foreign
+msgid "To Other Bank (Foreign / SWIFT)"
+msgstr "სხვა ბანკში (უცხოური / SWIFT)"
+
+#. module: tbc_bank
+#: model:ir.model.fields.selection,name:tbc_bank.selection__account_payment__tbc_transfer_type__national
+msgid "To Other Bank (GEL / national)"
+msgstr "სხვა ბანკში (ლარი / ეროვნული)"
+
+#. module: tbc_bank
+#: model:ir.model.fields.selection,name:tbc_bank.selection__account_payment__tbc_transfer_type__own
+msgid "To Own Account"
+msgstr "საკუთარ ანგარიშზე"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_connection__token_expiry
+msgid "Token Expiry"
+msgstr "ტოკენის ვადა"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement__credit_sum
+msgid "Total Credit (In)"
+msgstr "სულ ჩარიცხვა"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement__debit_sum
+msgid "Total Debit (Out)"
+msgstr "სულ ჩამოწერა"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid "Transfer found at TBC (id %s); status refreshed."
+msgstr "გადარიცხვა მოიძებნა TBC-ში (ID %s); სტატუსი განახლდა."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid "Transfer rejected by TBC."
+msgstr "TBC-მ გადარიცხვა უარყო."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid "Transfer rejected."
+msgstr "გადარიცხვა უარყოფილია."
+
+#. module: tbc_bank
+#: model:ir.ui.menu,name:tbc_bank.menu_tbc_payments
+msgid "Transfers"
+msgstr "გადარიცხვები"
+
+#. module: tbc_bank
+#: model:ir.model.fields.selection,name:tbc_bank.selection__account_payment__tbc_transfer_type__treasury
+msgid "Treasury"
+msgstr "ხაზინა"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_account_payment__tbc_treasury_code
+msgid "Treasury Code"
+msgstr "ხაზინის კოდი"
+
+#. module: tbc_bank
+#: model:ir.model.fields,field_description:tbc_bank.field_tbc_statement__snapshot_type
+msgid "Type"
+msgstr "ტიპი"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/services/tbc_bank_service.py:0
+msgid "Unexpected movement payload from TBC Bank."
+msgstr "TBC ბანკიდან ტრანზაქციების მოულოდნელი პასუხი მოვიდა."
+
+#. module: tbc_bank
+#: model:res.groups,name:tbc_bank.group_tbc_user
+msgid "User"
+msgstr "მომხმარებელი"
+
+#. module: tbc_bank
+#: model:ir.model.fields.selection,name:tbc_bank.selection__account_payment__tbc_transfer_type__internal
+msgid "Within TBC (another TBC account)"
+msgstr "TBC-ის შიგნით (სხვა TBC ანგარიში)"
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/services/tbc_bank_service.py:0
+msgid "check the credentials."
+msgstr "შეამოწმეთ ავტორიზაციის მონაცემები."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/tbc_connection.py:0
+msgid "unknown error"
+msgstr "უცნობი შეცდომა"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_account_payment_form_tbc
+msgid ""
+"—\n"
+"                    ready to send."
+msgstr ""
+"—\n"
+"                    მზადაა გასაგზავნად."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid ""
+"%s reset this transfer to pending. TBC had failed the earlier transfer, so a"
+" new send uses a new request id."
+msgstr ""
+"%s-მა ეს გადარიცხვა მოლოდინში დააბრუნა. TBC-მ წინა გადარიცხვა ვერ შეასრულა, "
+"ამიტომ ახალი გაგზავნა ახალ მოთხოვნის იდენტიფიკატორს გამოიყენებს."
+
+#. module: tbc_bank
+#: model:ir.model.fields,help:tbc_bank.field_tbc_statement__company_id
+msgid "Company related to this journal"
+msgstr "ამ ჟურნალთან დაკავშირებული კომპანია"
+
+#. module: tbc_bank
+#: model:ir.model,name:tbc_bank.model_res_partner
+msgid "Contact"
+msgstr "კონტაქტი"
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_account_payment_form_tbc
+msgid ""
+"Only confirm a transfer you can see executed in TBC Internet Banking. Odoo "
+"then stops checking it with the bank."
+msgstr ""
+"დაადასტურეთ მხოლოდ ის გადარიცხვა, რომლის შესრულებასაც TBC-ის ინტერნეტ-ბანკში"
+" ხედავთ. ამის შემდეგ Odoo მას ბანკთან აღარ ამოწმებს."
+
+#. module: tbc_bank
+#: model_terms:ir.ui.view,arch_db:tbc_bank.view_account_payment_form_tbc
+msgid ""
+"Only reset this after checking TBC Internet Banking. If TBC executed the "
+"transfer after all, sending again will pay twice."
+msgstr ""
+"მოლოდინში დააბრუნეთ მხოლოდ TBC-ის ინტერნეტ-ბანკის შემოწმების შემდეგ. თუ "
+"TBC-მ გადარიცხვა მაინც შეასრულა, ხელახალი გაგზავნა თანხას ორჯერ გადაიხდის."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid ""
+"TBC has no record of this transfer yet, but it may still be processing the "
+"send that timed out. Try 'Recover from TBC' again after %s minutes."
+msgstr ""
+"TBC-ს ამ გადარიცხვის ჩანაწერი ჯერ არ აქვს, მაგრამ შეიძლება ჯერ კიდევ "
+"ამუშავებდეს გაგზავნას, რომელსაც დრო ამოეწურა. „TBC-დან აღდგენა“ ხელახლა "
+"სცადეთ %s წუთის შემდეგ."
+
+#. module: tbc_bank
+#. odoo-python
+#: code:addons/tbc_bank/models/account_payment.py:0
+msgid ""
+"TBC refused the request before processing it (login or rate limit), so "
+"nothing was created. Send it again later."
+msgstr ""
+"TBC-მ მოთხოვნა დამუშავებამდე უარყო (შესვლა ან მოთხოვნების ლიმიტი), ამიტომ "
+"არაფერი შექმნილა. მოგვიანებით ხელახლა გაგზავნეთ."

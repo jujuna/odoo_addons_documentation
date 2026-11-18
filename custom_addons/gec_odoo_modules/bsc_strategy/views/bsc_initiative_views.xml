@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_bsc_initiative_stage_list" model="ir.ui.view">
+        <field name="name">bsc.initiative.stage.list</field>
+        <field name="model">bsc.initiative.stage</field>
+        <field name="arch" type="xml">
+            <list string="Initiative Stages" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="state"/>
+                <field name="fold"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_bsc_initiative_stage" model="ir.actions.act_window">
+        <field name="name">Initiative Stages</field>
+        <field name="res_model">bsc.initiative.stage</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_bsc_initiative_kanban" model="ir.ui.view">
+        <field name="name">bsc.initiative.kanban</field>
+        <field name="model">bsc.initiative</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="stage_id" quick_create="false">
+                <field name="stage_id" options="{'no_create': True}" />
+                <field name="currency_id"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between">
+                            <strong><field name="name"/></strong>
+                            <field name="priority" widget="priority"/>
+                        </div>
+                        <div class="text-muted">
+                            <field name="objective_ids" widget="many2many_tags" options="{'no_quick_create': True}" />
+                        </div>
+                        <div class="mt-2">
+                            <field name="progress" widget="progressbar"/>
+                        </div>
+                        <div>
+                            <span class="text-muted">Budget: </span>
+                            <field name="budget_planned" widget="monetary"/>
+                        </div>
+                        <footer>
+                            <field name="date_end" widget="remaining_days"/>
+                            <field name="owner_id" widget="many2one_avatar_user" options="{'no_create': True}" />
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_bsc_initiative_list" model="ir.ui.view">
+        <field name="name">bsc.initiative.list</field>
+        <field name="model">bsc.initiative</field>
+        <field name="arch" type="xml">
+            <list string="Initiatives" decoration-muted="state == 'cancelled'"
+                  decoration-success="state == 'done'">
+                <field name="priority" widget="priority" optional="show"/>
+                <field name="name"/>
+                <field name="scorecard_id" optional="hide" options="{'no_quick_create': True}" />
+                <field name="objective_ids" widget="many2many_tags" optional="show" options="{'no_quick_create': True}" />
+                <field name="stage_id" options="{'no_create': True}" />
+                <field name="owner_id" widget="many2one_avatar_user" options="{'no_create': True}" />
+                <field name="date_start" optional="show"/>
+                <field name="date_end"/>
+                <field name="budget_planned" sum="Planned"/>
+                <field name="budget_actual" sum="Actual"/>
+                <field name="budget_variance" sum="Variance" optional="show"/>
+                <field name="progress" widget="progressbar"/>
+                <field name="review_id" optional="hide"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bsc_initiative_form" model="ir.ui.view">
+        <field name="name">bsc.initiative.form</field>
+        <field name="model">bsc.initiative</field>
+        <field name="arch" type="xml">
+            <form string="Initiative">
+                <header>
+                    <field name="stage_id" widget="statusbar" options="{'clickable': '1'}"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Roll out the new onboarding process"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="scorecard_id" options="{'no_quick_create': True}" />
+                            <field name="objective_ids" widget="many2many_tags"
+                                   domain="[('scorecard_id', '=', scorecard_id)]" options="{'no_quick_create': True}" />
+                            <field name="owner_id" widget="many2one_avatar_user" options="{'no_create': True}" />
+                            <field name="priority" widget="priority"/>
+                            <field name="active" invisible="1"/>
+                            <field name="state" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                            <field name="budget_planned"
+                                   required="state in ['approved', 'in_progress', 'done']"/>
+                            <field name="budget_actual"/>
+                            <field name="budget_variance"/>
+                            <field name="progress" widget="progressbar"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group invisible="not approval_date">
+                        <group>
+                            <field name="approval_date"/>
+                            <field name="approved_by_id"/>
+                        </group>
+                        <group>
+                            <field name="review_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Expected Impact" name="impact">
+                            <group>
+                                <field name="impact_kpi_ids" widget="many2many_tags" options="{'no_create': True}" />
+                            </group>
+                            <field name="expected_impact" nolabel="1"
+                                   placeholder="What is expected to change, on which measure, by when, and how you will know."/>
+                        </page>
+                        <page string="Result" name="result"
+                              invisible="state not in ['in_progress', 'done']">
+                            <field name="result_summary" nolabel="1"
+                                   placeholder="What actually happened. Required before the initiative can be closed."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bsc_initiative_search" model="ir.ui.view">
+        <field name="name">bsc.initiative.search</field>
+        <field name="model">bsc.initiative</field>
+        <field name="arch" type="xml">
+            <search string="Initiatives">
+                <field name="name"/>
+                <field name="objective_ids"/>
+                <field name="owner_id"/>
+                <field name="scorecard_id"/>
+                <filter name="filter_mine" string="My Initiatives"
+                        domain="[('owner_id', '=', uid)]"/>
+                <separator/>
+                <filter name="filter_proposed" string="Proposed"
+                        domain="[('state', '=', 'proposed')]"/>
+                <filter name="filter_running" string="Running"
+                        domain="[('state', 'in', ['approved', 'in_progress'])]"/>
+                <filter name="filter_done" string="Done" domain="[('state', '=', 'done')]"/>
+                <separator/>
+                <filter name="filter_late" string="Overdue"
+                        domain="[('date_end', '&lt;', context_today().strftime('%Y-%m-%d')), ('state', 'in', ['approved', 'in_progress'])]"/>
+                <group>
+                    <filter name="group_stage" string="Stage"
+                            context="{'group_by': 'stage_id'}"/>
+                    <filter name="group_owner" string="Owner"
+                            context="{'group_by': 'owner_id'}"/>
+                    <filter name="group_scorecard" string="Scorecard"
+                            context="{'group_by': 'scorecard_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bsc_initiative" model="ir.actions.act_window">
+        <field name="name">Initiatives</field>
+        <field name="res_model">bsc.initiative</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_bsc_initiative_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Propose an initiative</p>
+            <p>Anyone can propose one; approval is a separate step and needs a
+               budget. Objectives without any initiative behind them are
+               intentions, not strategy.</p>
+        </field>
+    </record>
+
+</odoo>

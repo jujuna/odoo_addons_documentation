@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_rs_buyer_inbox_wizard_form_rs_spec_invoice" model="ir.ui.view">
+        <field name="name">rs.einvoice.inbox.wizard.form.rs.spec.invoice</field>
+        <field name="model">rs.einvoice.inbox.wizard</field>
+        <field name="inherit_id" ref="rs_einvoice.view_rs_buyer_inbox_wizard_form"/>
+        <field name="arch" type="xml">
+            <field name="date_to" position="after">
+                <field name="rs_spec" readonly="1" invisible="not rs_spec"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="action_rs_spec_buyer_inbox" model="ir.actions.act_window">
+        <field name="name">Received Petroleum Invoices</field>
+        <field name="res_model">rs.einvoice.inbox.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="context">{'default_rs_spec': True}</field>
+    </record>
+</odoo>

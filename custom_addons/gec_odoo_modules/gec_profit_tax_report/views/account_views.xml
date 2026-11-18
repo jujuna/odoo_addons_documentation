@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_form_gec_cit" model="ir.ui.view">
+        <field name="name">account.account.form.gec.cit</field>
+        <field name="model">account.account</field>
+        <field name="inherit_id" ref="account.view_account_form"/>
+        <field name="arch" type="xml">
+            <field name="tag_ids" position="after">
+                <field name="gec_cit_cell_id" options="{'no_create': True}"/>
+                <field name="gec_cit_balance_group"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_move_form_gec_cit" model="ir.ui.view">
+        <field name="name">account.move.form.gec.cit</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='line_ids']/list/field[@name='name']" position="after">
+                <field name="gec_cit_cell_id" optional="hide" options="{'no_create': True}"
+                       groups="account.group_account_user"/>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/list/field[@name='price_total']" position="after">
+                <field name="gec_cit_market_value" optional="hide" groups="account.group_account_user"
+                       column_invisible="parent.move_type not in ('out_invoice', 'out_receipt', 'in_invoice', 'in_receipt')"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

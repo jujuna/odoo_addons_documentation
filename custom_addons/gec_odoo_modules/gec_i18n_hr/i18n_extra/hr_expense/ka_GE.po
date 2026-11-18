@@ -1,0 +1,2786 @@
+# Georgian translation of the Odoo addon hr_expense, kept in gec_i18n_hr.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-18 17:38+0000\n"
+"PO-Revision-Date: 2026-09-30 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian (ka_GE)\n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_hr_expense__has_existing_bill
+msgid ""
+" - When a bill already exists, the payment will use the supplier payable account so it can be matched with the bill.\n"
+"                 - When no bill exists, the payment will be recorded directly on the expense account, as usual.\n"
+"            "
+msgstr ""
+" - როდესაც ანგარიშ-ფაქტურა უკვე არსებობს, გადახდა გამოიყენებს მომწოდებლის გადასახდელ ანგარიშს, რათა შესაძლებელი იყოს მისი შეჯერება ანგარიშ-ფაქტურასთან.\n"
+"                 - როდესაც ანგარიშ-ფაქტურა არ არსებობს, გადახდა, ჩვეულებისამებრ, პირდაპირ ხარჯის ანგარიშზე აღირიცხება.\n"
+"            "
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "%(employee_name)s: %(expense_name)s"
+msgstr "%(employee_name)s: %(expense_name)s"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "%(expense_name)s: It is not from your department"
+msgstr "%(expense_name)s: ეს არ არის თქვენი დეპარტამენტიდან"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "%(expense_name)s: It is your own expense"
+msgstr "%(expense_name)s: ეს თქვენი საკუთარი ხარჯია"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "%(expense_name)s: You are neither a Manager nor a HR Officer"
+msgstr "%(expense_name)s: თქვენ არც მენეჯერი ხართ და არც HR ოფიცერი"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "%(expense_name)s: Your are neither a Manager nor a HR Officer of this expense's company"
+msgstr "%(expense_name)s: თქვენ ამ ხარჯის კომპანიის არც მენეჯერი ხართ და არც HR ოფიცერი"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "%(user)s confirms this expense is not a duplicate with similar expense."
+msgstr "%(user)s ადასტურებს, რომ ეს ხარჯი არ წარმოადგენს მსგავსი ხარჯის დუბლიკატს."
+
+#. module: hr_expense
+msgid "'Expense - %s - %s' % (object.employee_id.name, (object.name or '').replace('/', ''))"
+msgstr "'Expense - %s - %s' % (object.employee_id.name, (object.name or '').replace('/', ''))"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_submitted_expenses
+msgid "--<br/>"
+msgstr "--<br/>"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "1 %(exp_cur)s = %(rate)s %(comp_cur)s"
+msgstr "1 %(exp_cur)s = %(rate)s %(comp_cur)s"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "<b>Wasting time recording your receipts?</b> Let’s try a better way."
+msgstr "<b>დროს კარგავთ ქვითრების აღრიცხვაში?</b> სცადეთ უკეთესი გზა."
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "<i class=\"oi\" data-icon=\"east\"/> Setup your alias domain"
+msgstr "<i class=\"oi\" data-icon=\"east\"/> დააყენეთ თქვენი ალიასის დომენი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_split
+msgid "<span class=\"mx-1\" invisible=\"split_possible\">/</span>"
+msgstr "<span class=\"mx-1\" invisible=\"split_possible\">/</span>"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.view_payment_form_inherit_expense
+msgid "<span class=\"o_stat_text\">Expense</span>"
+msgstr "<span class=\"o_stat_text\">ხარჯი</span>"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "<span class=\"o_stat_text\">Journal Entry</span>"
+msgstr "<span class=\"o_stat_text\">ბუღალტრული გატარება</span>"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "<span class=\"o_stat_text\">Payment</span>"
+msgstr "<span class=\"o_stat_text\">გადახდა</span>"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "<span>@</span>"
+msgstr "<span>@</span>"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "<span>Employee:</span>"
+msgstr "<span>თანამშრომელი:</span>"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "<span>Manager:</span>"
+msgstr "<span>მენეჯერი:</span>"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "<span>Paid by:</span>"
+msgstr "<span>გადამხდელი:</span>"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.view_move_form_inherit_expense
+msgid "<span>This bill was already paid by an employee and the bill has been sent to you. Don't pay the supplier</span>"
+msgstr "<span>ეს ანგარიშ-ფაქტურა უკვე გადაიხადა თანამშრომელმა და ანგარიშ-ფაქტურა გამოგეგზავნათ. არ გადაუხადოთ მომწოდებელს</span>"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_submitted_expenses
+msgid "<strong>expenses</strong> pending approval, from:"
+msgstr "<strong>ხარჯი</strong> დამტკიცების მოლოდინში, წარმდგენი:"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_submitted_expenses
+msgid "A new expense is waiting for your approval in Odoo."
+msgstr "ახალი ხარჯი Odoo-ში თქვენს დამტკიცებას ელოდება."
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__account_id
+msgid "Account"
+msgstr "ანგარიში"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "Accounting"
+msgstr "ბუღალტერია"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.view_move_list_expense
+msgid "Accounting Date"
+msgstr "ბუღალტრული თარიღი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__message_needaction
+msgid "Action Needed"
+msgstr "საჭიროა მოქმედება"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "Action Required"
+msgstr "საჭიროა მოქმედება"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__activity_ids
+msgid "Activities"
+msgstr "აქტივობები"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "აქტივობის გამონაკლისის გაფორმება"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__activity_plans_ids
+msgid "Activity Plans"
+msgstr "აქტივობის გეგმები"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__activity_state
+msgid "Activity State"
+msgstr "აქტივობის მდგომარეობა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "აქტივობის ტიპის ხატულა"
+
+#. module: hr_expense
+#: model:ir.actions.act_window,name:hr_expense.mail_activity_type_action_config_hr_expense model:ir.ui.menu,name:hr_expense.hr_expense_menu_config_activity_type
+msgid "Activity Types"
+msgstr "აქტივობის ტიპები"
+
+#. module: hr_expense
+#: model:res.groups,name:hr_expense.group_hr_expense_manager
+msgid "Administrator"
+msgstr "ადმინისტრატორი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "Alias"
+msgstr "ფსევდონიმი"
+
+#. module: hr_expense
+#: model:res.groups,name:hr_expense.group_hr_expense_user
+msgid "All Approver"
+msgstr "ყველა დამმტკიცებელი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "All Paid"
+msgstr "ყველა გადახდილი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "All payment methods allowed"
+msgstr "ნებადართულია ყველა გადახდის მეთოდი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "All to Pay"
+msgstr "ყველა გადასახდელი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "All to Post"
+msgstr "ყველა გასატარებელი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__amount_residual model_terms:ir.ui.view,arch_db:hr_expense.view_move_list_expense
+msgid "Amount Due"
+msgstr "გადასახდელი თანხა"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Amount reimbursed"
+msgstr "ანაზღაურებული თანხა"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "An"
+msgstr "An"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/mixins/document_upload.js:0
+msgid "An error occurred during the upload"
+msgstr "ატვირთვისას მოხდა შეცდომა"
+
+#. module: hr_expense
+msgid ""
+"An expense account is expected for employee paid expenses and company paid expenses without a matched bill.\n"
+"For company paid expenses with a matched bill, the account needs to be the payable account of the bill."
+msgstr ""
+"ხარჯის ანგარიში საჭიროა თანამშრომლის მიერ გადახდილი ხარჯებისთვის და კომპანიის მიერ გადახდილი იმ ხარჯებისთვის, რომლებსაც შესაბამისი ანგარიშ-ფაქტურა არ აქვს.\n"
+"კომპანიის მიერ გადახდილი ხარჯებისთვის, რომლებსაც შესაბამისი ანგარიშ-ფაქტურა აქვს, ანგარიში უნდა იყოს ამ ანგარიშ-ფაქტურის გადასახდელი ანგარიში."
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/views/expense_form_view.js:0
+msgid ""
+"An expense with the same product, amount, and date already exists.\n"
+"Are you sure you want to submit this one as well?"
+msgstr ""
+"იმავე პროდუქტის, თანხისა და თარიღის ხარჯი უკვე არსებობს.\n"
+"დარწმუნებული ხართ, რომ გსურთ ამის წარდგენაც?"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_split model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_split_form_view model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "Analytic"
+msgstr "ანალიტიკური"
+
+#. module: hr_expense
+#: model:ir.model,name:hr_expense.model_account_analytic_account
+msgid "Analytic Account"
+msgstr "ანალიტიკური ანგარიში"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__analytic_distribution model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__analytic_distribution
+msgid "Analytic Distribution"
+msgstr "ანალიტიკური განაწილება"
+
+#. module: hr_expense
+msgid "Analytic Plan's Applicabilities"
+msgstr "ანალიტიკური გეგმის გავრცელებები"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__analytic_precision model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__analytic_precision
+msgid "Analytic Precision"
+msgstr "ანალიტიკური სიზუსტე"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__approval_date model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__approval_date
+msgid "Approval Date"
+msgstr "დამტკიცების თარიღი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__approval_state model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__approval_state
+msgid "Approval State"
+msgstr "დამტკიცების მდგომარეობა"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/views/list.xml:0 model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_approve_duplicate_view_form model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "Approve"
+msgstr "დამტკიცება"
+
+#. module: hr_expense
+#: model:ir.model.fields.selection,name:hr_expense.selection__hr_expense__approval_state__approved model:ir.model.fields.selection,name:hr_expense.selection__hr_expense__state__approved model:ir.model.fields.selection,name:hr_expense.selection__hr_expense_split__approval_state__approved model:mail.message.subtype,name:hr_expense.mt_expense_approved
+msgid "Approved"
+msgstr "დამტკიცებული"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.product_product_expense_form_view
+msgid "Archived"
+msgstr "დაარქივებული"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0 model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "Attach Receipt"
+msgstr "ქვითრის მიმაგრება"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Attach a receipt - usually an image or a PDF file."
+msgstr "მიამაგრეთ ქვითარი — ჩვეულებრივ სურათი ან PDF ფაილი."
+
+#. module: hr_expense
+#: model:ir.model,name:hr_expense.model_ir_attachment
+msgid "Attachment"
+msgstr "დანართი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__message_attachment_count
+msgid "Attachment Count"
+msgstr "დანართების რაოდენობა"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense_img
+msgid "Attachment Name"
+msgstr "დანართის სახელი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__attachment_ids
+msgid "Attachments"
+msgstr "დანართები"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_employee_view_form_inherit_expense model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form model_terms:ir.ui.view,arch_db:hr_expense.view_employee_tree_inherit_expense
+msgid "Auto-validation"
+msgstr "ავტომატური ვალიდაცია"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_account_bank_statement_line__bill_paid_by_employee model:ir.model.fields,field_description:hr_expense.field_account_move__bill_paid_by_employee
+msgid "Bill Paid By Employee"
+msgstr "თანამშრომლის მიერ გადახდილი ანგარიშ-ფაქტურა"
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_hr_expense__tax_ids
+msgid "Both price-included and price-excluded taxes will behave as price-included taxes for expenses."
+msgstr "ფასში ჩათვლილი და ფასში ჩაუთვლელი გადასახადები ხარჯებისთვის მოიქცევა როგორც ფასში ჩათვლილი გადასახადები."
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__can_approve
+msgid "Can Approve"
+msgstr "შეუძლია დამტკიცება"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__can_edit_account
+msgid "Can Edit Account"
+msgstr "შეუძლია ანგარიშის რედაქტირება"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__can_reset
+msgid "Can Reset"
+msgstr "შეუძლია გადაყენება"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "Cap Reimbursement to Policy"
+msgstr "ანაზღაურების შეზღუდვა პოლიტიკის მიხედვით"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.product_product_expense_form_view
+msgid "Category"
+msgstr "კატეგორია"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__message_main_attachment_checksum
+msgid "Checksum/SHA1"
+msgstr "საკონტროლო ჯამი/SHA1"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Click here to create your employee profile."
+msgstr "დააწკაპუნეთ აქ თანამშრომლის პროფილის შესაქმნელად."
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Click on all expenses"
+msgstr "დააწკაპუნეთ ყველა ხარჯზე"
+
+#. module: hr_expense
+#: model:product.template,name:hr_expense.expense_product_communication_product_template
+msgid "Communication"
+msgstr "კომუნიკაცია"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/ir_actions_report.py:0 model:ir.model,name:hr_expense.model_res_company model:ir.model.fields,field_description:hr_expense.field_hr_expense__company_id model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__company_id model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "Company"
+msgstr "კომპანია"
+
+#. module: hr_expense
+#: model:ir.model,name:hr_expense.model_res_config_settings
+msgid "Config Settings"
+msgstr "კონფიგურაციის პარამეტრები"
+
+#. module: hr_expense
+#: model:ir.ui.menu,name:hr_expense.menu_hr_expense_configuration
+msgid "Configuration"
+msgstr "კონფიგურაცია"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense_product_job_position_limit__company_currency_id
+msgid "Cost Currency"
+msgstr "თვითღირებულების ვალუტა"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.product_product_expense_kanban_view
+msgid "Cost:"
+msgstr "ღირებულება:"
+
+#. module: hr_expense
+#: model_terms:ir.actions.act_window,help:hr_expense.action_hr_expense_account
+msgid "Create a new expense"
+msgstr "ახალი ხარჯის შექმნა"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Create and edit a new employee profile."
+msgstr "შექმენით და დაარედაქტირეთ თანამშრომლის ახალი პროფილი."
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "Create expenses from incoming emails"
+msgstr "შემომავალი ელ-ფოსტიდან ხარჯების შექმნა"
+
+#. module: hr_expense
+#: model_terms:ir.actions.act_window,help:hr_expense.hr_expense_actions_all
+msgid "Create new expenses to get statistics."
+msgstr "შექმენით ახალი ხარჯები სტატისტიკის მისაღებად."
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "Create prepaid virtual and physical cards for both one-time and recurring expenses, integrated into Odoo through Stripe Issuing."
+msgstr "შექმენით წინასწარ გადახდილი ვირტუალური და ფიზიკური ბარათები ერთჯერადი და განმეორებადი ხარჯებისთვის, ინტეგრირებული Odoo-ში Stripe Issuing-ის მეშვეობით."
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__create_uid model:ir.model.fields,field_description:hr_expense.field_hr_expense_approve_duplicate__create_uid model:ir.model.fields,field_description:hr_expense.field_hr_expense_product_job_position_limit__create_uid model:ir.model.fields,field_description:hr_expense.field_hr_expense_refuse_wizard__create_uid model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__create_uid model:ir.model.fields,field_description:hr_expense.field_hr_expense_split_wizard__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__create_date model:ir.model.fields,field_description:hr_expense.field_hr_expense_approve_duplicate__create_date model:ir.model.fields,field_description:hr_expense.field_hr_expense_product_job_position_limit__create_date model:ir.model.fields,field_description:hr_expense.field_hr_expense_refuse_wizard__create_date model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__create_date model:ir.model.fields,field_description:hr_expense.field_hr_expense_split_wizard__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__currency_id model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__currency_id model:ir.model.fields,field_description:hr_expense.field_hr_expense_split_wizard__currency_id model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "Currency"
+msgstr "ვალუტა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__currency_rate
+msgid "Currency Rate"
+msgstr "ვალუტის კურსი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__date model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "Date"
+msgstr "თარიღი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_register
+msgid "Dear"
+msgstr "ძვირფასო"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_res_config_settings__hr_expense_alias_prefix
+msgid "Default Alias Name for Expenses"
+msgstr "ნაგულისხმევი მეტსახელი ხარჯებისთვის"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_res_company__expense_journal_id model:ir.model.fields,field_description:hr_expense.field_res_config_settings__expense_journal_id
+msgid "Default Expense Journal"
+msgstr "ნაგულისხმევი ხარჯების ჟურნალი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "Default accounting journal for expenses paid by employees."
+msgstr "ნაგულისხმევი ბუღალტრული ჟურნალი თანამშრომლების მიერ გადახდილი ხარჯებისთვის."
+
+#. module: hr_expense
+#: model:ir.model,name:hr_expense.model_hr_department model:ir.model.fields,field_description:hr_expense.field_hr_expense__department_id model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "Department"
+msgstr "დეპარტამენტი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__name model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__name
+msgid "Description"
+msgstr "აღწერა"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "Digitalize your receipts with OCR and Artificial Intelligence"
+msgstr "გაამარტივეთ თქვენი ქვითრების ციფრულ ფორმატში გადაყვანა OCR-ისა და ხელოვნური ინტელექტის მეშვეობით"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_account_analytic_account__display_name model:ir.model.fields,field_description:hr_expense.field_account_analytic_applicability__display_name model:ir.model.fields,field_description:hr_expense.field_account_journal__display_name model:ir.model.fields,field_description:hr_expense.field_account_move__display_name model:ir.model.fields,field_description:hr_expense.field_account_move_line__display_name model:ir.model.fields,field_description:hr_expense.field_account_payment__display_name model:ir.model.fields,field_description:hr_expense.field_account_payment_register__display_name model:ir.model.fields,field_description:hr_expense.field_account_tax__display_name model:ir.model.fields,field_description:hr_expense.field_hr_department__display_name model:ir.model.fields,field_description:hr_expense.field_hr_employee__display_name model:ir.model.fields,field_description:hr_expense.field_hr_employee_public__display_name model:ir.model.fields,field_description:hr_expense.field_hr_expense__display_name model:ir.model.fields,field_description:hr_expense.field_hr_expense_approve_duplicate__display_name model:ir.model.fields,field_description:hr_expense.field_hr_expense_product_job_position_limit__display_name model:ir.model.fields,field_description:hr_expense.field_hr_expense_refuse_wizard__display_name model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__display_name model:ir.model.fields,field_description:hr_expense.field_hr_expense_split_wizard__display_name model:ir.model.fields,field_description:hr_expense.field_ir_attachment__display_name model:ir.model.fields,field_description:hr_expense.field_product_product__display_name model:ir.model.fields,field_description:hr_expense.field_product_template__display_name model:ir.model.fields,field_description:hr_expense.field_res_company__display_name model:ir.model.fields,field_description:hr_expense.field_res_config_settings__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__distribution_analytic_account_ids model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__distribution_analytic_account_ids
+msgid "Distribution Analytic Account"
+msgstr "განაწილების ანალიტიკური ანგარიში"
+
+#. module: hr_expense
+#: model_terms:digest.tip,tip_description:hr_expense.digest_tip_hr_expense_0
+msgid "Do not keep your expense tickets in your pockets any longer. Just snap a picture of your receipt and let Odoo digitalizes it for you. The OCR and Artificial Intelligence will fill the data automatically."
+msgstr "აღარ შეინახოთ ხარჯის ბილეთები ჯიბეებში. უბრალოდ გადაუღეთ ფოტო თქვენს ქვითარს და მიანდეთ Odoo-ს მისი ციფრულ ფორმატში გადაყვანა. OCR და ხელოვნური ინტელექტი მონაცემებს ავტომატურად შეავსებს."
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_account_analytic_applicability__business_domain
+msgid "Domain"
+msgstr "დომენი"
+
+#. module: hr_expense
+#: model:ir.model.fields.selection,name:hr_expense.selection__hr_expense__state__draft model:mail.message.subtype,name:hr_expense.mt_expense_reset
+msgid "Draft"
+msgstr "მონახაზი"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/wizard/hr_expense_approve_duplicate.py:0 model:ir.model.fields,field_description:hr_expense.field_hr_expense__duplicate_expense_ids
+msgid "Duplicate Expense"
+msgstr "ხარჯის დუბლიკატი"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/views/expense_form_view.js:0
+msgid "Duplicate Expense found"
+msgstr "მოიძებნა ხარჯის დუბლიკატი"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/account_move.py:0
+msgid "Each expense paid by the company must have a distinct and dedicated journal entry."
+msgstr "კომპანიის მიერ გადახდილ თითოეულ ხარჯს უნდა ჰქონდეს ცალკე, გამოყოფილი ბუღალტრული გატარება."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/ir_actions_report.py:0 model:ir.model,name:hr_expense.model_hr_employee model:ir.model.fields,field_description:hr_expense.field_hr_expense__employee_id model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__employee_id model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "Employee"
+msgstr "თანამშრომელი"
+
+#. module: hr_expense
+msgid "Employee (Through a Purchase Receipt)"
+msgstr "თანამშრომელი (შესყიდვის ქვითრით)"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "Employee Expense Journal"
+msgstr "თანამშრომლის ხარჯების ჟურნალი"
+
+#. module: hr_expense
+#: model:ir.actions.act_window,name:hr_expense.action_hr_expense_account
+msgid "Employee Expenses"
+msgstr "თანამშრომლის ხარჯები"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Enter a description and select a product to proceed."
+msgstr "გასაგრძელებლად შეიყვანეთ აღწერა და აირჩიეთ პროდუქტი."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Enter a description to proceed."
+msgstr "გასაგრძელებლად შეიყვანეთ აღწერა."
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Enter a name then choose a product and configure the amount of your expense."
+msgstr "შეიყვანეთ სახელი, შემდეგ აირჩიეთ პროდუქტი და დააკონფიგურირეთ თქვენი ხარჯის თანხა."
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Enter the total amount of the expense."
+msgstr "შეიყვანეთ ხარჯის საერთო თანხა."
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Enter your name to create your employee profile."
+msgstr "შეიყვანეთ თქვენი სახელი თანამშრომლის პროფილის შესაქმნელად."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Exceeds company limit"
+msgstr "აღემატება კომპანიის ლიმიტს"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__existing_bill_id model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "Existing Bill"
+msgstr "არსებული ანგარიშ-ფაქტურა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_account_bank_statement_line__existing_expense_ids model:ir.model.fields,field_description:hr_expense.field_account_move__existing_expense_ids
+msgid "Existing Expense"
+msgstr "არსებული ხარჯი"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/webclient/share_target/expense_share_target_item.js:0 model:account.journal,name:hr_expense.hr_expense_account_journal model:ir.model,name:hr_expense.model_hr_expense model:ir.model.fields,field_description:hr_expense.field_account_bank_statement_line__expense_ids model:ir.model.fields,field_description:hr_expense.field_account_move__expense_ids model:ir.model.fields,field_description:hr_expense.field_account_move_line__expense_id model:ir.model.fields,field_description:hr_expense.field_account_payment__expense_ids model:ir.model.fields,field_description:hr_expense.field_hr_expense_approve_duplicate__expense_ids model:ir.model.fields,field_description:hr_expense.field_hr_expense_refuse_wizard__expense_ids model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__expense_id model:ir.model.fields,field_description:hr_expense.field_hr_expense_split_wizard__expense_id model:ir.model.fields.selection,name:hr_expense.selection__account_analytic_applicability__business_domain__expense model_terms:ir.ui.view,arch_db:hr_expense.account_journal_dashboard_kanban_view_inherit_expense model_terms:ir.ui.view,arch_db:hr_expense.hr_employee_view_form_inherit_expense model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "Expense"
+msgstr "ხარჯი"
+
+#. module: hr_expense
+#: model:ir.actions.act_window,name:hr_expense.action_hr_expense_department_filtered
+msgid "Expense Analysis"
+msgstr "ხარჯების ანალიზი"
+
+#. module: hr_expense
+#: model:mail.activity.type,name:hr_expense.mail_act_expense_approval model:mail.activity.type,summary:hr_expense.mail_act_expense_approval
+msgid "Expense Approval"
+msgstr "ხარჯის დამტკიცება"
+
+#. module: hr_expense
+#: model:ir.model,name:hr_expense.model_hr_expense_approve_duplicate
+msgid "Expense Approve Duplicate"
+msgstr "ხარჯის დუბლიკატის დამტკიცება"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_employee__expense_manager_id
+msgid "Expense Approver"
+msgstr "ხარჯის დამმტკიცებელი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.account_journal_dashboard_kanban_view_inherit_expense
+msgid "Expense Bills"
+msgstr "ხარჯის ანგარიშ-ფაქტურები"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "Expense Card"
+msgstr "ხარჯის ბარათი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "Expense Date"
+msgstr "ხარჯის თარიღი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "Expense Digitalization (OCR)"
+msgstr "ხარჯის ციფრულ ფორმატში გადაყვანა (OCR)"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_employee_public__expense_manager_id
+msgid "Expense Manager"
+msgstr "ხარჯის მენეჯერი"
+
+#. module: hr_expense
+#: model:ir.model,name:hr_expense.model_hr_expense_product_job_position_limit
+msgid "Expense Product Limit by Job Position"
+msgstr "ხარჯის პროდუქტის ლიმიტი ვაკანსიის მიხედვით"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.product_product_expense_form_view
+msgid "Expense Products"
+msgstr "ხარჯის პროდუქტები"
+
+#. module: hr_expense
+#: model:ir.model,name:hr_expense.model_hr_expense_refuse_wizard
+msgid "Expense Refuse Reason Wizard"
+msgstr "ხარჯზე უარის თქმის მიზეზის ოსტატი"
+
+#. module: hr_expense
+#: model:ir.actions.report,name:hr_expense.action_report_expense_img
+msgid "Expense Report Image"
+msgstr "ხარჯის ანგარიშის სურათი"
+
+#. module: hr_expense
+#: model:ir.model,name:hr_expense.model_hr_expense_split
+msgid "Expense Split"
+msgstr "ხარჯის გაყოფა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense_split_wizard__expense_split_line_ids
+msgid "Expense Split Line"
+msgstr "ხარჯის გაყოფის სტრიქონი"
+
+#. module: hr_expense
+#: model:ir.model,name:hr_expense.model_hr_expense_split_wizard
+msgid "Expense Split Wizard"
+msgstr "ხარჯის გაყოფის ოსტატი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_approve_duplicate_view_form
+msgid "Expense Validate Duplicate"
+msgstr "ხარჯის დუბლიკატის ვალიდაცია"
+
+#. module: hr_expense
+#: model:mail.message.subtype,description:hr_expense.mt_expense_approved
+msgid "Expense approved"
+msgstr "ხარჯი დამტკიცდა"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Expense created from a split."
+msgstr "ხარჯი შექმნილია გაყოფიდან."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/account_journal.py:0
+msgid "Expense linked moves"
+msgstr "ხარჯთან დაკავშირებული გატარებები"
+
+#. module: hr_expense
+#: model:mail.message.subtype,description:hr_expense.mt_expense_paid
+msgid "Expense paid"
+msgstr "ხარჯი გადახდილია"
+
+#. module: hr_expense
+#: model_terms:ir.actions.act_window,help:hr_expense.hr_expense_product
+msgid "Expense products can be reinvoiced to your customers."
+msgstr "ხარჯის პროდუქტები შეიძლება ხელახლა გადაეფარდოს თქვენს კლიენტებს."
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_refuse_wizard_view_form
+msgid "Expense refuse reason"
+msgstr "ხარჯზე უარის თქმის მიზეზი"
+
+#. module: hr_expense
+#: model:mail.message.subtype,description:hr_expense.mt_expense_refused
+msgid "Expense refused"
+msgstr "ხარჯზე უარი ეთქვა"
+
+#. module: hr_expense
+#: model:mail.message.subtype,description:hr_expense.mt_expense_reset
+msgid "Expense reset to Draft"
+msgstr "ხარჯი გადაყვანილია მონახაზში"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Expense split"
+msgstr "ხარჯის გაყოფა"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/account_move.py:0 code:addons/hr_expense/models/account_payment.py:0 model:ir.model.fields,field_description:hr_expense.field_product_product__can_be_expensed model:ir.model.fields,field_description:hr_expense.field_product_template__can_be_expensed model:ir.module.module,shortdesc:base.module_hr_expense model:ir.ui.menu,name:hr_expense.menu_hr_expense_root model:product.template,name:hr_expense.product_product_no_cost_product_template model:res.groups.privilege,name:hr_expense.res_groups_privilege_expenses model_terms:ir.ui.view,arch_db:hr_expense.hr_department_view_kanban model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_activity model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_expenses_analysis_tree model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form model_terms:ir.ui.view,arch_db:hr_expense.product_template_search_view_inherit_hr_expense model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form model_terms:ir.ui.view,arch_db:hr_expense.view_move_form_inherit_expense
+msgid "Expenses"
+msgstr "ხარჯები"
+
+#. module: hr_expense
+#: model:ir.actions.act_window,name:hr_expense.hr_expense_actions_all model:ir.ui.menu,name:hr_expense.menu_hr_expense_all_expenses model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_graph model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_pivot
+msgid "Expenses Analysis"
+msgstr "ხარჯების ანალიზი"
+
+#. module: hr_expense
+#: model:ir.actions.report,name:hr_expense.action_report_hr_expense model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "Expenses Report"
+msgstr "ხარჯების ანგარიში"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Expenses of %(employee)s"
+msgstr "%(employee)s-ის ხარჯები"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "Expenses of Your Team Member"
+msgstr "თქვენი გუნდის წევრის ხარჯები"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Expenses similar to %(other_expense_name)s"
+msgstr "%(other_expense_name)s-ის მსგავსი ხარჯები"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_department__expenses_to_approve_count
+msgid "Expenses to Approve"
+msgstr "დასამტკიცებელი ხარჯები"
+
+#. module: hr_expense
+#: model:ir.actions.act_window,name:hr_expense.hr_expense_actions_to_process model:ir.ui.menu,name:hr_expense.menu_hr_expense_expenses_to_process
+msgid "Expenses to Process"
+msgstr "დასამუშავებელი ხარჯები"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.view_account_invoice_filter_inherit_expense
+msgid "Expenses to post"
+msgstr "გასატარებელი ხარჯები"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Expenses with a similar receipt to %(other_expense_name)s"
+msgstr "%(other_expense_name)s-ის მსგავსი ქვითრის მქონე ხარჯები"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Failed to send mails for submitted expenses. No valid email was found for the company"
+msgstr "წარდგენილი ხარჯების შესახებ ელ-ფოსტის გაგზავნა ვერ მოხერხდა. კომპანიისთვის ვერ მოიძებნა მოქმედი ელ-ფოსტა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_employee__filter_for_expense model:ir.model.fields,field_description:hr_expense.field_hr_employee_public__filter_for_expense
+msgid "Filter For Expense"
+msgstr "ხარჯის ფილტრი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "Flight Ticket"
+msgstr "ავიაბილეთი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__message_follower_ids
+msgid "Followers"
+msgstr "გამომწერები"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "გამომწერები (პარტნიორები)"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__former_sheet_id
+msgid "Former Report"
+msgstr "წინა ანგარიში"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "Future Activities"
+msgstr "მომავალი აქტივობები"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/mixins/document_upload.js:0
+msgid "Generate Expenses"
+msgstr "ხარჯების გენერირება"
+
+#. module: hr_expense
+#: model:product.template,name:hr_expense.expense_product_gift_product_template
+msgid "Gifts"
+msgstr "საჩუქრები"
+
+#. module: hr_expense
+#: model_terms:product.template,description:hr_expense.expense_product_gift_product_template
+msgid "Gifts to customers or vendors"
+msgstr "საჩუქრები მომხმარებლებისთვის ან მომწოდებლებისთვის"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Go to Account"
+msgstr "ანგარიშზე გადასვლა"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Go to expense(s)"
+msgstr "ხარჯ(ებ)ზე გადასვლა"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Go to the Settings tab to configure the expense approver."
+msgstr "ხარჯის დამმტკიცებლის კონფიგურაციისთვის გადადით პარამეტრების ჩანართზე."
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.product_product_expense_form_view
+msgid "Guideline"
+msgstr "სახელმძღვანელო"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__has_existing_bill
+msgid "Has Existing Bill"
+msgstr "აქვს არსებული ანგარიშ-ფაქტურა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__has_expense_job_position_limit
+msgid "Has Expense Job Position Limit"
+msgstr "აქვს ხარჯის ვაკანსიის ლიმიტი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__has_message
+msgid "Has Message"
+msgstr "აქვს შეტყობინება"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_submitted_expenses
+msgid "Hi"
+msgstr "გამარჯობა"
+
+#. module: hr_expense
+#: model_terms:product.template,description:hr_expense.expense_product_travel_accommodation_product_template
+msgid "Hotel, plane ticket, taxi, etc."
+msgstr "სასტუმრო, ავიაბილეთი, ტაქსი და ა.შ."
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_account_tax__hr_expense_ids
+msgid "Hr Expense"
+msgstr "HR ხარჯი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_res_config_settings__hr_expense_alias_domain_id
+msgid "Hr Expense Alias Domain"
+msgstr "HR ხარჯის მეტსახელის დომენი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_account_analytic_account__id model:ir.model.fields,field_description:hr_expense.field_account_analytic_applicability__id model:ir.model.fields,field_description:hr_expense.field_account_journal__id model:ir.model.fields,field_description:hr_expense.field_account_move__id model:ir.model.fields,field_description:hr_expense.field_account_move_line__id model:ir.model.fields,field_description:hr_expense.field_account_payment__id model:ir.model.fields,field_description:hr_expense.field_account_payment_register__id model:ir.model.fields,field_description:hr_expense.field_account_tax__id model:ir.model.fields,field_description:hr_expense.field_hr_department__id model:ir.model.fields,field_description:hr_expense.field_hr_employee__id model:ir.model.fields,field_description:hr_expense.field_hr_employee_public__id model:ir.model.fields,field_description:hr_expense.field_hr_expense__id model:ir.model.fields,field_description:hr_expense.field_hr_expense_approve_duplicate__id model:ir.model.fields,field_description:hr_expense.field_hr_expense_product_job_position_limit__id model:ir.model.fields,field_description:hr_expense.field_hr_expense_refuse_wizard__id model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__id model:ir.model.fields,field_description:hr_expense.field_hr_expense_split_wizard__id model:ir.model.fields,field_description:hr_expense.field_ir_actions_report__id model:ir.model.fields,field_description:hr_expense.field_ir_attachment__id model:ir.model.fields,field_description:hr_expense.field_product_product__id model:ir.model.fields,field_description:hr_expense.field_product_template__id model:ir.model.fields,field_description:hr_expense.field_res_company__id model:ir.model.fields,field_description:hr_expense.field_res_config_settings__id
+msgid "ID"
+msgstr "ID"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__activity_exception_icon
+msgid "Icon"
+msgstr "ხატულა"
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_hr_expense__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "ხატულა გამონაკლისი აქტივობის აღსანიშნავად."
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_hr_expense__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "თუ მონიშნულია, ახალი შეტყობინებები საჭიროებს თქვენს ყურადღებას."
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_hr_expense__message_has_error model:ir.model.fields,help:hr_expense.field_hr_expense__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "თუ მონიშნულია, ზოგიერთ შეტყობინებას აქვს მიწოდების შეცდომა."
+
+#. module: hr_expense
+#: model:ir.model.fields.selection,name:hr_expense.selection__hr_expense__state__in_payment
+msgid "In Payment"
+msgstr "გადახდის პროცესში"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__tax_ids
+msgid "Included taxes"
+msgstr "ჩათვლილი გადასახადები"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "Incoming Emails"
+msgstr "შემომავალი ელ-ფოსტა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__description
+msgid "Internal Notes"
+msgstr "შიდა შენიშვნები"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Invalid attachments!"
+msgstr "არასწორი დანართები!"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.view_account_invoice_filter_inherit_expense
+msgid "Invoices from an expense, approved but not posted yet"
+msgstr "ხარჯიდან შექმნილი ანგარიშ-ფაქტურები, დამტკიცებული, მაგრამ ჯერ არ გატარებული"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__is_editable
+msgid "Is Editable By Current User"
+msgstr "რედაქტირებადია მიმდინარე მომხმარებლის მიერ"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__is_expense_exceeding_job_position_limit
+msgid "Is Expense Exceeding Job Position Limit"
+msgstr "ხარჯი აღემატება ვაკანსიის ლიმიტს"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__message_is_follower
+msgid "Is Follower"
+msgstr "არის გამომწერი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__is_own_expense
+msgid "Is Own Expense"
+msgstr "საკუთარი ხარჯია"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__is_multiple_currency
+msgid "Is currency_id different from the company_currency_id"
+msgstr "არის currency_id განსხვავებული company_currency_id-ისგან"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__product_has_cost
+msgid "Is product with non zero cost selected"
+msgstr "არჩეულია არანულოვანი ღირებულების მქონე პროდუქტი"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "It all begins here - let's go!"
+msgstr "აქ ყველაფერი იწყება — წავიდეთ!"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__expense_job_position_limit_amount
+msgid "Job Position Limit"
+msgstr "ვაკანსიის ლიმიტი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__expense_job_position_limit_amount_currency
+msgid "Job Position Limit in Currency"
+msgstr "ვაკანსიის ლიმიტი ვალუტაში"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_product_product__expense_job_position_limit_ids
+msgid "Job Position Limits"
+msgstr "ვაკანსიის ლიმიტები"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense_product_job_position_limit__job_ids
+msgid "Job Positions"
+msgstr "ვაკანსიები"
+
+#. module: hr_expense
+#: model:ir.model,name:hr_expense.model_account_journal model:ir.model.fields,field_description:hr_expense.field_hr_expense__journal_id
+msgid "Journal"
+msgstr "ჟურნალი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__account_move_id
+msgid "Journal Entry"
+msgstr "ბუღალტრული გატარება"
+
+#. module: hr_expense
+#: model:mail.message.subtype,name:hr_expense.mt_expense_entry_delete
+msgid "Journal Entry Deleted"
+msgstr "ბუღალტრული გატარება წაიშალა"
+
+#. module: hr_expense
+#: model:mail.message.subtype,name:hr_expense.mt_expense_entry_draft
+msgid "Journal Entry Reset to Draft"
+msgstr "ბუღალტრული გატარება გადაყვანილია მონახაზში"
+
+#. module: hr_expense
+msgid "Journal Item"
+msgstr "ჟურნალის ერთეული"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/account_move.py:0
+msgid "Journal entry created from these expenses: %(links)s"
+msgstr "ბუღალტრული გატარება, შექმნილი ამ ხარჯებიდან: %(links)s"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/account_move.py:0
+msgid "Journal entry created from this expense: %(link)s"
+msgstr "ბუღალტრული გატარება, შექმნილი ამ ხარჯიდან: %(link)s"
+
+#. module: hr_expense
+#: model:mail.message.subtype,description:hr_expense.mt_expense_entry_delete
+msgid "Journal entry deleted"
+msgstr "ბუღალტრული გატარება წაიშალა"
+
+#. module: hr_expense
+#: model:mail.message.subtype,description:hr_expense.mt_expense_entry_draft
+msgid "Journal entry reset to draft"
+msgstr "ბუღალტრული გატარება დაბრუნდა მონახაზში"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__label_currency_rate
+msgid "Label Currency Rate"
+msgstr "ვალუტის კურსის წარწერა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__last_notification_date
+msgid "Last Notification Date"
+msgstr "ბოლო შეტყობინების თარიღი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__write_uid model:ir.model.fields,field_description:hr_expense.field_hr_expense_approve_duplicate__write_uid model:ir.model.fields,field_description:hr_expense.field_hr_expense_product_job_position_limit__write_uid model:ir.model.fields,field_description:hr_expense.field_hr_expense_refuse_wizard__write_uid model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__write_uid model:ir.model.fields,field_description:hr_expense.field_hr_expense_split_wizard__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__write_date model:ir.model.fields,field_description:hr_expense.field_hr_expense_approve_duplicate__write_date model:ir.model.fields,field_description:hr_expense.field_hr_expense_product_job_position_limit__write_date model:ir.model.fields,field_description:hr_expense.field_hr_expense_refuse_wizard__write_date model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__write_date model:ir.model.fields,field_description:hr_expense.field_hr_expense_split_wizard__write_date
+msgid "Last Updated on"
+msgstr "ბოლოს განახლდა"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "Late Activities"
+msgstr "ვადაგადაცილებული აქტივობები"
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_hr_expense_product_job_position_limit__job_ids
+msgid "Leave empty to define the limit for all job positions."
+msgstr "დატოვეთ ცარიელი, რომ ლიმიტი განისაზღვროს ყველა ვაკანსიისთვის."
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_res_config_settings__hr_expense_use_mailgateway
+msgid "Let your employees record expenses by email"
+msgstr "დაუშვით თქვენს თანამშრომლებს ხარჯების ელ-ფოსტით აღრიცხვა"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Let's check out where you can manage all your employees expenses"
+msgstr "ვნახოთ, სად შეგიძლიათ თქვენი ყველა თანამშრომლის ხარჯების მართვა"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Let's go back to your expenses."
+msgstr "დავუბრუნდეთ თქვენს ხარჯებს."
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense_product_job_position_limit__limit_amount
+msgid "Limit"
+msgstr "ლიმიტი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.product_product_expense_form_view
+msgid "Limits"
+msgstr "ლიმიტები"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_res_config_settings__module_hr_expense_stripe
+msgid "Link your stripe issuing account to manage company credit cards for your employees through Odoo"
+msgstr "დააკავშირეთ თქვენი stripe issuing ანგარიში, რომ Odoo-ს მეშვეობით მართოთ კომპანიის საკრედიტო ბარათები თქვენი თანამშრომლებისთვის"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Lunch with customer $12.32"
+msgstr "სადილი მომხმარებელთან $12.32"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__message_main_attachment_id
+msgid "Main Attachment"
+msgstr "მთავარი დანართი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__manager_id model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__manager_id
+msgid "Manager"
+msgstr "მენეჯერი"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Managers can approve the expense here, then an accountant can post the accounting entries."
+msgstr "მენეჯერებს შეუძლიათ ხარჯის დამტკიცება აქ, შემდეგ ბუღალტერს შეუძლია ბუღალტრული გატარებების გატარება."
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Managers can inspect and select expenses from here."
+msgstr "მენეჯერებს შეუძლიათ ხარჯების დათვალიერება და არჩევა აქედან."
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Managers can inspect expenses from here."
+msgstr "მენეჯერებს შეუძლიათ ხარჯების დათვალიერება აქედან."
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "Marc Demo"
+msgstr "Marc Demo"
+
+#. module: hr_expense
+msgid "Material Symbols icon e.g. checklist"
+msgstr "Material Symbols-ის ხატულა, მაგ. checklist"
+
+#. module: hr_expense
+#: model:product.template,name:hr_expense.expense_product_meal_product_template
+msgid "Meals"
+msgstr "კვება"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__message_has_error
+msgid "Message Delivery error"
+msgstr "შეტყობინების მიწოდების შეცდომა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__message_ids
+msgid "Messages"
+msgstr "შეტყობინებები"
+
+#. module: hr_expense
+#: model:product.template,name:hr_expense.expense_product_mileage_product_template
+msgid "Mileage"
+msgstr "გარბენი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "Mitchell Admin"
+msgstr "Mitchell Admin"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/ir_actions_report.py:0
+msgid "Multiple Managers"
+msgstr "მრავალი მენეჯერი"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/ir_actions_report.py:0
+msgid "Multiple employees"
+msgstr "მრავალი თანამშრომელი"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/ir_actions_report.py:0
+msgid "Multiple payment modes"
+msgstr "გადახდის მრავალი რეჟიმი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "My Activities"
+msgstr "ჩემი აქტივობები"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "ჩემი აქტივობის ვადა"
+
+#. module: hr_expense
+#: model:ir.actions.act_window,name:hr_expense.hr_expense_actions_my_all model:ir.ui.menu,name:hr_expense.menu_hr_expense_my_expenses model:ir.ui.menu,name:hr_expense.menu_hr_expense_my_expenses_all model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "My Expenses"
+msgstr "ჩემი ხარჯები"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "My Team"
+msgstr "ჩემი გუნდი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "Name"
+msgstr "სახელი"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "New expenses waiting for your approval"
+msgstr "ახალი ხარჯები ელოდება თქვენს დამტკიცებას"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__activity_calendar_event_id
+msgid "Next Activity Calendar Event"
+msgstr "შემდეგი აქტივობის კალენდრის მოვლენა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "შემდეგი აქტივობის ვადა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__activity_summary
+msgid "Next Activity Summary"
+msgstr "შემდეგი აქტივობის შეჯამება"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__activity_type_id
+msgid "Next Activity Type"
+msgstr "შემდეგი აქტივობის ტიპი"
+
+#. module: hr_expense
+#: model:res.groups.privilege,placeholder:hr_expense.res_groups_privilege_expenses
+msgid "No"
+msgstr "არა"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "No (Direct Expense)"
+msgstr "არა (პირდაპირი ხარჯი)"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "No attachment was provided"
+msgstr "დანართი არ იყო მოწოდებული"
+
+#. module: hr_expense
+#: model_terms:ir.actions.act_window,help:hr_expense.action_hr_expense_department_filtered model_terms:ir.actions.act_window,help:hr_expense.hr_expense_actions_all
+msgid "No data yet!"
+msgstr "ჯერ მონაცემები არ არის!"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/ir_actions_report.py:0
+msgid "No employee"
+msgstr "თანამშრომელი არ არის"
+
+#. module: hr_expense
+#: model_terms:ir.actions.act_window,help:hr_expense.hr_expense_product
+msgid "No expense products found. Let's create one!"
+msgstr "ხარჯის პროდუქტები ვერ მოიძებნა. შევქმნათ ერთი!"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "No work contact found for the employee %(name)s, please configure one."
+msgstr "თანამშრომელ %(name)s-ისთვის სამუშაო კონტაქტი ვერ მოიძებნა, გთხოვთ, დააკონფიგურიროთ ერთი."
+
+#. module: hr_expense
+#: model:ir.model.fields.selection,name:hr_expense.selection__hr_expense__payment_mode__company_account
+msgid "None (Paid by Company)"
+msgstr "არცერთი (გადახდილია კომპანიის მიერ)"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/ir_actions_report.py:0
+msgid "None (automatic)"
+msgstr "არცერთი (ავტომატური)"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.product_product_expense_categories_tree_view
+msgid "Note"
+msgstr "შენიშვნა"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "Notes..."
+msgstr "შენიშვნები..."
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__message_needaction_counter
+msgid "Number of Actions"
+msgstr "ქმედებების რაოდენობა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__nb_attachment
+msgid "Number of Attachments"
+msgstr "დანართების რაოდენობა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_account_bank_statement_line__nb_expenses model:ir.model.fields,field_description:hr_expense.field_account_move__nb_expenses
+msgid "Number of Expenses"
+msgstr "ხარჯების რაოდენობა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__split_expense_count
+msgid "Number of Split Expenses"
+msgstr "გაყოფილი ხარჯების რაოდენობა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__message_has_error_counter
+msgid "Number of errors"
+msgstr "შეცდომების რაოდენობა"
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_hr_expense__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "ქმედების მომთხოვნი შეტყობინებების რაოდენობა"
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_hr_expense__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "მიწოდების შეცდომის მქონე შეტყობინებების რაოდენობა"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/components/expense_dashboard.xml:0
+msgid "Numbers computed from your personal expenses."
+msgstr "რიცხვები გამოთვლილია თქვენი პირადი ხარჯებიდან."
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_register_no_user model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_submitted_expenses
+msgid "Odoo"
+msgstr "Odoo"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid ""
+"Odoo had a look at your expense, its product, your company and the journal but came back with empty hands.\n"
+"Give Odoo a hand to find an account by setting up an expense account.\n"
+"%(expense)s %(expense_name)s.\n"
+msgstr ""
+"Odoo-მ დაათვალიერა თქვენი ხარჯი, მისი პროდუქტი, თქვენი კომპანია და ჟურნალი, მაგრამ ცარიელი ხელით დაბრუნდა.\n"
+"დაეხმარეთ Odoo-ს ანგარიშის პოვნაში ხარჯის ანგარიშის დაყენებით.\n"
+"%(expense)s %(expense_name)s.\n"
+
+#. module: hr_expense
+#: model_terms:ir.actions.act_window,help:hr_expense.action_hr_expense_account
+msgid "Once you have created your expense, submit it to your manager who will validate it."
+msgstr "თქვენი ხარჯის შექმნის შემდეგ, წარადგინეთ ის თქვენს მენეჯერთან, რომელიც მას დაამტკიცებს."
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Once your <b>Expense</b> is ready, you can submit it to your manager and wait for approval."
+msgstr "როდესაც თქვენი <b>ხარჯი</b> მზად იქნება, შეგიძლიათ წარადგინოთ ის თქვენს მენეჯერთან და დაელოდოთ დამტკიცებას."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Only HR Officers, accountants, or the concerned employee can reset to draft."
+msgstr "მონახაზში დაბრუნება შეუძლიათ მხოლოდ HR ოფიცრებს, ბუღალტრებს ან შესაბამის თანამშრომელს."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Only draft expenses can have a total of 0."
+msgstr "მხოლოდ მონახაზის ხარჯებს შეიძლება ჰქონდეთ ჯამი 0."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Only one expense can be linked to a particular payment"
+msgstr "კონკრეტულ გადახდას შეიძლება დაუკავშირდეს მხოლოდ ერთი ხარჯი"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense_product_job_position_limit.py:0
+msgid "Only one generic expense limit can be defined per product."
+msgstr "თითოეულ პროდუქტზე შეიძლება განისაზღვროს მხოლოდ ერთი ზოგადი ხარჯის ლიმიტი."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Only submitted expenses exceeding a job position limit can be capped."
+msgstr "ლიმიტით შეზღუდვა შესაძლებელია მხოლოდ იმ წარდგენილი ხარჯებისთვის, რომლებიც ვაკანსიის ლიმიტს აღემატება."
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Open burger menu."
+msgstr "გახსენით ბურგერ-მენიუ."
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Open the actions menu."
+msgstr "გახსენით მოქმედებების მენიუ."
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__split_expense_origin_id
+msgid "Origin Split Expense"
+msgstr "წყაროს გაყოფილი ხარჯი"
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_hr_expense__split_expense_origin_id
+msgid "Original expense from a split."
+msgstr "საწყისი ხარჯი გაყოფიდან."
+
+#. module: hr_expense
+#: model:ir.model.fields.selection,name:hr_expense.selection__hr_expense__state__paid model:mail.message.subtype,name:hr_expense.mt_expense_paid
+msgid "Paid"
+msgstr "გადახდილი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "Paid by Company"
+msgstr "გადახდილია კომპანიის მიერ"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "Paid by Employee"
+msgstr "გადახდილია თანამშრომლის მიერ"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.view_move_list_expense
+msgid "Partner"
+msgstr "პარტნიორი"
+
+#. module: hr_expense
+#: model:ir.model,name:hr_expense.model_account_payment_register
+msgid "Pay"
+msgstr "გადახდა"
+
+#. module: hr_expense
+msgid "Payment"
+msgstr "გადახდა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__payment_method_line_id
+msgid "Payment Method"
+msgstr "გადახდის მეთოდი"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/account_payment.py:0
+msgid "Payment created for: %s"
+msgstr "გადახდა შექმნილია: %s-ისთვის"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "Payment method allowed for expenses paid by company."
+msgstr "გადახდის მეთოდი დაშვებულია კომპანიის მიერ გადახდილი ხარჯებისთვის."
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "Payment methods"
+msgstr "გადახდის მეთოდები"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_res_company__company_expense_allowed_payment_method_line_ids model:ir.model.fields,field_description:hr_expense.field_res_config_settings__company_expense_allowed_payment_method_line_ids
+msgid "Payment methods available for expenses paid by company"
+msgstr "გადახდის მეთოდები, ხელმისაწვდომი კომპანიის მიერ გადახდილი ხარჯებისთვის"
+
+#. module: hr_expense
+#: model_terms:product.template,description:hr_expense.expense_product_communication_product_template
+msgid "Phone bills, postage, etc."
+msgstr "ტელეფონის ანგარიშები, საფოსტო ხარჯი და სხვ."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Please specify if the expenses were paid by the company, reimbursed to the employee directly, or in a payslip."
+msgstr "გთხოვთ, მიუთითოთ, ხარჯები გადაიხადა კომპანიამ, პირდაპირ აუნაზღაურდა თანამშრომელს თუ ხელფასის უწყისით."
+
+#. module: hr_expense
+#: model:ir.model.fields.selection,name:hr_expense.selection__hr_expense__state__posted
+msgid "Posted"
+msgstr "გატარებული"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_register_no_user model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_submitted_expenses
+msgid "Powered by"
+msgstr "მუშაობს ტექნოლოგიით"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_register
+msgid "Price:"
+msgstr "ფასი:"
+
+#. module: hr_expense
+#. odoo-javascript
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0 code:addons/hr_expense/static/src/views/list.xml:0
+msgid "Print"
+msgstr "ბეჭდვა"
+
+#. module: hr_expense
+#: model:ir.model,name:hr_expense.model_product_template model:ir.model.fields,field_description:hr_expense.field_hr_expense__product_id model:ir.model.fields,field_description:hr_expense.field_hr_expense_product_job_position_limit__product_id model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__product_id model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "Product"
+msgstr "პროდუქტი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__product_description
+msgid "Product Description"
+msgstr "პროდუქტის აღწერა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__product_has_cost
+msgid "Product Has Cost"
+msgstr "პროდუქტს აქვს ღირებულება"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.product_product_expense_form_view
+msgid "Product Name"
+msgstr "პროდუქტის სახელი"
+
+#. module: hr_expense
+#: model:ir.model,name:hr_expense.model_product_product
+msgid "Product Variant"
+msgstr "პროდუქტის ვარიანტი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.product_product_expense_tree_view
+msgid "Product Variants"
+msgstr "პროდუქტის ვარიანტები"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_register
+msgid "Product:"
+msgstr "პროდუქტი:"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_register
+msgid "Product: not found"
+msgstr "პროდუქტი: ვერ მოიძებნა"
+
+#. module: hr_expense
+#: model:ir.model,name:hr_expense.model_hr_employee_public
+msgid "Public Employee"
+msgstr "საჯარო თანამშრომელი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__quantity model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "Quantity"
+msgstr "რაოდენობა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__rating_ids
+msgid "Ratings"
+msgstr "შეფასებები"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Ready? You can save it manually or discard modifications from here. You don't <em>need to save</em> - Odoo will save everything for you when you navigate."
+msgstr "მზად ხართ? შეგიძლიათ ხელით შეინახოთ ან აქედან გააუქმოთ ცვლილებები. <em>შენახვა საჭირო არ არის</em> - Odoo ყველაფერს თავად შეინახავს, როდესაც ნავიგაციას დაიწყებთ."
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense_refuse_wizard__reason model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_refuse_wizard_view_form
+msgid "Reason"
+msgstr "მიზეზი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_refuse_reason
+msgid "Reason:"
+msgstr "მიზეზი:"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.product_product_expense_categories_tree_view model_terms:ir.ui.view,arch_db:hr_expense.product_product_expense_form_view
+msgid "Reference"
+msgstr "მითითება"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "Refund employees via their payslips."
+msgstr "აუნაზღაურეთ თანამშრომლებს ხელფასის უწყისების მეშვეობით."
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/views/list.xml:0 model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_approve_duplicate_view_form model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_refuse_wizard_view_form model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "Refuse"
+msgstr "უარყოფა"
+
+#. module: hr_expense
+#: model:ir.actions.act_window,name:hr_expense.hr_expense_refuse_wizard_action
+msgid "Refuse Expense"
+msgstr "ხარჯის უარყოფა"
+
+#. module: hr_expense
+#: model:ir.model.fields.selection,name:hr_expense.selection__hr_expense__approval_state__refused model:ir.model.fields.selection,name:hr_expense.selection__hr_expense__state__refused model:ir.model.fields.selection,name:hr_expense.selection__hr_expense_split__approval_state__refused model:mail.message.subtype,name:hr_expense.mt_expense_refused
+msgid "Refused"
+msgstr "უარყოფილი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_res_config_settings__module_hr_payroll_expense
+msgid "Reimburse Expenses in Payslip"
+msgstr "ხარჯების ანაზღაურება ხელფასის უწყისში"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "Reimburse in Payslip"
+msgstr "ანაზღაურება ხელფასის უწყისში"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "Reimbursement"
+msgstr "ანაზღაურება"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "Related"
+msgstr "დაკავშირებული"
+
+#. module: hr_expense
+#: model:ir.model,name:hr_expense.model_ir_actions_report
+msgid "Report Action"
+msgstr "ანგარიშის ქმედება"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__company_currency_id
+msgid "Report Company Currency"
+msgstr "ანგარიში კომპანიის ვალუტაში"
+
+#. module: hr_expense
+#: model:ir.ui.menu,name:hr_expense.menu_hr_expense_reports
+msgid "Reporting"
+msgstr "ანგარიშგება"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "Reset"
+msgstr "გადატვირთვა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__activity_user_id
+msgid "Responsible User"
+msgstr "პასუხისმგებელი მომხმარებელი"
+
+#. module: hr_expense
+#: model_terms:product.template,description:hr_expense.expense_product_meal_product_template
+msgid "Restaurants, business lunches, etc."
+msgstr "რესტორნები, საქმიანი სადილები და სხვ."
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_submitted_expenses
+msgid "Review Expenses"
+msgstr "ხარჯების განხილვა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "SMS მიწოდების შეცდომა"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.product_product_expense_categories_tree_view
+msgid "Sales Price"
+msgstr "გასაყიდი ფასი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__same_receipt_expense_ids
+msgid "Same Receipt Expense"
+msgstr "იმავე ქვითრის ხარჯი"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Save the employee profile."
+msgstr "შეინახეთ თანამშრომლის პროფილი."
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "Save this page and come back here to set up the feature."
+msgstr "შეინახეთ ეს გვერდი და დაუბრუნდით აქ ფუნქციის გასამართად."
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/views/kanban.xml:0 code:addons/hr_expense/static/src/views/list.xml:0
+msgid "Scan"
+msgstr "სკანირება"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "Select Bill..."
+msgstr "აირჩიეთ ანგარიშ-ფაქტურა..."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Select a product to proceed."
+msgstr "გასაგრძელებლად აირჩიეთ პროდუქტი."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Select an employee to proceed."
+msgstr "გასაგრძელებლად აირჩიეთ თანამშრომელი."
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Select the expense approver."
+msgstr "აირჩიეთ ხარჯის დამმტკიცებელი."
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_hr_employee__expense_manager_id
+msgid ""
+"Select the user responsible for approving \"Expenses\" of this employee.\n"
+"If empty, the approval is done by an Administrator or Approver (determined in settings/users)."
+msgstr ""
+"აირჩიეთ მომხმარებელი, რომელიც პასუხისმგებელია ამ თანამშრომლის „ხარჯების\" დამტკიცებაზე.\n"
+"თუ ცარიელია, დამტკიცებას ახორციელებს ადმინისტრატორი ან დამმტკიცებელი (განისაზღვრება პარამეტრებში/მომხმარებლებში)."
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__selectable_payment_method_line_ids
+msgid "Selectable Payment Method Line"
+msgstr "ასარჩევი გადახდის მეთოდის სტრიქონი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "Send an email to this email alias with the receipt in attachment to create an expense in one click. If the first word of the mail subject contains the product's internal reference or the product name, the corresponding product will automatically be set. Type the expense amount in the mail subject to set it on the expense too."
+msgstr "გაგზავნეთ ელ-წერილი ამ ელ-ფოსტის ალიასზე დანართად ქვითრით, რომ ერთი დაწკაპუნებით შექმნათ ხარჯი. თუ წერილის თემის პირველი სიტყვა შეიცავს პროდუქტის შიდა მითითებას ან პროდუქტის სახელს, შესაბამისი პროდუქტი ავტომატურად დაყენდება. ჩაწერეთ ხარჯის თანხა წერილის თემაში, რომ ისიც დაყენდეს ხარჯზე."
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_res_config_settings__module_hr_expense_extract
+msgid "Send bills to OCR to generate expenses"
+msgstr "გააგზავნეთ ანგარიშ-ფაქტურები OCR-ში ხარჯების გენერირებისთვის"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense_product_job_position_limit__sequence
+msgid "Sequence"
+msgstr "თანმიმდევრობა"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Set an expense approver for this employee."
+msgstr "მიუთითეთ ხარჯის დამმტკიცებელი ამ თანამშრომლისთვის."
+
+#. module: hr_expense
+#: model:ir.actions.act_window,name:hr_expense.action_hr_expense_configuration model:ir.ui.menu,name:hr_expense.menu_hr_expense_global_settings
+msgid "Settings"
+msgstr "პარამეტრები"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "Show all records whose next activity date is past"
+msgstr "ყველა ჩანაწერის ჩვენება, რომელთა შემდეგი აქტივობის თარიღი გასულია"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.view_move_list_expense
+msgid "Source Document"
+msgstr "წყაროს დოკუმენტი"
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_product_product__can_be_expensed model:ir.model.fields,help:hr_expense.field_product_template__can_be_expensed
+msgid "Specify whether the product can be selected in an expense."
+msgstr "მიუთითეთ, შეიძლება თუ არა პროდუქტის არჩევა ხარჯში."
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_split model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "Split"
+msgstr "გაყოფა"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0 code:addons/hr_expense/wizard/hr_expense_split_wizard.py:0
+msgid "Split Expenses"
+msgstr "ხარჯების გაყოფა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense_split_wizard__split_possible
+msgid "Split Possible"
+msgstr "გაყოფა შესაძლებელია"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__state model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search model_terms:ir.ui.view,arch_db:hr_expense.view_move_list_expense
+msgid "Status"
+msgstr "სტატუსი"
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_hr_expense__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+"სტატუსი აქტივობების მიხედვით\n"
+"ვადაგადაცილებული: ვადის თარიღი უკვე გასულია\n"
+"დღეს: აქტივობის თარიღი არის დღეს\n"
+"დაგეგმილი: მომავალი აქტივობები."
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0 code:addons/hr_expense/static/src/views/list.xml:0 model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "Submit"
+msgstr "წარდგენა"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/views/expense_form_view.js:0
+msgid "Submit Expense"
+msgstr "ხარჯის წარდგენა"
+
+#. module: hr_expense
+#: model:ir.module.module,summary:base.module_hr_expense
+msgid "Submit, validate and reinvoice employee expenses"
+msgstr "თანამშრომლის ხარჯების წარდგენა, დადასტურება და ხელახლა გადაფარდება"
+
+#. module: hr_expense
+#: model:ir.model.fields.selection,name:hr_expense.selection__hr_expense__approval_state__submitted model:ir.model.fields.selection,name:hr_expense.selection__hr_expense__state__submitted model:ir.model.fields.selection,name:hr_expense.selection__hr_expense_split__approval_state__submitted
+msgid "Submitted"
+msgstr "წარდგენილი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "Subtotal"
+msgstr "ქვეჯამი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "Subtotal in currency"
+msgstr "ქვეჯამი ვალუტაში"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Switch to the list view."
+msgstr "გადართეთ სიის ხედზე."
+
+#. module: hr_expense
+#: model:ir.model,name:hr_expense.model_account_tax model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__tax_ids model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_split model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_split_form_view model_terms:ir.ui.view,arch_db:hr_expense.view_move_list_expense
+msgid "Tax"
+msgstr "გადასახადი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "Tax 15%"
+msgstr "გადასახადი 15%"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.view_move_list_expense
+msgid "Tax Excluded"
+msgstr "გადასახადის გარეშე"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__tax_amount
+msgid "Tax amount"
+msgstr "გადასახადის თანხა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__tax_amount_currency model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__tax_amount_currency
+msgid "Tax amount in Currency"
+msgstr "გადასახადის თანხა ვალუტაში"
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_hr_expense__tax_amount
+msgid "Tax amount in company currency"
+msgstr "გადასახადის თანხა კომპანიის ვალუტაში"
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_hr_expense__tax_amount_currency
+msgid "Tax amount in currency"
+msgstr "გადასახადის თანხა ვალუტაში"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense_split_wizard__tax_amount_currency model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_split model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "Taxes"
+msgstr "გადასახადები"
+
+#. module: hr_expense
+#: model:res.groups,name:hr_expense.group_hr_expense_team_approver
+msgid "Team Approver"
+msgstr "გუნდის დამმტკიცებელი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_submitted_expenses
+msgid "Thanks,"
+msgstr "მადლობა,"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "The account %(name)s (%(code)s) is archived. Activate it to continue"
+msgstr "ანგარიში %(name)s (%(code)s) დაარქივებულია. გასაგრძელებლად გაააქტიურეთ ის"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/ir_actions_report.py:0
+msgid "The attachment (%(attachment_name)s) has not been added to the report due to the following error: '%(error)s'"
+msgstr "დანართი (%(attachment_name)s) ანგარიშს არ დაემატა შემდეგი შეცდომის გამო: '%(error)s'"
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_res_company__expense_journal_id model:ir.model.fields,help:hr_expense.field_res_config_settings__expense_journal_id
+msgid "The company's default journal used when an employee expense is created."
+msgstr "კომპანიის ნაგულისხმევი ჟურნალი, რომელიც გამოიყენება თანამშრომლის ხარჯის შექმნისას."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "The current user has no related employee. Please, create one."
+msgstr "მიმდინარე მომხმარებელს არ აქვს დაკავშირებული თანამშრომელი. გთხოვთ, შექმნათ ერთი."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/res_company.py:0
+msgid "The employee expense journal must be a purchase journal."
+msgstr "თანამშრომლის ხარჯების ჟურნალი უნდა იყოს შესყიდვების ჟურნალი."
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_register
+msgid "The first word of the email subject did not correspond to any product code. You'll have to set the product manually on the expense."
+msgstr "ელ-წერილის თემის პირველი სიტყვა არ შეესაბამებოდა არცერთ პროდუქტის კოდს. პროდუქტი ხელით უნდა დააყენოთ ხარჯზე."
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_approve_duplicate_view_form
+msgid "The following approved expenses have similar employee, amount and product than some expenses of this report. Please verify this report does not contain duplicates."
+msgstr "შემდეგ დამტკიცებულ ხარჯებს აქვს მსგავსი თანამშრომელი, თანხა და პროდუქტი ამ ანგარიშის ზოგიერთ ხარჯთან შედარებით. გთხოვთ, გადაამოწმოთ, რომ ეს ანგარიში არ შეიცავს დუბლიკატებს."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid ""
+"The following expenses payment method leads to several accounts payable and this isn't supported:\n"
+"%(expenses)s"
+msgstr ""
+"შემდეგი ხარჯების გადახდის მეთოდი იწვევს რამდენიმე გადასახდელ ანგარიშს და ეს არ არის მხარდაჭერილი:\n"
+"%(expenses)s"
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_hr_expense__payment_method_line_id
+msgid "The payment method used when the expense is paid by the company."
+msgstr "გადახდის მეთოდი, რომელიც გამოიყენება, როდესაც ხარჯი გადახდილია კომპანიის მიერ."
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "The status of all your current expenses is visible from here."
+msgstr "თქვენი ყველა მიმდინარე ხარჯის სტატუსი ხილულია აქედან."
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_hr_expense_split_wizard__split_possible
+msgid "The sum of after split shut remain the same"
+msgstr "გაყოფის შემდგომი ჯამი უცვლელი უნდა დარჩეს"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid ""
+"The vendor is required for expenses using SEPA Credit Transfer as the payment method.\n"
+"Please set a vendor on the expenses."
+msgstr ""
+"მომწოდებელი სავალდებულოა ხარჯებისთვის, რომლებიც გადახდის მეთოდად SEPA საკრედიტო გადარიცხვას იყენებს.\n"
+"გთხოვთ, მიუთითოთ მომწოდებელი ხარჯებზე."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/product_product.py:0
+msgid "There are draft expenses linked to this product. Updating the product cost will change expense amounts. Make sure it is what you want to do."
+msgstr "ამ პროდუქტთან დაკავშირებულია მონახაზი ხარჯები. პროდუქტის თვითღირებულების განახლება შეცვლის ხარჯების თანხებს. დარწმუნდით, რომ ეს არის ის, რისი გაკეთებაც გსურთ."
+
+#. module: hr_expense
+#: model_terms:web_tour.tour,rainbow_man_message:hr_expense.hr_expense_tour
+msgid "There you go - expense management in a nutshell!"
+msgstr "აი, ასეა - ხარჯების მართვა მოკლედ!"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "This expense exceeds the limit of"
+msgstr "ეს ხარჯი აღემატება ლიმიტს"
+
+#. module: hr_expense
+#: model:digest.tip,name:hr_expense.digest_tip_hr_expense_0 model_terms:digest.tip,tip_description:hr_expense.digest_tip_hr_expense_0
+msgid "Tip: Snap pictures of your receipts with the remote app"
+msgstr "რჩევა: გადაუღეთ თქვენს ქვითრებს ფოტოები მობილური აპლიკაციით"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Tip: try sending receipts by email"
+msgstr "რჩევა: სცადეთ ქვითრების ელ-ფოსტით გაგზავნა"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "To Post"
+msgstr "გასატარებელი"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0 model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "To Submit"
+msgstr "წარსადგენი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "Today Activities"
+msgstr "დღევანდელი აქტივობები"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__total_amount model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_split model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_split_form_view model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form model_terms:ir.ui.view,arch_db:hr_expense.report_expense model_terms:ir.ui.view,arch_db:hr_expense.view_move_list_expense
+msgid "Total"
+msgstr "ჯამი"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense_split_wizard__total_amount_currency model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_expenses_analysis_tree
+msgid "Total Amount"
+msgstr "საერთო თანხა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__total_amount_currency model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__total_amount_currency
+msgid "Total In Currency"
+msgstr "ჯამი ვალუტაში"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_expenses_analysis_tree
+msgid "Total Taxes"
+msgstr "სულ გადასახადები"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__untaxed_amount
+msgid "Total Untaxed Amount"
+msgstr "სულ დაუბეგრავი თანხა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__untaxed_amount_currency
+msgid "Total Untaxed Amount In Currency"
+msgstr "სულ დაუბეგრავი თანხა ვალუტაში"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "Total With Conversion"
+msgstr "ჯამი კონვერსიით"
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_hr_expense_split_wizard__total_amount_currency_original
+msgid "Total amount of the original Expense that we are splitting"
+msgstr "საწყისი ხარჯის სრული თანხა, რომელსაც ვყოფთ"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense_split_wizard__total_amount_currency_original
+msgid "Total amount original"
+msgstr "საწყისი სრული თანხა"
+
+#. module: hr_expense
+#: model:product.template,name:hr_expense.expense_product_travel_accommodation_product_template
+msgid "Travel & Accommodation"
+msgstr "მგზავრობა და განთავსება"
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_hr_expense__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "ჩანაწერზე გამონაკლისის აქტივობის ტიპი."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid ""
+"Uh-oh! You can’t edit this expense.\n"
+"\n"
+"Reach out to the administrators, flash your best smile, and see if they'll grant you the magical access you seek."
+msgstr ""
+"უჰ! თქვენ ვერ შეძლებთ ამ ხარჯის რედაქტირებას.\n"
+"\n"
+"დაუკავშირდით ადმინისტრატორებს, გაუღიმეთ თქვენი საუკეთესო ღიმილით და ნახეთ, მოგცემენ თუ არა იმ ჯადოსნურ წვდომას, რომელსაც ეძებთ."
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__product_uom_id
+msgid "Unit"
+msgstr "ერთეული"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__price_unit model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_expenses_analysis_tree model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "Unit Price"
+msgstr "ერთეულის ფასი"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/ir_actions_report.py:0
+msgid "Unknown"
+msgstr "უცნობი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "Untaxed Amount"
+msgstr "დაუბეგრავი თანხა"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/components/hr_expense_product_form_view.js:0
+msgid "Update cost"
+msgstr "თვითღირებულების განახლება"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/views/kanban.xml:0 code:addons/hr_expense/static/src/views/list.xml:0
+msgid "Upload"
+msgstr "ატვირთვა"
+
+#. module: hr_expense
+#: model_terms:ir.actions.act_window,help:hr_expense.hr_expense_actions_my_all model_terms:ir.actions.act_window,help:hr_expense.hr_expense_actions_to_process
+msgid "Upload or drop an expense receipt"
+msgstr "ატვირთეთ ან ჩააგდეთ ხარჯის ქვითარი"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Use the breadcrumbs to go back to the list of expenses."
+msgstr "გამოიყენეთ ნავიგაციის ბილიკი ხარჯების სიაში დასაბრუნებლად."
+
+#. module: hr_expense
+#: model:ir.actions.act_window,name:hr_expense.hr_expense_approve_duplicate_action
+msgid "Validate Duplicate Expenses"
+msgstr "დუბლირებული ხარჯების ვალიდაცია"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__vendor_id
+msgid "Vendor"
+msgstr "მომწოდებელი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_register
+msgid "View Expense"
+msgstr "ხარჯის ნახვა"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0 model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "Waiting Approval"
+msgstr "ელოდება დამტკიცებას"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0 model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_search
+msgid "Waiting Reimbursement"
+msgstr "ელოდება ანაზღაურებას"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.product_product_expense_form_view
+msgid "When the cost of an expense product is different than 0, then the user                                             using this product won't be able to change the amount of the expense,                                             only the quantity. Use a cost different than 0 for expense products funded by                                             the company at fixed cost like allowances for mileage, per diem, accommodation                                             or meal."
+msgstr "როდესაც ხარჯის პროდუქტის თვითღირებულება 0-ისგან განსხვავებულია, ამ პროდუქტის გამომყენებელი მომხმარებელი ვერ შეძლებს ხარჯის თანხის შეცვლას, მხოლოდ რაოდენობისა. გამოიყენეთ 0-ისგან განსხვავებული თვითღირებულება იმ ხარჯის პროდუქტებისთვის, რომლებსაც კომპანია ფიქსირებული ღირებულებით აფინანსებს, მაგალითად, გარბენის, დღიური მივლინების, საცხოვრებლის ან კვების კომპენსაციებისთვის."
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__product_has_tax model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__product_has_tax
+msgid "Whether tax is defined on a selected product"
+msgstr "არის თუ არა გადასახადი განსაზღვრული შერჩეულ პროდუქტზე"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__wizard_id
+msgid "Wizard"
+msgstr "ვიზარდი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "Yes (Match to Bill)"
+msgstr "დიახ (შეჯერება ანგარიშ-ფაქტურასთან)"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_register
+msgid "You can now submit it to the manager from the following link."
+msgstr "ახლა შეგიძლიათ წარუდგინოთ იგი მენეჯერს შემდეგი ბმულიდან."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "You can only generate an accounting entry for approved expense(s)."
+msgstr "ბუღალტრული გატარების გენერირება მხოლოდ დამტკიცებული ხარჯ(ებ)ისთვის შეგიძლიათ."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "You can't add an attachment to an expense once it has been approved."
+msgstr "დამტკიცების შემდეგ ხარჯს დანართს ვერ დაამატებთ."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "You can't create move for employee-paid expenses belonging to different companies at the same time"
+msgstr "ვერ შექმნით გატარებას ერთდროულად სხვადასხვა კომპანიის კუთვნილი, თანამშრომლის მიერ გადახდილი ხარჯებისთვის"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/ir_attachment.py:0
+msgid "You can't delete attachments from an expense once it has been submitted."
+msgstr "წარდგენის შემდეგ ხარჯიდან დანართებს ვერ წაშლით."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid ""
+"You cannot approve:\n"
+" %(reasons)s"
+msgstr ""
+"ვერ დაამტკიცებთ:\n"
+" %(reasons)s"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "You cannot cancel an expense linked to a journal entry"
+msgstr "ვერ გააუქმებთ ბუღალტრულ გატარებასთან დაკავშირებულ ხარჯს"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "You cannot delete a posted or approved expense."
+msgstr "ვერ წაშლით გატარებულ ან დამტკიცებულ ხარჯს."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/analytic.py:0
+msgid "You cannot delete an analytic account that is used in an expense."
+msgstr "ვერ წაშლით ანალიტიკურ ანგარიშს, რომელიც გამოყენებულია ხარჯში."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/account_payment.py:0
+msgid "You cannot do this modification since the payment is linked to an expense."
+msgstr "ამ ცვლილებას ვერ შეასრულებთ, რადგან გადახდა დაკავშირებულია ხარჯთან."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "You cannot edit the security fields of an expense manually"
+msgstr "ხარჯის უსაფრთხოების ველებს ხელით ვერ დაარედაქტირებთ"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid ""
+"You cannot refuse:\n"
+" %(reasons)s"
+msgstr ""
+"ვერ უარყოფთ:\n"
+" %(reasons)s"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "You cannot reset to draft an expense linked to a journal entry."
+msgstr "ბუღალტრულ გატარებასთან დაკავშირებულ ხარჯს მონახაზზე ვერ დააბრუნებთ."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "You cannot split an expense that is already posted."
+msgstr "უკვე გატარებულ ხარჯს ვერ გაყოფთ."
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_submitted_expenses
+msgid "You currently have"
+msgstr "ამჟამად გაქვთ"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "You do not have the required permission to submit this expense."
+msgstr "არ გაქვთ ამ ხარჯის წარსადგენად საჭირო ნებართვა."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "You do not have the rights to edit this expense."
+msgstr "არ გაქვთ ამ ხარჯის რედაქტირების უფლება."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "You don't have the access rights to modify this expense."
+msgstr "არ გაქვთ ამ ხარჯის შეცვლის წვდომის უფლებები."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "You need to add a manual payment method on the journal (%s)"
+msgstr "ჟურნალზე (%s) უნდა დაამატოთ გადახდის ხელით მეთოდი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_refuse_reason
+msgid "Your Expense"
+msgstr "თქვენი ხარჯი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_register
+msgid "Your expense has been successfully registered."
+msgstr "თქვენი ხარჯი წარმატებით დარეგისტრირდა."
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "Your job position has a limit of"
+msgstr "თქვენს ვაკანსიას აქვს ლიმიტი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "alias"
+msgstr "მეტსახელი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "defined for this job position."
+msgstr "რომელიც განსაზღვრულია ამ ვაკანსიისთვის."
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.product_product_expense_form_view
+msgid "e.g. Lunch"
+msgstr "მაგ. ლანჩი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "e.g. Lunch with Customer"
+msgstr "მაგ. ლანჩი მომხმარებელთან"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.product_product_expense_form_view
+msgid "e.g. Restaurants: only week days, for lunch"
+msgstr "მაგ. რესტორნები: მხოლოდ სამუშაო დღეები, ლანჩისთვის"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "e.g. mycompany.com"
+msgstr "მაგ. mycompany.com"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "expense"
+msgstr "ხარჯი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "for this expense. You may not be fully reimbursed!"
+msgstr "ამ ხარჯისთვის. შესაძლოა, თანხა სრულად არ აგინაზღაურდეთ!"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_refuse_reason
+msgid "has been refused"
+msgstr "უარყოფილია"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.product_product_expense_form_view
+msgid "no taxes"
+msgstr "გადასახადების გარეშე"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.product_product_expense_form_view
+msgid "per"
+msgstr "თითო"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "use OCR to fill data from a picture of the bill"
+msgstr "გამოიყენეთ OCR ქვითრის ფოტოდან მონაცემების შესავსებად"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "with the same category, date, amount, and employee already exists."
+msgstr "იმავე კატეგორიით, თარიღით, თანხითა და თანამშრომლით უკვე არსებობს."
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "with the same receipt already exists."
+msgstr "იგივე ქვითრით უკვე არსებობს."
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "$100.00"
+msgstr "$100.00"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "$120.00"
+msgstr "$120.00"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "$500.00"
+msgstr "$500.00"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "$600.00"
+msgstr "$600.00"
+
+#. module: hr_expense
+#: model:ir.actions.report,print_report_name:hr_expense.action_report_hr_expense
+msgid "'Expense - %s - %s' % (object.employee_id.name, (object.name).replace('/', ''))"
+msgstr "'Expense - %s - %s' % (object.employee_id.name, (object.name).replace('/', ''))"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "(incl"
+msgstr "(ჩათვლ"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "2023-08-11"
+msgstr "2023-08-11"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "<i class=\"oi oi-arrow-right\"/> Setup your alias domain"
+msgstr "<i class=\"oi oi-arrow-right\"/> დააყენეთ თქვენი მეტსახელის დომენი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "<span>Date:</span>"
+msgstr "<span>თარიღი:</span>"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_split
+msgid "<span>The total amount doesn't match the original amount.</span>"
+msgstr "<span>ჯამური თანხა არ ემთხვევა საწყის თანხას.</span>"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_post_wizard_view
+msgid "Accounting date"
+msgstr "ბუღალტრული თარიღი"
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_hr_expense__account_id
+msgid "An expense account is expected"
+msgstr "მოსალოდნელია ხარჯის ანგარიში"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/views/expense_form_view.js:0
+msgid "An expense of same category, amount and date already exists."
+msgstr "იმავე კატეგორიის, თანხისა და თარიღის ხარჯი უკვე არსებობს."
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "Business Trip"
+msgstr "მივლინება"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_approve_duplicate_view_form model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_post_wizard_view model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_refuse_wizard_view_form model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_split
+msgid "Cancel"
+msgstr "გაუქმება"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_register
+msgid "Category:"
+msgstr "კატეგორია:"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_register
+msgid "Category: not found"
+msgstr "კატეგორია: ვერ მოიძებნა"
+
+#. module: hr_expense
+msgid "Companies"
+msgstr "კომპანიები"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
+msgid "Credit Card"
+msgstr "საკრედიტო ბარათი"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/mixins/qrcode.js:0
+msgid "Download our App"
+msgstr "ჩამოტვირთეთ ჩვენი აპლიკაცია"
+
+#. module: hr_expense
+#: model:ir.model.fields.selection,name:hr_expense.selection__hr_expense__payment_mode__own_account
+msgid "Employee (to reimburse)"
+msgstr "თანამშრომელი (ასანაზღაურებელი)"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Enter a name then choose a category and configure the amount of your expense."
+msgstr "შეიყვანეთ სახელი, შემდეგ აირჩიეთ კატეგორია და დააკონფიგურირეთ თქვენი ხარჯის თანხა."
+
+#. module: hr_expense
+#: model:ir.actions.act_window,name:hr_expense.hr_expense_product model:ir.ui.menu,name:hr_expense.menu_hr_product model_terms:ir.ui.view,arch_db:hr_expense.product_product_expense_form_view
+msgid "Expense Categories"
+msgstr "ხარჯის კატეგორიები"
+
+#. module: hr_expense
+#: model:ir.model,name:hr_expense.model_hr_expense_post_wizard
+msgid "Expense Posting Wizard"
+msgstr "ხარჯის გატარების ოსტატი"
+
+#. module: hr_expense
+#: model_terms:ir.actions.act_window,help:hr_expense.hr_expense_product
+msgid "Expense categories can be reinvoiced to your customers."
+msgstr "ხარჯის კატეგორიები შეიძლება ხელახლა გადაეფარდოს თქვენს მომხმარებლებს."
+
+#. module: hr_expense
+#: model:ir.actions.act_window,name:hr_expense.action_hr_expense_department_to_approve
+msgid "Expense to Approve"
+msgstr "დასამტკიცებელი ხარჯი"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_submitted_expenses
+msgid "Expenses approval"
+msgstr "ხარჯების დამტკიცება"
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_hr_expense__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr "Font Awesome-ის ხატულა, მაგ. fa-tasks"
+
+#. module: hr_expense
+#: model:ir.actions.server,name:hr_expense.ir_cron_send_submitted_expenses_mail_ir_actions_server
+msgid "HR Expense: Send Submitted Expenses Mail"
+msgstr "HR ხარჯი: წარდგენილი ხარჯების შესახებ ელ-ფოსტის გაგზავნა"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Managers can inspect all expenses from here."
+msgstr "მენეჯერებს შეუძლიათ ყველა ხარჯის დათვალიერება აქედან."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/wizard/hr_expense_post_wizard.py:0
+msgid "New expense entries"
+msgstr "ხარჯის ახალი ჩანაწერები"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_submitted_expenses
+msgid "New expenses are waiting for your approval. You can Review them by following this link."
+msgstr "ახალი ხარჯები ელოდება თქვენს დამტკიცებას. შეგიძლიათ მათი გადახედვა ამ ბმულზე გადასვლით."
+
+#. module: hr_expense
+#: model_terms:ir.actions.act_window,help:hr_expense.hr_expense_product
+msgid "No expense categories found. Let's create one!"
+msgstr "ხარჯის კატეგორიები ვერ მოიძებნა. შევქმნათ ერთი!"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Only expense paid by the employee can be posted with the wizard"
+msgstr "ოსტატით შეიძლება გატარდეს მხოლოდ თანამშრომლის მიერ გადახდილი ხარჯი"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Open bugger menu."
+msgstr "გახსენით bugger მენიუ."
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_split
+msgid "Original Amount"
+msgstr "საწყისი თანხა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__payment_mode
+msgid "Paid By"
+msgstr "გადახდილია"
+
+#. module: hr_expense
+#: model:ir.model,name:hr_expense.model_account_payment
+msgid "Payments"
+msgstr "გადახდები"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Please specify if the expenses were paid by the company, or the employee."
+msgstr "გთხოვთ, მიუთითოთ ხარჯები გადახდილია კომპანიის თუ თანამშრომლის მიერ."
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/views/list.xml:0
+msgid "Post Entries"
+msgstr "ჩანაწერების გატარება"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_post_wizard_view
+msgid "Post Expenses"
+msgstr "ხარჯების გატარება"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "Post Journal Entries"
+msgstr "ბუღალტრული გატარებების გატარება"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Post expenses"
+msgstr "ხარჯების გატარება"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Post expenses paid by the employee"
+msgstr "თანამშრომლის მიერ გადახდილი ხარჯების გატარება"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Ready? You can save it manually or discard modifications from here. You don't <em>need to save</em> - Odoo will save eveyrthing for you when you navigate."
+msgstr "მზად ხართ? შეგიძლიათ ხელით შეინახოთ ან აქედან გააუქმოთ ცვლილებები. <em>შენახვა საჭირო არ არის</em> - Odoo ყველაფერს თავად შეინახავს, როდესაც ნავიგაციას დაიწყებთ."
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/components/qrcode_action.xml:0
+msgid "Scan this QR code to get the Odoo app:"
+msgstr "დაასკანერეთ ეს QR კოდი Odoo აპლიკაციის მისაღებად:"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
+msgid "Send an email to this email alias with the receipt in attachment to create an expense in one click. If the first word of the mail subject contains the category's internal reference or the category name, the corresponding category will automatically be set. Type the expense amount in the mail subject to set it on the expense too."
+msgstr "გაგზავნეთ ელ-წერილი ამ ელ-ფოსტის მისამართზე დანართად ქვითრით, რომ ერთი დაწკაპუნებით შექმნათ ხარჯი. თუ წერილის თემის პირველი სიტყვა შეიცავს კატეგორიის შიდა ნომერს ან კატეგორიის სახელს, შესაბამისი კატეგორია ავტომატურად დაყენდება. ჩაწერეთ ხარჯის თანხა წერილის თემაში, რომ ისიც დაყენდეს ხარჯზე."
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_hr_expense_post_wizard__accounting_date
+msgid "Specify the bill date of the related vendor bill."
+msgstr "მიუთითეთ დაკავშირებული მომწოდებლის ანგარიშ-ფაქტურის თარიღი."
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_split model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "Split Expense"
+msgstr "ხარჯის გაყოფა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_product_product__standard_price_update_warning
+msgid "Standard Price Update Warning"
+msgstr "სტანდარტული ფასის განახლების გაფრთხილება"
+
+#. module: hr_expense
+#. odoo-javascript
+#: code:addons/hr_expense/static/src/js/tours/hr_expense.js:0
+msgid "Submit to Manager"
+msgstr "მენეჯერთან წარდგენა"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_register
+msgid "The first word of the email subject did not correspond to any category code. You'll have to set the category manually on the expense."
+msgstr "ელ-წერილის თემის პირველი სიტყვა არ შეესაბამებოდა არცერთ კატეგორიის კოდს. კატეგორია ხელით უნდა დააყენოთ ხარჯზე."
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_approve_duplicate_view_form
+msgid "The following approved expenses have similar employee, amount and category than some expenses of this report. Please verify this report does not contain duplicates."
+msgstr "შემდეგ დამტკიცებულ ხარჯებს აქვს მსგავსი თანამშრომელი, თანხა და კატეგორია ამ ანგარიშის ზოგიერთ ხარჯთან შედარებით. გთხოვთ, გადაამოწმოთ, რომ ეს ანგარიში არ შეიცავს დუბლიკატებს."
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_hr_expense_post_wizard__employee_journal_id
+msgid "The journal used when the expense is paid by employee."
+msgstr "ჟურნალი, რომელიც გამოიყენება, როდესაც ხარჯი გადახდილია თანამშრომლის მიერ."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/product_product.py:0
+msgid "There are unsubmitted expenses linked to this category. Updating the category cost will change expense amounts. Make sure it is what you want to do."
+msgstr "ამ კატეგორიასთან დაკავშირებულია წარუდგენელი ხარჯები. კატეგორიის ღირებულების განახლება შეცვლის ხარჯების თანხებს. დარწმუნდით, რომ ეს არის ის, რისი გაკეთებაც გსურთ."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "Untitled Expense %s"
+msgstr "უსათაურო ხარჯი %s"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_submitted_expenses
+msgid "View expenses"
+msgstr "ხარჯების ნახვა"
+
+#. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_hr_expense__website_message_ids
+msgid "Website Messages"
+msgstr "ვებსაიტის შეტყობინებები"
+
+#. module: hr_expense
+#: model:ir.model.fields,help:hr_expense.field_hr_expense__website_message_ids
+msgid "Website communication history"
+msgstr "ვებსაიტის კომუნიკაციის ისტორია"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.product_product_expense_form_view
+msgid "When the cost of an expense product is different than 0, then the user                                             using this product won't be able to change the amount of the expense,                                             only the quantity. Use a cost different than 0 for expense categories funded by                                             the company at fixed cost like allowances for mileage, per diem, accommodation                                             or meal."
+msgstr "როდესაც ხარჯის პროდუქტის ღირებულება განსხვავდება 0-ისგან, ამ პროდუქტის გამომყენებელ მომხმარებელს არ შეეძლება ხარჯის თანხის შეცვლა, მხოლოდ რაოდენობის. გამოიყენეთ 0-ისგან განსხვავებული ღირებულება ისეთი ხარჯის კატეგორიებისთვის, რომლებსაც კომპანია ფიქსირებული ღირებულებით აფინანსებს, მაგალითად გარბენის, დღიური, საცხოვრებლის ან კვების ანაზღაურება."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "You can not submit an expense without a category."
+msgstr "ხარჯის წარდგენა კატეგორიის გარეშე ვერ მოხერხდება."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "You can't post simultaneously employee-paid expenses belonging to different companies"
+msgstr "ვერ გაატარებთ ერთდროულად სხვადასხვა კომპანიის კუთვნილ თანამშრომლის მიერ გადახდილ ხარჯებს"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "You cannot cancel an expense linked to a posted journal entry"
+msgstr "ვერ გააუქმებთ გატარებულ ბუღალტრულ გატარებასთან დაკავშირებულ ხარჯს"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "You cannot reset to draft an expense linked to a posted journal entry."
+msgstr "გატარებულ ბუღალტრულ გატარებასთან დაკავშირებულ ხარჯს მონახაზზე ვერ დააბრუნებთ."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/wizard/hr_expense_post_wizard.py:0
+msgid "You don't have the rights to create accounting entries."
+msgstr "არ გაქვთ ბუღალტრული გატარებების შექმნის უფლება."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid "You need to have at least one category that can be expensed in your database to proceed!"
+msgstr "გასაგრძელებლად თქვენს ბაზაში უნდა გქონდეთ მინიმუმ ერთი კატეგორია, რომელიც შეიძლება ხარჯად გატარდეს!"
+
+#. module: hr_expense
+#: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
+msgid "tax)"
+msgstr "გადასახადი)"

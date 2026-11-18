@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="hotel_rms.Waterfall">
+        <div class="o_rms_waterfall">
+            <t t-foreach="this.bars" t-as="bar" t-key="bar.code + bar_index">
+                <span class="o_rms_wf_label" t-out="bar.label"/>
+                <span class="o_rms_wf_track">
+                    <span t-attf-class="o_rms_wf_bar o_rms_wf_{{ bar.tone }}" t-att-style="bar.style"/>
+                </span>
+                <span class="o_rms_wf_amount" t-out="bar.text"/>
+            </t>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,205 @@
+// Wraps the KPI row + the renderer as one flex item under <main class="o_content">;
+// without it they become side-by-side flex siblings of the search panel.
+.o_rs_waybill_main {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+}
+
+#{$rsw-list} {
+    .o_rs_waybill_kpi_row {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0;
+        margin: 12px 12px 14px;
+        padding: 0;
+        background: var(--rsw-sheet);
+        border: 1px solid var(--rsw-rule);
+        border-radius: var(--rsw-R);
+        overflow: hidden;
+        @media (max-width: 768px) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    .o_rs_waybill_kpi {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        padding: 12px 18px;
+        background: transparent;
+        border: 0;
+        border-left: 1px solid var(--rsw-rule);
+        border-radius: 0;
+        box-shadow: none;
+        transform: none;
+        transition: none;
+        text-align: left;
+        cursor: pointer;
+        &:first-child { border-left: 0; }
+        &:hover { background: var(--rsw-head); box-shadow: none; transform: none; }
+        &.o_rs_waybill_kpi_selected {
+            background: var(--rsw-accent-tint);
+            border-color: var(--rsw-rule);
+            box-shadow: inset 0 -3px 0 var(--rsw-accent);
+        }
+        &:focus-visible { outline: 2px solid var(--rsw-accent); outline-offset: -2px; }
+    }
+    .o_rs_waybill_kpi_head { display: flex; margin: 0; }
+    .o_rs_waybill_kpi_label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--rsw-label);
+        text-transform: none;
+    }
+    .o_rs_waybill_kpi_value {
+        font-size: 28px;
+        font-weight: 700;
+        line-height: 1.1;
+        margin: 0;
+        color: var(--rsw-ink) !important;
+    }
+    .o_rs_waybill_kpi_icon,
+    .o_rs_waybill_kpi_sub { display: none !important; }
+
+    .o_rs_waybill_kpi_label { display: inline-flex; align-items: center; gap: 6px; }
+    @each $state, $shape in (
+        'active':    (0, var(--rsw-st-active), var(--rsw-st-active-text)),
+        'completed': (0, var(--rsw-st-done), var(--rsw-st-done-text)),
+        'cancelled': (0, var(--rsw-st-void), var(--rsw-st-void-text)),
+    ) {
+        .o_rs_waybill_kpi_#{$state} {
+            .o_rs_waybill_kpi_label::before {
+                content: "";
+                width: 12px;
+                height: 12px;
+                box-sizing: border-box;
+                border-radius: 3px;
+                border: nth($shape, 1);
+                background: nth($shape, 2);
+            }
+            .o_rs_waybill_kpi_value { color: nth($shape, 3) !important; }
+        }
+    }
+
+    .o_list_renderer {
+        @include rsw-table;
+        margin: 0 12px 12px;
+        width: auto;
+    }
+    .o_list_table {
+        td[name="rs_waybill_number"] { font-weight: 600; letter-spacing: 0.02em; }
+        td:is([name="waybill_status"], [name="category"], [name="waybill_type"], [name="driver_name"]) { color: var(--rsw-ink-2); }
+        td:is([name="activation_date"], [name="transport_start_date"], [name="delivery_date"],
+              [name="cancel_date"], [name="close_date"], [name="create_date"]) { color: var(--rsw-ink-2); }
+        td[name="full_amount"] { font-weight: 600; }
+        td[name="car_number"] { font-weight: 600; letter-spacing: 0.05em; }
+        td[name="template_name"] { font-weight: 600; }
+        td[name="unresolved_count"] { color: var(--rsw-label); }
+        tfoot td:not(:empty) {
+            background: var(--rsw-head);
+            border-top: 1px solid var(--rsw-ink);
+            font-weight: 700;
+            color: var(--rsw-ink);
+        }
+
+        tr.o_data_row.text-warning {
+            @include rsw-unmapped-row;
+            > td[name="unresolved_count"] { font-weight: 700; color: var(--rsw-active) !important; }
+        }
+
+        tr.o_group_header > * {
+            background: var(--rsw-head) !important;
+            border-bottom: 1px solid var(--rsw-rule);
+        }
+        .o_group_name { font-size: 13px !important; font-weight: 600 !important; color: var(--rsw-ink) !important; }
+        .o_group_header .o_group_count, .o_group_name .text-muted { color: var(--rsw-label) !important; }
+    }
+    .o_view_nocontent { color: var(--rsw-ink-2); .o_nocontent_help p { color: var(--rsw-label); } }
+
+    .o_search_panel {
+        background: transparent;
+        font-size: 13px;
+        .o_search_panel_section_header {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--rsw-ink);
+            text-transform: none !important;   // beats Odoo's .text-uppercase
+            padding: 0 8px 6px;
+            * { text-transform: none !important; }
+            .o_search_panel_section_icon, .fa, .oi { font-size: 14px; color: var(--rsw-ink-2) !important; }
+        }
+        .o_search_panel_category_value_header,
+        .o_search_panel_filter_value {
+            padding: 5px 8px;
+            border-radius: var(--rsw-r);
+            border-left: 0 !important;
+            background: transparent;
+            color: var(--rsw-ink);
+            &:hover { background: var(--rsw-head); }
+        }
+        .o_search_panel_category_value_header.active,
+        .o_search_panel_filter_value.active {
+            background: var(--rsw-accent-tint) !important;
+            color: var(--rsw-ink) !important;
+            font-weight: 700;
+            box-shadow: inset 0 -2px 0 var(--rsw-accent);
+        }
+        .o_search_panel_counter { color: var(--rsw-label); font-variant-numeric: tabular-nums lining-nums; }
+        .form-check-input:checked { background-color: var(--rsw-accent); border-color: var(--rsw-accent); }
+    }
+
+    .o_control_panel {
+        .o_list_button_add {
+            @include rsw-btn-filled;
+            height: 34px;
+            border-radius: var(--rsw-r);
+        }
+        .o_selection_container .btn:not(.o_list_button_add) {
+            @include rsw-btn-secondary;
+            border-radius: var(--rsw-r);
+            > i, > .oi, > .fa { display: none; }
+        }
+        .o_searchview {
+            border: 1px solid var(--rsw-line);
+            border-radius: var(--rsw-r);
+            &:focus-within { @include rsw-focus; }
+        }
+        .o_searchview_facet {
+            background: var(--rsw-head);
+            border: 1px solid var(--rsw-rule);
+            border-radius: var(--rsw-r);
+            color: var(--rsw-ink);
+            .o_searchview_facet_label { background: transparent; color: var(--rsw-ink-2); }
+        }
+    }
+}
+
+:is(#{$rsw-list}, #{$rsw-form}) .o_rs_state_icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    > i { display: none; }
+    &::before {
+        content: "";
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        box-sizing: border-box;
+        border-radius: 3px;
+    }
+    &.o_rs_state_draft::before     { border: 2px dashed var(--rsw-st-draft); }
+    &.o_rs_state_active::before    { background: var(--rsw-st-active); }
+    &.o_rs_state_completed::before { background: var(--rsw-st-done); }
+    &.o_rs_state_cancelled::before { background: var(--rsw-st-void); }
+}
+
+.o_rs_sync_notification .o_notification_content {
+    white-space: pre-line;
+    display: block;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    overflow: visible;
+}

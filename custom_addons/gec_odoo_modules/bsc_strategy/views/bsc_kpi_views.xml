@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_bsc_kpi_list" model="ir.ui.view">
+        <field name="name">bsc.kpi.list</field>
+        <field name="model">bsc.kpi</field>
+        <field name="arch" type="xml">
+            <list string="Key Performance Indicators" editable="bottom" open_form_view="True"
+                  decoration-danger="current_status == 'red'"
+                  decoration-warning="current_status == 'amber'"
+                  decoration-muted="current_status == 'no_data'">
+                <field name="sequence" widget="handle"/>
+                <field name="scorecard_id" optional="hide" options="{'no_quick_create': True}" />
+                <field name="perspective_id" optional="show" options="{'no_create': True}" />
+                <field name="objective_id" options="{'no_create': True}" />
+                <field name="name"/>
+                <field name="uom_name" string="Unit"/>
+                <field name="direction"/>
+                <field name="default_target" invisible="direction == 'target_range'"/>
+                <field name="target_min" optional="hide"
+                       invisible="direction != 'target_range'"
+                       required="direction == 'target_range'"/>
+                <field name="target_max" optional="hide"
+                       invisible="direction != 'target_range'"
+                       required="direction == 'target_range'"/>
+                <field name="owner_id" widget="many2one_avatar_user" options="{'no_create': True}" />
+                <field name="weight" sum="Total weight" optional="hide"/>
+                <field name="current_target" string="Current Target" optional="hide" readonly="1"/>
+                <field name="current_actual" string="Actual" readonly="1"/>
+                <field name="current_achievement" string="Achievement %" digits="[16,1]" readonly="1"/>
+                <field name="current_status" readonly="1" widget="badge"
+                       decoration-success="current_status == 'green'"
+                       decoration-warning="current_status == 'amber'"
+                       decoration-danger="current_status == 'red'"/>
+                <button name="action_open_measurements" type="object"
+                        string="History" icon="show_chart"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bsc_kpi_form" model="ir.ui.view">
+        <field name="name">bsc.kpi.form</field>
+        <field name="model">bsc.kpi</field>
+        <field name="arch" type="xml">
+            <form string="KPI">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_measurements" type="object"
+                                class="oe_stat_button" icon="show_chart">
+                            <field name="measurement_count" widget="statinfo" string="Measurements"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Customer retention rate"/></h1>
+                    </div>
+                    <group>
+                        <group string="What is measured">
+                            <field name="objective_id" options="{'no_quick_create': True}" />
+                            <field name="scorecard_id" readonly="1"/>
+                            <field name="uom_name" placeholder="%, GEL, days, tCO2e"/>
+                            <field name="direction"/>
+                            <field name="default_target" invisible="direction == 'target_range'"/>
+                            <field name="target_min" invisible="direction != 'target_range'"
+                                   required="direction == 'target_range'"/>
+                            <field name="target_max" invisible="direction != 'target_range'"
+                                   required="direction == 'target_range'"/>
+                            <field name="baseline_value"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group string="How it is judged">
+                            <field name="owner_id" widget="many2one_avatar_user" options="{'no_create': True}" />
+                            <field name="weight"/>
+                            <field name="threshold_green"/>
+                            <field name="threshold_amber"/>
+                            <field name="data_source" groups="bsc_strategy.group_bsc_admin"/>
+                        </group>
+                    </group>
+                    <div class="mb-2">
+                        <button name="action_open_current_measurement" type="object"
+                                string="Enter / change this period's figure" icon="keyboard"
+                                class="btn-secondary" invisible="not scorecard_id"/>
+                    </div>
+                    <group string="Current Period">
+                        <group>
+                            <field name="current_target"/>
+                            <field name="current_actual"/>
+                        </group>
+                        <group>
+                            <label for="current_achievement"/>
+                            <div class="o_row">
+                                <field name="current_achievement" digits="[16,1]" class="oe_inline"/>
+                                <span class="oe_inline">%</span>
+                                <field name="current_status" widget="badge" class="ms-2"
+                                       decoration-success="current_status == 'green'"
+                                       decoration-warning="current_status == 'amber'"
+                                       decoration-danger="current_status == 'red'"/>
+                            </div>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Definition" name="definition">
+                            <field name="description" nolabel="1"
+                                   placeholder="Exactly how this figure is obtained: source, formula, who calculates it. Next year nobody will remember."/>
+                        </page>
+                        <page string="Advanced" name="advanced">
+                            <group>
+                                <group>
+                                    <field name="aggregation"/>
+                                    <field name="digits"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="History" name="history">
+                            <field name="measurement_ids" readonly="1">
+                                <list>
+                                    <field name="period_id" options="{'no_create': True}" />
+                                    <field name="target_value"/>
+                                    <field name="actual_value"/>
+                                    <field name="actual_value_set" string="Reported"
+                                           widget="boolean_toggle" readonly="1"/>
+                                    <field name="achievement" digits="[16,1]"/>
+                                    <field name="status" widget="badge"
+                                           decoration-success="status == 'green'"
+                                           decoration-warning="status == 'amber'"
+                                           decoration-danger="status == 'red'"/>
+                                    <field name="trend"/>
+                                    <field name="comment" optional="show"/>
+                                    <button name="action_open_form" type="object" string="Edit" icon="edit" title="Open it where it can be changed"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bsc_kpi_search" model="ir.ui.view">
+        <field name="name">bsc.kpi.search</field>
+        <field name="model">bsc.kpi</field>
+        <field name="arch" type="xml">
+            <search string="KPIs">
+                <field name="name"/>
+                <field name="objective_id"/>
+                <field name="scorecard_id"/>
+                <field name="owner_id"/>
+                <filter name="filter_mine" string="I Report These"
+                        domain="[('owner_id', '=', uid)]"/>
+                <separator/>
+                <filter name="filter_red" string="Off Track"
+                        domain="[('current_status', '=', 'red')]"/>
+                <filter name="filter_no_data" string="Not Reported"
+                        domain="[('current_status', '=', 'no_data')]"/>
+                <group>
+                    <filter name="group_objective" string="Objective"
+                            context="{'group_by': 'objective_id'}"/>
+                    <filter name="group_perspective" string="Perspective"
+                            context="{'group_by': 'perspective_id'}"/>
+                    <filter name="group_owner" string="Data Owner"
+                            context="{'group_by': 'owner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bsc_kpi" model="ir.actions.act_window">
+        <field name="name">Key Performance Indicators</field>
+        <field name="res_model">bsc.kpi</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_bsc_kpi_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define a measure</p>
+            <p>One or two per objective is plenty. Scorecards die of too many
+               measures, not too few.</p>
+        </field>
+    </record>
+
+</odoo>

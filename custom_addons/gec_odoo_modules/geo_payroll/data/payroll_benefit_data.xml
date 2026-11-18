@@ -1,0 +1,1074 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Keep default_struct_id empty: benefits payslips must stay off-cycle, beside the salary payslip. -->
+        <record id="structure_type_geo_benefits" model="hr.payroll.structure.type">
+            <field name="name">GEO Benefits</field>
+            <field name="wage_type">monthly</field>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="structure_geo_benefits" model="hr.payroll.structure">
+            <field name="name">GEO Benefits Pay</field>
+            <field name="type_id" ref="structure_type_geo_benefits"/>
+            <field name="country_id" ref="base.ge"/>
+            <field name="rule_ids" eval="[]"/>
+            <field name="use_worked_day_lines" eval="False"/>
+        </record>
+
+    </data>
+
+    <data noupdate="0">
+
+        <record id="rule_category_adv" model="hr.salary.rule.category">
+            <field name="name">Salary Advance</field>
+            <field name="code">ADV</field>
+            <field name="country_id" eval="False"/>
+        </record>
+
+        <!-- Company share paid to a vendor: in GROSS, so income tax and pension apply, taken out of NET by
+             BENEFIT_KIND_DED, which credits the vendor's payable. -->
+        <record id="rule_category_bik" model="hr.salary.rule.category">
+            <field name="name">Benefit in Kind</field>
+            <field name="code">BIK</field>
+            <field name="parent_id" ref="hr_payroll.ALW"/>
+            <field name="country_id" eval="False"/>
+        </record>
+
+    </data>
+
+    <!-- Archived copies, noupdate: see payroll_structure_data.xml. -->
+    <data noupdate="1">
+
+        <record id="rule_geo_hourly_advance_pay" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('rule_category_adv')])]"/>
+            <field name="name">Salary Advance Pay-Out (Net)</field>
+            <field name="sequence">28</field>
+            <field name="code">ADVANCE_PAY</field>
+            <field name="input_usage_payslip" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE_PAY' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+pit_rate = payslip._rule_parameter('gec_ge_pit_rate') / 100
+a = inputs['ADVANCE_PAY'].amount
+pee = round(a * pension_rate, 2) if employee.pension_fund_member else 0.0
+taxable = payslip.gec_advance_taxable_gross(a)
+pension = taxable * pension_rate if employee.pension_fund_member else 0.0
+pit = round((taxable - pension) * pit_rate, 2)
+result = a - pee - pit
+result_name = inputs['ADVANCE_PAY'].name
+            </field>
+            <field name="employee_move_line" eval="True"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_adv_pee_pre" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Prepaid Pension - Employee</field>
+            <field name="sequence">31</field>
+            <field name="code">ADV_PEE_PRE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE_PAY' in inputs and employee.pension_fund_member</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+result = round(inputs['ADVANCE_PAY'].amount * pension_rate, 2)
+            </field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_adv_pit_pre" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Prepaid Income Tax on Advance</field>
+            <field name="sequence">32</field>
+            <field name="code">ADV_PIT_PRE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE_PAY' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+pit_rate = payslip._rule_parameter('gec_ge_pit_rate') / 100
+taxable = payslip.gec_advance_taxable_gross(inputs['ADVANCE_PAY'].amount)
+pension = taxable * pension_rate if employee.pension_fund_member else 0.0
+result = round((taxable - pension) * pit_rate, 2)
+            </field>
+            <field name="partner_id" ref="partner_state_treasury"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_adv_per_pre" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Prepaid Pension - Company</field>
+            <field name="sequence">33</field>
+            <field name="code">ADV_PER_PRE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE_PAY' in inputs and employee.pension_fund_member</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employer'] / 100
+result = round(inputs['ADVANCE_PAY'].amount * pension_rate, 2)
+            </field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_advance" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Salary Advance Repayment</field>
+            <field name="sequence">29</field>
+            <field name="code">ADVANCE</field>
+            <field name="input_usage_payslip" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = -inputs['ADVANCE'].amount
+result_name = inputs['ADVANCE'].name</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_repay_net" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Advance Net from Prepaid</field>
+            <field name="sequence">171</field>
+            <field name="code">REPAY_NET</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">d = inputs['ADVANCE'].amount
+pee = payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PEE')
+result = d - pee - payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PIT')
+result_name = inputs['ADVANCE'].name</field>
+            <field name="employee_move_line" eval="True"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_repay_pee" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Pension Employee from Prepaid</field>
+            <field name="sequence">172</field>
+            <field name="code">REPAY_PEE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE' in inputs and bool(payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PEE'))</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PEE')</field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_repay_pit" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Income Tax from Prepaid</field>
+            <field name="sequence">173</field>
+            <field name="code">REPAY_PIT</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PIT')</field>
+            <field name="partner_id" ref="partner_state_treasury"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_repay_per" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Pension Company from Prepaid</field>
+            <field name="sequence">174</field>
+            <field name="code">REPAY_PER</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE' in inputs and bool(payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PER'))</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PER')</field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_bonus" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Bonus</field>
+            <field name="sequence">30</field>
+            <field name="code">BONUS</field>
+            <field name="input_usage_payslip" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'BONUS' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs['BONUS'].amount
+result_name = inputs['BONUS'].name</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_benefit_ded" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
+            <field name="name">Benefit Deduction</field>
+            <field name="sequence">170</field>
+            <field name="code">BENEFIT_DED</field>
+            <field name="input_usage_payslip" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'BENEFIT_DED' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = -inputs['BENEFIT_DED'].amount
+result_name = inputs['BENEFIT_DED'].name</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_benefit_kind" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('rule_category_bik')])]"/>
+            <field name="name">Benefit in Kind (Company Share)</field>
+            <field name="sequence">34</field>
+            <field name="code">BENEFIT_KIND</field>
+            <field name="input_usage_payslip" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'BENEFIT_KIND' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs['BENEFIT_KIND'].amount
+result_name = inputs['BENEFIT_KIND'].name</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_hourly_benefit_kind_ded" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
+            <field name="name">Company Share Paid to Vendor</field>
+            <field name="sequence">175</field>
+            <field name="code">BENEFIT_KIND_DED</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'BENEFIT_KIND' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = -inputs['BENEFIT_KIND'].amount</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_hourly')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_advance_pay" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('rule_category_adv')])]"/>
+            <field name="name">Salary Advance Pay-Out (Net)</field>
+            <field name="sequence">28</field>
+            <field name="code">ADVANCE_PAY</field>
+            <field name="input_usage_payslip" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE_PAY' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+pit_rate = payslip._rule_parameter('gec_ge_pit_rate') / 100
+a = inputs['ADVANCE_PAY'].amount
+pee = round(a * pension_rate, 2) if employee.pension_fund_member else 0.0
+taxable = payslip.gec_advance_taxable_gross(a)
+pension = taxable * pension_rate if employee.pension_fund_member else 0.0
+pit = round((taxable - pension) * pit_rate, 2)
+result = a - pee - pit
+result_name = inputs['ADVANCE_PAY'].name
+            </field>
+            <field name="employee_move_line" eval="True"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_adv_pee_pre" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Prepaid Pension - Employee</field>
+            <field name="sequence">31</field>
+            <field name="code">ADV_PEE_PRE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE_PAY' in inputs and employee.pension_fund_member</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+result = round(inputs['ADVANCE_PAY'].amount * pension_rate, 2)
+            </field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_adv_pit_pre" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Prepaid Income Tax on Advance</field>
+            <field name="sequence">32</field>
+            <field name="code">ADV_PIT_PRE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE_PAY' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+pit_rate = payslip._rule_parameter('gec_ge_pit_rate') / 100
+taxable = payslip.gec_advance_taxable_gross(inputs['ADVANCE_PAY'].amount)
+pension = taxable * pension_rate if employee.pension_fund_member else 0.0
+result = round((taxable - pension) * pit_rate, 2)
+            </field>
+            <field name="partner_id" ref="partner_state_treasury"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_adv_per_pre" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Prepaid Pension - Company</field>
+            <field name="sequence">33</field>
+            <field name="code">ADV_PER_PRE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE_PAY' in inputs and employee.pension_fund_member</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employer'] / 100
+result = round(inputs['ADVANCE_PAY'].amount * pension_rate, 2)
+            </field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_advance" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Salary Advance Repayment</field>
+            <field name="sequence">29</field>
+            <field name="code">ADVANCE</field>
+            <field name="input_usage_payslip" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = -inputs['ADVANCE'].amount
+result_name = inputs['ADVANCE'].name</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_repay_net" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Advance Net from Prepaid</field>
+            <field name="sequence">171</field>
+            <field name="code">REPAY_NET</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">d = inputs['ADVANCE'].amount
+pee = payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PEE')
+result = d - pee - payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PIT')
+result_name = inputs['ADVANCE'].name</field>
+            <field name="employee_move_line" eval="True"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_repay_pee" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Pension Employee from Prepaid</field>
+            <field name="sequence">172</field>
+            <field name="code">REPAY_PEE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE' in inputs and bool(payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PEE'))</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PEE')</field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_repay_pit" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Income Tax from Prepaid</field>
+            <field name="sequence">173</field>
+            <field name="code">REPAY_PIT</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PIT')</field>
+            <field name="partner_id" ref="partner_state_treasury"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_repay_per" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Pension Company from Prepaid</field>
+            <field name="sequence">174</field>
+            <field name="code">REPAY_PER</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE' in inputs and bool(payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PER'))</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PER')</field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_bonus" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Bonus</field>
+            <field name="sequence">30</field>
+            <field name="code">BONUS</field>
+            <field name="input_usage_payslip" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'BONUS' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs['BONUS'].amount
+result_name = inputs['BONUS'].name</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_benefit_ded" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
+            <field name="name">Benefit Deduction</field>
+            <field name="sequence">170</field>
+            <field name="code">BENEFIT_DED</field>
+            <field name="input_usage_payslip" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'BENEFIT_DED' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = -inputs['BENEFIT_DED'].amount
+result_name = inputs['BENEFIT_DED'].name</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_benefit_kind" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('rule_category_bik')])]"/>
+            <field name="name">Benefit in Kind (Company Share)</field>
+            <field name="sequence">34</field>
+            <field name="code">BENEFIT_KIND</field>
+            <field name="input_usage_payslip" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'BENEFIT_KIND' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs['BENEFIT_KIND'].amount
+result_name = inputs['BENEFIT_KIND'].name</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_daily_benefit_kind_ded" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
+            <field name="name">Company Share Paid to Vendor</field>
+            <field name="sequence">175</field>
+            <field name="code">BENEFIT_KIND_DED</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'BENEFIT_KIND' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = -inputs['BENEFIT_KIND'].amount</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_daily')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_advance_pay" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('rule_category_adv')])]"/>
+            <field name="name">Salary Advance Pay-Out (Net)</field>
+            <field name="sequence">28</field>
+            <field name="code">ADVANCE_PAY</field>
+            <field name="input_usage_payslip" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE_PAY' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+pit_rate = payslip._rule_parameter('gec_ge_pit_rate') / 100
+a = inputs['ADVANCE_PAY'].amount
+pee = round(a * pension_rate, 2) if employee.pension_fund_member else 0.0
+taxable = payslip.gec_advance_taxable_gross(a)
+pension = taxable * pension_rate if employee.pension_fund_member else 0.0
+pit = round((taxable - pension) * pit_rate, 2)
+result = a - pee - pit
+result_name = inputs['ADVANCE_PAY'].name
+            </field>
+            <field name="employee_move_line" eval="True"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_adv_pee_pre" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Prepaid Pension - Employee</field>
+            <field name="sequence">31</field>
+            <field name="code">ADV_PEE_PRE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE_PAY' in inputs and employee.pension_fund_member</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+result = round(inputs['ADVANCE_PAY'].amount * pension_rate, 2)
+            </field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_adv_pit_pre" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Prepaid Income Tax on Advance</field>
+            <field name="sequence">32</field>
+            <field name="code">ADV_PIT_PRE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE_PAY' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+pit_rate = payslip._rule_parameter('gec_ge_pit_rate') / 100
+taxable = payslip.gec_advance_taxable_gross(inputs['ADVANCE_PAY'].amount)
+pension = taxable * pension_rate if employee.pension_fund_member else 0.0
+result = round((taxable - pension) * pit_rate, 2)
+            </field>
+            <field name="partner_id" ref="partner_state_treasury"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_adv_per_pre" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Prepaid Pension - Company</field>
+            <field name="sequence">33</field>
+            <field name="code">ADV_PER_PRE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE_PAY' in inputs and employee.pension_fund_member</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employer'] / 100
+result = round(inputs['ADVANCE_PAY'].amount * pension_rate, 2)
+            </field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_advance" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Salary Advance Repayment</field>
+            <field name="sequence">29</field>
+            <field name="code">ADVANCE</field>
+            <field name="input_usage_payslip" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = -inputs['ADVANCE'].amount
+result_name = inputs['ADVANCE'].name</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_repay_net" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Advance Net from Prepaid</field>
+            <field name="sequence">171</field>
+            <field name="code">REPAY_NET</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">d = inputs['ADVANCE'].amount
+pee = payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PEE')
+result = d - pee - payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PIT')
+result_name = inputs['ADVANCE'].name</field>
+            <field name="employee_move_line" eval="True"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_repay_pee" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Pension Employee from Prepaid</field>
+            <field name="sequence">172</field>
+            <field name="code">REPAY_PEE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE' in inputs and bool(payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PEE'))</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PEE')</field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_repay_pit" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Income Tax from Prepaid</field>
+            <field name="sequence">173</field>
+            <field name="code">REPAY_PIT</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PIT')</field>
+            <field name="partner_id" ref="partner_state_treasury"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_repay_per" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Pension Company from Prepaid</field>
+            <field name="sequence">174</field>
+            <field name="code">REPAY_PER</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE' in inputs and bool(payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PER'))</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PER')</field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_bonus" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Bonus</field>
+            <field name="sequence">30</field>
+            <field name="code">BONUS</field>
+            <field name="input_usage_payslip" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'BONUS' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs['BONUS'].amount
+result_name = inputs['BONUS'].name</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_benefit_ded" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
+            <field name="name">Benefit Deduction</field>
+            <field name="sequence">170</field>
+            <field name="code">BENEFIT_DED</field>
+            <field name="input_usage_payslip" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'BENEFIT_DED' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = -inputs['BENEFIT_DED'].amount
+result_name = inputs['BENEFIT_DED'].name</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_benefit_kind" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('rule_category_bik')])]"/>
+            <field name="name">Benefit in Kind (Company Share)</field>
+            <field name="sequence">34</field>
+            <field name="code">BENEFIT_KIND</field>
+            <field name="input_usage_payslip" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'BENEFIT_KIND' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs['BENEFIT_KIND'].amount
+result_name = inputs['BENEFIT_KIND'].name</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_unit_benefit_kind_ded" model="hr.salary.rule">
+            <field name="active" eval="False"/>
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
+            <field name="name">Company Share Paid to Vendor</field>
+            <field name="sequence">175</field>
+            <field name="code">BENEFIT_KIND_DED</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'BENEFIT_KIND' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = -inputs['BENEFIT_KIND'].amount</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+
+    </data>
+
+    <data noupdate="0">
+
+        <!-- Advance pay-out books only assets (ADV net, COMP prepaid taxes). Repayment: ADVANCE cuts GROSS, so PIT and
+             pension use reduced base; COMP legs consume assets, company share is expense. Rules stay below NET 200. -->
+
+        <record id="rule_geo_monthly_advance_pay" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('rule_category_adv')])]"/>
+            <field name="name">Salary Advance Pay-Out (Net)</field>
+            <field name="sequence">28</field>
+            <field name="code">ADVANCE_PAY</field>
+            <field name="input_usage_payslip" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE_PAY' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+pit_rate = payslip._rule_parameter('gec_ge_pit_rate') / 100
+a = inputs['ADVANCE_PAY'].amount
+pee = round(a * pension_rate, 2) if employee.pension_fund_member else 0.0
+taxable = payslip.gec_advance_taxable_gross(a)
+pension = taxable * pension_rate if employee.pension_fund_member else 0.0
+pit = round((taxable - pension) * pit_rate, 2)
+result = a - pee - pit
+result_name = inputs['ADVANCE_PAY'].name
+            </field>
+            <field name="employee_move_line" eval="True"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_adv_pee_pre" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Prepaid Pension - Employee</field>
+            <field name="sequence">31</field>
+            <field name="code">ADV_PEE_PRE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE_PAY' in inputs and employee.pension_fund_member</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+result = round(inputs['ADVANCE_PAY'].amount * pension_rate, 2)
+            </field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_adv_pit_pre" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Prepaid Income Tax on Advance</field>
+            <field name="sequence">32</field>
+            <field name="code">ADV_PIT_PRE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE_PAY' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+pit_rate = payslip._rule_parameter('gec_ge_pit_rate') / 100
+taxable = payslip.gec_advance_taxable_gross(inputs['ADVANCE_PAY'].amount)
+pension = taxable * pension_rate if employee.pension_fund_member else 0.0
+result = round((taxable - pension) * pit_rate, 2)
+            </field>
+            <field name="partner_id" ref="partner_state_treasury"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_adv_per_pre" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Prepaid Pension - Company</field>
+            <field name="sequence">33</field>
+            <field name="code">ADV_PER_PRE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE_PAY' in inputs and employee.pension_fund_member</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employer'] / 100
+result = round(inputs['ADVANCE_PAY'].amount * pension_rate, 2)
+            </field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_advance" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Salary Advance Repayment</field>
+            <field name="sequence">29</field>
+            <field name="code">ADVANCE</field>
+            <field name="input_usage_payslip" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = -inputs['ADVANCE'].amount
+result_name = inputs['ADVANCE'].name</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_repay_net" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Advance Net from Prepaid</field>
+            <field name="sequence">171</field>
+            <field name="code">REPAY_NET</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">d = inputs['ADVANCE'].amount
+pee = payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PEE')
+result = d - pee - payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PIT')
+result_name = inputs['ADVANCE'].name</field>
+            <field name="employee_move_line" eval="True"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_repay_pee" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Pension Employee from Prepaid</field>
+            <field name="sequence">172</field>
+            <field name="code">REPAY_PEE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE' in inputs and bool(payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PEE'))</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PEE')</field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_repay_pit" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Income Tax from Prepaid</field>
+            <field name="sequence">173</field>
+            <field name="code">REPAY_PIT</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PIT')</field>
+            <field name="partner_id" ref="partner_state_treasury"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_repay_per" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Pension Company from Prepaid</field>
+            <field name="sequence">174</field>
+            <field name="code">REPAY_PER</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE' in inputs and bool(payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PER'))</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = payslip.gec_advance_repay_share(inputs['ADVANCE'], 'REPAY_PER')</field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_bonus" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Bonus</field>
+            <field name="sequence">30</field>
+            <field name="code">BONUS</field>
+            <field name="input_usage_payslip" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'BONUS' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs['BONUS'].amount
+result_name = inputs['BONUS'].name</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_termination" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Termination Payment</field>
+            <field name="sequence">35</field>
+            <field name="code">TERMINATION</field>
+            <field name="input_usage_payslip" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'TERMINATION' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs['TERMINATION'].amount
+result_name = inputs['TERMINATION'].name</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_benefit_ded" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
+            <field name="name">Benefit Deduction</field>
+            <field name="sequence">170</field>
+            <field name="code">BENEFIT_DED</field>
+            <field name="input_usage_payslip" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'BENEFIT_DED' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = -inputs['BENEFIT_DED'].amount
+result_name = inputs['BENEFIT_DED'].name</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_benefit_kind" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('rule_category_bik')])]"/>
+            <field name="name">Benefit in Kind (Company Share)</field>
+            <field name="sequence">34</field>
+            <field name="code">BENEFIT_KIND</field>
+            <field name="input_usage_payslip" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'BENEFIT_KIND' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs['BENEFIT_KIND'].amount
+result_name = inputs['BENEFIT_KIND'].name</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_monthly_benefit_kind_ded" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
+            <field name="name">Company Share Paid to Vendor</field>
+            <field name="sequence">175</field>
+            <field name="code">BENEFIT_KIND_DED</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'BENEFIT_KIND' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = -inputs['BENEFIT_KIND'].amount</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_monthly'), ref('structure_geo_hourly'), ref('structure_geo_daily'), ref('structure_geo_unit')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <!-- No BASIC rule: with use_worked_day_lines=False it would pay the full wage again.
+             No deduction rule: employee-paid items belong on With Salary programs. -->
+
+        <record id="rule_geo_benefits_bonus" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.ALW')])]"/>
+            <field name="name">Bonus</field>
+            <field name="sequence">30</field>
+            <field name="code">BONUS</field>
+            <field name="input_usage_payslip" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'BONUS' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs['BONUS'].amount
+result_name = inputs['BONUS'].name</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_benefits')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_benefits_advance_pay" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('rule_category_adv')])]"/>
+            <field name="name">Salary Advance Pay-Out (Net)</field>
+            <field name="sequence">28</field>
+            <field name="code">ADVANCE_PAY</field>
+            <field name="input_usage_payslip" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE_PAY' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+pit_rate = payslip._rule_parameter('gec_ge_pit_rate') / 100
+a = inputs['ADVANCE_PAY'].amount
+pee = round(a * pension_rate, 2) if employee.pension_fund_member else 0.0
+taxable = payslip.gec_advance_taxable_gross(a)
+pension = taxable * pension_rate if employee.pension_fund_member else 0.0
+pit = round((taxable - pension) * pit_rate, 2)
+result = a - pee - pit
+result_name = inputs['ADVANCE_PAY'].name
+            </field>
+            <field name="employee_move_line" eval="True"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_benefits')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_benefits_adv_pee_pre" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Prepaid Pension - Employee</field>
+            <field name="sequence">31</field>
+            <field name="code">ADV_PEE_PRE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE_PAY' in inputs and employee.pension_fund_member</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+result = round(inputs['ADVANCE_PAY'].amount * pension_rate, 2)
+            </field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_benefits')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_benefits_adv_pit_pre" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Prepaid Income Tax on Advance</field>
+            <field name="sequence">32</field>
+            <field name="code">ADV_PIT_PRE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE_PAY' in inputs</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+pit_rate = payslip._rule_parameter('gec_ge_pit_rate') / 100
+taxable = payslip.gec_advance_taxable_gross(inputs['ADVANCE_PAY'].amount)
+pension = taxable * pension_rate if employee.pension_fund_member else 0.0
+result = round((taxable - pension) * pit_rate, 2)
+            </field>
+            <field name="partner_id" ref="partner_state_treasury"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_benefits')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_benefits_adv_per_pre" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Prepaid Pension - Company</field>
+            <field name="sequence">33</field>
+            <field name="code">ADV_PER_PRE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ADVANCE_PAY' in inputs and employee.pension_fund_member</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employer'] / 100
+result = round(inputs['ADVANCE_PAY'].amount * pension_rate, 2)
+            </field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_benefits')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_benefits_gross" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.GROSS')])]"/>
+            <field name="name">Gross</field>
+            <field name="sequence">100</field>
+            <field name="code">GROSS</field>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories['BASIC'] + categories['ALW']</field>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_benefits')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_benefits_pension_ee" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
+            <field name="name">Pension Employee Contribution</field>
+            <field name="sequence">120</field>
+            <field name="code">PENSION_EE</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = employee.pension_fund_member</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employee'] / 100
+result = -(categories['GROSS'] * pension_rate)
+            </field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_benefits')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_benefits_pit" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.DED')])]"/>
+            <field name="name">Income Tax</field>
+            <field name="sequence">140</field>
+            <field name="code">PIT</field>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pit_rate = payslip._rule_parameter('gec_ge_pit_rate') / 100
+pension = -result_rules['PENSION_EE']['total']
+advance_pension = result_rules['ADV_PEE_PRE']['total']
+taxable = payslip.gec_pit_taxable_gross(categories['GROSS'], pension, advance_pension)
+result = -(taxable * pit_rate)
+explanation_info = payslip.gec_pit_explanation(categories['GROSS'], taxable, pension, -result, advance_pension)
+            </field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="partner_id" ref="partner_state_treasury"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_benefits')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_benefits_pension_er" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.COMP')])]"/>
+            <field name="name">Pension Company Contribution</field>
+            <field name="sequence">160</field>
+            <field name="code">PENSION_ER</field>
+            <field name="appears_on_employee_cost_dashboard" eval="True"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = employee.pension_fund_member</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+pension_rate = payslip._rule_parameter('gec_ge_pension_rates')['employer'] / 100
+result = categories['GROSS'] * pension_rate
+            </field>
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_benefits')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+        <record id="rule_geo_benefits_net" model="hr.salary.rule">
+            <field name="category_ids" eval="[(6, 0, [ref('hr_payroll.NET')])]"/>
+            <field name="name">Net Salary</field>
+            <field name="sequence">200</field>
+            <field name="code">NET</field>
+            <field name="appears_on_employee_cost_dashboard" eval="True"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories['BASIC'] + categories['ALW'] + categories['DED'] + categories['ADV']
+explanation_info = payslip.gec_net_explanation(categories['BASIC'] + categories['ALW'], -categories['DED'], categories['ADV'], result)</field>
+            <field name="explanation_template">{explanation}</field>
+            <field name="employee_move_line" eval="True"/>
+            <field name="struct_ids" eval="[(6, 0, [ref('structure_geo_benefits')])]"/>
+            <field name="country_id" ref="base.ge"/>
+        </record>
+
+        <!-- Runs on install and every upgrade: the base structures are noupdate, so input types are linked in code. -->
+
+        <!-- Re-run the account configurator: on a fresh install the earlier call ran before these rules existed. -->
+        <function model="account.chart.template" name="_gec_configure_ge_payroll_accounts"/>
+
+    </data>
+</odoo>

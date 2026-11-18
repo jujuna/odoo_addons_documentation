@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_bsc_objective_list" model="ir.ui.view">
+        <field name="name">bsc.objective.list</field>
+        <field name="model">bsc.objective</field>
+        <field name="arch" type="xml">
+            <list string="Objectives"
+                  decoration-danger="status == 'red'"
+                  decoration-warning="status == 'amber'"
+                  decoration-muted="status == 'no_data'">
+                <field name="perspective_sequence" column_invisible="1"/>
+                <field name="scorecard_id" optional="show" options="{'no_quick_create': True}" />
+                <field name="code" optional="show"/>
+                <field name="perspective_id" options="{'no_create': True}" />
+                <field name="name"/>
+                <field name="assessment_mode" optional="hide"/>
+                <field name="owner_id" widget="many2one_avatar_user" options="{'no_create': True}" />
+                <field name="weight" sum="Total weight"/>
+                <field name="kpi_count" string="KPIs"/>
+                <field name="initiative_count" string="Initiatives" optional="show"/>
+                <field name="score" digits="[16,1]"/>
+                <field name="status" widget="badge"
+                       decoration-success="status == 'green'"
+                       decoration-warning="status == 'amber'"
+                       decoration-danger="status == 'red'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bsc_objective_kanban" model="ir.ui.view">
+        <field name="name">bsc.objective.kanban</field>
+        <field name="model">bsc.objective</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="perspective_id" quick_create="false">
+                <field name="status"/>
+                <field name="color"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between">
+                            <strong>
+                                <field name="code" class="me-1"/>
+                                <field name="name"/>
+                            </strong>
+                            <field name="status" widget="badge"
+                                   decoration-success="status == 'green'"
+                                   decoration-warning="status == 'amber'"
+                                   decoration-danger="status == 'red'"/>
+                        </div>
+                        <div class="mt-2">
+                            <span>Score </span><strong><field name="score" digits="[16,1]"/>%</strong>
+                            <span class="text-muted ms-2">weight <field name="weight"/>%</span>
+                        </div>
+                        <div class="text-muted">
+                            <field name="kpi_count"/> KPI(s),
+                            <field name="initiative_count"/> initiative(s)
+                        </div>
+                        <footer>
+                            <field name="owner_id" widget="many2one_avatar_user" options="{'no_create': True}" />
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_bsc_objective_form" model="ir.ui.view">
+        <field name="name">bsc.objective.form</field>
+        <field name="model">bsc.objective</field>
+        <field name="arch" type="xml">
+            <form string="Strategic Objective">
+                <header>
+                    <button name="action_create_corrective_initiative" type="object"
+                            string="Corrective Initiative" class="btn-primary"
+                            invisible="status != 'red'"
+                            help="An off-track objective with no action behind it is just a red cell."/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_kpis" type="object"
+                                class="oe_stat_button" icon="speed">
+                            <field name="kpi_count" widget="statinfo" string="KPIs"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1 class="d-flex gap-2 align-items-baseline">
+                            <field name="code" placeholder="F1" class="o_bsc_objective_code"
+                                   readonly="not bsc_can_manage"/>
+                            <field name="name" placeholder="e.g. Improve customer retention"
+                                   readonly="not bsc_can_manage"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="bsc_can_manage" invisible="1"/>
+                            <field name="scorecard_id" options="{'no_quick_create': True}"
+                                   readonly="not bsc_can_manage"/>
+                            <field name="perspective_id" options="{'no_create': True}"
+                                   readonly="not bsc_can_manage"/>
+                            <field name="owner_id" widget="many2one_avatar_user" options="{'no_create': True}"
+                                   readonly="not bsc_can_manage"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="weight" readonly="not bsc_can_manage"/>
+                            <field name="assessment_mode" widget="radio" readonly="not bsc_can_manage"/>
+                            <label for="score"/>
+                            <div class="o_row">
+                                <field name="score" digits="[16,1]" class="oe_inline"/>
+                                <span class="oe_inline">%</span>
+                                <field name="status" widget="badge" class="ms-2"
+                                       decoration-success="status == 'green'"
+                                       decoration-warning="status == 'amber'"
+                                       decoration-danger="status == 'red'"/>
+                            </div>
+                        </group>
+                    </group>
+                    <group string="Qualitative Assessment"
+                           invisible="assessment_mode != 'qualitative'">
+                        <p class="text-muted" colspan="2">
+                            Not every objective becomes a number. This one is rated by its
+                            owner each period; no KPI is required.
+                        </p>
+                        <field name="qualitative_status" widget="radio" options="{'horizontal': true}"/>
+                        <field name="qualitative_note"
+                               required="qualitative_status == 'red'"
+                               placeholder="What is happening, and what is being done about it."/>
+                    </group>
+                    <notebook>
+                        <page string="KPIs" name="kpis" invisible="assessment_mode != 'kpi'">
+                            <p class="text-muted mb-2">
+                                One or two measures are plenty. Fill a line per KPI: what
+                                is measured, the unit, which direction is good, the target
+                                and who reports it. The arrow opens the full KPI form.
+                            </p>
+                            <field name="kpi_ids" context="{'default_objective_id': id}"
+                                   readonly="not bsc_can_manage">
+                                <list editable="bottom" open_form_view="True">
+                                    <field name="name"/>
+                                    <field name="uom_name" placeholder="%, GEL, days"/>
+                                    <field name="direction"/>
+                                    <field name="default_target"
+                                           invisible="direction == 'target_range'"/>
+                                    <field name="target_min" optional="hide"
+                                           invisible="direction != 'target_range'"
+                                           required="direction == 'target_range'"/>
+                                    <field name="target_max" optional="hide"
+                                           invisible="direction != 'target_range'"
+                                           required="direction == 'target_range'"/>
+                                    <field name="owner_id" widget="many2one_avatar_user" options="{'no_create': True}" />
+                                    <field name="weight" sum="Total weight" optional="show"/>
+                                    <field name="current_target" string="Current Target" optional="hide"/>
+                                    <field name="current_actual" string="Actual" optional="show"/>
+                                    <field name="current_achievement" string="Achievement %"
+                                           digits="[16,1]" optional="hide"/>
+                                    <button name="action_open_current_measurement" type="object"
+                                            string="Figure" icon="keyboard"
+                                            title="Enter or change this period's figure"/>
+                                    <field name="current_status" widget="badge"
+                                           decoration-success="current_status == 'green'"
+                                           decoration-warning="current_status == 'amber'"
+                                           decoration-danger="current_status == 'red'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Strategy Map" name="map">
+                            <p class="text-muted">
+                                These links are hypotheses, not facts. Write down what you
+                                believe drives what, then check it against the data later -
+                                the assumed cause-and-effect chain is the part of this
+                                method that most often turns out to be wrong.
+                            </p>
+                            <separator string="This objective contributes to"/>
+                            <field name="link_out_ids" context="{'default_source_id': id}"
+                                   readonly="not bsc_can_manage">
+                                <list editable="bottom">
+                                    <field name="target_id" string="Effect"
+                                           options="{'no_create': True}"
+                                           domain="[('scorecard_id', '=', parent.scorecard_id), ('id', '!=', parent.id)]"/>
+                                    <field name="hypothesis"/>
+                                    <field name="strength"/>
+                                    <field name="validated" widget="boolean_toggle"/>
+                                </list>
+                            </field>
+                            <separator string="This objective is driven by"/>
+                            <field name="link_in_ids" context="{'default_target_id': id}"
+                                   readonly="not bsc_can_manage">
+                                <list editable="bottom">
+                                    <field name="source_id" string="Cause"
+                                           options="{'no_create': True}"
+                                           domain="[('scorecard_id', '=', parent.scorecard_id), ('id', '!=', parent.id)]"/>
+                                    <field name="hypothesis"/>
+                                    <field name="strength"/>
+                                    <field name="validated" widget="boolean_toggle"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Initiatives" name="initiatives">
+                            <field name="initiative_ids" readonly="not bsc_can_manage">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="stage_id" options="{'no_create': True}" />
+                                    <field name="owner_id" widget="many2one_avatar_user" options="{'no_create': True}" />
+                                    <field name="date_end"/>
+                                    <field name="progress" widget="progressbar"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Description" name="description">
+                            <field name="description" nolabel="1" readonly="not bsc_can_manage"
+                                   placeholder="What this objective means in practice, and how you will know it was achieved."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bsc_objective_search" model="ir.ui.view">
+        <field name="name">bsc.objective.search</field>
+        <field name="model">bsc.objective</field>
+        <field name="arch" type="xml">
+            <search string="Objectives">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="scorecard_id"/>
+                <field name="perspective_id"/>
+                <field name="owner_id"/>
+                <filter name="filter_mine" string="My Objectives"
+                        domain="[('owner_id', '=', uid)]"/>
+                <separator/>
+                <filter name="filter_red" string="Off Track" domain="[('status', '=', 'red')]"/>
+                <filter name="filter_amber" string="At Risk" domain="[('status', '=', 'amber')]"/>
+                <filter name="filter_no_data" string="No Data"
+                        domain="[('status', '=', 'no_data')]"/>
+                <separator/>
+                <filter name="filter_active_card" string="Active Scorecard"
+                        domain="[('scorecard_id.state', '=', 'active')]"/>
+                <group>
+                    <filter name="group_perspective" string="Perspective"
+                            context="{'group_by': 'perspective_id'}"/>
+                    <filter name="group_scorecard" string="Scorecard"
+                            context="{'group_by': 'scorecard_id'}"/>
+                    <filter name="group_owner" string="Owner"
+                            context="{'group_by': 'owner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bsc_objective" model="ir.actions.act_window">
+        <field name="name">Objectives</field>
+        <field name="res_model">bsc.objective</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_bsc_objective_search"/>
+        <field name="context">{'search_default_filter_active_card': 1}</field>
+    </record>
+
+</odoo>

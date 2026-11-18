@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_tbc_root"
+              name="TBC Bank"
+              sequence="90"
+              web_icon="tbc_bank,static/description/icon.png"
+              groups="tbc_bank.group_tbc_user"/>
+
+    <menuitem id="menu_tbc_payments"
+              name="Transfers"
+              parent="menu_tbc_root"
+              action="action_tbc_payment"
+              sequence="5"/>
+
+    <menuitem id="menu_tbc_pending_approval"
+              name="Pending Approval"
+              parent="menu_tbc_root"
+              action="action_tbc_pending_approval"
+              sequence="6"/>
+
+    <menuitem id="menu_tbc_connection"
+              name="Connections"
+              parent="menu_tbc_root"
+              action="action_tbc_connection"
+              sequence="10"/>
+
+    <menuitem id="menu_tbc_statement_import"
+              name="Import Statement"
+              parent="menu_tbc_root"
+              action="action_tbc_statement_import"
+              sequence="15"/>
+
+    <menuitem id="menu_tbc_statement"
+              name="Statements"
+              parent="menu_tbc_root"
+              action="action_tbc_statement"
+              sequence="17"/>
+
+    <menuitem id="menu_tbc_statement_fetch"
+              name="Fetch Statement"
+              parent="menu_tbc_root"
+              action="action_tbc_statement_fetch"
+              sequence="18"/>
+
+    <menuitem id="menu_tbc_approval"
+              name="Approvers"
+              parent="menu_tbc_root"
+              action="action_tbc_approval"
+              groups="tbc_bank.group_tbc_manager"
+              sequence="19"/>
+
+    <menuitem id="menu_tbc_api_log"
+              name="API Logs"
+              parent="menu_tbc_root"
+              action="action_tbc_api_log"
+              groups="tbc_bank.group_tbc_manager"
+              sequence="20"/>
+</odoo>

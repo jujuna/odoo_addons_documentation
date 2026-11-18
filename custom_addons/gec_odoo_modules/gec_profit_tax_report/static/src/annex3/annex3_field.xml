@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="gec_profit_tax_report.RsCitAnnex3Field">
+        <table class="o_rs_cit_annex3">
+            <thead>
+                <tr>
+                    <th rowspan="2">შინაარსი</th>
+                    <th rowspan="2">
+                        <div class="d-flex align-items-start gap-2">
+                            <span>საანგარიშო პერიოდის საწყისი ნაშთი</span>
+                            <span class="o_rs_cit_help" title="საანგარიშო თვის საწყისი თარიღის მდგომარეობით">?</span>
+                        </div>
+                    </th>
+                    <th colspan="2">ზრდა საანგარიშო პერიოდში</th>
+                    <th colspan="2">შემცირება საანგარიშო პერიოდში</th>
+                    <th rowspan="2">
+                        <div class="d-flex align-items-start gap-2">
+                            <span>საანგარიშო პერიოდის საბოლოო ნაშთი</span>
+                            <span class="o_rs_cit_help" title="საანგარიშო თვის ბოლო თარიღის მდგომარეობით">?</span>
+                        </div>
+                    </th>
+                </tr>
+                <tr>
+                    <th>სულ</th>
+                    <th>მათ შორის, გადაფასება</th>
+                    <th>სულ</th>
+                    <th>მათ შორის, გადაფასება</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr t-foreach="this.records" t-as="rec" t-key="rec.id">
+                    <td class="o_rs_cit_annex3_name" t-out="rec.data.name"/>
+                    <td t-foreach="['amount1', 'amount2', 'amount3', 'amount4', 'amount5']" t-as="fname" t-key="fname">
+                        <t t-if="!['amount3', 'amount5'].includes(fname) or this.hasRevaluation(rec)">
+                            <div t-if="!this.props.readonly" class="o_rs_cit_box o_rs_cit_box_typed">
+                                <input type="text" class="o_rs_cit_input" inputmode="decimal"
+                                       t-att-value="this.format(rec.data[fname])"
+                                       t-on-change="(ev) => this.onChange(rec, fname, ev)"/>
+                            </div>
+                            <div t-else="" class="o_rs_cit_box o_rs_cit_box_locked">
+                                <span t-out="this.format(rec.data[fname])"/>
+                                <i class="oi o_rs_cit_lock" data-icon="lock"/>
+                            </div>
+                        </t>
+                    </td>
+                    <td>
+                        <div class="o_rs_cit_box o_rs_cit_box_locked">
+                            <span t-out="this.format(this.closing(rec))"/>
+                            <i class="oi o_rs_cit_lock" data-icon="lock"/>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </t>
+
+</templates>

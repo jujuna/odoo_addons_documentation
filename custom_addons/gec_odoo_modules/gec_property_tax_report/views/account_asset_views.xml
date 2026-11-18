@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_account_asset_form_rs_form15" model="ir.ui.view">
+        <field name="name">account.asset.form.rs.form15</field>
+        <field name="model">account.asset</field>
+        <field name="inherit_id" ref="account_asset.view_account_asset_form"/>
+        <field name="arch" type="xml">
+            <field name="model_id" position="after">
+                <field name="rs_form15_is_land"
+                       invisible="method != 'no_depreciation' and not rs_form15_is_land"
+                       readonly="rs_form15_land_plot_ids or not is_main_variant"
+                       groups="account.group_account_user"/>
+            </field>
+            <notebook position="inside">
+                <page string="Land Plot" name="rs_form15_land_plot"
+                      invisible="not rs_form15_is_land or context.get('rs_form15_land_plot_id')"
+                      groups="account.group_account_user">
+                    <field name="rs_form15_land_plot_ids" create="not rs_form15_land_plot_ids"
+                           context="{'default_name': name, 'default_company_id': company_id}">
+                        <list editable="bottom">
+                            <field name="land_territory_id" widget="rs_form15_land_territory"/>
+                            <field name="land_type_id"/>
+                            <field name="name"/>
+                            <field name="area"/>
+                            <field name="unit"/>
+                            <field name="exemption_basis_id"
+                                   domain="['|', ('valid_to', '=', False), ('valid_to', '&gt;=', context_today().year - 1)]"
+                                   placeholder="შეღავათით არ ვსარგებლობ"/>
+                            <field name="taxable_area" readonly="not exemption_basis_id"/>
+                            <field name="supporting_document" optional="show"/>
+                            <field name="note" optional="hide"/>
+                            <field name="company_id" column_invisible="True"/>
+                        </list>
+                    </field>
+                </page>
+                <page string="Property Tax" name="rs_form15"
+                      groups="account.group_account_user">
+                    <group>
+                        <group string="Declaration">
+                            <field name="rs_form15_excluded"/>
+                            <field name="rs_form15_property_type_id"
+                                   readonly="rs_form15_excluded"/>
+                            <field name="rs_form15_territory_id"
+                                   readonly="rs_form15_excluded"/>
+                        </group>
+                        <group string="Exemption" invisible="rs_form15_excluded">
+                            <field name="rs_form15_exemption_basis_id"
+                                   domain="['|', ('valid_to', '=', False), ('valid_to', '&gt;=', context_today().year - 1)]"
+                                   placeholder="შეღავათით არ ვსარგებლობ"/>
+                            <field name="rs_form15_exemption_amount"
+                                   readonly="not rs_form15_exemption_basis_id" force_save="1"/>
+                            <field name="rs_form15_international_company_months"
+                                   readonly="not rs_form15_exemption_basis_id" force_save="1"/>
+                        </group>
+                        <group string="Revaluation Coefficient" invisible="rs_form15_excluded">
+                            <field name="rs_form15_revaluation_model_applied"/>
+                            <field name="rs_form15_last_audit_date"
+                                   required="rs_form15_revaluation_model_applied"
+                                   invisible="not rs_form15_revaluation_model_applied"/>
+                        </group>
+                        <group string="Leasing" invisible="rs_form15_excluded">
+                            <field name="rs_form15_leased_out"/>
+                            <field name="rs_form15_leased_out_base_value"
+                                   invisible="not rs_form15_leased_out"/>
+                        </group>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+    <record id="view_account_asset_list_rs_form15" model="ir.ui.view">
+        <field name="name">account.asset.list.rs.form15</field>
+        <field name="model">account.asset</field>
+        <field name="inherit_id" ref="account_asset.view_account_asset_tree"/>
+        <field name="arch" type="xml">
+            <field name="main_variant_state" position="before">
+                <field name="rs_form15_property_type_id" optional="hide"
+                       readonly="state not in ['draft', 'open']"/>
+                <field name="rs_form15_territory_id" optional="hide"
+                       readonly="state not in ['draft', 'open']"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_account_depreciation_model_form_rs_form15" model="ir.ui.view">
+        <field name="name">account.depreciation.model.form.rs.form15</field>
+        <field name="model">account.depreciation.model</field>
+        <field name="inherit_id" ref="account_asset.view_account_depreciation_model_form"/>
+        <field name="arch" type="xml">
+            <field name="method" position="after">
+                <field name="rs_form15_property_type_id" options="{'no_create': True}"
+                       groups="account.group_account_user"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_res_company_form_rs_form15" model="ir.ui.view">
+        <field name="name">res.company.form.rs.form15</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <field name="currency_id" position="after">
+                <field name="rs_form15_is_leasing_company"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,44 @@
+// Bank colours on a bank app only (menu line, primary buttons, search focus, current status step); rgba tints
+// read in light and dark mode. Off on the enterprise home menu, which keeps the last app as current.
+// The --gec-app-* variables hand the bank colors to gec_brand_kit's frames; without that module nothing reads them.
+@mixin gec-bank-app-theme($app, $brand, $button, $hover, $active, $disabled) {
+    body[data-gec-bank-app="#{$app}"]:not(.o_home_menu_background) {
+        --gec-app-primary: #{$button};
+        --gec-app-accent: #{$brand};
+        --gec-app-action: #{$button};
+        --gec-app-navbar: #{$button};
+
+        .o_main_navbar {
+            box-shadow: inset 0 -3px 0 $brand;
+
+            .o_menu_brand {
+                color: var(--gec-app-navbar-text, #{$brand});
+            }
+        }
+
+        .btn-primary {
+            --#{$prefix}btn-color: #{$white};
+            --#{$prefix}btn-bg: #{$button};
+            --#{$prefix}btn-border-color: #{$button};
+            --#{$prefix}btn-hover-color: #{$white};
+            --#{$prefix}btn-hover-bg: #{$hover};
+            --#{$prefix}btn-hover-border-color: #{$hover};
+            --#{$prefix}btn-active-color: #{$white};
+            --#{$prefix}btn-active-bg: #{$active};
+            --#{$prefix}btn-active-border-color: #{$active};
+            --#{$prefix}btn-disabled-color: #{$white};
+            --#{$prefix}btn-disabled-bg: #{$disabled};
+            --#{$prefix}btn-disabled-border-color: #{$disabled};
+            --#{$prefix}btn-focus-shadow-rgb: #{to-rgb($button)};
+        }
+
+        .o_searchview:focus-within {
+            border-color: $brand;
+        }
+
+        .o_arrow_button_current {
+            --#{$prefix}btn-disabled-bg: #{rgba($brand, .16)};
+            --#{$prefix}btn-disabled-border-color: #{$brand};
+        }
+    }
+}

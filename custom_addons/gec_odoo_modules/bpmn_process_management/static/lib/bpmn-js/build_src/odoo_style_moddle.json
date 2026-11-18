@@ -1,0 +1,68 @@
+{
+  "name": "OdooStyle",
+  "prefix": "odoostyle",
+  "uri": "http://gecbusiness.com/schema/bpmn/odoo-style/1.0",
+  "xml": {},
+  "associations": [],
+  "types": [
+    {
+      "name": "TextStyle",
+      "isAbstract": true,
+      "extends": [
+        "bpmndi:BPMNShape",
+        "bpmndi:BPMNEdge"
+      ],
+      "properties": [
+        {
+          "name": "fontSize",
+          "isAttr": true,
+          "type": "Real"
+        },
+        {
+          "name": "fontWeight",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "fontStyle",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "textDecoration",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "textAlign",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "group",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "locked",
+          "isAttr": true,
+          "type": "Boolean"
+        }
+      ]
+    },
+    {
+      "name": "DiagramText",
+      "isAbstract": true,
+      "extends": [
+        "bpmndi:BPMNPlane"
+      ],
+      "properties": [
+        {
+          "name": "baseFontSize",
+          "isAttr": true,
+          "type": "Real"
+        }
+      ]
+    }
+  ]
+}

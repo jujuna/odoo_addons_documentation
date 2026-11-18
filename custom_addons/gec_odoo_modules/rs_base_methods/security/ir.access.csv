@@ -1,0 +1,7 @@
+id,name,model_id,group_id/id,operation,domain
+access_rs_auth_pin_wizard,rs.auth.pin.wizard user,rs.auth.pin.wizard,base.group_user,crud,
+access_rs_einvoice_waybill_link_read,rs.einvoice.waybill.link read,rs.einvoice.waybill.link,base.group_user,r,
+access_rs_einvoice_waybill_link_invoice,rs.einvoice.waybill.link invoice,rs.einvoice.waybill.link,account.group_account_invoice,crud,
+rule_rs_einvoice_waybill_link_company,rs.einvoice.waybill.link: multi-company,rs.einvoice.waybill.link,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+access_rs_invoice_from_waybill_wizard,rs.invoice.from.waybill.wizard,rs.invoice.from.waybill.wizard,base.group_user,crud,
+access_rs_invoice_from_waybill_wizard_line,rs.invoice.from.waybill.wizard.line,rs.invoice.from.waybill.wizard.line,base.group_user,crud,

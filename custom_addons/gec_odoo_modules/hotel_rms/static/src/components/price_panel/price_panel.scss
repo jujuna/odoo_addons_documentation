@@ -1,0 +1,122 @@
+@keyframes o_rms_panel_in {
+    from { opacity: 0; transform: translateX(8px); }
+}
+
+.o_rms_panel {
+    width: var(--rms-panel-width, 400px);
+    height: 100%;
+    overflow-y: auto;
+    border-left: 1px solid var(--rms-border);
+    background: var(--rms-surface);
+    font-variant-numeric: tabular-nums;
+    animation: o_rms_panel_in 150ms ease;
+
+    .o_rms_min0 { min-width: 0; }
+    .o_rms_panel_header, .o_rms_panel_section { padding: 16px 24px; }
+    .o_rms_panel_header {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        background: var(--rms-surface);
+        border-bottom: 1px solid var(--rms-border);
+    }
+    .o_rms_panel_section + .o_rms_panel_section { border-top: 1px solid var(--rms-subtle); }
+    .o_rms_panel_title { font-size: 1.125rem; font-weight: 600; margin: 0; }
+    .o_rms_panel_heading {
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--rms-muted);
+    }
+    .o_rms_progress { font-size: 0.75rem; color: var(--rms-accent-text); font-weight: 600; }
+    .o_rms_handle {
+        width: 40px;
+        height: 4px;
+        margin: 8px auto 0;
+        border-radius: 2px;
+        background: var(--rms-border);
+        touch-action: none;
+        cursor: grab;
+    }
+    .o_rms_hero { display: flex; align-items: center; gap: 16px; }
+    .o_rms_hero .o_rms_price_change { align-items: flex-start; }
+    .o_rms_hero .o_rms_pc_price { font-size: 2rem; line-height: 1.2; }
+    .o_rms_badge {
+        padding: 0 8px;
+        border-radius: 999px;
+        background: var(--rms-subtle);
+        color: var(--rms-muted);
+        font-size: 0.75rem;
+    }
+    .o_rms_badge_pending { background: var(--rms-accent-soft); color: var(--rms-accent-text); }
+    .o_rms_badge_accepted { background: var(--rms-success-soft); color: var(--rms-success); }
+    .o_rms_badge_edited { background: var(--rms-info-soft); color: var(--rms-info); }
+    .o_rms_sentences { padding-left: 16px; margin: 0 0 16px; }
+    .o_rms_facts {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px 16px;
+        margin: 0;
+        dt { font-weight: 400; color: var(--rms-muted); }
+        dd { margin: 0; text-align: end; }
+    }
+    .o_rms_history { list-style: none; padding: 0; margin: 0; li + li { margin-top: 8px; } }
+}
+
+@media (min-width: 768px) and (max-width: 1199.98px) {
+    .o_rms_calendar { --rms-panel-width: 480px; }
+}
+
+@media (max-width: 767.98px) {
+    .o_rms_panel {
+        width: 100%;
+        height: 55dvh;
+        transition: height 200ms ease;
+        &.o_rms_sheet_full { height: 92dvh; }
+        padding-bottom: env(safe-area-inset-bottom);
+        border-left: 0;
+        border-top: 1px solid var(--rms-border);
+        border-radius: 16px 16px 0 0;
+        box-shadow: 0 -4px 16px rgba(black, 0.2);
+        animation: none;
+        .o_rms_panel_header, .o_rms_panel_section { padding: 12px 16px; }
+        .o_rms_actions {
+            position: sticky;
+            bottom: 0;
+            z-index: 2;
+            background: var(--rms-surface);
+            border-top: 1px solid var(--rms-border);
+            padding-bottom: calc(12px + env(safe-area-inset-bottom));
+        }
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .o_rms_panel { animation: none; }
+}
+
+.o_rms_price_form_panel .o_rms_panel {
+    width: 100%;
+    max-width: none;
+    height: auto;
+    overflow: visible;
+    border: 0;
+    box-shadow: none;
+    animation: none;
+    .o_rms_panel_header { position: static; padding-left: 0; padding-right: 0; }
+    .o_rms_panel_section { padding-left: 0; padding-right: 0; }
+}
+
+@media (min-width: 992px) {
+    .o_rms_price_form_panel .o_rms_panel {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 32px;
+        > * { grid-column: 1 / -1; }
+        > .o_rms_panel_why, > .o_rms_panel_forecast { grid-column: auto; }
+    }
+}

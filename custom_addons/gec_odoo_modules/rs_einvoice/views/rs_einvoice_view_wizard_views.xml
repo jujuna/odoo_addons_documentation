@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_rs_einvoice_view_wizard_form" model="ir.ui.view">
+        <field name="name">rs.einvoice.view.wizard.form</field>
+        <field name="model">rs.einvoice.view.wizard</field>
+        <field name="arch" type="xml">
+            <form string="ანგარიშ-ფაქტურა (RS)">
+                <div class="rse-tab rse-snapshot">
+
+                    <div class="rse-id-bar">
+                        <span>ID-<field name="rs_invoice_id" nolabel="1" readonly="1" class="d-inline"/></span>
+                        <field name="rs_status" widget="badge" nolabel="1" readonly="1"
+                               decoration-success="rs_status in ('2', '8')"
+                               decoration-warning="rs_status in ('1', '5', '6')"
+                               decoration-danger="rs_status in ('-1', '7')"
+                               decoration-info="rs_status in ('0', '4')"
+                               decoration-muted="rs_status == '3'"/>
+                    </div>
+
+                    <div class="rse-section-title">ძირითადი ინფორმაცია</div>
+                    <div class="rse-row">
+                        <div class="rse-field">
+                            <span class="rse-label">შექმნა</span>
+                            <div class="rse-value">
+                                <field name="created_label" nolabel="1" readonly="1"/>
+                            </div>
+                        </div>
+                        <div class="rse-field">
+                            <span class="rse-label">ოპერაციის თვე</span>
+                            <div class="rse-value">
+                                <field name="operation_month" nolabel="1" readonly="1"/>
+                            </div>
+                        </div>
+                        <div class="rse-field">
+                            <span class="rse-label">ოპერაციის წელი</span>
+                            <div class="rse-value">
+                                <field name="operation_year" nolabel="1" readonly="1"/>
+                            </div>
+                        </div>
+                        <div class="rse-field">
+                            <span class="rse-label">ა/ფ ნომერი</span>
+                            <div class="rse-value">
+                                <field name="invoice_number" nolabel="1" readonly="1"/>
+                            </div>
+                        </div>
+                        <div class="rse-field">
+                            <span class="rse-label">დეკლარაციის ნომერი</span>
+                            <div class="rse-value">
+                                <field name="declaration_number" nolabel="1" readonly="1"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rse-parties">
+                        <div class="rse-party">
+                            <div class="rse-section-title">გამყიდველი</div>
+                            <div class="rse-row">
+                                <div class="rse-field">
+                                    <span class="rse-label">საიდენტ. №</span>
+                                    <div class="rse-value">
+                                        <field name="seller_tin" nolabel="1" readonly="1"/>
+                                    </div>
+                                </div>
+                                <div class="rse-field" style="flex: 1;">
+                                    <span class="rse-label">ორგანიზაციის დასახელება</span>
+                                    <div class="rse-value">
+                                        <field name="seller_name" nolabel="1" readonly="1"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rse-party">
+                            <div class="rse-section-title">მყიდველი</div>
+                            <div class="rse-row">
+                                <div class="rse-field">
+                                    <span class="rse-label">საიდენტ. №</span>
+                                    <div class="rse-value">
+                                        <field name="buyer_tin" nolabel="1" readonly="1"/>
+                                    </div>
+                                </div>
+                                <div class="rse-field" style="flex: 1;">
+                                    <span class="rse-label">ორგანიზაციის დასახელება</span>
+                                    <div class="rse-value">
+                                        <field name="buyer_name" nolabel="1" readonly="1"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rse-section-title">საქონელი / მომსახურება</div>
+                    <field name="goods_line_ids" nolabel="1" readonly="1">
+                        <list create="false" delete="false">
+                            <field name="name" string="საქონელი / მომსახურება"/>
+                            <field name="unit" string="ზომის ერთეული"/>
+                            <field name="quantity" string="რაოდ." sum="ჯამი"/>
+                            <field name="full_amount" string="ღირებულება დღგ და აქციზის ჩათვლით" sum="ჯამი"/>
+                            <field name="taxation" string="დაბეგვრა"/>
+                            <field name="vat_amount" string="დღგ" sum="ჯამი"/>
+                            <field name="excise_amount" string="აქციზი" sum="ჯამი"/>
+                        </list>
+                    </field>
+
+                    <div class="rse-section-title">ზედნადებები</div>
+                    <field name="waybill_line_ids" nolabel="1" readonly="1">
+                        <list create="false" delete="false">
+                            <field name="wb_number" string="ზედნადების №"/>
+                            <field name="wb_date" string="თარიღი"/>
+                        </list>
+                    </field>
+
+                    <div class="rse-section-title">ავანსის ანგარიშ-ფაქტურები</div>
+                    <field name="advance_line_ids" nolabel="1" readonly="1">
+                        <list create="false" delete="false">
+                            <field name="adv_series" string="სერია / ნომერი"/>
+                            <field name="adv_date" string="თარიღი"/>
+                            <field name="adv_vat" string="დღგ-ს თანხა" sum="ჯამი"/>
+                        </list>
+                    </field>
+
+                    <div class="rse-row">
+                        <div class="rse-field">
+                            <span class="rse-label">სულ დასარიცხი დღგ-ს თანხა</span>
+                            <div class="rse-value">
+                                <field name="total_vat_charge" nolabel="1" readonly="1"/>
+                            </div>
+                        </div>
+                        <div class="rse-field">
+                            <span class="rse-label">სულ შესამცირებელი დღგ-ს თანხა</span>
+                            <div class="rse-value">
+                                <field name="total_vat_reduce" nolabel="1" readonly="1"/>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <footer>
+                    <button string="დახურვა" class="btn-primary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

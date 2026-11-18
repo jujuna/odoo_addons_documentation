@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="employee_registry_rs_browser_view_form" model="ir.ui.view">
+        <field name="name">employee.registry.rs.browser.form</field>
+        <field name="model">employee.registry.rs.browser</field>
+        <field name="arch" type="xml">
+            <form string="RS Employee Browser">
+                <sheet>
+                    <group string="Filters">
+                        <group>
+                            <field name="filter_tin" placeholder="e.g. 01001081142"/>
+                            <field name="filter_fullname" placeholder="e.g. მარიამ"/>
+                            <field name="filter_status"/>
+                        </group>
+                        <group>
+                            <field name="filter_citizenship" placeholder="e.g. საქართველო"/>
+                            <field name="filter_max_rows"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_search"
+                                type="object"
+                                string="Search RS"
+                                class="btn-primary"
+                                icon="search"/>
+                        <button string="Close" special="cancel" class="btn-secondary"/>
+                    </footer>
+                    <group invisible="not has_results">
+                        <field name="total_count" readonly="1"/>
+                    </group>
+                    <field name="line_ids" nolabel="1" invisible="not has_results">
+                        <list create="false" edit="false" delete="false"
+                              decoration-success="in_odoo and status == '1'"
+                              decoration-warning="in_odoo and status != '1'"
+                              decoration-muted="not in_odoo">
+                            <field name="rs_id"/>
+                            <field name="tin"/>
+                            <field name="fullname"/>
+                            <field name="phone"/>
+                            <field name="status"/>
+                            <field name="status_txt"/>
+                            <field name="citizenship"/>
+                            <field name="gender_txt" optional="hide"/>
+                            <field name="birth_date" optional="hide"/>
+                            <field name="work_type_txt" optional="hide"/>
+                            <field name="create_date_rs" optional="hide"/>
+                            <field name="last_change_date"/>
+                            <field name="in_odoo" widget="boolean_toggle"/>
+                            <field name="matching_employee_id" optional="hide"/>
+                            <button name="action_open_in_odoo"
+                                    type="object"
+                                    string="Open"
+                                    icon="open_in_new"
+                                    invisible="not in_odoo"/>
+                            <button name="action_link_to_odoo"
+                                    type="object"
+                                    string="Link"
+                                    icon="link"
+                                    invisible="not in_odoo"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="employee_registry_rs_browser_action" model="ir.actions.act_window">
+        <field name="name">RS Employee Browser</field>
+        <field name="res_model">employee.registry.rs.browser</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="employee_registry_rs_browser_view_form"/>
+    </record>
+
+    <menuitem id="menu_employee_registry_rs_browser"
+              name="RS Employee Browser"
+              parent="hr.menu_human_resources_configuration"
+              action="employee_registry_rs_browser_action"
+              sequence="85"
+              groups="hr.group_hr_manager"/>
+</odoo>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_employee_registry_rs" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.employee.registry.rs</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="hr.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='hr']" position="inside">
+                <block title="RS Employee Registry" name="employee_registry_rs_settings">
+                    <setting string="Credentials"
+                             help="Per-user credentials are stored on each user. Open Settings > Users > Preferences > Revenue Service (rs.ge). The user the daily cron runs as must have RS Username and RS Password filled in.">
+                        <div class="text-muted">
+                            Per-user credentials live on Settings &gt; Users &gt; Preferences &gt; Revenue Service (rs.ge).
+                        </div>
+                    </setting>
+                    <setting string="Daily Sync"
+                             help="Master toggle for the daily sync cron. When off, the cron skips everything.">
+                        <field name="employee_registry_rs_sync_enabled"/>
+                    </setting>
+                    <setting string="Country Codes"
+                             help="Fetch RS country codes (3-digit numeric) and match them to Odoo countries by Georgian name. Uses the currently logged-in user's credentials.">
+                        <button name="action_employee_registry_rs_sync_countries"
+                                string="Sync Countries from RS"
+                                type="object"
+                                class="btn-secondary"
+                                icon="public"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

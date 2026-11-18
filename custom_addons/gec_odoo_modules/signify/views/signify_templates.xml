@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="signify_oauth_error" name="Signify connection error">
+        <t t-call-assets="web.assets_frontend" t-js="false"/>
+        <div class="py-5">
+            <div class="alert alert-warning w-50 mx-auto" role="alert">
+                <t t-out="error"/>
+                <br/>
+                <a class="btn btn-primary mt-3" href="/odoo/action-signify.action_signify_connection">Back to Signify Accounts</a>
+            </div>
+        </div>
+    </template>
+</odoo>

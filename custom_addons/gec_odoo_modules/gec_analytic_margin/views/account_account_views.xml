@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_account_form_margin_component" model="ir.ui.view">
+        <field name="name">account.account.form.margin.component</field>
+        <field name="model">account.account</field>
+        <field name="inherit_id" ref="account.view_account_form"/>
+        <field name="arch" type="xml">
+            <field name="account_type" position="after">
+                <field name="gec_margin_component_id"/>
+                <field name="gec_revenue_stream_id"
+                       invisible="account_type not in ('income', 'income_other')"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_account_list_margin_component" model="ir.ui.view">
+        <field name="name">account.account.list.margin.component</field>
+        <field name="model">account.account</field>
+        <field name="inherit_id" ref="account.view_account_list"/>
+        <field name="arch" type="xml">
+            <field name="account_type" position="after">
+                <field name="gec_margin_component_id" optional="show"/>
+                <field name="gec_revenue_stream_id" optional="hide"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

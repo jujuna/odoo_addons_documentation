@@ -1,0 +1,2212 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* bog_bank
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-02 15:27+0000\n"
+"PO-Revision-Date: 2026-10-02 15:27+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian (ka_GE)\n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#. module: bog_bank
+#: model:ir.module.module,description:base.module_bog_bank
+msgid ""
+"\n"
+"Sends payment orders to Bank of Georgia Business Online and imports account statements for\n"
+"reconciliation, using OAuth2 client credentials. Salaries are paid through Pay Salaries\n"
+"(gec_payroll_bank), where Bank of Georgia is one of the banks to choose.\n"
+"\n"
+"Setup, and the API differences from the TBC and Basis Bank modules: README.md in the module\n"
+"folder.\n"
+msgstr ""
+"\n"
+"აგზავნის საგადახდო დავალებებს საქართველოს ბანკის Business Online-ში და შემოაქვს ანგარიშის ამონაწერები\n"
+"შესაჯერებლად, OAuth2 კლიენტის მონაცემებით. ხელფასები იხდება „ხელფასების გადახდით“\n"
+"(gec_payroll_bank), სადაც საქართველოს ბანკი ერთ-ერთი ასარჩევი ბანკია.\n"
+"\n"
+"გამართვა და API-ის განსხვავებები TBC-ისა და ბაზისბანკის მოდულებისგან: README.md მოდულის\n"
+"საქაღალდეში.\n"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "%(count)s transfer(s) submitted as batch %(key)s."
+msgstr "%(count)s გადარიცხვა გაიგზავნა პაკეტად %(key)s."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid ""
+"%(user)s chose to submit this transfer again after Bank of Georgia warning "
+"%(code)s."
+msgstr ""
+"%(user)s-მა გადაწყვიტა, საქართველოს ბანკის გაფრთხილების (%(code)s) შემდეგ ეს"
+" გადარიცხვა ხელახლა გაეგზავნა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid ""
+"%s Bank of Georgia did not create the document. Fix the cause, then use "
+"'Create Anyway' to submit it again."
+msgstr ""
+"%s საქართველოს ბანკმა დოკუმენტი არ შექმნა. აღმოფხვერით მიზეზი, შემდეგ "
+"ხელახლა გასაგზავნად გამოიყენეთ „მაინც შექმნა“."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid ""
+"%s Check Business Online before doing anything else - the original document "
+"may already exist."
+msgstr ""
+"%s სანამ რამეს გააკეთებთ, შეამოწმეთ Business Online — თავდაპირველი დოკუმენტი"
+" შეიძლება უკვე არსებობდეს."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "%s file(s) uploaded to Bank of Georgia."
+msgstr "საქართველოს ბანკში აიტვირთა %s ფაილი."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/wizard/bog_statement_import_wizard.py:0
+msgid "%s new statement line(s) imported."
+msgstr "დაიმპორტდა ამონაწერის %s ახალი სტრიქონი."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid ""
+"%s reset this transfer to pending. A new send will reuse the same request id"
+" (UniqueId)."
+msgstr ""
+"%s-მა ეს გადარიცხვა მოლოდინში დააბრუნა. ახალი გაგზავნა იგივე მოთხოვნის "
+"იდენტიფიკატორს (UniqueId) გამოიყენებს."
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_bog_connection_form
+msgid "<span class=\"o_stat_text\">API Logs</span>"
+msgstr "<span class=\"o_stat_text\">API ჟურნალი</span>"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid ""
+"A batch cannot mix domestic and foreign transfers. BOG has a separate bulk "
+"endpoint for each."
+msgstr ""
+"ერთ პაკეტში შიდა და უცხოური გადარიცხვები ვერ გაერთიანდება. საქართველოს ბანკს"
+" თითოეულისთვის ცალკე მისამართი აქვს."
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__log_ids
+#: model:ir.ui.menu,name:bog_bank.menu_bog_api_log
+msgid "API Logs"
+msgstr "API ჟურნალი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__access_token
+msgid "Access Token"
+msgstr "წვდომის ტოკენი"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_bog_statement_form
+msgid "Account"
+msgstr "ანგარიში"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement__account_number
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement_import_wizard__account_number
+msgid "Account (IBAN)"
+msgstr "ანგარიში (IBAN)"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__message_needaction
+msgid "Action Needed"
+msgstr "საჭიროა მოქმედება"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_approval__active
+msgid "Active"
+msgstr "აქტიური"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment__bog_additional_information
+msgid "Additional Information"
+msgstr "დამატებითი ინფორმაცია"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__allow_self_approval
+msgid "Allow Self-Approval"
+msgstr "საკუთარი გადარიცხვის დამტკიცების ნებართვა"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "Ambiguous result (timeout/server error)."
+msgstr "შედეგი გაურკვეველია (დრო ამოიწურა/სერვერის შეცდომა)."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Ambiguous result (timeout/server error). Use Recover from BOG."
+msgstr ""
+"შედეგი გაურკვეველია (დრო ამოიწურა/სერვერის შეცდომა). გამოიყენეთ „ბანკიდან "
+"აღდგენა“."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/bog_connection.py:0
+msgid ""
+"An approver is required when processing mode is 'Approve in Odoo first'."
+msgstr ""
+"როდესაც დამუშავების რეჟიმია „ჯერ Odoo-ში დამტკიცება“, დამმტკიცებლის მითითება"
+" სავალდებულოა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid ""
+"An earlier send of this batch is not settled yet. Wait for the bank's "
+"status, recover the transfers whose outcome is unknown, or send the failed "
+"transfers from their own payment or in a new batch: %s"
+msgstr ""
+"ამ პაკეტის წინა გაგზავნა ჯერ არ დასრულებულა. დაელოდეთ ბანკის სტატუსს, "
+"აღადგინეთ გადარიცხვები, რომელთა შედეგიც უცნობია, ან წარუმატებელი "
+"გადარიცხვები გაგზავნეთ თავიანთი გადახდიდან ან ახალი პაკეტით: %s"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_bog_connection_form
+msgid "Approval"
+msgstr "დამტკიცება"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_batch_payment_form_bog
+msgid "Approve"
+msgstr "დამტკიცება"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__approval_id
+msgid "Approver"
+msgstr "დამმტკიცებელი"
+
+#. module: bog_bank
+#: model:ir.ui.menu,name:bog_bank.menu_bog_approval
+msgid "Approvers"
+msgstr "დამმტკიცებლები"
+
+#. module: bog_bank
+#: model:ir.actions.act_window,name:bog_bank.action_bog_approval
+msgid "Approvers & Delegates"
+msgstr "დამმტკიცებლები და უფლებამოსილი პირები"
+
+#. module: bog_bank
+#: model:ir.model.fields,help:bog_bank.field_account_payment__bog_check_inn
+msgid ""
+"Ask BOG to confirm the account belongs to the given ID. Only valid for "
+"transfers within Bank of Georgia."
+msgstr ""
+"სთხოვეთ ბანკს, დაადასტუროს, რომ ანგარიში მითითებულ საიდენტიფიკაციო კოდს "
+"ეკუთვნის. მოქმედებს მხოლოდ საქართველოს ბანკის შიგნით გადარიცხვებზე."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Attachment %s has no content to upload."
+msgstr "დანართს %s ასატვირთი შიგთავსი არ აქვს."
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__message_attachment_count
+msgid "Attachment Count"
+msgstr "დანართების რაოდენობა"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+msgid "Attachments"
+msgstr "დანართები"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/services/bog_service.py:0
+msgid "Authentication failed."
+msgstr "ავთენტიფიკაცია ვერ მოხერხდა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/bog_connection.py:0
+msgid "Authentication failed: %s"
+msgstr "ავთენტიფიკაცია ვერ მოხერხდა: %s"
+
+#. module: bog_bank
+#: model:ir.model.fields.selection,name:bog_bank.selection__account_payment__gec_bank_state__awaiting_confirmation
+msgid "Awaiting Confirmation"
+msgstr "დასადასტურებლად მოლოდინში"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_journal.py:0
+msgid "BANK OF GEORGIA"
+msgstr "საქართველოს ბანკი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment__bog_attachment_hashes
+msgid "BOG Attachment Hashes"
+msgstr "დანართების ჰეშები"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment__bog_attachment_ids
+msgid "BOG Attachments"
+msgstr "დანართები"
+
+#. module: bog_bank
+#: model:ir.module.module,shortdesc:base.module_bog_bank
+msgid "BOG Bank Integration"
+msgstr "საქართველოს ბანკის ინტეგრაცია"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_batch_payment__bog_bulk_key
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment__bog_bulk_key
+msgid "BOG Batch Key"
+msgstr "პაკეტის გასაღები ბანკში"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_batch_payment__bog_state
+msgid "BOG Batch State"
+msgstr "პაკეტის სტატუსი ბანკში"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_batch_payment__bog_error_message
+msgid "BOG Error"
+msgstr "ბანკის შეცდომა"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_batch_payment__bog_file_name
+msgid "BOG File Name"
+msgstr "პაკეტის ფაილის სახელი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_batch_payment__bog_processing_mode
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment__bog_processing_mode
+msgid "BOG Processing Mode"
+msgstr "დამუშავების რეჟიმი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment__bog_transfer_type
+msgid "BOG Transfer Type"
+msgstr "გადარიცხვის ტიპი"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/wizard/bog_statement_import_wizard.py:0
+msgid "BOG entry %s"
+msgstr "ბანკის ჩანაწერი %s"
+
+#. module: bog_bank
+#: model:ir.model.fields.selection,name:bog_bank.selection__account_payment__bog_dispatch_type__bulk
+msgid "BULK (standard, <= 10,000 GEL)"
+msgstr "BULK (სტანდარტული, არაუმეტეს 10 000 ლარისა)"
+
+#. module: bog_bank
+#: model:ir.module.category,name:bog_bank.module_category_bog
+#: model:res.groups.privilege,name:bog_bank.bog_privilege
+msgid "Bank Of Georgia"
+msgstr "საქართველოს ბანკი"
+
+#. module: bog_bank
+#: model:ir.model,name:bog_bank.model_bog_approval
+msgid "Bank Of Georgia Approver"
+msgstr "საქართველოს ბანკის დამმტკიცებელი"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+msgid "Bank References"
+msgstr "ბანკის იდენტიფიკატორები"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment__gec_bank_state
+msgid "Bank State"
+msgstr "ბანკის სტატუსი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_batch_payment__bog_bank_status
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment__bog_bank_status
+msgid "Bank Status (raw)"
+msgstr "ბანკის სტატუსი (დაუმუშავებელი)"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+#: code:addons/bog_bank/models/bog_connection.py:0
+#: code:addons/bog_bank/models/bog_sendable.py:0
+#: code:addons/bog_bank/wizard/bog_statement_import_wizard.py:0
+#: model:ir.ui.menu,name:bog_bank.menu_bog_root
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_journal_form_bog
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_batch_payment_form_bog
+msgid "Bank of Georgia"
+msgstr "საქართველოს ბანკი"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/wizard/bog_statement_import_wizard.py:0
+msgid "Bank of Georgia %(start)s - %(end)s"
+msgstr "საქართველოს ბანკი %(start)s - %(end)s"
+
+#. module: bog_bank
+#: model:ir.model,name:bog_bank.model_bog_api_log
+msgid "Bank of Georgia API Log"
+msgstr "საქართველოს ბანკის API ჟურნალი"
+
+#. module: bog_bank
+#: model:ir.actions.act_window,name:bog_bank.action_bog_api_log
+msgid "Bank of Georgia API Logs"
+msgstr "საქართველოს ბანკის API ჟურნალი"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_bog_approval_form
+msgid "Bank of Georgia Approver"
+msgstr "საქართველოს ბანკის დამმტკიცებელი"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_bog_approval_list
+msgid "Bank of Georgia Approvers"
+msgstr "საქართველოს ბანკის დამმტკიცებლები"
+
+#. module: bog_bank
+#: model:ir.model,name:bog_bank.model_bog_connection
+#: model:ir.model.fields,field_description:bog_bank.field_account_journal__bog_connection_id
+msgid "Bank of Georgia Connection"
+msgstr "საქართველოს ბანკის კავშირი"
+
+#. module: bog_bank
+#: model:ir.actions.act_window,name:bog_bank.action_bog_connection
+msgid "Bank of Georgia Connections"
+msgstr "საქართველოს ბანკის კავშირები"
+
+#. module: bog_bank
+#: model:ir.model,name:bog_bank.model_bog_service
+msgid "Bank of Georgia REST Client"
+msgstr "საქართველოს ბანკის REST კლიენტი"
+
+#. module: bog_bank
+#: model:ir.model,name:bog_bank.model_bog_sendable
+msgid "Bank of Georgia Sendable Mixin"
+msgstr "საქართველოს ბანკის გაგზავნის მიქსინი"
+
+#. module: bog_bank
+#: model:ir.model,name:bog_bank.model_bog_statement_import_wizard
+msgid "Bank of Georgia Statement Import"
+msgstr "საქართველოს ბანკის ამონაწერის იმპორტი"
+
+#. module: bog_bank
+#: model:ir.model,name:bog_bank.model_bog_statement
+msgid "Bank of Georgia Statement Snapshot"
+msgstr "საქართველოს ბანკის ამონაწერის ანაბეჭდი"
+
+#. module: bog_bank
+#: model:ir.actions.act_window,name:bog_bank.action_bog_statement
+msgid "Bank of Georgia Statements"
+msgstr "საქართველოს ბანკის ამონაწერები"
+
+#. module: bog_bank
+#: model:account.payment.method,name:bog_bank.account_payment_method_bog
+msgid "Bank of Georgia Transfer"
+msgstr "საქართველოს ბანკის გადარიცხვა"
+
+#. module: bog_bank
+#: model:ir.actions.act_window,name:bog_bank.action_bog_payment
+msgid "Bank of Georgia Transfers"
+msgstr "საქართველოს ბანკის გადარიცხვები"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid ""
+"Bank of Georgia already holds a document with this request id. Use 'Recover "
+"from BOG' to load it; do not create a new payment."
+msgstr ""
+"საქართველოს ბანკს ამ მოთხოვნის ID-ით დოკუმენტი უკვე აქვს. მის ჩასატვირთად "
+"გამოიყენეთ „ბანკიდან აღდგენა“; ახალი გადახდა არ შექმნათ."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/services/bog_service.py:0
+msgid "Bank of Georgia authentication failed: %s"
+msgstr "საქართველოს ბანკში ავთენტიფიკაცია ვერ მოხერხდა: %s"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+msgid ""
+"Bank of Georgia declined this document with a warning and did not create it."
+" Submit it again with the same request id?"
+msgstr ""
+"საქართველოს ბანკმა ეს დოკუმენტი გაფრთხილებით უარყო და არ შექმნა. გავაგზავნოთ"
+" ხელახლა იგივე მოთხოვნის იდენტიფიკატორით?"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid ""
+"Bank of Georgia did not confirm this batch. The transfers may or may not "
+"exist at the bank - recover each one before resending."
+msgstr ""
+"საქართველოს ბანკმა ეს პაკეტი არ დაადასტურა. გადარიცხვები ბანკში შეიძლება "
+"არსებობდეს, შეიძლება — არა; ხელახლა გაგზავნამდე თითოეული აღადგინეთ."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid ""
+"Bank of Georgia did not confirm this transfer (timeout/server error). It may"
+" or may not exist at the bank - use 'Recover from BOG' before resending."
+msgstr ""
+"საქართველოს ბანკმა ეს გადარიცხვა არ დაადასტურა (დრო ამოიწურა/სერვერის "
+"შეცდომა). ბანკში შეიძლება არსებობდეს, შეიძლება — არა; ხელახლა გაგზავნამდე "
+"გამოიყენეთ „ბანკიდან აღდგენა“."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/services/bog_service.py:0
+msgid "Bank of Georgia does not accept '.%(ext)s' files. Allowed: %(list)s"
+msgstr "საქართველოს ბანკი '.%(ext)s' ფაილებს არ იღებს. დასაშვებია: %(list)s"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/services/bog_service.py:0
+msgid "Bank of Georgia error %(status)s: %(body)s"
+msgstr "საქართველოს ბანკის შეცდომა %(status)s: %(body)s"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid ""
+"Bank of Georgia flagged this as a duplicate. Check Business Online and reset"
+" the transfer manually if it really is new."
+msgstr ""
+"საქართველოს ბანკმა ეს დოკუმენტი დუბლიკატად მიიჩნია. შეამოწმეთ Business "
+"Online და, თუ გადარიცხვა ნამდვილად ახალია, ხელით დააბრუნეთ მოლოდინში."
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_bog_connection_form
+msgid ""
+"Bank of Georgia has no test environment. Every call from this\n"
+"                        connection reaches production and moves real money."
+msgstr ""
+"საქართველოს ბანკს სატესტო გარემო არ აქვს. ამ კავშირიდან ყოველი\n"
+"                        მოთხოვნა რეალურ სისტემაში ხვდება და რეალურ თანხას გადარიცხავს."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/services/bog_service.py:0
+msgid "Bank of Georgia is unreachable."
+msgstr "საქართველოს ბანკთან კავშირი ვერ დამყარდა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid ""
+"Bank of Georgia matched the beneficiary name at only %(match).0f%% "
+"(threshold %(threshold).0f%%). Check the recipient before this document is "
+"signed."
+msgstr ""
+"საქართველოს ბანკმა მიმღების დასახელების თანხვედრა მხოლოდ %(match).0f%%-ით "
+"დაადგინა (ზღვარი %(threshold).0f%%). ამ დოკუმენტის ხელმოწერამდე შეამოწმეთ "
+"მიმღები."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment_method_line.py:0
+msgid ""
+"Bank of Georgia needs the bank (BIC) of these recipients' accounts. Enter "
+"the full Georgian IBAN, which fills in the bank, or set the BIC on the "
+"account: %s"
+msgstr ""
+"საქართველოს ბანკს ამ მიმღებების ანგარიშების ბანკი (BIC) სჭირდება. შეიყვანეთ "
+"სრული ქართული IBAN — ბანკი ავტომატურად შეივსება — ან ანგარიშზე BIC მიუთითეთ:"
+" %s"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_batch_payment_form_bog
+msgid ""
+"Bank of Georgia never confirmed this batch. Recover each transfer\n"
+"                    individually before resending — resending blind can pay twice."
+msgstr ""
+"საქართველოს ბანკს ეს პაკეტი არ დაუდასტურებია. ხელახლა გაგზავნამდე თითოეული\n"
+"                    გადარიცხვა ცალ-ცალკე აღადგინეთ — შემოწმების გარეშე ხელახლა გაგზავნისას თანხა შეიძლება ორჯერ გადაირიცხოს."
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+msgid ""
+"Bank of Georgia never confirmed this send. Use \"Recover from BOG\" before\n"
+"                    resending — resending blind can pay twice."
+msgstr ""
+"საქართველოს ბანკს ეს გაგზავნა არ დაუდასტურებია. ხელახლა გაგზავნამდე გამოიყენეთ \"ბანკიდან აღდგენა\"\n"
+"                    — შემოწმების გარეშე ხელახლა გაგზავნისას თანხა შეიძლება ორჯერ გადაირიცხოს."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment_method_line.py:0
+msgid ""
+"Bank of Georgia pays payroll only into Georgian IBANs. Pay these recipients "
+"another way, or give them a Georgian account: %s"
+msgstr ""
+"სახელფასო გადახდებს საქართველოს ბანკი მხოლოდ ქართულ IBAN-ზე ასრულებს. ამ "
+"მიმღებებს სხვა გზით გადაუხადეთ ან მიუთითეთ მათი ქართული ანგარიში: %s"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Bank of Georgia refused the cancellation: %s"
+msgstr "საქართველოს ბანკმა გაუქმებაზე უარი თქვა: %s"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/services/bog_service.py:0
+msgid "Bank of Georgia refused the upload of %(name)s: %(error)s"
+msgstr "საქართველოს ბანკმა %(name)s-ის ატვირთვაზე უარი თქვა: %(error)s"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid ""
+"Bank of Georgia reports this file as a duplicate of an earlier package. "
+"Check Business Online before doing anything else: the earlier package may "
+"have executed, and nothing was resent."
+msgstr ""
+"საქართველოს ბანკი ამ ფაილს წინა პაკეტის დუბლიკატად აფიქსირებს. სანამ რამეს "
+"გააკეთებდეთ, შეამოწმეთ Business Online: წინა პაკეტი შესაძლოა შესრულდა, "
+"ხელახლა კი არაფერი გაგზავნილა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/services/bog_service.py:0
+msgid "Bank of Georgia request failed."
+msgstr "საქართველოს ბანკისთვის გაგზავნილი მოთხოვნა ვერ შესრულდა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/services/bog_service.py:0
+msgid "Bank of Georgia request timed out. Please try again."
+msgstr ""
+"საქართველოს ბანკისთვის გაგზავნილი მოთხოვნის დრო ამოიწურა. სცადეთ ხელახლა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Bank of Georgia result code %s."
+msgstr "საქართველოს ბანკის შედეგის კოდი %s."
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+msgid ""
+"Bank of Georgia returned a warning and did <b>not</b> create the document.\n"
+"                    Fix the cause (funds, value date, validation) and then use \"Create Anyway\"."
+msgstr ""
+"საქართველოს ბანკმა დააბრუნა გაფრთხილება და დოკუმენტი <b>არ</b> შექმნა.\n"
+"                    აღმოფხვერით მიზეზი (თანხა, ვალუტირების თარიღი, შემოწმება) და შემდეგ გამოიყენეთ \"მაინც შექმნა\"."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid ""
+"Bank of Georgia returned an unrecognised batch status: %s. The batch state "
+"was left unchanged."
+msgstr ""
+"საქართველოს ბანკმა დააბრუნა პაკეტის უცნობი სტატუსი: %s. პაკეტის სტატუსი არ "
+"შეცვლილა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid ""
+"Bank of Georgia returned an unrecognised document status: %s. The payment "
+"state was left unchanged."
+msgstr ""
+"საქართველოს ბანკმა დააბრუნა დოკუმენტის უცნობი სტატუსი: %s. გადახდის სტატუსი "
+"არ შეცვლილა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/services/bog_service.py:0
+msgid ""
+"Bank of Georgia returned more than %(pages)s pages for %(account)s. Import a"
+" shorter period."
+msgstr ""
+"საქართველოს ბანკმა %(account)s-ისთვის %(pages)s-ზე მეტი გვერდი დააბრუნა. "
+"გააკეთეთ უფრო მოკლე პერიოდის იმპორტი."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Bank of Georgia returned no activity list. Try again shortly."
+msgstr ""
+"საქართველოს ბანკმა ოპერაციების სია არ დააბრუნა. ცოტა ხანში სცადეთ ხელახლა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "Bank of Georgia returned no batch key. Check Business Online."
+msgstr ""
+"საქართველოს ბანკმა პაკეტის გასაღები არ დააბრუნა. შეამოწმეთ Business Online."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/services/bog_service.py:0
+msgid "Bank of Georgia returned no file hash for %s."
+msgstr "საქართველოს ბანკმა %s-ისთვის ფაილის ჰეში არ დააბრუნა."
+
+#. module: bog_bank
+#: model:ir.model.fields,help:bog_bank.field_bog_connection__match_threshold
+msgid ""
+"Bank of Georgia returns how closely the beneficiary name matches the actual "
+"account holder on domestic documents. Below this percentage a warning is "
+"logged on the payment. Set 0 to disable the check."
+msgstr ""
+"შიდა დოკუმენტებზე საქართველოს ბანკი აბრუნებს, რამდენად ემთხვევა მიმღების "
+"დასახელება ანგარიშის რეალურ მფლობელს. ამ პროცენტზე ნაკლების შემთხვევაში "
+"გადახდაზე გაფრთხილება ჩაიწერება. შემოწმების გასათიშად მიუთითეთ 0."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/services/bog_service.py:0
+msgid ""
+"Bank of Georgia sent %(count)s entries of %(account)s but no statement id to"
+" read the rest. Nothing was imported; import a shorter period."
+msgstr ""
+"საქართველოს ბანკმა ანგარიშის %(account)s %(count)s ჩანაწერი გამოგზავნა, "
+"მაგრამ დანარჩენის წასაკითხად ამონაწერის ID არ დააბრუნა. არაფერი დაიმპორტდა; "
+"გააკეთეთ უფრო მოკლე პერიოდის იმპორტი."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/services/bog_service.py:0
+msgid ""
+"Bank of Georgia sent %(count)s of the %(total)s entries of %(account)s and "
+"then stopped. Nothing was imported; import the period again later."
+msgstr ""
+"საქართველოს ბანკმა ანგარიშის %(account)s %(total)s ჩანაწერიდან მხოლოდ "
+"%(count)s გამოგზავნა და შეწყვიტა. არაფერი დაიმპორტდა; მოგვიანებით გაიმეორეთ "
+"ამ პერიოდის იმპორტი."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/services/bog_service.py:0
+msgid "Bank of Georgia token request timed out."
+msgstr "საქართველოს ბანკიდან ტოკენის მოთხოვნის დრო ამოიწურა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Bank of Georgia transfer"
+msgstr "საქართველოს ბანკის გადარიცხვა"
+
+#. module: bog_bank
+#: model:ir.actions.server,name:bog_bank.cron_bog_bulk_status_poll_ir_actions_server
+msgid "Bank of Georgia — Batch status poll"
+msgstr "საქართველოს ბანკი — პაკეტების სტატუსის შემოწმება"
+
+#. module: bog_bank
+#: model:ir.actions.server,name:bog_bank.cron_bog_daily_statement_sync_ir_actions_server
+msgid "Bank of Georgia — Daily statement sync"
+msgstr "საქართველოს ბანკი — ამონაწერის ყოველდღიური სინქრონიზაცია"
+
+#. module: bog_bank
+#: model:ir.actions.server,name:bog_bank.cron_bog_status_poll_ir_actions_server
+msgid "Bank of Georgia — Document status poll"
+msgstr "საქართველოს ბანკი — დოკუმენტების სტატუსის შემოწმება"
+
+#. module: bog_bank
+#: model:ir.actions.server,name:bog_bank.cron_bog_live_statements_ir_actions_server
+msgid "Bank of Georgia — Live statement snapshots"
+msgstr "საქართველოს ბანკი — ამონაწერის მიმდინარე ანაბეჭდები"
+
+#. module: bog_bank
+#: model:ir.model,name:bog_bank.model_account_batch_payment
+msgid "Batch Payment"
+msgstr "სერიული გადახდა"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "Batch rejected."
+msgstr "პაკეტი უარყოფილია."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "Batch send was ambiguous. Use Recover from BOG."
+msgstr "პაკეტის გაგზავნის შედეგი გაურკვეველია. გამოიყენეთ „ბანკიდან აღდგენა“."
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+msgid "Beneficiary"
+msgstr "მიმღები"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment__bog_beneficiary_bank_code
+msgid "Beneficiary Bank Code (RTGS/BIC)"
+msgstr "მიმღები ბანკის კოდი (RTGS/BIC)"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment__bog_beneficiary_inn
+msgid "Beneficiary ID / Tax Code"
+msgstr "მიმღების საიდენტიფიკაციო კოდი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment__bog_beneficiary_name
+msgid "Beneficiary Name"
+msgstr "მიმღების დასახელება"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_bog_statement_import_wizard_form
+msgid "Cancel"
+msgstr "გაუქმება"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_batch_payment_form_bog
+msgid "Cancel at Bank"
+msgstr "ბანკში გაუქმება"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Cancelled in Odoo."
+msgstr "გაუქმდა Odoo-ში."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Cancelled with its batch."
+msgstr "გაუქმდა თავის პაკეტთან ერთად."
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__client_id
+msgid "Client ID"
+msgstr "კლიენტის ID"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/services/bog_service.py:0
+msgid "Client ID and Client Secret are required."
+msgstr "კლიენტის ID და საიდუმლო კოდი სავალდებულოა."
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__client_secret
+msgid "Client Secret"
+msgstr "კლიენტის საიდუმლო კოდი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement__closing_balance
+msgid "Closing Balance"
+msgstr "საბოლოო ნაშთი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_api_log__company_id
+#: model:ir.model.fields,field_description:bog_bank.field_bog_approval__company_id
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__company_id
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement__company_id
+msgid "Company"
+msgstr "კომპანია"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+msgid "Confirm Manually"
+msgstr "ხელით დადასტურება"
+
+#. module: bog_bank
+#: model:ir.model.fields.selection,name:bog_bank.selection__account_batch_payment__bog_state__confirmed
+msgid "Confirmed"
+msgstr "დადასტურებული"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_api_log__connection_id
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement__connection_id
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_bog_connection_form
+msgid "Connection"
+msgstr "კავშირი"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/bog_connection.py:0
+msgid "Connection successful."
+msgstr "კავშირი წარმატებით დამყარდა."
+
+#. module: bog_bank
+#: model:ir.ui.menu,name:bog_bank.menu_bog_connection
+msgid "Connections"
+msgstr "კავშირები"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_api_log__correlation_id
+msgid "Correlation ID"
+msgstr "კორელაციის ID"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+msgid "Create Anyway"
+msgstr "მაინც შექმნა"
+
+#. module: bog_bank
+#: model:ir.model.fields.selection,name:bog_bank.selection__account_batch_payment__bog_state__created
+#: model:ir.model.fields.selection,name:bog_bank.selection__account_payment__gec_bank_state__created
+msgid "Created at Bank (unsigned)"
+msgstr "ბანკში შექმნილი (ხელმოუწერელი)"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_api_log__create_uid
+#: model:ir.model.fields,field_description:bog_bank.field_bog_approval__create_uid
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__create_uid
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement__create_uid
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement_import_wizard__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_api_log__create_date
+#: model:ir.model.fields,field_description:bog_bank.field_bog_approval__create_date
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__create_date
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement__create_date
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement_import_wizard__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_bog_connection_form
+msgid "Credentials"
+msgstr "ავტორიზაციის მონაცემები"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement__currency_code
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement_import_wizard__currency_code
+msgid "Currency"
+msgstr "ვალუტა"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/bog_connection.py:0
+msgid "Daily statement sync failed for %s; see API log."
+msgstr ""
+"ამონაწერის ყოველდღიური სინქრონიზაცია ვერ შესრულდა: %s; იხილეთ API ჟურნალი."
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_approval__delegate_ids
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_bog_approval_form
+msgid "Delegates"
+msgstr "უფლებამოსილი პირები"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment__bog_dispatch_type
+msgid "Dispatch Type"
+msgstr "გაგზავნის ტიპი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_batch_payment__display_name
+#: model:ir.model.fields,field_description:bog_bank.field_account_journal__display_name
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment__display_name
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment_method__display_name
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment_method_line__display_name
+#: model:ir.model.fields,field_description:bog_bank.field_bog_api_log__display_name
+#: model:ir.model.fields,field_description:bog_bank.field_bog_approval__display_name
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__display_name
+#: model:ir.model.fields,field_description:bog_bank.field_bog_sendable__display_name
+#: model:ir.model.fields,field_description:bog_bank.field_bog_service__display_name
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement__display_name
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement_import_wizard__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment__bog_document_no
+msgid "Document No."
+msgstr "დოკუმენტის ნომერი"
+
+#. module: bog_bank
+#: model:ir.model.fields.selection,name:bog_bank.selection__account_payment__bog_transfer_type__domestic
+msgid "Domestic (GEL, Georgian bank)"
+msgstr "შიდა (ლარი, ქართული ბანკი)"
+
+#. module: bog_bank
+#: model:ir.model.fields.selection,name:bog_bank.selection__account_batch_payment__bog_state__draft
+msgid "Draft"
+msgstr "პროექტი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_api_log__duration_ms
+msgid "Duration (ms)"
+msgstr "ხანგრძლივობა (მწმ)"
+
+#. module: bog_bank
+#: model:ir.model.constraint,message:bog_bank.constraint_bog_connection_company_uniq
+msgid "Each company can have only one Bank of Georgia connection."
+msgstr ""
+"თითოეულ კომპანიას მხოლოდ ერთი კავშირი შეიძლება ჰქონდეს საქართველოს ბანკთან."
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_api_log__endpoint
+msgid "Endpoint"
+msgstr "მისამართი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement__entry_count
+msgid "Entries"
+msgstr "ჩანაწერები"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_api_log__error_message
+msgid "Error Message"
+msgstr "შეცდომის ტექსტი"
+
+#. module: bog_bank
+#: model:ir.model.fields.selection,name:bog_bank.selection__account_batch_payment__bog_state__failed
+msgid "Failed"
+msgstr "წარუმატებელი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement__fetched_on
+msgid "Fetched On"
+msgstr "მიღების თარიღი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__message_follower_ids
+msgid "Followers"
+msgstr "გამომწერები"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "გამომწერები (პარტნიორები)"
+
+#. module: bog_bank
+#: model:ir.model.fields.selection,name:bog_bank.selection__account_payment__bog_transfer_type__foreign
+msgid "Foreign (SWIFT)"
+msgstr "უცხოური (SWIFT)"
+
+#. module: bog_bank
+#: model:ir.model.fields,help:bog_bank.field_account_payment__bog_additional_information
+msgid "Foreign transfers only. Max 210 characters."
+msgstr "მხოლოდ უცხოური გადარიცხვებისთვის. მაქსიმუმ 210 სიმბოლო."
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement__period_from
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement_import_wizard__start_date
+msgid "From"
+msgstr "საიდან"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_api_log__http_status
+msgid "HTTP Status"
+msgstr "HTTP სტატუსი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__has_message
+msgid "Has Message"
+msgstr "აქვს შეტყობინება"
+
+#. module: bog_bank
+#: model:ir.model.fields,help:bog_bank.field_account_payment__bog_match_percent
+msgid ""
+"How closely the beneficiary name matches the account holder at BOG. Only "
+"returned for domestic transfers."
+msgstr ""
+"რამდენად ემთხვევა მიმღების დასახელება ანგარიშის მფლობელს ბანკში. ბრუნდება "
+"მხოლოდ შიდა გადარიცხვებზე."
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_batch_payment__id
+#: model:ir.model.fields,field_description:bog_bank.field_account_journal__id
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment__id
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment_method__id
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment_method_line__id
+#: model:ir.model.fields,field_description:bog_bank.field_bog_api_log__id
+#: model:ir.model.fields,field_description:bog_bank.field_bog_approval__id
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__id
+#: model:ir.model.fields,field_description:bog_bank.field_bog_sendable__id
+#: model:ir.model.fields,field_description:bog_bank.field_bog_service__id
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement__id
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement_import_wizard__id
+msgid "ID"
+msgstr "ID"
+
+#. module: bog_bank
+#: model:ir.model.fields,help:bog_bank.field_bog_connection__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "თუ მონიშნულია, ახალი შეტყობინებები საჭიროებს თქვენს ყურადღებას."
+
+#. module: bog_bank
+#: model:ir.model.fields,help:bog_bank.field_bog_connection__message_has_error
+#: model:ir.model.fields,help:bog_bank.field_bog_connection__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "თუ მონიშნულია, ზოგიერთ შეტყობინებას მიწოდების შეცდომა აქვს."
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_bog_statement_import_wizard_form
+msgid "Import"
+msgstr "იმპორტი"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_journal_form_bog
+msgid "Import BOG Statement"
+msgstr "საქართველოს ბანკის ამონაწერის იმპორტი"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_journal.py:0
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_bog_statement_import_wizard_form
+msgid "Import Bank of Georgia Statement"
+msgstr "საქართველოს ბანკის ამონაწერის იმპორტი"
+
+#. module: bog_bank
+#: model:ir.actions.act_window,name:bog_bank.action_bog_statement_import
+#: model:ir.ui.menu,name:bog_bank.menu_bog_statement_import
+msgid "Import Statement"
+msgstr "ამონაწერის იმპორტი"
+
+#. module: bog_bank
+#: model:ir.model.fields,help:bog_bank.field_account_payment__bog_attachment_ids
+msgid ""
+"Invoices or contracts to send with this transfer. Result code 669 rejects "
+"some transfers until one is attached."
+msgstr ""
+"ანგარიშ-ფაქტურები ან ხელშეკრულებები, რომლებიც ამ გადარიცხვას თან ერთვის. "
+"შედეგის კოდი 669 ზოგიერთ გადარიცხვას უარყოფს, სანამ დანართი არ დაემატება."
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_batch_payment__is_bog
+#: model:ir.model.fields,field_description:bog_bank.field_account_journal__is_bog
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment__is_bog
+msgid "Is Bank of Georgia Journal"
+msgstr "საქართველოს ბანკის ჟურნალია"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__message_is_follower
+msgid "Is Follower"
+msgstr "არის გამომწერი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment__bog_is_salary
+msgid "Is Salary"
+msgstr "სახელფასოა"
+
+#. module: bog_bank
+#: model:ir.model,name:bog_bank.model_account_journal
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement__journal_id
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement_import_wizard__journal_id
+msgid "Journal"
+msgstr "ჟურნალი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__last_error_message
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_bog_connection_form
+msgid "Last Error"
+msgstr "ბოლო შეცდომა"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__last_error_code
+msgid "Last Error Code"
+msgstr "ბოლო შეცდომის კოდი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_api_log__write_uid
+#: model:ir.model.fields,field_description:bog_bank.field_bog_approval__write_uid
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__write_uid
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement__write_uid
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement_import_wizard__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_api_log__write_date
+#: model:ir.model.fields,field_description:bog_bank.field_bog_approval__write_date
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__write_date
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement__write_date
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement_import_wizard__write_date
+msgid "Last Updated on"
+msgstr "ბოლოს განახლდა"
+
+#. module: bog_bank
+#: model:ir.model.fields.selection,name:bog_bank.selection__bog_statement__snapshot_type__live
+msgid "Live (auto)"
+msgstr "მიმდინარე (ავტომატური)"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__log_retention_days
+msgid "Log Retention (days)"
+msgstr "ჟურნალის შენახვის ვადა (დღე)"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_bog_connection_form
+msgid "Logging"
+msgstr "ჟურნალირება"
+
+#. module: bog_bank
+#: model:ir.model.fields.selection,name:bog_bank.selection__account_payment__bog_dispatch_type__mt103
+msgid "MT103 (individual)"
+msgstr "MT103 (ინდივიდუალური)"
+
+#. module: bog_bank
+#: model:res.groups,name:bog_bank.group_bog_manager
+msgid "Manager"
+msgstr "მენეჯერი"
+
+#. module: bog_bank
+#: model:ir.model.fields,help:bog_bank.field_account_payment__bog_document_no
+msgid ""
+"Max 16 characters. Also the only handle for recovering a timed-out send "
+"through today's activities."
+msgstr ""
+"მაქსიმუმ 16 სიმბოლო. ასევე ერთადერთი საშუალებაა, რომ დღევანდელი ოპერაციებით "
+"აღდგეს გაგზავნა, რომელსაც დრო ამოეწურა."
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__message_has_error
+msgid "Message Delivery error"
+msgstr "შეტყობინების მიწოდების შეცდომა"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__message_ids
+msgid "Messages"
+msgstr "შეტყობინებები"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_api_log__is_money_movement
+msgid "Money Movement"
+msgstr "თანხის მოძრაობა"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_approval__name
+msgid "Name"
+msgstr "სახელი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment__bog_match_percent
+msgid "Name Match %"
+msgstr "დასახელების თანხვედრა %"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__match_threshold
+msgid "Name Match Threshold (%)"
+msgstr "დასახელების თანხვედრის ზღვარი (%)"
+
+#. module: bog_bank
+#: model:res.groups.privilege,placeholder:bog_bank.bog_privilege
+msgid "No"
+msgstr "არა"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/wizard/bog_statement_import_wizard.py:0
+msgid ""
+"No Bank of Georgia connection is configured for this journal's company."
+msgstr ""
+"ამ ჟურნალის კომპანიისთვის საქართველოს ბანკის კავშირი არ არის "
+"კონფიგურირებული."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/services/bog_service.py:0
+msgid "No access token in Bank of Georgia response."
+msgstr "საქართველოს ბანკის პასუხში წვდომის ტოკენი არ მოიძებნა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "No batch key returned by Bank of Georgia."
+msgstr "საქართველოს ბანკმა პაკეტის გასაღები არ დააბრუნა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "No document key returned by Bank of Georgia."
+msgstr "საქართველოს ბანკმა დოკუმენტის გასაღები არ დააბრუნა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "No document number on this payment to recover from."
+msgstr ""
+"ამ გადახდას არ აქვს დოკუმენტის ნომერი, რომლითაც აღდგენა შესაძლებელი "
+"იქნებოდა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid ""
+"No document with number %s was found in today's activities. If it was sent "
+"on an earlier day, check Business Online before resending."
+msgstr ""
+"დღევანდელ ოპერაციებში დოკუმენტი ნომრით %s ვერ მოიძებნა. თუ ის უფრო ადრე "
+"გაიგზავნა, ხელახლა გაგზავნამდე შეამოწმეთ Business Online."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "No sendable Bank of Georgia transfers in this batch."
+msgstr "ამ პაკეტში გასაგზავნი გადარიცხვა არ არის."
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__message_needaction_counter
+msgid "Number of Actions"
+msgstr "ქმედებების რაოდენობა"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__message_has_error_counter
+msgid "Number of errors"
+msgstr "შეცდომების რაოდენობა"
+
+#. module: bog_bank
+#: model:ir.model.fields,help:bog_bank.field_bog_connection__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "ქმედების მომთხოვნი შეტყობინებების რაოდენობა"
+
+#. module: bog_bank
+#: model:ir.model.fields,help:bog_bank.field_bog_connection__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "მიწოდების შეცდომის მქონე შეტყობინებების რაოდენობა"
+
+#. module: bog_bank
+#: model:ir.model.fields,help:bog_bank.field_bog_connection__allow_self_approval
+msgid ""
+"Off (recommended): the user who created a transfer cannot approve it, so "
+"releasing money always takes two people. Turn it on only if your team has "
+"nobody else to approve."
+msgstr ""
+"გამორთული (რეკომენდებული): გადარიცხვის შემქმნელი მომხმარებელი მას ვერ "
+"დაამტკიცებს, ამიტომ თანხის გაშვებას ყოველთვის ორი ადამიანი სჭირდება. ჩართეთ "
+"მხოლოდ მაშინ, თუ გუნდში დამტკიცება სხვას არავის შეუძლია."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "Only a batch that is created but not yet signed can be cancelled."
+msgstr ""
+"გაუქმება შესაძლებელია მხოლოდ იმ პაკეტისა, რომელიც შექმნილია, მაგრამ "
+"ხელმოწერილი არ არის."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Only a document that is created but not yet signed can be cancelled."
+msgstr ""
+"გაუქმება შესაძლებელია მხოლოდ იმ დოკუმენტისა, რომელიც შექმნილია, მაგრამ "
+"ხელმოწერილი არ არის."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Only a failed, warned or unknown transfer can be reset."
+msgstr ""
+"მოლოდინში დაბრუნება შესაძლებელია მხოლოდ წარუმატებელი, გაფრთხილებული ან "
+"უცნობი გადარიცხვისთვის."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid ""
+"Only a transfer whose send did not finish, or whose outcome is unknown, can "
+"be recovered from Bank of Georgia."
+msgstr ""
+"საქართველოს ბანკიდან აღდგენა შესაძლებელია მხოლოდ იმ გადარიცხვისთვის, რომლის "
+"გაგზავნა არ დასრულდა ან რომლის შედეგიც უცნობია."
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+msgid ""
+"Only reset this after checking Business Online. If the document already "
+"exists there, sending again will pay twice."
+msgstr ""
+"მოლოდინში დააბრუნეთ მხოლოდ Business Online-ის შემოწმების შემდეგ. თუ "
+"დოკუმენტი იქ უკვე არსებობს, ხელახლა გაგზავნისას თანხა ორჯერ გადაირიცხება."
+
+#. module: bog_bank
+#: model:ir.model.fields.selection,name:bog_bank.selection__account_batch_payment__bog_state__partial
+msgid "Partially Failed"
+msgstr "ნაწილობრივ წარუმატებელი"
+
+#. module: bog_bank
+#: model:ir.model,name:bog_bank.model_account_payment
+msgid "Payment"
+msgstr "გადახდა"
+
+#. module: bog_bank
+#: model:ir.model,name:bog_bank.model_account_payment_method
+msgid "Payment Method"
+msgstr "გადახდის მეთოდი"
+
+#. module: bog_bank
+#: model:ir.model,name:bog_bank.model_account_payment_method_line
+msgid "Payment Method Line"
+msgstr "გადახდის მეთოდის სტრიქონი"
+
+#. module: bog_bank
+#: model:ir.actions.act_window,name:bog_bank.action_bog_pending_approval
+#: model:ir.ui.menu,name:bog_bank.menu_bog_pending_approval
+msgid "Pending Approval"
+msgstr "დასამტკიცებელი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment__bog_warn_code
+msgid "Pending Warning Code"
+msgstr "გადაუწყვეტელი გაფრთხილების კოდი"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_bog_statement_form
+msgid "Period"
+msgstr "პერიოდი"
+
+#. module: bog_bank
+#: model:ir.model.fields.selection,name:bog_bank.selection__bog_statement__snapshot_type__period
+msgid "Period (manual)"
+msgstr "პერიოდული (ხელით)"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_approval__approver_id
+msgid "Primary Approver"
+msgstr "ძირითადი დამმტკიცებელი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__processing_mode
+msgid "Processing Mode"
+msgstr "დამუშავების რეჟიმი"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+msgid "Recover from BOG"
+msgstr "ბანკიდან აღდგენა"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_batch_payment_form_bog
+msgid "Refresh Batch Status"
+msgstr "პაკეტის სტატუსის განახლება"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+msgid "Refresh Status"
+msgstr "სტატუსის განახლება"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment__bog_reject_code
+msgid "Reject Code"
+msgstr "უარყოფის კოდი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_api_log__request_payload
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_bog_api_log_form
+msgid "Request"
+msgstr "მოთხოვნა"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+msgid "Reset to Pending"
+msgstr "მოლოდინში დაბრუნება"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_api_log__response_payload
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_bog_api_log_form
+msgid "Response"
+msgstr "პასუხი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment__bog_result_code
+#: model:ir.model.fields,field_description:bog_bank.field_bog_api_log__result_code
+msgid "Result Code"
+msgstr "შედეგის კოდი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_api_log__retry_after
+msgid "Retry After (s)"
+msgstr "გამეორება (წმ)"
+
+#. module: bog_bank
+#: model:ir.model.fields,help:bog_bank.field_bog_connection__log_retention_days
+msgid ""
+"Routine API log entries older than this are removed by Odoo's daily vacuum, "
+"so the log table cannot grow without bound. Set 0 to keep everything. "
+"Transfer logs are never deleted - they are the audit trail for money "
+"movement."
+msgstr ""
+"ამაზე ძველ რიგით API ჩანაწერებს Odoo-ს ყოველდღიური გასუფთავება შლის, რომ "
+"ჟურნალი უსასრულოდ არ გაიზარდოს. ყველაფრის შესანახად მიუთითეთ 0. "
+"გადარიცხვების ჩანაწერები არასოდეს იშლება — ისინი თანხის მოძრაობის აუდიტის "
+"კვალია."
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "SMS მიწოდების შეცდომა"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_bog_connection_form
+msgid "Safety Checks"
+msgstr "უსაფრთხოების შემოწმებები"
+
+#. module: bog_bank
+#: model:ir.model.fields,help:bog_bank.field_account_payment__bog_is_salary
+msgid "Salary transfers may only be sent to individuals."
+msgstr "სახელფასო გადარიცხვა მხოლოდ ფიზიკურ პირებზე შეიძლება გაიგზავნოს."
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_batch_payment_form_bog
+msgid "Send One by One"
+msgstr "სათითაოდ გაგზავნა"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_batch_payment_form_bog
+msgid "Send to BOG"
+msgstr "ბანკში გაგზავნა"
+
+#. module: bog_bank
+#: model:ir.module.module,summary:base.module_bog_bank
+msgid "Send transfers and import statements from BOG Bank (BIS) via OAuth2"
+msgstr ""
+"გადარიცხვების გაგზავნა და ამონაწერების იმპორტი საქართველოს ბანკიდან (BIS) "
+"OAuth2-ით"
+
+#. module: bog_bank
+#: model:ir.module.category,description:bog_bank.module_category_bog
+msgid "Send transfers and import statements via the Bank Of Georgia BIS API."
+msgstr ""
+"გადარიცხვების გაგზავნა და ამონაწერების იმპორტი საქართველოს ბანკის BIS API-"
+"ით."
+
+#. module: bog_bank
+#: model:ir.model.fields.selection,name:bog_bank.selection__account_batch_payment__bog_state__sending
+msgid "Sending"
+msgstr "იგზავნება"
+
+#. module: bog_bank
+#: model:ir.model.fields.selection,name:bog_bank.selection__account_batch_payment__bog_state__sent
+msgid "Sent / Signed"
+msgstr "გაგზავნილი / ხელმოწერილი"
+
+#. module: bog_bank
+#: model:ir.model.fields,help:bog_bank.field_account_payment__bog_attachment_hashes
+msgid ""
+"Space-separated externalFileHash values returned by BOG. Uploading is "
+"separate from sending, so a re-send does not re-upload."
+msgstr ""
+"ბანკის მიერ დაბრუნებული externalFileHash მნიშვნელობები, ჰარით გამოყოფილი. "
+"ატვირთვა გაგზავნისგან დამოუკიდებელია, ამიტომ ხელახლა გაგზავნისას ფაილები "
+"ხელახლა არ იტვირთება."
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__state
+msgid "State"
+msgstr "სტატუსი"
+
+#. module: bog_bank
+#: model:ir.ui.menu,name:bog_bank.menu_bog_statement
+msgid "Statements"
+msgstr "ამონაწერები"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_batch_payment_form_bog
+msgid "Submit for Approval"
+msgstr "დასამტკიცებლად გაგზავნა"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_bog_connection_form
+msgid "Test Connection"
+msgstr "კავშირის შემოწმება"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/wizard/bog_statement_import_wizard.py:0
+msgid "The 'From' date must be before the 'To' date."
+msgstr "თარიღი „საიდან“ უნდა უსწრებდეს თარიღს „სადამდე“."
+
+#. module: bog_bank
+#: model:ir.model.fields,help:bog_bank.field_account_payment__bog_bank_status
+msgid "The Status letter exactly as BOG returned it."
+msgstr "სტატუსის ასო ზუსტად ისე, როგორც ბანკმა დააბრუნა."
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_batch_payment_form_bog
+msgid ""
+"The batch exists at Bank of Georgia but is not yet reported as executed.\n"
+"                    Bulk submissions return only a batch key — use \"Refresh Batch Status\" to\n"
+"                    learn which individual lines succeeded."
+msgstr ""
+"პაკეტი საქართველოს ბანკში არსებობს, მაგრამ ჯერ შესრულებულად არ ჩანს.\n"
+"                    პაკეტური გაგზავნა მხოლოდ პაკეტის გასაღებს აბრუნებს — გამოიყენეთ \"პაკეტის სტატუსის განახლება\", რომ\n"
+"                    გაიგოთ, რომელი სტრიქონები შესრულდა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "The batch was cancelled at Bank of Georgia."
+msgstr "პაკეტი გაუქმდა საქართველოს ბანკში."
+
+#. module: bog_bank
+#: model:ir.model.fields,help:bog_bank.field_account_payment__bog_value_date
+msgid "The date BOG should process the document."
+msgstr "თარიღი, როდესაც ბანკმა დოკუმენტი უნდა დაამუშაოს."
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+msgid ""
+"The document exists at Bank of Georgia but is not yet reported as executed.\n"
+"                    If your API application does not have signing rights, it must be signed in\n"
+"                    Business Online before the money moves."
+msgstr ""
+"დოკუმენტი საქართველოს ბანკში არსებობს, მაგრამ ჯერ შესრულებულად არ ჩანს.\n"
+"                    თუ თქვენს API აპლიკაციას ხელმოწერის უფლება არ აქვს, დოკუმენტს ხელი უნდა მოეწეროს\n"
+"                    Business Online-ში, სანამ თანხა გადაირიცხება."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "The document was cancelled at Bank of Georgia."
+msgstr "დოკუმენტი გაუქმდა საქართველოს ბანკში."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid ""
+"The document was found at Bank of Georgia, but the activity carries no "
+"document key. Refresh its status later."
+msgstr ""
+"დოკუმენტი საქართველოს ბანკში მოიძებნა, მაგრამ ჩანაწერს დოკუმენტის გასაღები "
+"არ ახლავს. მისი სტატუსი მოგვიანებით განაახლეთ."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "The document was found at Bank of Georgia; its status was refreshed."
+msgstr "დოკუმენტი მოიძებნა საქართველოს ბანკში; მისი სტატუსი განახლდა."
+
+#. module: bog_bank
+#: model:ir.model.fields,help:bog_bank.field_account_batch_payment__bog_file_name
+msgid ""
+"The fileName the batch was submitted under. BOG requires it as a query "
+"parameter and shows it in Business Online."
+msgstr ""
+"ფაილის სახელი (fileName), რომლითაც პაკეტი გაიგზავნა. ბანკი მას მოთხოვნის "
+"პარამეტრად ითხოვს და Business Online-ში აჩვენებს."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/wizard/bog_statement_import_wizard.py:0
+msgid "The journal has no bank account number (IBAN)."
+msgstr "ჟურნალს არ აქვს მითითებული საბანკო ანგარიშის ნომერი (IBAN)."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "The package was rejected by Bank of Georgia."
+msgstr "პაკეტი საქართველოს ბანკმა უარყო."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid ""
+"This batch has %(count)s sendable transfers. Split it into batches of at "
+"most %(limit)s."
+msgstr ""
+"ამ პაკეტში %(count)s გასაგზავნი გადარიცხვაა. დაყავით პაკეტებად, თითოში "
+"არაუმეტეს %(limit)s."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "This batch has no Bank of Georgia batch key."
+msgstr "ამ პაკეტს საქართველოს ბანკის პაკეტის გასაღები არ აქვს."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "This batch is not on a Bank of Georgia journal."
+msgstr "ეს პაკეტი არ არის საქართველოს ბანკის ჟურნალზე."
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_batch_payment_form_bog
+msgid "This deletes the unsigned batch at Bank of Georgia. Continue?"
+msgstr "ეს წაშლის ხელმოუწერელ პაკეტს საქართველოს ბანკში. გავაგრძელოთ?"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+msgid "This deletes the unsigned document at Bank of Georgia. Continue?"
+msgstr "ეს წაშლის ხელმოუწერელ დოკუმენტს საქართველოს ბანკში. გავაგრძელოთ?"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "This payment has no Bank of Georgia document key."
+msgstr "ამ გადახდას საქართველოს ბანკის დოკუმენტის გასაღები არ აქვს."
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+msgid "This sends a real payment order to Bank of Georgia. Continue?"
+msgstr ""
+"ეს საქართველოს ბანკში რეალურ საგადახდო დავალებას გაგზავნის. გავაგრძელოთ?"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_batch_payment_form_bog
+msgid ""
+"This sends each transfer as its own document. Slower, but each gets its own "
+"bank key. Continue?"
+msgstr ""
+"ეს თითოეულ გადარიცხვას ცალკე დოკუმენტად გაგზავნის. უფრო ნელია, მაგრამ "
+"თითოეული საკუთარ ბანკის გასაღებს მიიღებს. გავაგრძელოთ?"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_batch_payment_form_bog
+msgid ""
+"This submits every transfer in this batch to Bank of Georgia in one call. "
+"Continue?"
+msgstr ""
+"ეს პაკეტის ყველა გადარიცხვას საქართველოს ბანკში ერთი მოთხოვნით გაგზავნის. "
+"გავაგრძელოთ?"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "This transfer is not waiting for confirmation."
+msgstr "ეს გადარიცხვა დადასტურებას არ ელოდება."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid ""
+"This transfer may still be on its way to Bank of Georgia (sending started "
+"less than %s minutes ago). Reset it only after that."
+msgstr ""
+"ეს გადარიცხვა შეიძლება ჯერ კიდევ იგზავნებოდეს საქართველოს ბანკში (გაგზავნა "
+"%s წუთზე ნაკლები ხნის წინ დაიწყო). მოლოდინში დააბრუნეთ მხოლოდ ამის შემდეგ."
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement__period_to
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement_import_wizard__end_date
+msgid "To"
+msgstr "სადამდე"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_connection__token_expiry
+msgid "Token Expiry"
+msgstr "ტოკენის ვადა"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_bog_statement_list
+msgid "Total Credit"
+msgstr "სულ ჩარიცხვა"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement__credit_sum
+msgid "Total Credit (In)"
+msgstr "სულ ჩარიცხვა"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_bog_statement_list
+msgid "Total Debit"
+msgstr "სულ ჩამოწერა"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement__debit_sum
+msgid "Total Debit (Out)"
+msgstr "სულ ჩამოწერა"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_bog_statement_form
+msgid "Totals"
+msgstr "ჯამები"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+msgid "Transfer"
+msgstr "გადარიცხვა"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Transfer rejected."
+msgstr "გადარიცხვა უარყოფილია."
+
+#. module: bog_bank
+#: model:ir.ui.menu,name:bog_bank.menu_bog_payments
+msgid "Transfers"
+msgstr "გადარიცხვები"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_bog_statement__snapshot_type
+msgid "Type"
+msgstr "ტიპი"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/services/bog_service.py:0
+msgid "Unexpected statement payload from Bank of Georgia."
+msgstr "საქართველოს ბანკიდან ამონაწერის მოულოდნელი პასუხი მოვიდა."
+
+#. module: bog_bank
+#: model:ir.model.fields.selection,name:bog_bank.selection__account_batch_payment__bog_state__unknown
+msgid "Unknown"
+msgstr "უცნობი"
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+msgid "Upload Attachments"
+msgstr "დანართების ატვირთვა"
+
+#. module: bog_bank
+#: model:res.groups,name:bog_bank.group_bog_user
+msgid "User"
+msgstr "მომხმარებელი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment__bog_value_date
+msgid "Value Date"
+msgstr "ვალუტირების თარიღი"
+
+#. module: bog_bank
+#: model:ir.model.fields,field_description:bog_bank.field_account_payment__bog_check_inn
+msgid "Verify Beneficiary ID"
+msgstr "მიმღების საიდენტიფიკაციო კოდის შემოწმება"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/services/bog_service.py:0
+msgid "check the credentials."
+msgstr "შეამოწმეთ ავტორიზაციის მონაცემები."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/services/bog_service.py:0
+msgid "no response"
+msgstr "პასუხი არ მოსულა"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/bog_connection.py:0
+msgid "unknown error"
+msgstr "უცნობი შეცდომა"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid ""
+"%s is a treasury payment. Our Bank of Georgia connection does not send "
+"treasury transfers yet: pay it through Basis or TBC."
+msgstr ""
+"%s სახაზინო გადახდაა. საქართველოს ბანკთან ჩვენი კავშირი სახაზინო "
+"გადარიცხვებს ჯერ არ აგზავნის: გადაიხადეთ ბაზისბანკით ან TBC ბანკით."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment_method_line.py:0
+msgid ""
+"Our Bank of Georgia connection sends no treasury transfers yet. Pay these "
+"recipients through another bank: %s"
+msgstr ""
+"საქართველოს ბანკთან ჩვენი კავშირი სახაზინო გადარიცხვებს ჯერ არ აგზავნის. ამ "
+"მიმღებებს სხვა ბანკით გადაუხადეთ: %s"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "%(name)s is in %(currency)s, but the journal's account is in %(account)s. Bank of Georgia debits the journal's account in its own currency: pay from a %(currency)s journal."
+msgstr "%(name)s: გადახდის ვალუტაა %(currency)s, ჟურნალის ანგარიშის ვალუტა კი — %(account)s. საქართველოს ბანკი თანხას ჟურნალის ანგარიშიდან მისივე ვალუტით ჩამოჭრის: გადაიხადეთ %(currency)s-ის ჟურნალიდან."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "%(name)s: Bank of Georgia accepts BULK dispatch only up to %(limit)s GEL. Set Dispatch Type to MT103."
+msgstr "%(name)s: საქართველოს ბანკი BULK გაგზავნას მხოლოდ %(limit)s ლარამდე იღებს. გაგზავნის ტიპად აირჩიეთ MT103."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "%s is a foreign transfer. Our Bank of Georgia connection does not build BOG's foreign document yet (charges, beneficiary address and country): pay it through Business Online or TBC."
+msgstr "%s საზღვარგარეთ გადარიცხვაა. საქართველოს ბანკთან ჩვენი კავშირი საზღვარგარეთ გადარიცხვის დოკუმენტს (საკომისიო, მიმღების მისამართი და ქვეყანა) ჯერ ვერ ქმნის: გადაიხადეთ Business Online-ით ან TBC ბანკით."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "%s reset this transfer to pending. Bank of Georgia had rejected or cancelled its document, so a new send uses a new request id (UniqueId)."
+msgstr "%s-მა ეს გადარიცხვა მოლოდინში დააბრუნა. საქართველოს ბანკმა მისი დოკუმენტი უარყო ან გააუქმა, ამიტომ ახალი გაგზავნა ახალ მოთხოვნის იდენტიფიკატორს (UniqueId) გამოიყენებს."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "A document with this request id already exists at BOG."
+msgstr "ამ მოთხოვნის ID-ით დოკუმენტი ბანკში უკვე არსებობს."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Amount format is invalid."
+msgstr "თანხის ფორმატი არასწორია."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "An invoice or contract must be attached to this transfer."
+msgstr "ამ გადარიცხვას ინვოისი ან ხელშეკრულება უნდა დაერთოს."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "BOG detected this as a duplicate document."
+msgstr "ბანკმა ეს დოკუმენტი დუბლიკატად მიიჩნია."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "Bank of Georgia refused the batch before processing it (login or rate limit), so nothing was created. Send it again later."
+msgstr "საქართველოს ბანკმა პაკეტი დამუშავებამდე უარყო (ავტორიზაცია ან მოთხოვნების ლიმიტი), ამიტომ არაფერი შექმნილა. მოგვიანებით გაგზავნეთ ხელახლა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Bank of Georgia refused the request before processing it (login or rate limit), so nothing was created. Send it again later."
+msgstr "საქართველოს ბანკმა მოთხოვნა დამუშავებამდე უარყო (ავტორიზაცია ან მოთხოვნების ლიმიტი), ამიტომ არაფერი შექმნილა. მოგვიანებით გაგზავნეთ ხელახლა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "Bank of Georgia returned result code %(code)s for this transfer in its package: %(text)s Check it in Business Online."
+msgstr "საქართველოს ბანკმა პაკეტში ამ გადარიცხვისთვის შედეგის კოდი %(code)s დააბრუნა: %(text)s შეამოწმეთ Business Online-ში."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Bank of Georgia warned about %s and did not create it. Check the warning, then use Create Anyway on the payment."
+msgstr "საქართველოს ბანკმა %s-ზე გაფრთხილება დააბრუნა და დოკუმენტი არ შექმნა. შეამოწმეთ გაფრთხილება, შემდეგ გადახდაზე გამოიყენეთ „მაინც შექმნა“."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Beneficiary ID code is invalid."
+msgstr "მიმღების საიდენტიფიკაციო კოდი არასწორია."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Beneficiary account is incorrect."
+msgstr "მიმღების ანგარიში არასწორია."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Beneficiary account is invalid."
+msgstr "მიმღების ანგარიში არასწორია."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Beneficiary account number and ID code do not match."
+msgstr "მიმღების ანგარიშის ნომერი და საიდენტიფიკაციო კოდი ერთმანეთს არ ემთხვევა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Beneficiary account number or bank code is empty."
+msgstr "მიმღების ანგარიშის ნომერი ან ბანკის კოდი შევსებული არ არის."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Blocked card."
+msgstr "ბარათი დაბლოკილია."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "Canceled by Response"
+msgstr "გაუქმებულია მომხმარებლის მიერ"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Cancelled by Bank"
+msgstr "გაუქმებულია ბანკის მიერ"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Cancelled by Response"
+msgstr "გაუქმებულია მომხმარებლის მიერ"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Cancelled; contact the bank for more information."
+msgstr "გაუქმებულია; დამატებითი ინფორმაციისთვის დაუკავშირდით ბანკს."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Card error."
+msgstr "ბარათის შეცდომა."
+
+#. module: bog_bank
+#: model:ir.model.fields,help:bog_bank.field_bog_statement__company_id
+msgid "Company related to this journal"
+msgstr "ამ ჟურნალთან დაკავშირებული კომპანია"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Completed"
+msgstr "შესრულებული"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "Deleted"
+msgstr "წაშლილი"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Dispatch type is mandatory."
+msgstr "გაგზავნის ტიპის მითითება სავალდებულოა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "Documents are being created"
+msgstr "მიმდინარეობს დოკუმენტების შექმნა"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Expired card."
+msgstr "ბარათს ვადა გაუვიდა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "File Duplicate"
+msgstr "დუბლირებული ფაილი"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Fonts cannot be read."
+msgstr "ტექსტის შრიფტი ვერ იკითხება."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "In Progress"
+msgstr "მუშავდება"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Incomplete"
+msgstr "დაუსრულებელი"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "Individual documents created"
+msgstr "ინდივიდუალური დოკუმენტები შექმნილია"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Insufficient amount."
+msgstr "თანხა არასაკმარისია."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Insufficient funds."
+msgstr "სახსრები არასაკმარისია."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Invalid IBAN format."
+msgstr "IBAN-ის ფორმატი არასწორია."
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+msgid "Only confirm a transfer you can see executed in Business Online. Odoo then stops checking it with the bank."
+msgstr "დაადასტურეთ მხოლოდ ის გადარიცხვა, რომლის შესრულებასაც Business Online-ში ხედავთ. ამის შემდეგ Odoo მას ბანკთან აღარ ამოწმებს."
+
+#. module: bog_bank
+#: model_terms:ir.ui.view,arch_db:bog_bank.view_account_payment_form_bog
+msgid "Only reset this after checking Business Online. If the document is there, a new send pays twice: Bank of Georgia blocks a repeat of the same request for 7 days only."
+msgstr "მოლოდინში დააბრუნეთ მხოლოდ Business Online-ის შემოწმების შემდეგ. თუ დოკუმენტი იქ არის, ახალი გაგზავნით თანხა ორჯერ გადაირიცხება: საქართველოს ბანკი იმავე მოთხოვნის გამეორებას მხოლოდ 7 დღის განმავლობაში ბლოკავს."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "Processing"
+msgstr "დასამუშავებელი"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Purpose (Nomination) is mandatory."
+msgstr "დანიშნულების (Nomination) მითითება სავალდებულოა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Purpose field exceeds 250 characters."
+msgstr "დანიშნულების ველი 250 სიმბოლოს აღემატება."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Rejected"
+msgstr "უარყოფილი"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Salary transfers may only be made to individuals."
+msgstr "ხელფასის გადარიცხვა მხოლოდ ფიზიკურ პირზეა შესაძლებელი."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Sender ID not found, or the sender account is invalid."
+msgstr "გამგზავნის იდენტიფიკატორი ვერ მოიძებნა, ან გამგზავნის ანგარიში არასწორია."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Sign In Progress"
+msgstr "ხელმოწერის პროცესში"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "Sign in progress"
+msgstr "დოკუმენტი ხელმოწერის პროცესშია"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Signed"
+msgstr "ხელმოწერილი"
+
+#. module: bog_bank
+#: model:ir.model.fields,help:bog_bank.field_account_payment__bog_attachment_hashes
+msgid "Space-separated externalFileHash values returned by BOG for the files of the last send. Every send uploads the files again."
+msgstr "ბოლო გაგზავნის ფაილებისთვის ბანკის მიერ დაბრუნებული externalFileHash მნიშვნელობები, ჰარით გამოყოფილი. ყოველი გაგზავნა ფაილებს ხელახლა ტვირთავს."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "The Bank of Georgia package key was restored from the batch's transfers."
+msgstr "საქართველოს ბანკის პაკეტის გასაღები პაკეტის გადარიცხვებიდან აღდგა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "The bulk transfer is in process of signature"
+msgstr "მიმდინარეობს პაკეტური გადარიცხვის ხელმოწერა"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "The document failed BOG's validations."
+msgstr "დოკუმენტმა ბანკის შემოწმება ვერ გაიარა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "The document was found at Bank of Georgia, but without its document key, so the payment is left as it is. Try Recover from BOG again later."
+msgstr "დოკუმენტი საქართველოს ბანკში მოიძებნა, მაგრამ დოკუმენტის გასაღების გარეშე, ამიტომ გადახდა უცვლელი დარჩა. მოგვიანებით კვლავ სცადეთ „ბანკიდან აღდგენა“."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "The document's signature deadline expired."
+msgstr "დოკუმენტის ხელმოწერის ვადა ამოიწურა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "The recipient account and name do not match."
+msgstr "მიმღების ანგარიში და სახელი ერთმანეთს არ ემთხვევა."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "To be Signed"
+msgstr "ხელმოსაწერი"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Transfer purpose (Nomination) is empty."
+msgstr "გადარიცხვის დანიშნულება (Nomination) შევსებული არ არის."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Treasury code not set."
+msgstr "სახაზინო კოდი მითითებული არ არის."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "Uploading file, checking"
+msgstr "მიმდინარეობს ფაილის ატვირთვა, შემოწმება"
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Value date is invalid."
+msgstr "ვალუტირების თარიღი არასწორია."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Working balance is insufficient."
+msgstr "სამუშაო ნაშთი არასაკმარისია."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Wrong IBAN format."
+msgstr "IBAN-ის ფორმატი არასწორია."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "Wrong destination."
+msgstr "მიმართულება არასწორია."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "You do not have permission to transfer from this account."
+msgstr "ამ ანგარიშიდან გადარიცხვის უფლება არ გაქვთ."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_payment.py:0
+msgid "You do not have transfer permission."
+msgstr "გადარიცხვის უფლება არ გაქვთ."
+
+#. module: bog_bank
+#. odoo-python
+#: code:addons/bog_bank/models/account_batch_payment.py:0
+msgid "This batch is already being processed. Try again in a moment."
+msgstr "ეს პაკეტი უკვე მუშავდება. სცადეთ ცოტა ხანში."

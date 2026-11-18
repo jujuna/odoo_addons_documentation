@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="glovo_event_view_list_inherit_pos_platform_order_glovo" model="ir.ui.view">
+        <field name="name">glovo.event.list.inherit.pos_platform_order_glovo</field>
+        <field name="model">glovo.event</field>
+        <field name="inherit_id" ref="glovo_base.glovo_event_view_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <header>
+                    <button name="action_retry" type="object" string="Retry" groups="point_of_sale.group_pos_manager"/>
+                </header>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="glovo_event_view_form_inherit_pos_platform_order_glovo" model="ir.ui.view">
+        <field name="name">glovo.event.form.inherit.pos_platform_order_glovo</field>
+        <field name="model">glovo.event</field>
+        <field name="inherit_id" ref="glovo_base.glovo_event_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='glovo_order_id']" position="after">
+                <field name="order_id"/>
+            </xpath>
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="action_retry" type="object" string="Retry" class="btn-primary"
+                        invisible="state == 'processed'" groups="point_of_sale.group_pos_manager"/>
+                </header>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

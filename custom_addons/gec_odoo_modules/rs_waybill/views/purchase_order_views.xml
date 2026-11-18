@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="purchase_order_form_inherit_rs_waybill" model="ir.ui.view">
+            <field name="name">purchase.order.form.inherit.rs.waybill</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_view_waybills"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="description"
+                            invisible="not waybill_id">
+                        <field name="waybill_id" widget="statinfo" string="Waybill"/>
+                    </button>
+                </xpath>
+                <xpath expr="//notebook" position="before">
+                    <field name="rs_waybill_locked" invisible="1"/>
+                    <div class="alert alert-warning mb-2" role="alert" invisible="not rs_waybill_locked">
+                        This order mirrors a vendor-issued RS.GE waybill. Products and quantities
+                        cannot be edited here — a buyer cannot change the vendor's waybill on RS.
+                        Changes arrive from the vendor via RS sync; use <b>Receive</b> or
+                        <b>Reject</b> on the waybill.
+                    </div>
+                </xpath>
+                <!-- Vendor is already read-only once the order is confirmed (state='purchase'), always the case
+                     with a linked waybill. -->
+                <xpath expr="//field[@name='order_line']" position="attributes">
+                    <attribute name="readonly">state == 'cancel' or locked or rs_waybill_locked</attribute>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,1022 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* gec_brand_kit
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-30 01:24+0000\n"
+"PO-Revision-Date: 2026-10-30 01:24+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: gec_brand_kit
+#: model:ir.module.module,description:base.module_gec_brand_kit
+msgid ""
+"\n"
+"Upload one ZIP (brand.json + images + optional font files) under Settings > Brand Kit and apply\n"
+"it: the backend colors are compiled from the kit through Odoo's SCSS variables (light and dark\n"
+"mode), the logo and report colors are written to every company, and the favicon, browser title,\n"
+"web-app manifest and home menu background follow the kit. Reset restores Odoo's default look.\n"
+"One brand per database.\n"
+msgstr ""
+"\n"
+"ატვირთეთ ერთი ZIP (brand.json + სურათები + სურვილისამებრ შრიფტის ფაილები) მენიუში\n"
+"პარამეტრები > ბრენდის ნაკრები და გამოიყენეთ: სისტემის ფერები იქმნება ნაკრებიდან Odoo-ს SCSS\n"
+"ცვლადებით (ღია და მუქი რეჟიმი), ლოგო და ანგარიშების ფერები იწერება ყველა კომპანიაში, ხოლო\n"
+"ფავიკონი, ბრაუზერის სათაური, ვებაპლიკაციის მანიფესტი და მთავარი ეკრანის ფონი ნაკრებს მიჰყვება.\n"
+"დაბრუნება აღადგენს Odoo-ს ნაგულისხმევ იერს. ერთი ბრენდი ერთ ბაზაზე.\n"
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid ""
+"\"%(name)s\" (%(key)s) is referenced in brand.json but missing from the ZIP."
+msgstr ""
+"„%(name)s“ (%(key)s) მითითებულია brand.json-ში, მაგრამ ZIP-ში არ არის."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "\"%s\" is larger than 5 MB."
+msgstr "„%s“ 5 მბ-ზე დიდია."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "\"%s\" is not a readable image."
+msgstr "„%s“ წაკითხვადი სურათი არ არის."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/models/gec_brand_kit.py:0
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "\"%s\" is not a woff2, woff or ttf font."
+msgstr "„%s“ woff2, woff ან ttf შრიფტი არ არის."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "\"%s\": images must be png, jpg or webp."
+msgstr "„%s“: სურათი უნდა იყოს png, jpg ან webp."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "\"colors\" and \"dark\" must be objects."
+msgstr "„colors“ და „dark“ ობიექტები უნდა იყოს."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "\"files\" may only contain %s."
+msgstr "„files“ შეიძლება შეიცავდეს მხოლოდ: %s."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "\"font\" must be a font name or {\"family\": ..., \"files\": {...}}."
+msgstr "„font“ უნდა იყოს შრიფტის სახელი ან {\"family\": ..., \"files\": {...}}."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "\"style\" must be one of: %s."
+msgstr "„style“ უნდა იყოს ერთ-ერთი: %s."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/models/gec_brand_kit.py:0
+msgid "%(mode)s: %(what)s is too low (%(ratio).1f:1, at least 3:1 needed)."
+msgstr ""
+"%(mode)s: %(what)s ძალიან დაბალია (%(ratio).1f:1, საჭიროა მინიმუმ 3:1)."
+
+#. module: gec_brand_kit
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_view_form
+msgid ""
+"<strong>Saved, but not applied yet.</strong> Click <strong>Apply</strong> so"
+" users see these changes."
+msgstr ""
+"<strong>შენახულია, მაგრამ ჯერ არ არის გამოყენებული.</strong> დააჭირეთ "
+"<strong>გამოყენებას</strong>, რომ მომხმარებლებმა ეს ცვლილებები დაინახონ."
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__color_accent
+msgid "Accent"
+msgstr "აქცენტის ფერი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__color_action
+msgid "Action"
+msgstr "მოქმედების ფერი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__name
+msgid "Application Name"
+msgstr "აპლიკაციის სახელი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__gec_brand_kit__state__applied
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_view_form
+msgid "Applied"
+msgstr "გამოყენებულია"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__applied_date
+msgid "Applied Date"
+msgstr "გამოყენების თარიღი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__applied_uid
+msgid "Applied by"
+msgstr "გამოიყენა"
+
+#. module: gec_brand_kit
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_view_form
+msgid "Apply"
+msgstr "გამოყენება"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit_import__apply_now
+msgid "Apply immediately"
+msgstr "მაშინვე გამოყენება"
+
+#. module: gec_brand_kit
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_view_form
+msgid ""
+"Apply this brand to the whole database? The logo, report colors and font of "
+"every company are overwritten."
+msgstr ""
+"გამოვიყენოთ ეს ბრენდი მთელ ბაზაზე? ყველა კომპანიის ლოგო, ანგარიშების ფერები "
+"და შრიფტი გადაიწერება."
+
+#. module: gec_brand_kit
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_import_view_form
+msgid ""
+"Applying a kit overwrites the logo, report colors and font of <strong>every company</strong>\n"
+"                    in this database. No copy of the previous values is kept."
+msgstr ""
+"ნაკრების გამოყენება გადააწერს <strong>ყველა კომპანიის</strong> ლოგოს, ანგარიშების ფერებს და შრიფტს\n"
+"                    ამ ბაზაში. წინა მნიშვნელობების ასლი არ ინახება."
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__color_background
+msgid "Background"
+msgstr "ფონი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,help:gec_brand_kit.field_gec_brand_kit__login_background
+msgid "Behind the login box. When empty, the home background is used."
+msgstr ""
+"ჩანს შესვლის ფორმის უკან. თუ ცარიელია, გამოიყენება მთავარი ეკრანის ფონი."
+
+#. module: gec_brand_kit
+#: model:ir.actions.act_window,name:gec_brand_kit.gec_brand_kit_action
+#: model:ir.model,name:gec_brand_kit.model_gec_brand_kit
+#: model:ir.ui.menu,name:gec_brand_kit.gec_brand_kit_menu
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_view_form
+msgid "Brand Kit"
+msgstr "ბრენდის ნაკრები"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit_import__file
+msgid "Brand Kit (.zip)"
+msgstr "ბრენდის ნაკრები (.zip)"
+
+#. module: gec_brand_kit
+#: model:ir.module.module,shortdesc:base.module_gec_brand_kit
+msgid "Brand Kit: Backend Branding from a ZIP"
+msgstr "ბრენდის ნაკრები: სისტემის გაფორმება ZIP ფაილიდან"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__ui_style
+msgid "Branding Strength"
+msgstr "ბრენდირების სიძლიერე"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__gec_brand_kit__palette__burgundy
+msgid "Burgundy"
+msgstr "ბორდო"
+
+#. module: gec_brand_kit
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_import_view_form
+msgid "Cancel"
+msgstr "გაუქმება"
+
+#. module: gec_brand_kit
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_view_form
+msgid ""
+"Changes are saved here first; users see them only after "
+"<strong>Apply</strong>."
+msgstr ""
+"ცვლილებები ჯერ აქ ინახება; მომხმარებლები მათ მხოლოდ "
+"<strong>გამოყენების</strong> შემდეგ დაინახავენ."
+
+#. module: gec_brand_kit
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__gec_brand_kit__ui_style__standard
+msgid "Colors only"
+msgstr "მხოლოდ ფერები"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,help:gec_brand_kit.field_gec_brand_kit__ui_style
+msgid ""
+"Colors only: Odoo's look with the brand colors on buttons and links.\n"
+"Strong: also a brand top bar, page header, list headers, form and card accents.\n"
+"Very strong: also tinted page backgrounds and solid list headers."
+msgstr ""
+"მხოლოდ ფერები: Odoo-ს ჩვეული იერსახე, ბრენდის ფერებით ღილაკებსა და ბმულებზე.\n"
+"ძლიერი: დამატებით ბრენდის ფერის ზედა ზოლი, გვერდის სათაური, სიის სათაურები, ფორმისა და ბარათების აქცენტები.\n"
+"ძალიან ძლიერი: დამატებით შეფერილი გვერდის ფონი და მთლიანად შეფერილი სიის სათაურები."
+
+#. module: gec_brand_kit
+#: model:ir.model,name:gec_brand_kit.model_res_company
+msgid "Company"
+msgstr "კომპანია"
+
+#. module: gec_brand_kit
+#. odoo-javascript
+#: code:addons/gec_brand_kit/static/src/xml/brand_preview.xml:0
+msgid "Confirm"
+msgstr "დადასტურება"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__create_uid
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit_import__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__create_date
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit_import__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: gec_brand_kit
+#. odoo-javascript
+#: code:addons/gec_brand_kit/static/src/xml/brand_preview.xml:0
+msgid "Customer"
+msgstr "კლიენტი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__color_danger
+msgid "Danger"
+msgstr "საფრთხე"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__dark_action
+msgid "Dark Action"
+msgstr "მუქი: მოქმედების ფერი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__dark_background
+msgid "Dark Background"
+msgstr "მუქი: ფონი"
+
+#. module: gec_brand_kit
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_view_form
+msgid "Dark Mode"
+msgstr "მუქი რეჟიმი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__dark_primary
+msgid "Dark Primary"
+msgstr "მუქი: ძირითადი ფერი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__dark_surface
+msgid "Dark Surface"
+msgstr "მუქი: ზედაპირი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__dark_text
+msgid "Dark Text"
+msgstr "მუქი: ტექსტი"
+
+#. module: gec_brand_kit
+#. odoo-javascript
+#. odoo-python
+#: code:addons/gec_brand_kit/models/gec_brand_kit.py:0
+#: code:addons/gec_brand_kit/static/src/xml/brand_preview.xml:0
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "Dark mode"
+msgstr "მუქი რეჟიმი"
+
+#. module: gec_brand_kit
+#. odoo-javascript
+#: code:addons/gec_brand_kit/static/src/js/brand_preview.js:0
+msgid "Deco Addict"
+msgstr ""
+
+#. module: gec_brand_kit
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__gec_brand_kit__palette__orange
+msgid "Deep Orange"
+msgstr "მუქი ნარინჯისფერი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__display_name
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit_import__display_name
+#: model:ir.model.fields,field_description:gec_brand_kit.field_ir_ui_menu__display_name
+#: model:ir.model.fields,field_description:gec_brand_kit.field_res_company__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: gec_brand_kit
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_view_form
+msgid "Export Kit"
+msgstr "ნაკრების ექსპორტი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__favicon
+msgid "Favicon"
+msgstr "ფავიკონი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit_import__filename
+msgid "Filename"
+msgstr "ფაილის სახელი"
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "Files not referenced in brand.json: %s."
+msgstr "ფაილები, რომლებიც brand.json-ში მითითებული არ არის: %s."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/models/gec_brand_kit.py:0
+msgid "Fill in these colors before Apply: %s."
+msgstr "გამოყენებამდე შეავსეთ ეს ფერები: %s."
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,help:gec_brand_kit.field_gec_brand_kit__palette
+msgid ""
+"Fills the light and dark colors; each color can still be changed afterwards."
+msgstr ""
+"ავსებს ღია და მუქი რეჟიმის ფერებს; თითოეული ფერის შეცვლა შემდეგაც შეიძლება."
+
+#. module: gec_brand_kit
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__gec_brand_kit__font__firago
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__res_company__font__firago
+msgid "FiraGO"
+msgstr ""
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,help:gec_brand_kit.field_gec_brand_kit__font
+msgid ""
+"FiraGO and the Noto fonts contain Georgian letters. Fonts marked \"Latin "
+"only\" show Georgian text in the browser's default font."
+msgstr ""
+"FiraGO-სა და Noto-ს შრიფტებში ქართული ასოებიც არის. „მხოლოდ ლათინური“ "
+"შრიფტების შემთხვევაში ქართული ტექსტი ბრაუზერის ნაგულისხმევი შრიფტით "
+"გამოჩნდება."
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__font
+#: model:ir.model.fields,field_description:gec_brand_kit.field_res_company__font
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_view_form
+msgid "Font"
+msgstr "შრიფტი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__font_bold
+msgid "Font Bold"
+msgstr "შრიფტი: მსხვილი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__font_bold_italic
+msgid "Font Bold Italic"
+msgstr "შრიფტი: მსხვილი დახრილი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__font_bold_italic_name
+msgid "Font Bold Italic Name"
+msgstr "შრიფტის ფაილი: მსხვილი დახრილი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__font_bold_name
+msgid "Font Bold Name"
+msgstr "შრიფტის ფაილი: მსხვილი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__font_italic
+msgid "Font Italic"
+msgstr "შრიფტი: დახრილი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__font_italic_name
+msgid "Font Italic Name"
+msgstr "შრიფტის ფაილი: დახრილი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__font_regular
+msgid "Font Regular"
+msgstr "შრიფტი: ჩვეულებრივი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__font_regular_name
+msgid "Font Regular Name"
+msgstr "შრიფტის ფაილი: ჩვეულებრივი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__font_sample
+msgid "Font Sample"
+msgstr "შრიფტის ნიმუში"
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/models/gec_brand_kit.py:0
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "Font file \"%s\" is larger than 2 MB."
+msgstr "შრიფტის ფაილი „%s“ 2 მბ-ზე დიდია."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "Font file \"%s\" is missing from the ZIP."
+msgstr "შრიფტის ფაილი „%s“ ZIP-ში არ არის."
+
+#. module: gec_brand_kit
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__gec_brand_kit__palette__forest
+msgid "Forest Green"
+msgstr "ტყისფერი მწვანე"
+
+#. module: gec_brand_kit
+#. odoo-javascript
+#: code:addons/gec_brand_kit/static/src/js/brand_preview.js:0
+msgid "Gemini Furniture"
+msgstr ""
+
+#. module: gec_brand_kit
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__gec_brand_kit__palette__graphite
+msgid "Graphite"
+msgstr "გრაფიტი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__home_background
+msgid "Home Background"
+msgstr "მთავარი ეკრანის ფონი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__id
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit_import__id
+#: model:ir.model.fields,field_description:gec_brand_kit.field_ir_ui_menu__id
+#: model:ir.model.fields,field_description:gec_brand_kit.field_res_company__id
+msgid "ID"
+msgstr ""
+
+#. module: gec_brand_kit
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_view_form
+msgid "Images"
+msgstr "სურათები"
+
+#. module: gec_brand_kit
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_import_view_form
+msgid "Import"
+msgstr "იმპორტი"
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/models/gec_brand_kit.py:0
+#: model:ir.model,name:gec_brand_kit.model_gec_brand_kit_import
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_import_view_form
+msgid "Import Brand Kit"
+msgstr "ბრენდის ნაკრების იმპორტი"
+
+#. module: gec_brand_kit
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_view_form
+msgid "Import Kit"
+msgstr "ნაკრების იმპორტი"
+
+#. module: gec_brand_kit
+#: model:ir.module.module,summary:base.module_gec_brand_kit
+msgid ""
+"Import a brand kit ZIP to restyle the whole backend: colors, font, logo, "
+"favicon, home background"
+msgstr ""
+"ბრენდის ნაკრების ZIP-ის იმპორტი მთელი სისტემის გასაფორმებლად: ფერები, "
+"შრიფტი, ლოგო, ფავიკონი, მთავარი ეკრანის ფონი"
+
+#. module: gec_brand_kit
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_view_form
+msgid ""
+"Import a brand kit ZIP with <strong>Import Kit</strong>, or pick a ready-"
+"made palette below and adjust it."
+msgstr ""
+"ატვირთეთ ბრენდის ZIP ფაილი ღილაკით <strong>ნაკრების იმპორტი</strong>, ან "
+"ქვემოთ აირჩიეთ მზა პალიტრა და მოარგეთ."
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__color_info
+msgid "Info"
+msgstr "ინფორმაცია"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__font_family
+msgid "Kit Font Family"
+msgstr "ნაკრების შრიფტი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__write_uid
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit_import__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__write_date
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit_import__write_date
+msgid "Last Updated on"
+msgstr "ბოლო განახლების თარიღი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__gec_brand_kit__font__lato
+msgid "Lato (Latin only)"
+msgstr "Lato (მხოლოდ ლათინური)"
+
+#. module: gec_brand_kit
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_view_form
+msgid "Light Mode"
+msgstr "ღია რეჟიმი"
+
+#. module: gec_brand_kit
+#. odoo-javascript
+#. odoo-python
+#: code:addons/gec_brand_kit/models/gec_brand_kit.py:0
+#: code:addons/gec_brand_kit/static/src/xml/brand_preview.xml:0
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "Light mode"
+msgstr "ღია რეჟიმი"
+
+#. module: gec_brand_kit
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_view_form
+msgid "Live Preview"
+msgstr "ცოცხალი გადახედვა"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__login_background
+msgid "Login Background"
+msgstr "შესვლის გვერდის ფონი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__logo
+msgid "Logo"
+msgstr "ლოგო"
+
+#. module: gec_brand_kit
+#: model:ir.model,name:gec_brand_kit.model_ir_ui_menu
+msgid "Menu"
+msgstr "მენიუ"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__gec_brand_kit__font__montserrat
+msgid "Montserrat (Latin only)"
+msgstr "Montserrat (მხოლოდ ლათინური)"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__gec_brand_kit__palette__gec
+msgid "Navy & Teal (GEC)"
+msgstr "მუქი ლურჯი და ზურმუხტისფერი (GEC)"
+
+#. module: gec_brand_kit
+#. odoo-javascript
+#: code:addons/gec_brand_kit/static/src/xml/brand_preview.xml:0
+msgid "New"
+msgstr "ახალი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__gec_brand_kit__font__noto_sans_georgian
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__res_company__font__noto_sans_georgian
+msgid "Noto Sans Georgian"
+msgstr ""
+
+#. module: gec_brand_kit
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__gec_brand_kit__font__noto_serif_georgian
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__res_company__font__noto_serif_georgian
+msgid "Noto Serif Georgian"
+msgstr ""
+
+#. module: gec_brand_kit
+#. odoo-javascript
+#: code:addons/gec_brand_kit/static/src/xml/brand_preview.xml:0
+msgid "Number"
+msgstr "ნომერი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__gec_brand_kit__palette__ocean
+msgid "Ocean Blue"
+msgstr "ოკეანისფერი ლურჯი"
+
+#. module: gec_brand_kit
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_view_form
+msgid "Odoo"
+msgstr ""
+
+#. module: gec_brand_kit
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__gec_brand_kit__state__default
+msgid "Odoo default"
+msgstr "Odoo-ს ნაგულისხმევი"
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/models/gec_brand_kit.py:0
+msgid "Only administrators can change the brand kit."
+msgstr "ბრენდის ნაკრების შეცვლა მხოლოდ ადმინისტრატორს შეუძლია."
+
+#. module: gec_brand_kit
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__gec_brand_kit__font__open_sans
+msgid "Open Sans (Latin only)"
+msgstr "Open Sans (მხოლოდ ლათინური)"
+
+#. module: gec_brand_kit
+#. odoo-javascript
+#: code:addons/gec_brand_kit/static/src/xml/brand_preview.xml:0
+msgid "Order Lines"
+msgstr "შეკვეთის ხაზები"
+
+#. module: gec_brand_kit
+#. odoo-javascript
+#: code:addons/gec_brand_kit/static/src/xml/brand_preview.xml:0
+msgid "Orders"
+msgstr "შეკვეთები"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__gec_brand_kit__font__oswald
+msgid "Oswald (Latin only)"
+msgstr "Oswald (მხოლოდ ლათინური)"
+
+#. module: gec_brand_kit
+#. odoo-javascript
+#: code:addons/gec_brand_kit/static/src/xml/brand_preview.xml:0
+msgid "Other Info"
+msgstr "სხვა ინფორმაცია"
+
+#. module: gec_brand_kit
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_view_form
+msgid "Own Font Files"
+msgstr "საკუთარი შრიფტის ფაილები"
+
+#. module: gec_brand_kit
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_view_form
+msgid "Pick a palette or fill in the colors."
+msgstr "აირჩიეთ პალიტრა ან შეავსეთ ფერები."
+
+#. module: gec_brand_kit
+#. odoo-javascript
+#: code:addons/gec_brand_kit/static/src/xml/brand_preview.xml:0
+msgid "Preview of the unsaved values. Users see the brand only after Apply."
+msgstr ""
+"შეუნახავი მნიშვნელობების გადახედვა. მომხმარებლები ბრენდს მხოლოდ გამოყენების "
+"შემდეგ დაინახავენ."
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__color_primary
+msgid "Primary"
+msgstr "ძირითადი ფერი"
+
+#. module: gec_brand_kit
+#. odoo-javascript
+#: code:addons/gec_brand_kit/static/src/xml/brand_preview.xml:0
+msgid "Products"
+msgstr "პროდუქტები"
+
+#. module: gec_brand_kit
+#. odoo-javascript
+#: code:addons/gec_brand_kit/static/src/js/brand_preview.js:0
+msgid "Quotation"
+msgstr "შეთავაზება"
+
+#. module: gec_brand_kit
+#. odoo-javascript
+#: code:addons/gec_brand_kit/static/src/xml/brand_preview.xml:0
+msgid "Quotations"
+msgstr "კომერციული შეთავაზებები"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__gec_brand_kit__font__raleway
+msgid "Raleway (Latin only)"
+msgstr "Raleway (მხოლოდ ლათინური)"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__readability
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_view_form
+msgid "Readability"
+msgstr "წაკითხვადობა"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__palette
+msgid "Ready-made Palette"
+msgstr "მზა პალიტრა"
+
+#. module: gec_brand_kit
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_view_form
+msgid "Reset to Odoo Default"
+msgstr "Odoo-ს ნაგულისხმევ იერზე დაბრუნება"
+
+#. module: gec_brand_kit
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_view_form
+msgid ""
+"Restore Odoo's default look? Company logos and report colors stay as they "
+"are."
+msgstr ""
+"დავაბრუნოთ Odoo-ს ნაგულისხმევი იერი? კომპანიების ლოგოები და ანგარიშების "
+"ფერები უცვლელი დარჩება."
+
+#. module: gec_brand_kit
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__gec_brand_kit__font__roboto
+msgid "Roboto (Latin only)"
+msgstr "Roboto (მხოლოდ ლათინური)"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__gec_brand_kit__palette__purple
+msgid "Royal Purple"
+msgstr "სამეფო იისფერი"
+
+#. module: gec_brand_kit
+#. odoo-javascript
+#: code:addons/gec_brand_kit/static/src/xml/brand_preview.xml:0
+msgid "S00041"
+msgstr ""
+
+#. module: gec_brand_kit
+#. odoo-javascript
+#: code:addons/gec_brand_kit/static/src/js/brand_preview.js:0
+msgid "Sales Order"
+msgstr "გაყიდვის შეკვეთა"
+
+#. module: gec_brand_kit
+#. odoo-javascript
+#: code:addons/gec_brand_kit/static/src/js/brand_preview.js:0
+msgid "Sent"
+msgstr "გაგზავნილი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,help:gec_brand_kit.field_gec_brand_kit__name
+msgid ""
+"Shown as the browser tab title and the installed-app name instead of "
+"\"Odoo\"."
+msgstr ""
+"ჩანს ბრაუზერის ჩანართის სათაურად და დაინსტალირებული აპლიკაციის სახელად "
+"„Odoo“-ს ნაცვლად."
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__state
+msgid "State"
+msgstr "მდგომარეობა"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__gec_brand_kit__ui_style__strong
+msgid "Strong"
+msgstr "ძლიერი"
+
+#. module: gec_brand_kit
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_view_form
+msgid "Style"
+msgstr "სტილი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__color_success
+msgid "Success"
+msgstr "წარმატება"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__color_surface
+msgid "Surface"
+msgstr "ზედაპირი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__gec_brand_kit__font__tajawal
+msgid "Tajawal (Latin only)"
+msgstr "Tajawal (მხოლოდ ლათინური)"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__color_text
+msgid "Text"
+msgstr "ტექსტი"
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/models/gec_brand_kit.py:0
+msgid "Text on background"
+msgstr "ტექსტი ფონზე"
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/models/gec_brand_kit.py:0
+msgid "Text on surface"
+msgstr "ტექსტი ზედაპირზე"
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/models/gec_brand_kit.py:0
+msgid ""
+"The brand could not be applied: Odoo failed to build the styles with it. Nothing was changed.\n"
+"\n"
+"%s"
+msgstr ""
+"ბრენდის გამოყენება ვერ მოხერხდა: Odoo-მ მისი სტილების აწყობა ვერ შეძლო. არაფერი შეცვლილა.\n"
+"\n"
+"%s"
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "The brand kit is larger than 20 MB."
+msgstr "ბრენდის ნაკრები 20 მბ-ზე დიდია."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "The brand kit must be a .zip file."
+msgstr "ბრენდის ნაკრები .zip ფაილი უნდა იყოს."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "The brand kit must be a flat ZIP without folders: \"%s\"."
+msgstr "ბრენდის ნაკრები უნდა იყოს ZIP საქაღალდეების გარეშე: „%s“."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "The brand kit record is missing; upgrade the Brand Kit module."
+msgstr ""
+"ბრენდის ნაკრების ჩანაწერი არ არსებობს; განაახლეთ ბრენდის ნაკრების მოდული."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/models/gec_brand_kit.py:0
+msgid "The color \"%(field)s\" must be #RRGGBB, not \"%(value)s\"."
+msgstr "ფერი „%(field)s“ უნდა იყოს #RRGGBB ფორმატის და არა „%(value)s“."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "The color \"%(key)s\" must be #RRGGBB, not \"%(value)s\"."
+msgstr "ფერი „%(key)s“ უნდა იყოს #RRGGBB ფორმატში და არა „%(value)s“."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "The color \"%s\" is required."
+msgstr "ფერი „%s“ სავალდებულოა."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/models/gec_brand_kit.py:0
+msgid ""
+"The font family name may only contain letters, digits, spaces, dots and "
+"dashes."
+msgstr ""
+"შრიფტის ოჯახის სახელში დასაშვებია მხოლოდ ასოები, ციფრები, ჰარი, წერტილი და "
+"ტირე."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "The font file \"regular\" is required."
+msgstr "შრიფტის ფაილი „regular“ სავალდებულოა."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/models/gec_brand_kit.py:0
+msgid "The kit's own font files are used; the sample shows after Apply."
+msgstr ""
+"გამოიყენება ნაკრების საკუთარი შრიფტის ფაილები; ნიმუში გამოყენების შემდეგ "
+"გამოჩნდება."
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,help:gec_brand_kit.field_gec_brand_kit__color_accent
+msgid ""
+"Thin highlight lines (top bar, page header, cards, tabs). Defaults to the "
+"action color."
+msgstr ""
+"თხელი აქცენტის ხაზები (ზედა ზოლი, გვერდის სათაური, ბარათები, ჩანართები). თუ "
+"მითითებული არ არის, გამოიყენება მოქმედების ფერი."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/models/gec_brand_kit.py:0
+msgid ""
+"This font has no Georgian letters; Georgian text will use the browser's "
+"default font."
+msgstr ""
+"ამ შრიფტში ქართული ასოები არ არის; ქართული ტექსტი ბრაუზერის ნაგულისხმევი "
+"შრიფტით გამოჩნდება."
+
+#. module: gec_brand_kit
+#. odoo-javascript
+#: code:addons/gec_brand_kit/static/src/xml/brand_preview.xml:0
+msgid "Total"
+msgstr "ჯამი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,help:gec_brand_kit.field_gec_brand_kit__web_app_name_set
+msgid ""
+"True when Apply wrote the application name parameter, so Reset may remove "
+"it."
+msgstr ""
+"ჩართულია, როცა გამოყენებამ ჩაწერა აპლიკაციის სახელის პარამეტრი, რათა "
+"დაბრუნებამ შეძლოს მისი წაშლა."
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__unapplied_changes
+msgid "Unapplied Changes"
+msgstr "გამოუყენებელი ცვლილებები"
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "Unknown color keys: %s."
+msgstr "უცნობი ფერის გასაღებები: %s."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "Unknown font \"%(font)s\". Use one of: %(fonts)s, or the kit's own files."
+msgstr ""
+"უცნობი შრიფტი „%(font)s“. გამოიყენეთ ერთ-ერთი: %(fonts)s, ან ნაკრების "
+"საკუთარი ფაილები."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "Unknown font style \"%s\" (regular, bold, italic, bold_italic)."
+msgstr "უცნობი შრიფტის სტილი „%s“ (regular, bold, italic, bold_italic)."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "Unknown keys in brand.json: %s."
+msgstr "უცნობი გასაღებები brand.json-ში: %s."
+
+#. module: gec_brand_kit
+#: model:ir.model.fields.selection,name:gec_brand_kit.selection__gec_brand_kit__ui_style__bold
+msgid "Very strong"
+msgstr "ძალიან ძლიერი"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__color_warning
+msgid "Warning"
+msgstr "გაფრთხილება"
+
+#. module: gec_brand_kit
+#: model:ir.model.fields,field_description:gec_brand_kit.field_gec_brand_kit__web_app_name_set
+msgid "Web App Name Set"
+msgstr "აპლიკაციის სახელი დაყენებულია"
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/models/gec_brand_kit.py:0
+msgid "White text on buttons"
+msgstr "თეთრი ტექსტი ღილაკებზე"
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/models/gec_brand_kit.py:0
+msgid "White text on primary"
+msgstr "თეთრი ტექსტი ძირითად ფერზე"
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/models/gec_brand_kit.py:0
+msgid "action"
+msgstr ""
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "brand.json is missing from the brand kit."
+msgstr "ბრენდის ნაკრებში brand.json არ არის."
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "brand.json is not valid JSON: %s"
+msgstr "brand.json არასწორი JSON-ია: %s"
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/wizard/gec_brand_kit_import.py:0
+msgid "brand.json must have \"format\": \"%s\"."
+msgstr "brand.json-ში უნდა იყოს \"format\": \"%s\"."
+
+#. module: gec_brand_kit
+#: model_terms:ir.ui.view,arch_db:gec_brand_kit.gec_brand_kit_view_form
+msgid "e.g. FiraGO"
+msgstr "მაგ. FiraGO"
+
+#. module: gec_brand_kit
+#. odoo-python
+#: code:addons/gec_brand_kit/models/gec_brand_kit.py:0
+msgid "text"
+msgstr "ტექსტი"
+
+#. module: gec_brand_kit
+#. odoo-javascript
+#: code:addons/gec_brand_kit/static/src/xml/brand_preview.xml:0
+msgid "ბრენდის სტილი — Brand Style Aa 123"
+msgstr ""

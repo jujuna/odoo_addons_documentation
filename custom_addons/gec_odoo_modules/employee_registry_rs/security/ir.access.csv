@@ -1,0 +1,6 @@
+id,name,model_id,group_id/id,operation,domain
+access_employee_registry_rs_log_hr_manager,employee.registry.rs.log hr manager,employee.registry.rs.log,hr.group_hr_manager,cru,
+access_employee_registry_rs_log_hr_user,employee.registry.rs.log hr user,employee.registry.rs.log,hr.group_hr_user,r,
+employee_registry_rs_log_comp_rule,employee.registry.rs.log multi-company,employee.registry.rs.log,,crud,"[('company_id', 'in', company_ids)]"
+access_employee_registry_rs_browser_hr_manager,employee.registry.rs.browser hr manager,employee.registry.rs.browser,hr.group_hr_manager,crud,"[('create_uid', '=', user.id)]"
+access_employee_registry_rs_browser_line_hr_manager,employee.registry.rs.browser.line hr manager,employee.registry.rs.browser.line,hr.group_hr_manager,crud,"[('browser_id', 'access', 'read')]"

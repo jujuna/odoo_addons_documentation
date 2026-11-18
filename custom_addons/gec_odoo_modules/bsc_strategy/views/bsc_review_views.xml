@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_bsc_review_list" model="ir.ui.view">
+        <field name="name">bsc.review.list</field>
+        <field name="model">bsc.review</field>
+        <field name="arch" type="xml">
+            <list string="Strategy Reviews">
+                <field name="review_date"/>
+                <field name="scorecard_id" options="{'no_quick_create': True}" />
+                <field name="period_id" options="{'no_create': True}" />
+                <field name="score_snapshot" string="Score %" digits="[16,1]"/>
+                <field name="completion_snapshot" string="Completion %" digits="[16,1]"/>
+                <field name="red_objective_ids" widget="many2many_tags"
+                       string="Off Track" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'done'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bsc_review_form" model="ir.ui.view">
+        <field name="name">bsc.review.form</field>
+        <field name="model">bsc.review</field>
+        <field name="arch" type="xml">
+            <form string="Strategy Review">
+                <header>
+                    <button name="action_prepare" type="object" string="Prepare"
+                            class="btn-primary" invisible="state != 'draft'"
+                            help="Freezes the score and lists the objectives that are off track."/>
+                    <button name="action_create_initiative" type="object"
+                            string="New Corrective Initiative"
+                            invisible="state != 'draft'"/>
+                    <button name="action_print" type="object" string="Board Pack"/>
+                    <button name="action_done" type="object" string="Close Review"
+                            invisible="state != 'draft'"/>
+                    <button name="action_back_to_draft" type="object" string="Reopen"
+                            invisible="state != 'done'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="scorecard_id" options="{'no_quick_create': True}" />
+                            <field name="period_id" options="{'no_create': True}" />
+                            <field name="review_date"/>
+                        </group>
+                        <group>
+                            <field name="score_snapshot"/>
+                            <field name="completion_snapshot"/>
+                            <field name="participant_ids" widget="many2many_avatar_user" options="{'no_create': True}" />
+                        </group>
+                    </group>
+                    <group string="Off-track Objectives">
+                        <field name="red_objective_ids" nolabel="1" readonly="1"
+                               context="{'bsc_period_id': period_id}">
+                            <list>
+                                <field name="code"/>
+                                <field name="perspective_id" options="{'no_create': True}" />
+                                <field name="name"/>
+                                <field name="owner_id" widget="many2one_avatar_user" options="{'no_create': True}" />
+                                <field name="score" digits="[16,1]"/>
+                                <button name="action_create_corrective_initiative"
+                                        type="object" string="Act on it" icon="rocket_launch"/>
+                                <button name="action_open_form" type="object" string="Edit" icon="edit" title="Open it where it can be changed"/>
+                            </list>
+                        </field>
+                    </group>
+                    <notebook>
+                        <page string="Findings" name="findings">
+                            <field name="findings" nolabel="1"
+                                   placeholder="What the figures actually say. Facts before opinions."/>
+                        </page>
+                        <page string="Decisions" name="decisions">
+                            <p class="text-muted">
+                                Required before the review can be closed. A review that
+                                decides nothing is a report.
+                            </p>
+                            <field name="decisions" nolabel="1"
+                                   placeholder="What was decided, by whom, and by when."/>
+                        </page>
+                        <page string="Figures of the Period" name="figures">
+                            <field name="period_measurement_ids" readonly="1"
+                                   context="{'bsc_period_id': period_id}">
+                                <list decoration-danger="status == 'red'"
+                                      decoration-warning="status == 'amber'"
+                                      decoration-muted="not actual_value_set">
+                                    <field name="perspective_id"/>
+                                    <field name="kpi_id"/>
+                                    <field name="uom_name" string="Unit"/>
+                                    <field name="target_value"/>
+                                    <field name="actual_value"/>
+                                    <field name="actual_value_set" column_invisible="1"/>
+                                    <field name="achievement" string="Achievement %" digits="[16,1]"/>
+                                    <field name="status" widget="badge"
+                                           decoration-success="status == 'green'"
+                                           decoration-warning="status == 'amber'"
+                                           decoration-danger="status == 'red'"/>
+                                    <field name="trend" optional="show"/>
+                                    <field name="comment"/>
+                                    <button name="action_open_form" type="object" string="Edit" icon="edit" title="Open it where it can be changed"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Corrective Initiatives" name="initiatives">
+                            <field name="action_initiative_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="objective_ids" widget="many2many_tags" options="{'no_quick_create': True}" />
+                                    <field name="stage_id" options="{'no_create': True}" />
+                                    <field name="owner_id" widget="many2one_avatar_user" options="{'no_create': True}" />
+                                    <field name="date_end"/>
+                                    <field name="progress" widget="progressbar"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Strategy Adjustment" name="adjustment">
+                            <field name="strategy_adjustment" nolabel="1"
+                                   placeholder="Objectives, targets or cause-effect links changed as a result of this review. A strategy that never changes was never being tested."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bsc_review" model="ir.actions.act_window">
+        <field name="name">Strategy Reviews</field>
+        <field name="res_model">bsc.review</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Hold the first review</p>
+            <p>This is where measurement becomes management: look at the period,
+               agree what it means, decide something, and record it.</p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- gec.margin.dashboard computes the figures; the page only draws them, so it needs no model of its own. -->
+    <record id="action_gec_margin_dashboard" model="ir.actions.client">
+        <field name="name">ABC Dashboard</field>
+        <field name="tag">gec_analytic_margin.dashboard</field>
+    </record>
+
+    <menuitem id="menu_gec_margin_dashboard"
+              name="Dashboard"
+              parent="menu_gec_abc_reports"
+              action="action_gec_margin_dashboard"
+              sequence="5"/>
+
+</odoo>

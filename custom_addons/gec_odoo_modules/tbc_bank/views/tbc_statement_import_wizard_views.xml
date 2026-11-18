@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_tbc_statement_import_wizard_form" model="ir.ui.view">
+        <field name="name">tbc.statement.import.wizard.form</field>
+        <field name="model">tbc.statement.import.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Import TBC Bank Statement">
+                <group>
+                    <field name="journal_id"/>
+                    <field name="account_number"/>
+                    <field name="currency_code"/>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                </group>
+                <footer>
+                    <button name="action_import" type="object" string="Import" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_tbc_statement_import" model="ir.actions.act_window">
+        <field name="name">Import Statement</field>
+        <field name="res_model">tbc.statement.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

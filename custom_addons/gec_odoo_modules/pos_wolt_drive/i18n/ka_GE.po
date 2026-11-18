@@ -1,0 +1,510 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* pos_wolt_drive
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-31 16:39+0000\n"
+"PO-Revision-Date: 2026-10-31 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian (ka_GE)\n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#. module: pos_wolt_drive
+#: model:ir.module.module,description:base.module_pos_wolt_drive
+msgid ""
+"\n"
+"Wolt Drive for the Point of Sale:\n"
+"- price and book a Wolt courier for a paid POS order with a customer address\n"
+"- follow the courier status and tracking link in the POS and on the order\n"
+"- cancel the courier before the pickup starts\n"
+msgstr ""
+"\n"
+"Wolt Drive გაყიდვის წერტილისთვის:\n"
+"- Wolt კურიერის ფასის მიღება და დაჯავშნა კლიენტის მისამართის მქონე გადახდილი POS შეკვეთისთვის\n"
+"- კურიერის სტატუსისა და თვალთვალის ბმულის ნახვა POS-სა და შეკვეთაზე\n"
+"- კურიერის გაუქმება აღების დაწყებამდე\n"
+
+#. module: pos_wolt_drive
+#. odoo-python
+#: code:addons/pos_wolt_drive/models/pos_order.py:0
+msgid "A Wolt courier is already booked for this order."
+msgstr "ამ შეკვეთისთვის Wolt კურიერი უკვე დაჯავშნილია."
+
+#. module: pos_wolt_drive
+#: model_terms:ir.ui.view,arch_db:pos_wolt_drive.res_config_settings_view_form_wolt_drive
+msgid "API Key"
+msgstr "API გასაღები"
+
+#. module: pos_wolt_drive
+#. odoo-python
+#: code:addons/pos_wolt_drive/models/pos_order.py:0
+msgid ""
+"Add the customer's street and city or zip so Wolt can price the delivery."
+msgstr ""
+"დაამატეთ კლიენტის ქუჩა და ქალაქი ან საფოსტო ინდექსი, რათა Wolt-მა მიწოდების "
+"ფასი გამოთვალოს."
+
+#. module: pos_wolt_drive
+#: model_terms:ir.ui.view,arch_db:pos_wolt_drive.res_config_settings_view_form_wolt_drive
+msgid "Book Wolt couriers for paid delivery orders of this Point of Sale"
+msgstr ""
+"Wolt კურიერების დაჯავშნა ამ გაყიდვის წერტილის გადახდილი მიწოდების "
+"შეკვეთებისთვის"
+
+#. module: pos_wolt_drive
+#: model:ir.module.module,summary:base.module_pos_wolt_drive
+msgid "Book Wolt couriers for your own Point of Sale delivery orders"
+msgstr ""
+"Wolt კურიერების დაჯავშნა თქვენი საკუთარი გაყიდვის წერტილის მიწოდების "
+"შეკვეთებისთვის"
+
+#. module: pos_wolt_drive
+#. odoo-javascript
+#: code:addons/pos_wolt_drive/static/src/app/ticket_screen.js:0
+msgid ""
+"Book the courier for %(price)s, at the customer in about %(eta)s minutes?"
+msgstr ""
+"გსურთ, დაჯავშნოთ კურიერი, რომელიც კლიენტთან დაახლოებით %(eta)s წუთში მივა, "
+"ფასად %(price)s?"
+
+#. module: pos_wolt_drive
+#. odoo-javascript
+#: code:addons/pos_wolt_drive/static/src/app/ticket_screen.js:0
+msgid "Book the courier for %(price)s?"
+msgstr "გსურთ, დაჯავშნოთ კურიერი ფასად %(price)s?"
+
+#. module: pos_wolt_drive
+#. odoo-javascript
+#: code:addons/pos_wolt_drive/static/src/app/ticket_screen.xml:0
+msgid "Cancel Courier"
+msgstr "კურიერის გაუქმება"
+
+#. module: pos_wolt_drive
+#. odoo-javascript
+#: code:addons/pos_wolt_drive/static/src/app/ticket_screen.js:0
+msgid "Cancel the Wolt courier?"
+msgstr "გსურთ, გააუქმოთ Wolt კურიერი?"
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields.selection,name:pos_wolt_drive.selection__pos_order__wolt_drive_status__cancelled
+msgid "Cancelled"
+msgstr "გაუქმებული"
+
+#. module: pos_wolt_drive
+#. odoo-python
+#: code:addons/pos_wolt_drive/models/pos_order.py:0
+msgid "Cancelled by the merchant"
+msgstr "გაუქმებულია მერჩანტის მიერ"
+
+#. module: pos_wolt_drive
+#: model:ir.model,name:pos_wolt_drive.model_res_config_settings
+msgid "Config Settings"
+msgstr "კონფიგურაციის პარამეტრები"
+
+#. module: pos_wolt_drive
+#. odoo-python
+#: code:addons/pos_wolt_drive/models/pos_order.py:0
+msgid "Contact Wolt support to cancel: the courier is already on the way."
+msgstr ""
+"გასაუქმებლად დაუკავშირდით Wolt-ის მხარდაჭერის სამსახურს: კურიერი უკვე "
+"გზაშია."
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields.selection,name:pos_wolt_drive.selection__pos_order__wolt_drive_status__courier_at_pickup
+msgid "Courier Arrived"
+msgstr "კურიერი მოვიდა"
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_pos_order__wolt_drive_pickup_eta
+msgid "Courier Pickup ETA"
+msgstr "კურიერის მიერ აღების სავარაუდო დრო"
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields.selection,name:pos_wolt_drive.selection__pos_order__wolt_drive_status__requested
+msgid "Courier Requested"
+msgstr "კურიერი მოთხოვნილია"
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields.selection,name:pos_wolt_drive.selection__pos_order__wolt_drive_status__courier_assigned
+msgid "Courier on the Way"
+msgstr "კურიერი გზაშია"
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields.selection,name:pos_wolt_drive.selection__pos_order__wolt_drive_status__delivered
+msgid "Delivered"
+msgstr "მიწოდებული"
+
+#. module: pos_wolt_drive
+#. odoo-javascript
+#: code:addons/pos_wolt_drive/static/src/app/pos_order.js:0
+msgid "Delivered by Wolt"
+msgstr "მიწოდებულია Wolt-ის მიერ"
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_pos_order__wolt_drive_dropoff_eta
+msgid "Delivery ETA"
+msgstr "მიწოდების სავარაუდო დრო"
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_pos_config__display_name
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_pos_order__display_name
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_res_config_settings__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_pos_config__id
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_pos_order__id
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_res_config_settings__id
+msgid "ID"
+msgstr "ID"
+
+#. module: pos_wolt_drive
+#: model_terms:ir.ui.view,arch_db:pos_wolt_drive.res_config_settings_view_form_wolt_drive
+msgid "Merchant ID"
+msgstr "მერჩანტის ID"
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields,help:pos_wolt_drive.field_pos_config__wolt_drive_preparation_minutes
+#: model:ir.model.fields,help:pos_wolt_drive.field_res_config_settings__pos_wolt_drive_preparation_minutes
+msgid "Minutes needed before the courier can pick the order up (0-60)."
+msgstr ""
+"წუთების რაოდენობა, რომელიც საჭიროა კურიერის მიერ შეკვეთის აღებამდე (0-60)."
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields.selection,name:pos_wolt_drive.selection__pos_order__wolt_drive_status__not_delivered
+msgid "Not Delivered"
+msgstr "მიუწოდებელი"
+
+#. module: pos_wolt_drive
+#. odoo-javascript
+#: code:addons/pos_wolt_drive/static/src/app/pos_order.js:0
+msgid "Not delivered by Wolt"
+msgstr "Wolt-ის მიერ არ არის მიწოდებული"
+
+#. module: pos_wolt_drive
+#. odoo-python
+#: code:addons/pos_wolt_drive/models/pos_order.py:0
+msgid "Only a paid sale can get a Wolt courier."
+msgstr "Wolt კურიერის დაჯავშნა მხოლოდ გადახდილი გაყიდვისთვის შეიძლება."
+
+#. module: pos_wolt_drive
+#. odoo-python
+#: code:addons/pos_wolt_drive/models/pos_config.py:0
+msgid "Only administrators can register the Wolt Drive webhook."
+msgstr ""
+"Wolt Drive-ის webhook-ის რეგისტრაცია მხოლოდ ადმინისტრატორებს შეუძლიათ."
+
+#. module: pos_wolt_drive
+#: model:ir.module.module,shortdesc:base.module_pos_wolt_drive
+msgid "POS Wolt Drive"
+msgstr "გაყიდვის წერტილი - Wolt Drive"
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields.selection,name:pos_wolt_drive.selection__pos_order__wolt_drive_status__picked_up
+msgid "Picked Up"
+msgstr "აღებული"
+
+#. module: pos_wolt_drive
+#. odoo-javascript
+#: code:addons/pos_wolt_drive/static/src/app/pos_order.js:0
+msgid "Picked up by Wolt"
+msgstr "აღებულია Wolt-ის მიერ"
+
+#. module: pos_wolt_drive
+#: model:ir.model,name:pos_wolt_drive.model_pos_config
+msgid "Point of Sale Configuration"
+msgstr "გაყიდვის წერტილის კონფიგურაცია"
+
+#. module: pos_wolt_drive
+#: model:ir.model,name:pos_wolt_drive.model_pos_order
+msgid "Point of Sale Order"
+msgstr "გაყიდვის წერტილის შეკვეთა"
+
+#. module: pos_wolt_drive
+#: model_terms:ir.ui.view,arch_db:pos_wolt_drive.res_config_settings_view_form_wolt_drive
+msgid "Preparation (min)"
+msgstr "მომზადება (წთ)"
+
+#. module: pos_wolt_drive
+#: model_terms:ir.ui.view,arch_db:pos_wolt_drive.res_config_settings_view_form_wolt_drive
+msgid "Register Status Webhook"
+msgstr "სტატუსის Webhook-ის რეგისტრაცია"
+
+#. module: pos_wolt_drive
+#. odoo-python
+#: code:addons/pos_wolt_drive/models/pos_config.py:0
+msgid "Set the Wolt Drive merchant ID and API key first."
+msgstr "ჯერ მიუთითეთ Wolt Drive-ის მერჩანტის ID და API გასაღები."
+
+#. module: pos_wolt_drive
+#: model_terms:ir.ui.view,arch_db:pos_wolt_drive.res_config_settings_view_form_wolt_drive
+msgid "Test Mode"
+msgstr "სატესტო რეჟიმი"
+
+#. module: pos_wolt_drive
+#. odoo-python
+#: code:addons/pos_wolt_drive/models/pos_order.py:0
+msgid "The customer needs a phone number, a street and a city or zip."
+msgstr ""
+"კლიენტს უნდა ჰქონდეს ტელეფონის ნომერი, ქუჩა და ქალაქი ან საფოსტო ინდექსი."
+
+#. module: pos_wolt_drive
+#. odoo-javascript
+#: code:addons/pos_wolt_drive/static/src/app/ticket_screen.xml:0
+msgid "Tracking link"
+msgstr "თვალთვალის ბმული"
+
+#. module: pos_wolt_drive
+#: model_terms:ir.ui.view,arch_db:pos_wolt_drive.res_config_settings_view_form_wolt_drive
+msgid "Venue ID"
+msgstr "ობიექტის ID"
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields,help:pos_wolt_drive.field_pos_config__wolt_drive_venue_id
+#: model:ir.model.fields,help:pos_wolt_drive.field_res_config_settings__pos_wolt_drive_venue_id
+msgid ""
+"Venue of this shop in Wolt Drive. Leave empty to disable Wolt couriers in "
+"this POS."
+msgstr ""
+"ამ მაღაზიის ობიექტი Wolt Drive-ში. Wolt კურიერების ამ POS-ში გასათიშად "
+"დატოვეთ ცარიელი."
+
+#. module: pos_wolt_drive
+#. odoo-javascript
+#: code:addons/pos_wolt_drive/static/src/app/ticket_screen.js:0
+#: code:addons/pos_wolt_drive/static/src/app/ticket_screen.xml:0
+#: model_terms:ir.ui.view,arch_db:pos_wolt_drive.view_pos_pos_form_inherit_wolt_drive
+msgid "Wolt Courier"
+msgstr "Wolt კურიერი"
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_pos_order__wolt_drive_status
+msgid "Wolt Courier Status"
+msgstr "Wolt კურიერის სტატუსი"
+
+#. module: pos_wolt_drive
+#: model_terms:ir.ui.view,arch_db:pos_wolt_drive.res_config_settings_view_form_wolt_drive
+msgid "Wolt Couriers"
+msgstr "Wolt კურიერები"
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_pos_order__wolt_drive_price
+msgid "Wolt Delivery Price"
+msgstr "Wolt-ის მიწოდების ფასი"
+
+#. module: pos_wolt_drive
+#: model_terms:ir.ui.view,arch_db:pos_wolt_drive.res_config_settings_view_form_wolt_drive
+msgid "Wolt Drive"
+msgstr "Wolt Drive"
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_pos_config__wolt_drive_api_key
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_res_config_settings__pos_wolt_drive_api_key
+msgid "Wolt Drive API Key"
+msgstr "Wolt Drive API გასაღები"
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_pos_order__wolt_drive_attempt
+msgid "Wolt Drive Attempt"
+msgstr "Wolt Drive-ის მცდელობა"
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_pos_config__wolt_drive_merchant_id
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_res_config_settings__pos_wolt_drive_merchant_id
+msgid "Wolt Drive Merchant ID"
+msgstr "Wolt Drive-ის მერჩანტის ID"
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_pos_config__wolt_drive_preparation_minutes
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_res_config_settings__pos_wolt_drive_preparation_minutes
+msgid "Wolt Drive Preparation Time"
+msgstr "Wolt Drive-ის მომზადების დრო"
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_pos_order__wolt_drive_ref
+msgid "Wolt Drive Reference"
+msgstr "Wolt Drive-ის მითითება"
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_pos_config__wolt_drive_test_mode
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_res_config_settings__pos_wolt_drive_test_mode
+msgid "Wolt Drive Test Mode"
+msgstr "Wolt Drive-ის სატესტო რეჟიმი"
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_pos_config__wolt_drive_venue_id
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_res_config_settings__pos_wolt_drive_venue_id
+msgid "Wolt Drive Venue ID"
+msgstr "Wolt Drive-ის ობიექტის ID"
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_pos_config__wolt_drive_webhook_secret
+msgid "Wolt Drive Webhook Secret"
+msgstr "Wolt Drive Webhook-ის საიდუმლო გასაღები"
+
+#. module: pos_wolt_drive
+#. odoo-python
+#: code:addons/pos_wolt_drive/utils/drive_request.py:0
+msgid "Wolt Drive cannot be reached: %s"
+msgstr "Wolt Drive-თან დაკავშირება ვერ ხერხდება: %s"
+
+#. module: pos_wolt_drive
+#. odoo-python
+#: code:addons/pos_wolt_drive/models/pos_order.py:0
+msgid "Wolt Drive is not set up for this Point of Sale."
+msgstr "Wolt Drive ამ გაყიდვის წერტილისთვის დაკონფიგურირებული არ არის."
+
+#. module: pos_wolt_drive
+#. odoo-python
+#: code:addons/pos_wolt_drive/models/pos_config.py:0
+msgid "Wolt Drive refused the webhook: %s"
+msgstr "Wolt Drive-მა webhook უარყო: %s"
+
+#. module: pos_wolt_drive
+#. odoo-javascript
+#: code:addons/pos_wolt_drive/static/src/app/ticket_screen.js:0
+msgid "Wolt Drive request failed."
+msgstr "Wolt Drive-ის მოთხოვნა ვერ შესრულდა."
+
+#. module: pos_wolt_drive
+#. odoo-python
+#: code:addons/pos_wolt_drive/models/pos_config.py:0
+msgid "Wolt Drive status updates are now sent to Odoo."
+msgstr "Wolt Drive-ის სტატუსის განახლებები ახლა Odoo-ში იგზავნება."
+
+#. module: pos_wolt_drive
+#. odoo-python
+#: code:addons/pos_wolt_drive/models/pos_order.py:0
+msgid "Wolt Drive: %s %s"
+msgstr "Wolt Drive: %s %s"
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_pos_order__wolt_drive_tracking_url
+msgid "Wolt Tracking Link"
+msgstr "Wolt-ის თვალთვალის ბმული"
+
+#. module: pos_wolt_drive
+#. odoo-javascript
+#: code:addons/pos_wolt_drive/static/src/app/pos_order.js:0
+msgid "Wolt courier arrived"
+msgstr "Wolt კურიერი მოვიდა"
+
+#. module: pos_wolt_drive
+#. odoo-javascript
+#. odoo-python
+#: code:addons/pos_wolt_drive/models/pos_order.py:0
+#: code:addons/pos_wolt_drive/static/src/app/ticket_screen.js:0
+msgid "Wolt courier booked."
+msgstr "Wolt კურიერი დაიჯავშნა."
+
+#. module: pos_wolt_drive
+#. odoo-python
+#: code:addons/pos_wolt_drive/models/pos_order.py:0
+msgid "Wolt courier booked: %s"
+msgstr "Wolt კურიერი დაიჯავშნა: %s"
+
+#. module: pos_wolt_drive
+#. odoo-javascript
+#: code:addons/pos_wolt_drive/static/src/app/pos_order.js:0
+msgid "Wolt courier cancelled"
+msgstr "Wolt კურიერი გაუქმებულია"
+
+#. module: pos_wolt_drive
+#. odoo-python
+#: code:addons/pos_wolt_drive/models/pos_order.py:0
+msgid "Wolt courier cancelled."
+msgstr "Wolt კურიერი გაუქმდა."
+
+#. module: pos_wolt_drive
+#. odoo-python
+#: code:addons/pos_wolt_drive/models/pos_order.py:0
+msgid "Wolt courier linked from a Wolt status update."
+msgstr "Wolt კურიერი დაკავშირებულია Wolt-ის სტატუსის განახლების საფუძველზე."
+
+#. module: pos_wolt_drive
+#. odoo-javascript
+#: code:addons/pos_wolt_drive/static/src/app/pos_order.js:0
+msgid "Wolt courier on the way"
+msgstr "Wolt კურიერი გზაშია"
+
+#. module: pos_wolt_drive
+#. odoo-javascript
+#: code:addons/pos_wolt_drive/static/src/app/pos_order.js:0
+msgid "Wolt courier requested"
+msgstr "Wolt კურიერი მოთხოვნილია"
+
+#. module: pos_wolt_drive
+#. odoo-python
+#: code:addons/pos_wolt_drive/models/pos_order.py:0
+msgid "Wolt courier: %s"
+msgstr "Wolt კურიერი: %s"
+
+#. module: pos_wolt_drive
+#. odoo-python
+#: code:addons/pos_wolt_drive/models/pos_order.py:0
+msgid ""
+"Wolt Drive status updates are not set up: ask an administrator to register "
+"the status webhook."
+msgstr ""
+"Wolt Drive-ის სტატუსის განახლებები არ არის დაყენებული: სთხოვეთ "
+"ადმინისტრატორს, დაარეგისტრიროს სტატუსის Webhook."
+
+#. module: pos_wolt_drive
+#. odoo-python
+#: code:addons/pos_wolt_drive/models/pos_order.py:0
+msgid "This order was already delivered by Wolt."
+msgstr "ეს შეკვეთა Wolt-მა უკვე მიიტანა."
+
+#. module: pos_wolt_drive
+#. odoo-python
+#: code:addons/pos_wolt_drive/models/pos_order.py:0
+msgid ""
+"Wolt did not confirm the courier request %s yet: press Wolt Courier again to"
+" check, Wolt will not book a second courier for it."
+msgstr ""
+"Wolt-ს კურიერის მოთხოვნა %s ჯერ არ დაუდასტურებია: შესამოწმებლად ხელახლა "
+"დააჭირეთ „Wolt კურიერს“, Wolt ამ მოთხოვნისთვის მეორე კურიერს არ დაჯავშნის."
+
+#. module: pos_wolt_drive
+#. odoo-python
+#: code:addons/pos_wolt_drive/models/pos_order.py:0
+msgid "Wolt has not confirmed this courier yet: wait for its status update."
+msgstr ""
+"Wolt-ს ეს კურიერი ჯერ არ დაუდასტურებია: დაელოდეთ სტატუსის განახლებას."
+
+#. module: pos_wolt_drive
+#. odoo-python
+#: code:addons/pos_wolt_drive/models/pos_order.py:0
+msgid "The price expired: press Wolt Courier again."
+msgstr "ფასს ვადა გაუვიდა: ხელახლა დააჭირეთ „Wolt კურიერს“."
+
+#. module: pos_wolt_drive
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_pos_config__wolt_drive_webhook_ready
+#: model:ir.model.fields,field_description:pos_wolt_drive.field_res_config_settings__pos_wolt_drive_webhook_ready
+#: model_terms:ir.ui.view,arch_db:pos_wolt_drive.res_config_settings_view_form_wolt_drive
+msgid "Status Updates Set Up"
+msgstr "სტატუსის განახლებები დაყენებულია"
+
+#. module: pos_wolt_drive
+#. odoo-javascript
+#: code:addons/pos_wolt_drive/static/src/app/pos_order.js:0
+msgid "Waiting for Wolt"
+msgstr "ველოდებით Wolt-ს"
+
+#. module: pos_wolt_drive
+#. odoo-javascript
+#: code:addons/pos_wolt_drive/static/src/app/ticket_screen.js:0
+msgid ""
+"Wolt has not confirmed the courier yet. The order shows Waiting for Wolt: "
+"press Wolt Courier again to check."
+msgstr ""
+"Wolt-ს კურიერი ჯერ არ დაუდასტურებია. შეკვეთაზე ჩანს „ველოდებით Wolt-ს“: "
+"შესამოწმებლად ხელახლა დააჭირეთ „Wolt კურიერს“."

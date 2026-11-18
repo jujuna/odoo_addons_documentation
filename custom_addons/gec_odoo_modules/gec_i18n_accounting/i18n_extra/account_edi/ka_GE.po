@@ -1,0 +1,405 @@
+# Georgian translation of the Odoo addon account_edi, kept in gec_i18n_accounting.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-28 17:41+0000\n"
+"PO-Revision-Date: 2026-09-30 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian (ka_GE)\n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#. module: account_edi
+#. odoo-python
+#: code:addons/account_edi/models/account_move.py:0
+msgid "%(count)s Electronic invoicing error(s)"
+msgstr "%(count)s ელექტრონული ანგარიშ-ფაქტურის შეცდომა"
+
+#. module: account_edi
+#. odoo-python
+#: code:addons/account_edi/models/account_move.py:0
+msgid "%(count)s Electronic invoicing info(s)"
+msgstr "%(count)s ელექტრონული ანგარიშ-ფაქტურის ინფორმაცია"
+
+#. module: account_edi
+#. odoo-python
+#: code:addons/account_edi/models/account_move.py:0
+msgid "%(count)s Electronic invoicing warning(s)"
+msgstr "%(count)s ელექტრონული ანგარიშ-ფაქტურის გაფრთხილება"
+
+#. module: account_edi
+#. odoo-python
+#: code:addons/account_edi/models/account_move.py:0
+msgid "A cancellation of the EDI has been requested."
+msgstr "მოთხოვნილია EDI-ის გაუქმება."
+
+#. module: account_edi
+#. odoo-python
+#: code:addons/account_edi/models/account_move.py:0
+msgid "A request for cancellation of the EDI has been called off."
+msgstr "EDI-ის გაუქმების მოთხოვნა გაუქმდა."
+
+#. module: account_edi
+#: model_terms:ir.ui.view,arch_db:account_edi.view_move_form_inherit
+msgid "Are you sure you want to cancel this invoice without waiting for the EDI document to be canceled?"
+msgstr "დარწმუნებული ხართ, რომ გსურთ ამ ანგარიშ-ფაქტურის გაუქმება EDI დოკუმენტის გაუქმების მოლოდინის გარეშე?"
+
+#. module: account_edi
+#: model:ir.model,name:account_edi.model_ir_attachment model:ir.model.fields,field_description:account_edi.field_account_edi_document__attachment_id
+msgid "Attachment"
+msgstr "დანართი"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_edi_document__blocking_level
+msgid "Blocking Level"
+msgstr "დაბლოკვის დონე"
+
+#. module: account_edi
+#: model:ir.model.fields,help:account_edi.field_account_edi_document__blocking_level
+msgid ""
+"Blocks the current operation of the document depending on the error severity:\n"
+"  * Info: the document is not blocked and everything is working as it should.\n"
+"  * Warning: there is an error that doesn't prevent the current Electronic Invoicing operation to succeed.\n"
+"  * Error: there is an error that blocks the current Electronic Invoicing operation."
+msgstr ""
+"ბლოკავს დოკუმენტის მიმდინარე ოპერაციას შეცდომის სიმძიმის მიხედვით:\n"
+"  * ინფორმაცია: დოკუმენტი არ არის დაბლოკილი და ყველაფერი ისე მუშაობს, როგორც უნდა.\n"
+"  * გაფრთხილება: არსებობს შეცდომა, რომელიც ხელს არ უშლის მიმდინარე ელექტრონული ანგარიშ-ფაქტურის ოპერაციის წარმატებას.\n"
+"  * შეცდომა: არსებობს შეცდომა, რომელიც ბლოკავს მიმდინარე ელექტრონული ანგარიშ-ფაქტურის ოპერაციას."
+
+#. module: account_edi
+#: model_terms:ir.ui.view,arch_db:account_edi.view_move_form_inherit
+msgid "Call off EDI Cancellation"
+msgstr "EDI-ის გაუქმების გაუქმება"
+
+#. module: account_edi
+#: model:ir.model.fields.selection,name:account_edi.selection__account_edi_document__state__cancelled model:ir.model.fields.selection,name:account_edi.selection__account_move__edi_state__cancelled
+msgid "Cancelled"
+msgstr "გაუქმებული"
+
+#. module: account_edi
+#. odoo-python
+#: code:addons/account_edi/models/account_journal.py:0
+msgid "Cannot deactivate (%s) on this journal because not all documents are synchronized"
+msgstr "ამ ჟურნალზე (%s)-ის გათიშვა ვერ ხერხდება, რადგან ყველა დოკუმენტი არ არის სინქრონიზებული"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_edi_format__code
+msgid "Code"
+msgstr "კოდი"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_journal__compatible_edi_ids
+msgid "Compatible Edi"
+msgstr "თავსებადი EDI"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_edi_document__create_uid model:ir.model.fields,field_description:account_edi.field_account_edi_format__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_edi_document__create_date model:ir.model.fields,field_description:account_edi.field_account_edi_format__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_edi_document__display_name model:ir.model.fields,field_description:account_edi.field_account_edi_format__display_name model:ir.model.fields,field_description:account_edi.field_account_journal__display_name model:ir.model.fields,field_description:account_edi.field_account_move__display_name model:ir.model.fields,field_description:account_edi.field_account_move_send__display_name model:ir.model.fields,field_description:account_edi.field_account_resequence_wizard__display_name model:ir.model.fields,field_description:account_edi.field_ir_actions_report__display_name model:ir.model.fields,field_description:account_edi.field_ir_attachment__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: account_edi
+#: model_terms:ir.ui.view,arch_db:account_edi.view_move_form_inherit
+msgid "Download"
+msgstr "ჩამოტვირთვა"
+
+#. module: account_edi
+#: model_terms:ir.ui.view,arch_db:account_edi.view_move_form_inherit
+msgid "EDI Documents"
+msgstr "EDI დოკუმენტები"
+
+#. module: account_edi
+#: model:ir.model,name:account_edi.model_account_edi_format
+msgid "EDI format"
+msgstr "EDI ფორმატი"
+
+#. module: account_edi
+#: model:ir.model.fields,help:account_edi.field_account_journal__compatible_edi_ids
+msgid "EDI format that support moves in this journal"
+msgstr "EDI ფორმატი, რომელიც მხარს უჭერს გატარებებს ამ ჟურნალში"
+
+#. module: account_edi
+#: model:ir.actions.server,name:account_edi.ir_cron_edi_network_ir_actions_server
+msgid "EDI: Perform web services operations"
+msgstr "EDI: ვებ-სერვისების ოპერაციების შესრულება"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_bank_statement_line__edi_blocking_level model:ir.model.fields,field_description:account_edi.field_account_move__edi_blocking_level
+msgid "Edi Blocking Level"
+msgstr "EDI დაბლოკვის დონე"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_edi_document__edi_content
+msgid "Edi Content"
+msgstr "EDI შიგთავსი"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_bank_statement_line__edi_document_ids model:ir.model.fields,field_description:account_edi.field_account_move__edi_document_ids
+msgid "Edi Document"
+msgstr "EDI დოკუმენტი"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_bank_statement_line__edi_error_count model:ir.model.fields,field_description:account_edi.field_account_move__edi_error_count
+msgid "Edi Error Count"
+msgstr "EDI შეცდომების რაოდენობა"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_bank_statement_line__edi_error_message model:ir.model.fields,field_description:account_edi.field_account_move__edi_error_message
+msgid "Edi Error Message"
+msgstr "EDI შეცდომის შეტყობინება"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_edi_document__edi_format_id
+msgid "Edi Format"
+msgstr "EDI ფორმატი"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_bank_statement_line__edi_show_abandon_cancel_button model:ir.model.fields,field_description:account_edi.field_account_move__edi_show_abandon_cancel_button
+msgid "Edi Show Abandon Cancel Button"
+msgstr "EDI გაუქმებაზე უარის ღილაკის ჩვენება"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_bank_statement_line__edi_show_cancel_button model:ir.model.fields,field_description:account_edi.field_account_move__edi_show_cancel_button
+msgid "Edi Show Cancel Button"
+msgstr "EDI გაუქმების ღილაკის ჩვენება"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_bank_statement_line__edi_show_force_cancel_button model:ir.model.fields,field_description:account_edi.field_account_move__edi_show_force_cancel_button
+msgid "Edi Show Force Cancel Button"
+msgstr "EDI იძულებითი გაუქმების ღილაკის ჩვენება"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_bank_statement_line__edi_web_services_to_process model:ir.model.fields,field_description:account_edi.field_account_move__edi_web_services_to_process
+msgid "Edi Web Services To Process"
+msgstr "დასამუშავებელი EDI ვებ-სერვისები"
+
+#. module: account_edi
+#: model:ir.model,name:account_edi.model_account_edi_document
+msgid "Electronic Document for an account.move"
+msgstr "ელექტრონული დოკუმენტი account.move-ისთვის"
+
+#. module: account_edi
+#: model:ir.actions.act_window,name:account_edi.action_open_edi_documents model:ir.model.fields,field_description:account_edi.field_account_bank_statement_line__edi_state model:ir.model.fields,field_description:account_edi.field_account_journal__edi_format_ids model:ir.model.fields,field_description:account_edi.field_account_move__edi_state
+msgid "Electronic invoicing"
+msgstr "ელექტრონული ანგარიშ-ფაქტურა"
+
+#. module: account_edi
+#: model_terms:ir.ui.view,arch_db:account_edi.view_account_invoice_filter
+msgid "Electronic invoicing processing needed"
+msgstr "საჭიროა ელექტრონული ანგარიშ-ფაქტურის დამუშავება"
+
+#. module: account_edi
+#: model_terms:ir.ui.view,arch_db:account_edi.view_account_invoice_filter
+msgid "Electronic invoicing state"
+msgstr "ელექტრონული ანგარიშ-ფაქტურის მდგომარეობა"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_edi_document__error model:ir.model.fields.selection,name:account_edi.selection__account_edi_document__blocking_level__error model:ir.model.fields.selection,name:account_edi.selection__account_move__edi_blocking_level__error
+msgid "Error"
+msgstr "შეცდომა"
+
+#. module: account_edi
+#: model_terms:ir.ui.view,arch_db:account_edi.view_move_form_inherit
+msgid "Force Cancel"
+msgstr "იძულებითი გაუქმება"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_edi_document__edi_format_name
+msgid "Format Name"
+msgstr "ფორმატის სახელი"
+
+#. module: account_edi
+#: model:ir.model.fields,help:account_edi.field_account_bank_statement_line__edi_error_count model:ir.model.fields,help:account_edi.field_account_move__edi_error_count
+msgid "How many EDIs are in error for this move?"
+msgstr "რამდენი EDI არის შეცდომით ამ გატარებისთვის?"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_edi_document__id model:ir.model.fields,field_description:account_edi.field_account_edi_format__id model:ir.model.fields,field_description:account_edi.field_account_journal__id model:ir.model.fields,field_description:account_edi.field_account_move__id model:ir.model.fields,field_description:account_edi.field_account_move_send__id model:ir.model.fields,field_description:account_edi.field_account_resequence_wizard__id model:ir.model.fields,field_description:account_edi.field_ir_actions_report__id model:ir.model.fields,field_description:account_edi.field_ir_attachment__id
+msgid "ID"
+msgstr "ID"
+
+#. module: account_edi
+#: model:ir.model.fields.selection,name:account_edi.selection__account_edi_document__blocking_level__info model:ir.model.fields.selection,name:account_edi.selection__account_move__edi_blocking_level__info
+msgid "Info"
+msgstr "ინფო"
+
+#. module: account_edi
+#. odoo-python
+#: code:addons/account_edi/models/account_move.py:0
+msgid ""
+"Invalid invoice configuration:\n"
+"\n"
+"%s"
+msgstr ""
+"ანგარიშ-ფაქტურის არასწორი კონფიგურაცია:\n"
+"\n"
+"%s"
+
+#. module: account_edi
+#: model:ir.model,name:account_edi.model_account_journal
+msgid "Journal"
+msgstr "ჟურნალი"
+
+#. module: account_edi
+#: model:ir.model,name:account_edi.model_account_move
+msgid "Journal Entry"
+msgstr "ბუღალტრული გატარება"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_edi_document__write_uid model:ir.model.fields,field_description:account_edi.field_account_edi_format__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_edi_document__write_date model:ir.model.fields,field_description:account_edi.field_account_edi_format__write_date
+msgid "Last Updated on"
+msgstr "ბოლოს განახლდა"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_edi_document__move_id
+msgid "Move"
+msgstr "გატარება"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_edi_document__name model:ir.model.fields,field_description:account_edi.field_account_edi_format__name
+msgid "Name"
+msgstr "სახელი"
+
+#. module: account_edi
+#: model:ir.model.constraint,message:account_edi.constraint_account_edi_document_unique_edi_document_by_move_by_format
+msgid "Only one edi document by move by format"
+msgstr "მხოლოდ ერთი EDI დოკუმენტი გატარებაზე ფორმატის მიხედვით"
+
+#. module: account_edi
+#: model_terms:ir.ui.view,arch_db:account_edi.view_move_form_inherit
+msgid "Process now"
+msgstr "ახლა დამუშავება"
+
+#. module: account_edi
+#: model:ir.model,name:account_edi.model_account_resequence_wizard
+msgid "Remake the sequence of Journal Entries."
+msgstr "ბუღალტრული გატარებების მიმდევრობის ხელახლა შექმნა."
+
+#. module: account_edi
+#: model:ir.model,name:account_edi.model_ir_actions_report
+msgid "Report Action"
+msgstr "ანგარიშის ქმედება"
+
+#. module: account_edi
+#: model_terms:ir.ui.view,arch_db:account_edi.view_move_form_inherit
+msgid "Request EDI Cancellation"
+msgstr "EDI-ის გაუქმების მოთხოვნა"
+
+#. module: account_edi
+#: model_terms:ir.ui.view,arch_db:account_edi.view_move_form_inherit
+msgid "Retry"
+msgstr "ხელახლა ცდა"
+
+#. module: account_edi
+#: model:ir.model.fields,help:account_edi.field_account_journal__edi_format_ids
+msgid "Send XML/EDI invoices"
+msgstr "XML/EDI ანგარიშ-ფაქტურების გაგზავნა"
+
+#. module: account_edi
+#: model:ir.model.fields.selection,name:account_edi.selection__account_edi_document__state__sent model:ir.model.fields.selection,name:account_edi.selection__account_move__edi_state__sent
+msgid "Sent"
+msgstr "გაგზავნილი"
+
+#. module: account_edi
+#: model:ir.model.fields,field_description:account_edi.field_account_edi_document__state
+msgid "State"
+msgstr "მდგომარეობა"
+
+#. module: account_edi
+#: model:ir.model.fields,help:account_edi.field_account_bank_statement_line__edi_state model:ir.model.fields,help:account_edi.field_account_move__edi_state
+msgid "The aggregated state of all the EDIs with web-service of this move"
+msgstr "ამ გატარების ვებ-სერვისის მქონე ყველა EDI-ის ჯამური მდგომარეობა"
+
+#. module: account_edi
+#: model:ir.model.fields,help:account_edi.field_account_edi_document__attachment_id
+msgid "The file generated by edi_format_id when the invoice is posted (and this document is processed)."
+msgstr "ფაილი, რომელიც გენერირდება edi_format_id-ის მიერ ანგარიშ-ფაქტურის გატარებისას (და ამ დოკუმენტის დამუშავებისას)."
+
+#. module: account_edi
+#. odoo-python
+#: code:addons/account_edi/wizard/account_resequence.py:0
+msgid "The following documents have already been sent and cannot be resequenced: %s"
+msgstr "შემდეგი დოკუმენტები უკვე გაგზავნილია და მათი მიმდევრობის ხელახლა მინიჭება შეუძლებელია: %s"
+
+#. module: account_edi
+#: model_terms:ir.ui.view,arch_db:account_edi.view_move_form_inherit
+msgid "The invoice will soon be sent to"
+msgstr "ანგარიშ-ფაქტურა მალე გაიგზავნება მისამართით"
+
+#. module: account_edi
+#: model:ir.model.fields,help:account_edi.field_account_edi_document__error
+msgid "The text of the last error that happened during Electronic Invoice operation."
+msgstr "ბოლო შეცდომის ტექსტი, რომელიც მოხდა ელექტრონული ანგარიშ-ფაქტურის ოპერაციის დროს."
+
+#. module: account_edi
+#: model:ir.model.constraint,message:account_edi.constraint_account_edi_format_unique_code
+msgid "This code already exists"
+msgstr "ეს კოდი უკვე არსებობს"
+
+#. module: account_edi
+#. odoo-python
+#: code:addons/account_edi/models/account_edi_document.py:0
+msgid "This document is being sent by another process already. "
+msgstr "ეს დოკუმენტი უკვე იგზავნება სხვა პროცესის მიერ. "
+
+#. module: account_edi
+#. odoo-python
+#: code:addons/account_edi/models/account_move.py:0
+msgid "This invoice was canceled while the EDIs %s still had a pending cancellation request."
+msgstr "ეს ანგარიშ-ფაქტურა გაუქმდა, სანამ EDI-ებს %s ჯერ კიდევ ჰქონდათ გაუქმების მოლოდინში მყოფი მოთხოვნა."
+
+#. module: account_edi
+#: model:ir.model.fields.selection,name:account_edi.selection__account_edi_document__state__to_cancel model:ir.model.fields.selection,name:account_edi.selection__account_move__edi_state__to_cancel
+msgid "To Cancel"
+msgstr "გასაუქმებელი"
+
+#. module: account_edi
+#: model:ir.model.fields.selection,name:account_edi.selection__account_edi_document__state__to_send model:ir.model.fields.selection,name:account_edi.selection__account_move__edi_state__to_send
+msgid "To Send"
+msgstr "გასაგზავნი"
+
+#. module: account_edi
+#: model:ir.model.fields.selection,name:account_edi.selection__account_edi_document__blocking_level__warning model:ir.model.fields.selection,name:account_edi.selection__account_move__edi_blocking_level__warning
+msgid "Warning"
+msgstr "გაფრთხილება"
+
+#. module: account_edi
+#. odoo-python
+#: code:addons/account_edi/models/account_move.py:0
+msgid "You can't edit the following journal entry %s because an electronic document has already been sent. Please use the 'Request EDI Cancellation' button instead."
+msgstr "შემდეგი ბუღალტრული გატარების %s რედაქტირება არ შეგიძლიათ, რადგან ელექტრონული დოკუმენტი უკვე გაიგზავნა. გთხოვთ, ნაცვლად ამისა გამოიყენოთ ღილაკი 'EDI-ის გაუქმების მოთხოვნა'."
+
+#. module: account_edi
+#. odoo-python
+#: code:addons/account_edi/models/ir_attachment.py:0
+msgid "You can't unlink an attachment being an EDI document sent to the government."
+msgstr "არ შეგიძლიათ მთავრობისთვის გაგზავნილი EDI დოკუმენტის დანართის გაუქმება."
+
+#. module: account_edi
+#: model_terms:ir.ui.view,arch_db:account_edi.view_move_form_inherit
+msgid "⇒ See errors"
+msgstr "⇒ იხილეთ შეცდომები"
+
+#. module: account_edi
+#: model:ir.model,name:account_edi.model_account_move_send
+msgid "Account Move Send"
+msgstr "ანგარიშის გატარების გაგზავნა"

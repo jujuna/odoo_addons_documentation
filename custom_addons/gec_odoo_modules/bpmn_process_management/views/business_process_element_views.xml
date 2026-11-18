@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="business_process_element_view_list" model="ir.ui.view">
+        <field name="name">business.process.element.list</field>
+        <field name="model">business.process.element</field>
+        <field name="arch" type="xml">
+            <list string="Process Elements" create="0" edit="0" delete="0">
+                <field name="process_id"/>
+                <field name="process_state" optional="hide"/>
+                <field name="element_group"/>
+                <field name="name"/>
+                <field name="pool_name" optional="hide"/>
+                <field name="lane_name" optional="show"/>
+                <field name="responsible_name" optional="show"/>
+                <field name="link_count" optional="show"/>
+                <field name="review_status" widget="badge"
+                       decoration-warning="review_status == 'pending'"
+                       decoration-success="review_status == 'none'"/>
+                <field name="review_reason"/>
+                <field name="element_id" optional="hide"/>
+                <button name="action_open_process" type="object" string="Open" class="btn-link"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="business_process_element_view_search" model="ir.ui.view">
+        <field name="name">business.process.element.search</field>
+        <field name="model">business.process.element</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="process_id"/>
+                <field name="lane_name"/>
+                <field name="responsible_name"/>
+                <filter name="pending" string="To Review" domain="[('review_status', '=', 'pending')]"/>
+                <filter name="drafts" string="Draft Processes" domain="[('process_state', '=', 'draft')]"/>
+                <separator/>
+                <filter name="lanes" string="Lanes and Pools" domain="[('element_group', 'in', ('lane', 'pool'))]"/>
+                <filter name="tasks" string="Tasks" domain="[('element_group', '=', 'task')]"/>
+                <group>
+                    <filter name="group_process" string="Process" context="{'group_by': 'process_id'}"/>
+                    <filter name="group_reason" string="What to do" context="{'group_by': 'review_reason'}"/>
+                    <filter name="group_responsible" string="Responsible" context="{'group_by': 'responsible_name'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="business_process_element_action_review" model="ir.actions.act_window">
+        <field name="name">Review Queue</field>
+        <field name="res_model">business.process.element</field>
+        <field name="view_mode">list</field>
+        <field name="context">{'search_default_pending': 1, 'search_default_group_process': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Nothing to review</p>
+            <p>Imported diagrams flag lanes without a department or role, shapes whose BPMN
+               type was guessed and links to check. They appear here until a process manager
+               marks them as reviewed in the diagram editor.</p>
+        </field>
+    </record>
+
+    <record id="business_process_element_action_all" model="ir.actions.act_window">
+        <field name="name">Responsibilities</field>
+        <field name="res_model">business.process.element</field>
+        <field name="view_mode">list</field>
+        <field name="context">{'search_default_lanes': 1, 'search_default_group_responsible': 1}</field>
+    </record>
+</odoo>

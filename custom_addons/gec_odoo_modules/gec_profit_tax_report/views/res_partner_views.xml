@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_gec_cit" model="ir.ui.view">
+        <field name="name">res.partner.form.gec.cit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='sales_purchases']" position="inside">
+                <group name="gec_cit" string="rs.ge Profit Tax" groups="account.group_account_user,account.group_account_readonly">
+                    <group>
+                        <field name="gec_cit_status" readonly="parent_id"/>
+                        <field name="gec_cit_related_party" readonly="parent_id"/>
+                        <field name="gec_cit_share" invisible="parent_id"/>
+                        <field name="gec_cit_charity" readonly="parent_id"/>
+                    </group>
+                    <group>
+                        <field name="gec_cit_micro_business" readonly="parent_id"/>
+                        <field name="gec_cit_fixed_tax" readonly="parent_id"/>
+                        <field name="gec_cit_listed_abroad" readonly="parent_id"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_country_tree_gec_cit" model="ir.ui.view">
+        <field name="name">res.country.list.gec.cit</field>
+        <field name="model">res.country</field>
+        <field name="inherit_id" ref="base.view_country_tree"/>
+        <field name="arch" type="xml">
+            <field name="code" position="after">
+                <field name="gec_cit_preferential" optional="show" widget="boolean_toggle"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_country_form_gec_cit" model="ir.ui.view">
+        <field name="name">res.country.form.gec.cit</field>
+        <field name="model">res.country</field>
+        <field name="inherit_id" ref="base.view_country_form"/>
+        <field name="arch" type="xml">
+            <field name="code" position="after">
+                <field name="gec_cit_preferential"/>
+            </field>
+        </field>
+    </record>
+</odoo>

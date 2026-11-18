@@ -1,0 +1,818 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* gec_payroll_bank
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-13 16:41+0000\n"
+"PO-Revision-Date: 2026-09-13 16:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian (ka_GE)\n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#. module: gec_payroll_bank
+#: model:ir.module.module,description:base.module_gec_payroll_bank
+msgid ""
+"\n"
+"Bank-agnostic bridge between payroll and bank payments.\n"
+"\n"
+"A bank channel is an account.payment.method.line. From a payslip run (or a single\n"
+"payslip) the user picks a channel per employee and per authority, and the module\n"
+"creates the payments through the standard payment register, one batch per channel.\n"
+"\n"
+"Bank integration modules implement a small set of hooks on account.payment.method.line,\n"
+"defined in gec_bank; this module calls them and never names a bank.\n"
+msgstr ""
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid "%(channel)s belongs to another company than the payslips."
+msgstr "%(channel)s და ხელფასის უწყისები სხვადასხვა კომპანიას ეკუთვნის."
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid ""
+"%(channel)s must pay payroll in the company's currency %(company)s; the "
+"journal uses %(journal)s and the selected lines use %(lines)s."
+msgstr ""
+"%(channel)s ხელფასს კომპანიის ვალუტით — %(company)s — უნდა იხდიდეს; ჟურნალი "
+"იყენებს ვალუტას %(journal)s, მონიშნული სტრიქონები კი — %(lines)s."
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid "%(channel)s tried to overwrite %(fields)s on the payroll batch."
+msgstr "%(channel)s შეეცადა, ხელფასის პაკეტში გადაეწერა: %(fields)s."
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid ""
+"%(channel)s tried to set %(fields)s on an already posted payment. Those "
+"fields must be set before the payment is created."
+msgstr ""
+"%(channel)s შეეცადა, უკვე გატარებულ გადახდაზე მიეთითებინა: %(fields)s. ეს "
+"ველები გადახდის შექმნამდე უნდა შეივსოს."
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid ""
+"%(user)s recorded this payroll batch for manual transfer: %(amount)s "
+"%(currency)s."
+msgstr ""
+"ეს ხელფასის პაკეტი მომხმარებელმა %(user)s ხელით გადასარიცხად აღრიცხა: "
+"%(amount)s %(currency)s."
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/wizard/hr_payroll_pay_wizard.py:0
+msgid ""
+"%s cannot be settled by a payment from the payslip. Those amounts are not "
+"included here; settle them through the tax or declaration flow."
+msgstr ""
+"%s ხელფასის უწყისიდან გადახდით ვერ დაიფარება. ეს თანხები აქ არ შედის; "
+"დაფარეთ ისინი გადასახადის ან დეკლარაციის პროცესით."
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid "%s has no receiver bank account."
+msgstr "%s: არ აქვს მიმღების საბანკო ანგარიში."
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid "%s uses a receiver account that is not trusted for outgoing payments."
+msgstr ""
+"%s: იყენებს მიმღების ანგარიშს, რომელიც სანდო არ არის გამავალი "
+"გადახდებისთვის."
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/account_payment.py:0
+msgid ""
+"A payment cannot be added to or removed from a generated payroll batch."
+msgstr ""
+"დაგენერირებულ ხელფასის პაკეტს გადახდას ვერც დაამატებთ და ვერც ამოიღებთ."
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid "A payroll batch cannot contain different payment dates."
+msgstr "ერთ ხელფასის პაკეტში სხვადასხვა გადახდის თარიღი ვერ იქნება."
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/account_batch_payment.py:0
+msgid ""
+"A payroll batch with payments cannot be deleted: it is the record of what "
+"was sent to the bank. To pay a rejected salary again, reset its payment to "
+"draft and cancel it, use Mark Unpaid on the payslip, then Pay Salaries: %s"
+msgstr ""
+"ხელფასის პაკეტს, რომელსაც გადახდები აქვს, ვერ წაშლით: ის იმის ჩანაწერია, რაც"
+" ბანკში გაიგზავნა. უარყოფილი ხელფასის ხელახლა გადასახდელად მისი გადახდა "
+"დააბრუნეთ მონახაზზე და გააუქმეთ, ხელფასის უწყისზე გამოიყენეთ „გადაუხდელად "
+"მონიშვნა“, შემდეგ კი — „ხელფასების გადახდა“: %s"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_authority__account_id
+msgid "Account"
+msgstr "ანგარიში"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_authority__amount
+msgid "Amount"
+msgstr "თანხა"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard__authority_line_ids
+#: model_terms:ir.ui.view,arch_db:gec_payroll_bank.hr_payroll_pay_wizard_view_form
+msgid "Authorities"
+msgstr "უწყებები"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields.selection,name:gec_payroll_bank.selection__account_batch_payment__gec_payroll_kind__authority
+msgid "Authority"
+msgstr "უწყება"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_authority__channel_id
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_line__channel_id
+msgid "Bank"
+msgstr "ბანკი"
+
+#. module: gec_payroll_bank
+#: model_terms:ir.ui.view,arch_db:gec_payroll_bank.res_config_settings_view_form_gec_payroll_bank
+msgid ""
+"Bank channel proposed when paying a payslip run. Each employee can override "
+"it."
+msgstr ""
+"საბანკო არხი, რომელიც ხელფასის გაშვების გადახდისას შემოთავაზებული იქნება. "
+"თითოეული თანამშრომლისთვის მისი შეცვლა შესაძლებელია."
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,help:gec_payroll_bank.field_hr_employee__gec_payroll_channel_id
+msgid ""
+"Bank channel used by default when this employee's salary is paid. Left "
+"empty, the company default is used."
+msgstr ""
+"საბანკო არხი, რომელიც ნაგულისხმევად გამოიყენება ამ თანამშრომლის ხელფასის "
+"გადახდისას. თუ ცარიელია, გამოიყენება კომპანიის ნაგულისხმევი არხი."
+
+#. module: gec_payroll_bank
+#: model:ir.model,name:gec_payroll_bank.model_account_batch_payment
+msgid "Batch Payment"
+msgstr "სერიული გადახდა"
+
+#. module: gec_payroll_bank
+#: model_terms:ir.ui.view,arch_db:gec_payroll_bank.hr_payroll_pay_wizard_view_form
+msgid "Cancel"
+msgstr "გაუქმება"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/wizard/hr_payroll_pay_wizard.py:0
+msgid "Choose a bank for: %s"
+msgstr "აირჩიეთ ბანკი: %s"
+
+#. module: gec_payroll_bank
+#: model:ir.model,name:gec_payroll_bank.model_res_company
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard__company_id
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_authority__company_id
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_line__company_id
+msgid "Company"
+msgstr "კომპანია"
+
+#. module: gec_payroll_bank
+#: model:ir.model,name:gec_payroll_bank.model_res_config_settings
+msgid "Config Settings"
+msgstr "კონფიგურაციის პარამეტრები"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields.selection,name:gec_payroll_bank.selection__account_batch_payment__gec_payroll_last_notified_state__confirmed
+msgid "Confirmed"
+msgstr "დადასტურებული"
+
+#. module: gec_payroll_bank
+#: model_terms:ir.ui.view,arch_db:gec_payroll_bank.hr_payroll_pay_wizard_view_form
+msgid "Create Payments"
+msgstr "გადახდების შექმნა"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard__create_uid
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_authority__create_uid
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_line__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard__create_date
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_authority__create_date
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_line__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard__currency_id
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_authority__currency_id
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_line__currency_id
+msgid "Currency"
+msgstr "ვალუტა"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard__channel_id
+msgid "Default Bank"
+msgstr "ნაგულისხმევი ბანკი"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_res_company__gec_payroll_channel_id
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_res_config_settings__gec_payroll_channel_id
+#: model_terms:ir.ui.view,arch_db:gec_payroll_bank.res_config_settings_view_form_gec_payroll_bank
+msgid "Default Salary Bank"
+msgstr "ნაგულისხმევი სახელფასო ბანკი"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_account_batch_payment__display_name
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_account_move_line__display_name
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_account_payment__display_name
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_account_payment_register__display_name
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard__display_name
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_authority__display_name
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_line__display_name
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payslip__display_name
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payslip_run__display_name
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_res_company__display_name
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_res_config_settings__display_name
+msgid "Display Name"
+msgstr "სახელი"
+
+#. module: gec_payroll_bank
+#: model:ir.model,name:gec_payroll_bank.model_hr_employee
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_line__employee_id
+msgid "Employee"
+msgstr "თანამშრომელი"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard__line_ids
+#: model_terms:ir.ui.view,arch_db:gec_payroll_bank.hr_payroll_pay_wizard_view_form
+msgid "Employees"
+msgstr "თანამშრომლები"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid "Every employee and authority needs a bank."
+msgstr "ბანკი ყველა თანამშრომელსა და უწყებას უნდა ჰქონდეს მითითებული."
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid "Every selected payslip must have a draft or posted journal entry: %s"
+msgstr ""
+"ყოველ მონიშნულ ხელფასის უწყისს ბუღალტრული გატარება უნდა ჰქონდეს — მონახაზის "
+"ან გატარებული: %s"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields.selection,name:gec_payroll_bank.selection__account_batch_payment__gec_payroll_last_notified_state__failed
+msgid "Failed"
+msgstr "წარუმატებელი"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payslip_run__gec_payroll_batch_count
+msgid "Gec Payroll Batch Count"
+msgstr "ხელფასის პაკეტების რაოდენობა"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payslip_run__gec_payroll_can_pay
+msgid "Gec Payroll Can Pay"
+msgstr "ხელფასის გადახდა შესაძლებელია"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_account_batch_payment__gec_payroll_last_notified_state
+msgid "Gec Payroll Last Notified State"
+msgstr "ბანკიდან მიღებული ბოლო სტატუსი"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_account_batch_payment__gec_payroll_stale_notified
+msgid "Gec Payroll Stale Notified"
+msgstr "დაყოვნების შეტყობინება გაგზავნილია"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_account_batch_payment__id
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_account_move_line__id
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_account_payment__id
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_account_payment_register__id
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_employee__id
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard__id
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_authority__id
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_line__id
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payslip__id
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payslip_run__id
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_res_company__id
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_res_config_settings__id
+msgid "ID"
+msgstr "იდენტიფიკატორი"
+
+#. module: gec_payroll_bank
+#: model:ir.model,name:gec_payroll_bank.model_account_move_line
+msgid "Journal Item"
+msgstr "საბუღალტრო სტრიქონი"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard__write_uid
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_authority__write_uid
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_line__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard__write_date
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_authority__write_date
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_line__write_date
+msgid "Last Updated on"
+msgstr "ბოლოს განახლდა"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard__manual_ack_required
+msgid "Manual Ack Required"
+msgstr "საჭიროა ხელით დადასტურება"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_line__amount
+msgid "Net Amount"
+msgstr "ნეტო თანხა"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/wizard/hr_payroll_pay_wizard.py:0
+msgid "Nothing to pay."
+msgstr "გადასახდელი არაფერია."
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/wizard/hr_payroll_pay_wizard.py:0
+msgid ""
+"One of the chosen banks only records the payment in Odoo and transmits "
+"nothing. Tick 'Record only' to confirm you will transfer it yourself."
+msgstr ""
+"არჩეული ბანკებიდან ერთი გადახდას მხოლოდ Odoo-ში აღრიცხავს და არსად აგზავნის."
+" მონიშნეთ „მხოლოდ აღრიცხვა“ და დაადასტურეთ, რომ გადარიცხვას თავად "
+"შეასრულებთ."
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid "Only confirmed payslips can be paid: %s"
+msgstr "გადახდა მხოლოდ დადასტურებულ ხელფასის უწყისებზეა შესაძლებელი: %s"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_authority__partner_id
+msgid "Paid To"
+msgstr "მიმღები"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields.selection,name:gec_payroll_bank.selection__account_batch_payment__gec_payroll_last_notified_state__partial
+msgid "Partial"
+msgstr "ნაწილობრივი"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/account_payment_register.py:0
+msgid ""
+"Partially paid payroll lines are not supported; nothing was created. Resolve"
+" the partial payment first: %s"
+msgstr ""
+"ნაწილობრივ გადახდილი სახელფასო სტრიქონები მხარდაჭერილი არ არის; არაფერი "
+"შექმნილა. ჯერ მოაგვარეთ ნაწილობრივი გადახდა: %s"
+
+#. module: gec_payroll_bank
+#: model:ir.model,name:gec_payroll_bank.model_account_payment_register
+msgid "Pay"
+msgstr "გადახდა"
+
+#. module: gec_payroll_bank
+#: model:ir.model,name:gec_payroll_bank.model_hr_payslip_run
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_account_batch_payment__payslip_run_id
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard__payslip_run_id
+msgid "Pay Run"
+msgstr "ხელფასის გაშვება"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+#: model:ir.actions.server,name:gec_payroll_bank.action_server_gec_pay_salaries
+#: model_terms:ir.ui.view,arch_db:gec_payroll_bank.hr_payroll_pay_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:gec_payroll_bank.hr_payslip_run_view_kanban_gec_payroll_bank
+#: model_terms:ir.ui.view,arch_db:gec_payroll_bank.view_hr_payslip_form_gec_payroll_bank
+msgid "Pay Salaries"
+msgstr "ხელფასების გადახდა"
+
+#. module: gec_payroll_bank
+#: model:ir.model,name:gec_payroll_bank.model_hr_payroll_pay_wizard
+msgid "Pay Salaries Through a Bank Channel"
+msgstr "ხელფასების გადახდა საბანკო არხით"
+
+#. module: gec_payroll_bank
+#: model:ir.model,name:gec_payroll_bank.model_hr_payroll_pay_wizard_authority
+msgid "Pay Salaries Wizard Authority Line"
+msgstr "ხელფასების გადახდის ვიზარდის უწყების სტრიქონი"
+
+#. module: gec_payroll_bank
+#: model:ir.model,name:gec_payroll_bank.model_hr_payroll_pay_wizard_line
+msgid "Pay Salaries Wizard Line"
+msgstr "ხელფასების გადახდის ვიზარდის სტრიქონი"
+
+#. module: gec_payroll_bank
+#: model:ir.model,name:gec_payroll_bank.model_hr_payslip
+msgid "Pay Slip"
+msgstr "ხელფასის უწყისი"
+
+#. module: gec_payroll_bank
+#: model:ir.module.module,summary:base.module_gec_payroll_bank
+msgid "Pay a payslip run through one or several banks, chosen per employee"
+msgstr ""
+"ხელფასის გაშვების გადახდა ერთი ან რამდენიმე ბანკის მეშვეობით, ბანკის არჩევით"
+" თითოეული თანამშრომლისთვის"
+
+#. module: gec_payroll_bank
+#: model:ir.model,name:gec_payroll_bank.model_account_payment
+msgid "Payment"
+msgstr "გადახდები"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip_run.py:0
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payslip_run__gec_payroll_batch_ids
+#: model_terms:ir.ui.view,arch_db:gec_payroll_bank.hr_payslip_run_view_kanban_gec_payroll_bank
+msgid "Payment Batches"
+msgstr "გადახდის პაკეტები"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard__payment_date
+msgid "Payment Date"
+msgstr "გადახდის თარიღი"
+
+#. module: gec_payroll_bank
+#: model_terms:ir.ui.view,arch_db:gec_payroll_bank.view_batch_payment_form_gec_payroll_bank
+msgid "Payroll"
+msgstr "ხელფასები"
+
+#. module: gec_payroll_bank
+#: model:ir.module.module,shortdesc:base.module_gec_payroll_bank
+msgid "Payroll Bank Channels"
+msgstr "ხელფასის საბანკო არხები"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_account_batch_payment__gec_payroll_is_batch
+msgid "Payroll Batch"
+msgstr "ხელფასის პაკეტი"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_account_batch_payment__gec_payroll_channel_id
+msgid "Payroll Channel"
+msgstr "ხელფასის არხი"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid "Payroll Payment Batches"
+msgstr "ხელფასის გადახდის პაკეტები"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_account_batch_payment__gec_payroll_kind
+msgid "Payroll Purpose"
+msgstr "ხელფასის დანიშნულება"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/account_batch_payment.py:0
+msgid "Payroll batch not confirmed by the bank"
+msgstr "ხელფასის პაკეტი ბანკს არ დაუდასტურებია"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/account_batch_payment.py:0
+msgid ""
+"Payroll batch payments must keep the exact channel, journal, company, and "
+"date chosen by the payroll run: %s"
+msgstr ""
+"ხელფასის პაკეტის გადახდებს უცვლელად უნდა შეუნარჩუნდეს ხელფასის გაშვებისას "
+"არჩეული არხი, ჟურნალი, კომპანია და თარიღი: %s"
+
+#. module: gec_payroll_bank
+#: model:ir.actions.server,name:gec_payroll_bank.cron_gec_payroll_stale_batches_ir_actions_server
+msgid "Payroll: flag batches never confirmed by the bank"
+msgstr "ხელფასები: ბანკის მიერ დაუდასტურებელი პაკეტების მონიშვნა"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_line__payslip_id
+msgid "Payslip"
+msgstr "ხელფასის უწყისი"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard__payslip_ids
+msgid "Payslips"
+msgstr "ხელფასის უწყისები"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields.selection,name:gec_payroll_bank.selection__account_batch_payment__gec_payroll_last_notified_state__pending
+msgid "Pending"
+msgstr "მოლოდინში"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields.selection,name:gec_payroll_bank.selection__account_batch_payment__gec_payroll_last_notified_state__prepared
+msgid "Prepared"
+msgstr "მომზადებული"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard__manual_ack
+msgid "Record only - I will transfer in the bank portal"
+msgstr "მხოლოდ აღრიცხვა — გადარიცხვას ბანკის პორტალში თავად შევასრულებ"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_account_batch_payment__gec_payroll_manual_ack
+msgid "Recorded Only"
+msgstr "მხოლოდ აღრიცხული"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard__remember_routing
+msgid "Remember these banks on the employees"
+msgstr "ბანკების დამახსოვრება თანამშრომლებზე"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields.selection,name:gec_payroll_bank.selection__account_batch_payment__gec_payroll_kind__salary
+msgid "Salary"
+msgstr "ხელფასი"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_employee__gec_payroll_channel_id
+msgid "Salary Bank"
+msgstr "სახელფასო ბანკი"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+#: code:addons/gec_payroll_bank/wizard/hr_payroll_pay_wizard.py:0
+msgid "Select payslips from a single company."
+msgstr "მონიშნეთ ერთი კომპანიის ხელფასის უწყისები."
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid ""
+"Shared payroll journal entries are enabled for %s, so the salary lines carry"
+" no employee. Disable Batch Payroll Move Lines, or pay from the accounting "
+"side."
+msgstr ""
+"%s: ჩართულია ხელფასების საერთო ბუღალტრული გატარებები, ამიტომ სახელფასო "
+"სტრიქონებს თანამშრომელი არ აქვს მითითებული. გამორთეთ „ჯგუფური ხელფასების "
+"გატარების სტრიქონები“ ან გადაიხადეთ ბუღალტერიის მხრიდან."
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid "The NET salary rule has no credit account on the structure of: %s"
+msgstr ""
+"NET ხელფასის წესს სტრუქტურაში საკრედიტო ანგარიში არ აქვს მითითებული: %s"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid ""
+"The accounting lines were settled but these payslips were not marked paid, "
+"so nothing was created: %s"
+msgstr ""
+"ბუღალტრული სტრიქონები დაიფარა, მაგრამ ეს ხელფასის უწყისები გადახდილად არ "
+"მოინიშნა, ამიტომ არაფერი შექმნილა: %s"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/account_payment.py:0
+msgid ""
+"The amount, recipient, bank account, currency, accounts, journal and date of"
+" a payment in a generated payroll batch cannot be changed: %s"
+msgstr ""
+"დაგენერირებული ხელფასის პაკეტის გადახდას თანხას, მიმღებს, საბანკო ანგარიშს, "
+"ვალუტას, ანგარიშებს, ჟურნალსა და თარიღს ვერ შეუცვლით: %s"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/account_batch_payment.py:0
+msgid ""
+"The bank did not confirm this payroll batch (%(state)s). Its payslips are "
+"already marked paid. Check with the bank before reversing or resending "
+"anything - the transfer may still have executed."
+msgstr ""
+"ბანკმა ეს ხელფასის პაკეტი არ დაადასტურა (%(state)s). მისი ხელფასის უწყისები "
+"უკვე გადახდილად არის მონიშნული. სანამ რამეს გააუქმებთ ან ხელახლა გააგზავნით,"
+" გადაამოწმეთ ბანკთან — გადარიცხვა შესაძლოა შესრულებული იყოს."
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid ""
+"The payment register did not settle these payslips, so nothing was created: "
+"%s"
+msgstr ""
+"გადახდის ვიზარდმა ეს ხელფასის უწყისები არ დაფარა, ამიტომ არაფერი შექმნილა: "
+"%s"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/account_batch_payment.py:0
+msgid ""
+"The routing and payments of a generated payroll batch cannot be changed."
+msgstr ""
+"დაგენერირებულ ხელფასის პაკეტში ბანკების განაწილებასა და გადახდებს ვერ "
+"შეცვლით."
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_employee.py:0
+msgid "The salary bank must belong to the employee's company: %s"
+msgstr "სახელფასო ბანკი თანამშრომლის კომპანიას უნდა ეკუთვნოდეს: %s"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid ""
+"The work contact of these employees is a child of another contact, so the "
+"salary would be paid to the parent company's bank account: %s"
+msgstr ""
+"ამ თანამშრომლების სამუშაო კონტაქტი სხვა კონტაქტის ქვეკონტაქტია, ამიტომ "
+"ხელფასი ზემდგომი კომპანიის საბანკო ანგარიშზე ჩაირიცხებოდა: %s"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid ""
+"These NET salary lines do not match the employee's current work contact or "
+"are not on a reconcilable payment account: %s"
+msgstr ""
+"ეს NET ხელფასის სტრიქონები თანამშრომლის მიმდინარე სამუშაო კონტაქტს არ "
+"შეესაბამება, ან შესაჯერებელ გადახდის ანგარიშზე არ არის: %s"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid "These authority amounts were not settled, so nothing was created: %s"
+msgstr "უწყებების ეს თანხები არ დაფარულა, ამიტომ არაფერი შექმნილა: %s"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid ""
+"These bank accounts are not trusted for outgoing payments; open the bank "
+"account and allow outgoing payments first: %s"
+msgstr ""
+"ეს საბანკო ანგარიშები გამავალი გადახდებისთვის სანდოდ არ არის მიჩნეული; ჯერ "
+"გახსენით საბანკო ანგარიში და დაუშვით გამავალი გადახდები: %s"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid ""
+"These employees have no work contact, so no payment can be addressed to "
+"them: %s"
+msgstr ""
+"ამ თანამშრომლებს სამუშაო კონტაქტი არ აქვთ, ამიტომ გადახდა მათ ვერ "
+"მიემართება: %s"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid ""
+"These open amounts are owed to somebody but cannot be routed by this flow, "
+"and paying without them would leave the payslip half settled: %s"
+msgstr ""
+"ეს დაუფარავი თანხები ვინმეს ეკუთვნის, მაგრამ ამ პროცესით ვერ განაწილდება; "
+"მათ გარეშე გადახდა ხელფასის უწყისს ნახევრად დაფარულს დატოვებდა: %s"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/account_payment_register.py:0
+msgid ""
+"These payroll amounts changed while you were working; nothing was created. "
+"Reopen the payment wizard and try again: %s"
+msgstr ""
+"სანამ მუშაობდით, ეს სახელფასო თანხები შეიცვალა; არაფერი შექმნილა. ხელახლა "
+"გახსენით გადახდის ვიზარდი და სცადეთ თავიდან: %s"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid ""
+"These recipients have no bank account (a budget recipient such as the State "
+"Treasury needs a Treasury Code on its contact instead): %s"
+msgstr ""
+"ამ მიმღებებს საბანკო ანგარიში არ აქვთ (ბიუჯეტის მიმღებს, მაგალითად, "
+"სახელმწიფო ხაზინას, ამის ნაცვლად კონტაქტში სახაზინო კოდი უნდა ჰქონდეს "
+"მითითებული): %s"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/account_payment_register.py:0
+msgid ""
+"These salary lines are being paid right now by someone else. Try again in a "
+"moment."
+msgstr "ამ სახელფასო სტრიქონებს ამჟამად სხვა იხდის. სცადეთ ცოტა ხანში."
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/account_payment_register.py:0
+msgid ""
+"These salary lines were paid while you were working; nothing was created. "
+"Reopen the payslips and start again: %s"
+msgstr ""
+"სანამ მუშაობდით, ეს სახელფასო სტრიქონები გადაიხადეს; არაფერი შექმნილა. "
+"ხელახლა გახსენით ხელფასის უწყისები და დაიწყეთ თავიდან: %s"
+
+#. module: gec_payroll_bank
+#: model_terms:ir.ui.view,arch_db:gec_payroll_bank.hr_payroll_pay_wizard_view_form
+msgid ""
+"This creates and reconciles the salary payments, and marks the payslips as "
+"paid. Transmitting each batch to its bank is a separate step. Continue?"
+msgstr ""
+"ეს შექმნის და შეაჯერებს ხელფასის გადახდებს და ხელფასის უწყისებს გადახდილად "
+"მონიშნავს. თითოეული პაკეტის ბანკში გაგზავნა ცალკე ნაბიჯია. გავაგრძელოთ?"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip_run.py:0
+msgid "This pay run has no confirmed payslip left to pay."
+msgstr ""
+"ამ ხელფასის გაშვებაში გადასახდელი დადასტურებული ხელფასის უწყისი აღარ არის."
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/account_batch_payment.py:0
+msgid ""
+"This payroll batch was created over %(hours)s hours ago and has still not "
+"been sent to the bank. Its payslips are already marked paid, but no money "
+"has moved. Send it, or cancel its payments."
+msgstr ""
+"ეს ხელფასის პაკეტი %(hours)s საათზე მეტი ხნის წინ შეიქმნა და ბანკში ჯერ "
+"კიდევ არ არის გაგზავნილი. მისი ხელფასის უწყისები უკვე გადახდილად არის "
+"მონიშნული, თანხა კი ჯერ არ გადარიცხულა. გააგზავნეთ პაკეტი ან გააუქმეთ მისი "
+"გადახდები."
+
+#. module: gec_payroll_bank
+#: model_terms:ir.ui.view,arch_db:gec_payroll_bank.hr_payroll_pay_wizard_view_form
+msgid "Total"
+msgstr "ჯამი"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields.selection,name:gec_payroll_bank.selection__account_batch_payment__gec_payroll_last_notified_state__transmitted
+msgid "Transmitted"
+msgstr "გაგზავნილი"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields.selection,name:gec_payroll_bank.selection__account_batch_payment__gec_payroll_last_notified_state__uncertain
+msgid "Uncertain"
+msgstr "გაურკვეველი"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard__warning
+msgid "Warning"
+msgstr "გაფრთხილება"
+
+#. module: gec_payroll_bank
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_authority__wizard_id
+#: model:ir.model.fields,field_description:gec_payroll_bank.field_hr_payroll_pay_wizard_line__wizard_id
+msgid "Wizard"
+msgstr "ვიზარდი"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+#: code:addons/gec_payroll_bank/models/hr_payslip_run.py:0
+msgid "id"
+msgstr "აიდი"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid "no partner"
+msgstr "პარტნიორის გარეშე"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid "These payslips have nothing left to pay: %s"
+msgstr "ამ ხელფასის უწყისებზე გადასახდელი აღარაფერი დარჩა: %s"
+
+#. module: gec_payroll_bank
+#. odoo-python
+#: code:addons/gec_payroll_bank/models/hr_payslip.py:0
+msgid "The journal entry of payslip %(slip)s is dated %(date)s, in a period locked by %(locks)s: set the entry's date to an open day or ask for a lock exception, then pay again."
+msgstr "ხელფასის უწყისის %(slip)s ბუღალტრული გატარების თარიღი (%(date)s) ჩაკეტილ პერიოდშია (%(locks)s): მიუთითეთ გატარებაში ღია პერიოდის თარიღი ან მოითხოვეთ ჩაკეტვის გამონაკლისი, შემდეგ კვლავ გადაიხადეთ."

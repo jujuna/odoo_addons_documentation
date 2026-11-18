@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!-- Inherits web.ListView; the renderer is replaced by a flex-column wrapper (KPI row above) as one flex item.
+    Props are copied from web.ListView: keep in sync. model.isReady() is on the wrapper so core's t-elif works. -->
+    <t t-name="rs_waybill.WaybillListKpisView" t-inherit="web.ListView" t-inherit-mode="primary" owl="1">
+        <xpath expr="//t[@t-component='this.props.Renderer']" position="replace">
+            <div class="o_rs_waybill_main" t-if="this.model.isReady()">
+
+                <div class="o_rs_waybill_kpi_row">
+
+                    <div class="o_rs_waybill_kpi o_rs_waybill_kpi_total" t-on-click="() => this.onKpiClick('total')"
+                        t-att-class="{ 'o_rs_waybill_kpi_selected': this.kpis.activeKey === 'total' }">
+                        <div class="o_rs_waybill_kpi_head">
+                            <span class="o_rs_waybill_kpi_icon">
+                                <i class="oi" data-icon="description"/>
+                            </span>
+                            <span class="o_rs_waybill_kpi_label">Total Waybills</span>
+                        </div>
+                        <div class="o_rs_waybill_kpi_value" t-out="this.kpis.total"/>
+                        <div class="o_rs_waybill_kpi_sub">
+                            <b t-out="this.kpis.totalToday"/> new today
+                        </div>
+                    </div>
+
+                    <div class="o_rs_waybill_kpi o_rs_waybill_kpi_active" t-on-click="() => this.onKpiClick('active')"
+                        t-att-class="{ 'o_rs_waybill_kpi_selected': this.kpis.activeKey === 'active' }">
+                        <div class="o_rs_waybill_kpi_head">
+                            <span class="o_rs_waybill_kpi_icon">
+                                <i class="oi oi-filled" data-icon="check_circle"/>
+                            </span>
+                            <span class="o_rs_waybill_kpi_label">Active</span>
+                        </div>
+                        <div class="o_rs_waybill_kpi_value" t-out="this.kpis.active"/>
+                        <div class="o_rs_waybill_kpi_sub">
+                            <b t-out="this.kpis.activeToday"/> active today
+                        </div>
+                    </div>
+
+                    <div class="o_rs_waybill_kpi o_rs_waybill_kpi_cancelled" t-on-click="() => this.onKpiClick('cancelled')"
+                        t-att-class="{ 'o_rs_waybill_kpi_selected': this.kpis.activeKey === 'cancelled' }">
+                        <div class="o_rs_waybill_kpi_head">
+                            <span class="o_rs_waybill_kpi_icon">
+                                <i class="oi" data-icon="cancel"/>
+                            </span>
+                            <span class="o_rs_waybill_kpi_label">Cancelled</span>
+                        </div>
+                        <div class="o_rs_waybill_kpi_value" t-out="this.kpis.cancelled"/>
+                        <div class="o_rs_waybill_kpi_sub">
+                            <b t-out="this.kpis.cancelledToday"/> cancelled today
+                        </div>
+                    </div>
+
+                    <div class="o_rs_waybill_kpi o_rs_waybill_kpi_completed" t-on-click="() => this.onKpiClick('completed')"
+                        t-att-class="{ 'o_rs_waybill_kpi_selected': this.kpis.activeKey === 'completed' }">
+                        <div class="o_rs_waybill_kpi_head">
+                            <span class="o_rs_waybill_kpi_icon">
+                                <i class="oi" data-icon="check_circle"/>
+                            </span>
+                            <span class="o_rs_waybill_kpi_label">Completed</span>
+                        </div>
+                        <div class="o_rs_waybill_kpi_value" t-out="this.kpis.completed"/>
+                        <div class="o_rs_waybill_kpi_sub">
+                            <b t-out="this.kpis.completedToday"/> completed today
+                        </div>
+                    </div>
+
+                </div>
+
+                <t t-component="this.props.Renderer"
+                    list="this.model.root"
+                    activeActions="this.activeActions"
+                    archInfo="this.archInfo"
+                    allowSelectors="this.props.allowSelectors"
+                    editable="this.editable"
+                    onOpenFormView="this.onOpenFormView"
+                    hasOpenFormViewButton="this.hasOpenFormViewButton"
+                    openRecord.bind="this.openRecord"
+                    noContentHelp="this.props.info.noContentHelp"
+                    onAdd.bind="this.createRecord"
+                    optionalActiveFields="this.optionalActiveFields"
+                    readonly="this.props.readonly"
+                />
+
+            </div>
+        </xpath>
+    </t>
+
+</templates>

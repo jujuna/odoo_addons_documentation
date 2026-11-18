@@ -1,0 +1,2908 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* gec_profit_tax_report
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-01 23:32+0000\n"
+"PO-Revision-Date: 2026-11-01 23:32+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: gec_profit_tax_report
+#: model:ir.module.module,description:base.module_gec_profit_tax_report
+msgid ""
+"\n"
+"Builds the monthly profit tax declaration (rs.ge form II-086) from posted journal items: part I, part III\n"
+"lines 16-29 in both columns, part IV for gambling organisers and the annexes 1, 1.1-1.7, 2, 3 and 4, following\n"
+"the rs.ge filling instruction (MoF Order 996, article 40.1). It classifies contacts and countries, keeps a\n"
+"register of taxed loans and advances for the money-back lines, books the profit tax on confirm, handles\n"
+"corrected declarations and exports an XLSX workbook.\n"
+"\n"
+"Full documentation: README.md and README_DEV.md in the module directory.\n"
+msgstr ""
+"\n"
+"აგებს მოგების გადასახადის ყოველთვიურ დეკლარაციას (rs.ge, ფორმა II-086) გატარებული საბუღალტრო სტრიქონებიდან: I ნაწილი, III ნაწილის\n"
+"16-29 სტრიქონები ორივე სვეტში, IV ნაწილი აზარტული თამაშობების ორგანიზატორებისთვის და დანართები 1, 1¹-1⁷, 2, 3 და 4,\n"
+"rs.ge-ის შევსების ინსტრუქციის (ფინანსთა მინისტრის №996 ბრძანება, მუხლი 40¹) მიხედვით. ახარისხებს კონტაქტებსა და ქვეყნებს, აწარმოებს\n"
+"დაბეგრილი სესხებისა და ავანსების რეესტრს შესამცირებელი სტრიქონებისთვის, დადასტურებისას არიცხავს მოგების გადასახადს, ამუშავებს\n"
+"შესწორებულ დეკლარაციებს და ახდენს XLSX ფაილის ექსპორტს.\n"
+"\n"
+"სრული დოკუმენტაცია: README.md და README_DEV.md მოდულის საქაღალდეში.\n"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration.py:0
+msgid ""
+"%s dividend payment(s) are not matched with their declaration entry: "
+"withholding tax kept from them is missing from line 16.1. Match them, or "
+"adjust line 16.1."
+msgstr "დივიდენდის %s გადახდა არ არის დაწყვილებული დივიდენდის დარიცხვის გატარებასთან: მათგან დაკავებული გადასახადი 16.1 სტრიქონს აკლია. დააწყვილეთ ან შეასწორეთ 16.1 სტრიქონი."
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration.py:0
+msgid "%s is still a draft: finish or delete it first."
+msgstr "%s ჯერ მონახაზია: ჯერ დაასრულეთ ან წაშალეთ."
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration.py:0
+msgid ""
+"%s journal item(s) on line 18 accounts have no contact, so they count "
+"nowhere."
+msgstr "მე-18 სტრიქონის ანგარიშებზე %s საბუღალტრო სტრიქონს კონტაქტი არ აქვს, ამიტომ არსად აისახება."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration_line__level
+msgid "0 for 16, 1 for 16.1, 2 for 16.1.1: used to indent."
+msgstr "0 – 16-ისთვის, 1 – 16.1-ისთვის, 2 – 16.1.1-ისთვის: გამოიყენება შეწევისთვის."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__version
+msgid "1 for the primary declaration, 2 and up for each corrected one."
+msgstr "1 – პირველადი დეკლარაციისთვის, 2 და მეტი – ყოველი შესწორებულისთვის."
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "1. ნაწილი I"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_annex_line__amount2
+msgid ""
+"1.1/1.4: line 16.1.1/16.1.2 amount. 1.6: dividend. 3: increase. 4: volume in"
+" GEL."
+msgstr "1¹/1⁴: 16.1.1/16.1.2 სტრიქონის თანხა. 1⁶: დივიდენდი. 3: ზრდა. 4: მოცულობა ლარში."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_annex_line__amount1
+msgid ""
+"1.1/1.4: line 25.1/25.3 amount. 1.5: taxed amount. 1.6: net profit. 3: "
+"opening balance. 4: volume in currency."
+msgstr "1¹/1⁴: 25.1/25.3 სტრიქონის თანხა. 1⁵: დაბეგრილი თანხა. 1⁶: წმინდა მოგება. 3: საწყისი ნაშთი. 4: მოცულობა ვალუტაში."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_annex_line__name
+msgid ""
+"1.1/1.4: month/year. 1.5: tax demand number. 1.6: calendar year. 3: balance."
+" 4: contract."
+msgstr "1¹/1⁴: თვე/წელი. 1⁵: საგადასახადო მოთხოვნის ნომერი. 1⁶: კალენდარული წელი. 3: ნაშთის სახე. 4: ხელშეკრულება."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_annex_line__date
+msgid "1.5: tax demand date. 4: start date of the transaction."
+msgstr "1⁵: საგადასახადო მოთხოვნის თარიღი. 4: ოპერაციის დაწყების თარიღი."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_annex_line__amount3
+msgid ""
+"1.6: expenses in Georgia. 3: of which revaluation. 4: balance owed at year "
+"end, in currency."
+msgstr "1⁶: საქართველოში გაწეული ხარჯი. 3: მათ შორის, გადაფასება. 4: დავალიანების ნაშთი წლის ბოლოს, ვალუტაში."
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "16.1.1 სტრიქონის მონაცემი"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "16.1.2 სტრიქონის მონაცემი"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "2. ნაწილი III და დანართები"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"2017 წლის 1 იანვრიდან საქართველოს საგადასახადო კოდექსის 309-ე მუხლის 94-ე "
+"ნაწილით გათვალისწინებული პირის სტატუსის დაკარგვამდე საანგარიშო პერიოდებში "
+"მიღებული წმინდა მოგებიდან დივიდენდის განაწილებისას ამ პერიოდების მიხედვით "
+"დარიცხული და გადახდილი მოგების გადასახადი, რომელიც ექვემდებარება ჩათვლას"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"2017 წლის 1 იანვრიდან საქართველოს საგადასახადო კოდექსის 309-ე მუხლის 94-ე "
+"ნაწილით გათვალისწინებული პირის სტატუსის დაკარგვამდე საანგარიშო პერიოდებში "
+"მიღებული წმინდა მოგებიდან დივიდენდის განაწილებისას ამ პერიოდების მიხედვით "
+"დარიცხული და გადახდილი მოგების გადასახადის თანხის მიხედვით ჩასათვლელი თანხის"
+" კორექტირება"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"2017 წლის 1 იანვრიდან სტატუსის დაკარგვამდე საანგარიშო პერიოდების მიხედვით "
+"დარიცხული და გადახდილი მოგების გადასახადის თანხა"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"2017 წლის 1 იანვრიდან სტატუსის დაკარგვამდე საანგარიშო პერიოდებში მიღებული "
+"წმინდა მოგების ოდენობა"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"2017 წლის 1 იანვრიდან სტატუსის დაკარგვამდე საანგარიშო პერიოდებში მიღებული "
+"წმინდა მოგების ხარჯზე დივიდენდის სანაცვლოდ საწარმოს მიერ პარტნიორისათვის "
+"გადაცემული ამ საწარმოს აქციების/წილის ღირებულება"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"2017 წლის 1 იანვრიდან სტატუსის დაკარგვამდე საანგარიშო პერიოდებში მიღებული "
+"წმინდა მოგების ხარჯზე დივიდენდის სანაცვლოდ საწარმოს მიერ პარტნიორისთვის "
+"გადაცემული ამ საწარმოს აქციების/წილის ღირებულება"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "25.1 სტრიქონის მონაცემი"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "25.3 სტრიქონის მონაცემი"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_annex_line__amount6
+msgid "3: closing balance."
+msgstr "3: საბოლოო ნაშთი."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_annex_line__amount4
+msgid "3: decrease."
+msgstr "3: შემცირება."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_annex_line__amount5
+msgid "3: of which revaluation."
+msgstr "3: მათ შორის, გადაფასება."
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "<span class=\"ms-3\">Refundable: </span>"
+msgstr "<span class=\"ms-3\">დასაბრუნებელი: </span>"
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "<span>,</span>"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "<span>Payable: </span>"
+msgstr "<span>კუთვნილი: </span>"
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "<span>მოგების გადასახადის ყოველთვიური დეკლარაცია</span>"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration.py:0
+#: code:addons/gec_profit_tax_report/models/rs_cit_taxed_item.py:0
+msgid "A confirmed declaration cannot be changed. Set it back to draft first."
+msgstr "დადასტურებული დეკლარაციის შეცვლა შეუძლებელია. ჯერ დააბრუნეთ მონახაზზე."
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration.py:0
+msgid ""
+"A later corrected version of %s is confirmed: set that one back to draft "
+"instead."
+msgstr "%s-ის შემდგომი შესწორებული ვერსია დადასტურებულია: მონახაზზე ის დააბრუნეთ."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_company__gec_cit_special_status
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_config_settings__gec_cit_special_status
+msgid ""
+"A status granted on top of the Part I status. It is not printed in Part I, "
+"but decides column 3: investment company 5% (line 16.1.4), innovative "
+"startup and innovative small or medium company 15%, research and development"
+" company 10%."
+msgstr "I ნაწილის სტატუსის გარდა მინიჭებული სტატუსი. I ნაწილში არ აისახება, მაგრამ განსაზღვრავს მე-3 სვეტს: საინვესტიციო კომპანია 5% (სტრიქონი 16.1.4), ინოვაციური სტარტაპი და ინოვაციური მცირე და საშუალო კომპანია 15%, კვლევისა და განვითარების კომპანია 10%."
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+#: model:ir.model,name:gec_profit_tax_report.model_account_account
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_taxed_item__account_id
+msgid "Account"
+msgstr "ანგარიში"
+
+#. module: gec_profit_tax_report
+#: model:ir.model,name:gec_profit_tax_report.model_account_chart_template
+msgid "Account Chart Template"
+msgstr "ანგარიშთა გეგმის შაბლონი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__a11_extra
+msgid "Additional credit, booked on the personal account card by rs.ge."
+msgstr "დამატებით ჩასათვლელი თანხა, რომელსაც rs.ge პირადი აღრიცხვის ბარათზე ასახავს."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__amount_adjust
+msgid "Adjustment"
+msgstr "კორექტირება"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__amount3_adjust
+msgid "Adjustment (Col. 3)"
+msgstr "კორექტირება (სვ. 3)"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_recovery__amount
+msgid "Amount"
+msgstr "თანხა"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_cell__columns
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration_line__columns
+msgid "Amount columns the rs.ge form shows for this row."
+msgstr "თანხის სვეტები, რომლებსაც rs.ge-ის ფორმა ამ სტრიქონისთვის აჩვენებს."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__booked_amount
+msgid ""
+"Amount of the entry posted by this declaration (a correction posts the "
+"difference)."
+msgstr "ამ დეკლარაციით გატარებული თანხა (შესწორება ატარებს სხვაობას)."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__amount1
+msgid "Amount1"
+msgstr "თანხა 1"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__amount2
+msgid "Amount2"
+msgstr "თანხა 2"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__amount3
+msgid "Amount3"
+msgstr "თანხა 3"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__amount4
+msgid "Amount4"
+msgstr "თანხა 4"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__amount5
+msgid "Amount5"
+msgstr "თანხა 5"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__amount6
+msgid "Amount6"
+msgstr "თანხა 6"
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.actions.act_window,help:gec_profit_tax_report.rs_cit_taxed_item_action
+msgid ""
+"Amounts taxed on lines 18.1.1, 18.1.3, 18.1.4, 18.2 and 18.3 by confirmed declarations. When the\n"
+"               money comes back, the declaration of that month counts it on line 27.1 or 27.2."
+msgstr ""
+"დადასტურებული დეკლარაციებით 18.1.1, 18.1.3, 18.1.4, 18.2 და 18.3 სტრიქონებში დაბეგრილი თანხები. როცა\n"
+"               თანხა ბრუნდება, იმ თვის დეკლარაცია მას 27.1 ან 27.2 სტრიქონში ასახავს."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_partner__gec_cit_micro_business
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_users__gec_cit_micro_business
+msgid ""
+"An individual with micro business status. Purchases from them feed line "
+"17.3, unless their income from this supply is taxed under the general rule: "
+"then leave it unticked."
+msgstr "მიკრობიზნესის სტატუსის მქონე ფიზიკური პირი. მისგან შესყიდვები 17.3 სტრიქონში აისახება, გარდა იმ შემთხვევისა, როცა ამ მიწოდებით მიღებული შემოსავალი საერთო წესით იბეგრება: მაშინ მონიშვნა მოხსენით."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__annex
+msgid "Annex"
+msgstr "დანართი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Annex 1"
+msgstr "დანართი 1"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a1_1
+msgid "Annex 1 Line 1"
+msgstr "დანართი 1, სტრიქონი 1"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a1_2
+msgid "Annex 1 Line 2"
+msgstr "დანართი 1, სტრიქონი 2"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a1_3
+msgid "Annex 1 Line 3"
+msgstr "დანართი 1, სტრიქონი 3"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a1_4
+msgid "Annex 1 Line 4"
+msgstr "დანართი 1, სტრიქონი 4"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a1_5
+msgid "Annex 1 Line 5"
+msgstr "დანართი 1, სტრიქონი 5"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__annex__1_1
+msgid "Annex 1.1"
+msgstr "დანართი 1¹"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a11_1
+msgid "Annex 1.1 Part II Line 1"
+msgstr "დანართი 1¹, II ნაწილი, სტრიქონი 1"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a11_2
+msgid "Annex 1.1 Part II Line 2"
+msgstr "დანართი 1¹, II ნაწილი, სტრიქონი 2"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a11_3
+msgid "Annex 1.1 Part II Line 3"
+msgstr "დანართი 1¹, II ნაწილი, სტრიქონი 3"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a11_4
+msgid "Annex 1.1 Part II Line 4"
+msgstr "დანართი 1¹, II ნაწილი, სტრიქონი 4"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a11_5
+msgid "Annex 1.1 Part II Line 5"
+msgstr "დანართი 1¹, II ნაწილი, სტრიქონი 5"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a11_extra
+msgid "Annex 1.1 Part III"
+msgstr "დანართი 1¹, III ნაწილი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Annex 1.1, part I"
+msgstr "დანართი 1¹, I ნაწილი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Annex 1.1, parts II and III"
+msgstr "დანართი 1¹, II და III ნაწილები"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__recovery_ids
+msgid "Annex 1.2"
+msgstr "დანართი 1²"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_recovery__taxed_period
+msgid "Annex 1.2 column 1."
+msgstr "დანართი 1², სვეტი 1."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_recovery__taxed_code
+msgid "Annex 1.2 column 2."
+msgstr "დანართი 1², სვეტი 2."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_recovery__amount
+msgid "Annex 1.2 column 3."
+msgstr "დანართი 1², სვეტი 3."
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Annex 1.3"
+msgstr "დანართი 1³"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a13_1
+msgid "Annex 1.3 Line 1"
+msgstr "დანართი 1³, სტრიქონი 1"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a13_2
+msgid "Annex 1.3 Line 2"
+msgstr "დანართი 1³, სტრიქონი 2"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a13_3
+msgid "Annex 1.3 Line 3"
+msgstr "დანართი 1³, სტრიქონი 3"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a13_4
+msgid "Annex 1.3 Line 4"
+msgstr "დანართი 1³, სტრიქონი 4"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a13_5
+msgid "Annex 1.3 Line 5"
+msgstr "დანართი 1³, სტრიქონი 5"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__annex__1_4
+msgid "Annex 1.4"
+msgstr "დანართი 1⁴"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a14_1
+msgid "Annex 1.4 Part II Line 1"
+msgstr "დანართი 1⁴, II ნაწილი, სტრიქონი 1"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a14_2
+msgid "Annex 1.4 Part II Line 2"
+msgstr "დანართი 1⁴, II ნაწილი, სტრიქონი 2"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a14_3
+msgid "Annex 1.4 Part II Line 3"
+msgstr "დანართი 1⁴, II ნაწილი, სტრიქონი 3"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a14_4
+msgid "Annex 1.4 Part II Line 4"
+msgstr "დანართი 1⁴, II ნაწილი, სტრიქონი 4"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a14_5
+msgid "Annex 1.4 Part II Line 5"
+msgstr "დანართი 1⁴, II ნაწილი, სტრიქონი 5"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a14_extra
+msgid "Annex 1.4 Part III"
+msgstr "დანართი 1⁴, III ნაწილი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Annex 1.4, part I"
+msgstr "დანართი 1⁴, I ნაწილი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Annex 1.4, parts II and III"
+msgstr "დანართი 1⁴, II და III ნაწილები"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__annex__1_5
+msgid "Annex 1.5"
+msgstr "დანართი 1⁵"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__annex__1_6
+msgid "Annex 1.6"
+msgstr "დანართი 1⁶"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_annex_line__result1
+msgid "Annex 1.6 column 5: expenses x dividend / net profit."
+msgstr "დანართი 1⁶, სვეტი 5: ხარჯი × დივიდენდი / წმინდა მოგება."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_annex_line__result2
+msgid "Annex 1.6 column 6: dividend less the reduction; line 16.1.3."
+msgstr "დანართი 1⁶, სვეტი 6: დივიდენდს გამოკლებული შესამცირებელი თანხა; სტრიქონი 16.1.3."
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Annex 1.7"
+msgstr "დანართი 1⁷"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a17_1
+msgid "Annex 1.7 Column 1"
+msgstr "დანართი 1⁷, სვეტი 1"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a17_2
+msgid "Annex 1.7 Column 2"
+msgstr "დანართი 1⁷, სვეტი 2"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a17_3
+msgid "Annex 1.7 Column 3"
+msgstr "დანართი 1⁷, სვეტი 3"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a17_4
+msgid "Annex 1.7 Column 4"
+msgstr "დანართი 1⁷, სვეტი 4"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a17_5
+msgid "Annex 1.7 Column 5"
+msgstr "დანართი 1⁷, სვეტი 5"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a17_6
+msgid "Annex 1.7 Column 6"
+msgstr "დანართი 1⁷, სვეტი 6"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Annex 2"
+msgstr "დანართი 2"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__annex__3
+msgid "Annex 3"
+msgstr "დანართი 3"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__annex__4
+msgid "Annex 4"
+msgstr "დანართი 4"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_annex_line__documentation
+msgid "Annex 4 column 10."
+msgstr "დანართი 4, სვეტი 10."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_annex_line__relation
+msgid "Annex 4 column 4."
+msgstr "დანართი 4, სვეტი 4."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_annex_line__operation
+msgid "Annex 4 column 5."
+msgstr "დანართი 4, სვეტი 5."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_annex_line__partner_id
+msgid "Annex 4 columns 1-3."
+msgstr "დანართი 4, სვეტები 1-3."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_annex_line__operation_currency_id
+msgid "Annex 4 columns 6 and 8."
+msgstr "დანართი 4, სვეტები 6 და 8."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__annex_line_ids
+msgid "Annex Line"
+msgstr "დანართის სტრიქონი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__annex11_line_ids
+msgid "Annex11 Line"
+msgstr "დანართი 1¹-ის სტრიქონი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__annex14_line_ids
+msgid "Annex14 Line"
+msgstr "დანართი 1⁴-ის სტრიქონი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__annex15_line_ids
+msgid "Annex15 Line"
+msgstr "დანართი 1⁵-ის სტრიქონი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__annex16_line_ids
+msgid "Annex16 Line"
+msgstr "დანართი 1⁶-ის სტრიქონი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__annex3_line_ids
+msgid "Annex3 Line"
+msgstr "დანართი 3-ის სტრიქონი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__annex4_line_ids
+msgid "Annex4 Line"
+msgstr "დანართი 4-ის სტრიქონი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Annexes"
+msgstr "დანართები"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__is_march
+msgid "Annexes 2 and 4 are filed with the March declaration."
+msgstr "დანართები 2 და 4 მარტის დეკლარაციასთან ერთად წარედგინება."
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "Back to Draft"
+msgstr "მონახაზზე დაბრუნება"
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "Balance at Year End"
+msgstr "ნაშთი წლის ბოლოს"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_account_account__gec_cit_balance_group
+msgid ""
+"Balances of annex 2 (inventory and fixed assets at year end, March "
+"declaration) and annex 3 (loans and capital, every month) of the profit tax "
+"declaration."
+msgstr "მოგების გადასახადის დეკლარაციის დანართი 2-ის (სასაქონლო-მატერიალური ფასეულობები და ძირითადი საშუალებები წლის ბოლოს, მარტის დეკლარაცია) და დანართი 3-ის (სესხები და კაპიტალი, ყოველთვე) ნაშთები."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_company__gec_cit_financial
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_config_settings__gec_cit_financial
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__res_partner__gec_cit_status__financial
+msgid "Bank, Credit Union, Microfinance or Lending Entity"
+msgstr "საბანკო დაწესებულება, საკრედიტო კავშირი, მიკროსაფინანსო ორგანიზაცია ან სესხის გამცემი სუბიექტი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__documentation__preparing
+msgid "Being prepared"
+msgstr "მზადდება"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__booked_amount
+msgid "Booked Amount"
+msgstr "გატარებული თანხა"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__res_partner__gec_cit_status__budget
+msgid "Budget Organisation"
+msgstr "საბიუჯეტო ორგანიზაცია"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__operation__restructuring
+msgid "Business restructuring"
+msgstr "ბიზნესის რესტრუქტურიზაცია"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_partner__gec_cit_listed_abroad
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_users__gec_cit_listed_abroad
+msgid "Buying its shares or securities stays out of lines 18.2 and 18.3."
+msgstr "მისი აქციების ან ფასიანი ქაღალდების შეძენა არ აისახება 18.2 და 18.3 სტრიქონებში."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__amount_auto
+msgid "Calculated"
+msgstr "გაანგარიშებული"
+
+#. module: gec_profit_tax_report
+#. odoo-javascript
+#: code:addons/gec_profit_tax_report/static/src/part3/part3_field.js:0
+msgid "Calculated %(calculated)s, adjustment %(adjustment)s"
+msgstr "გაანგარიშებული %(calculated)s, კორექტირება %(adjustment)s"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__amount3_auto
+msgid "Calculated (Col. 3)"
+msgstr "გაანგარიშებული (სვ. 3)"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__account_account__gec_cit_balance_group__investment
+msgid "Capital in Other Enterprises"
+msgstr "სხვა საწარმოში რიცხული კაპიტალი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration.py:0
+msgid "Capital in other enterprises"
+msgstr "სხვა საწარმოში რიცხული კაპიტალი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__cell_id
+msgid "Cell"
+msgstr "სტრიქონი"
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.res_config_settings_view_form_gec_cit
+msgid "Change which lines of the declaration apply"
+msgstr "ცვლის, დეკლარაციის რომელი სტრიქონები გამოიყენება"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_partner__gec_cit_charity
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_users__gec_cit_charity
+msgid "Charity Organisation"
+msgstr "საქველმოქმედო ორგანიზაცია"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__charity_taxed
+msgid "Charity Taxed"
+msgstr "დაბეგრილი შემოწირულობა"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__checks
+msgid "Checks"
+msgstr "შემოწმებები"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_cell__code
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__code
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_taxed_item__code
+msgid "Code"
+msgstr "კოდი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__amount
+msgid "Column 2"
+msgstr "სვეტი 2"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_cell__columns__col2
+msgid "Column 2 Only"
+msgstr "მხოლოდ სვეტი 2"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration_line__amount_adjust
+msgid ""
+"Column 2, typed by the accountant: the whole amount on typed-in rows, a "
+"correction of the calculated amount on the others."
+msgstr "სვეტი 2, ბუღალტრის შეყვანილი: ხელით შესავსებ სტრიქონებზე – მთელი თანხა, დანარჩენზე – გაანგარიშებული თანხის კორექტირება."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration_line__amount_auto
+msgid "Column 2: what Odoo calculated from accounting or from other rows."
+msgstr "სვეტი 2: რაც Odoo-მ გაიანგარიშა ბუღალტერიიდან ან სხვა სტრიქონებიდან."
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__amount3
+msgid "Column 3"
+msgstr "სვეტი 3"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_cell__columns__col3
+msgid "Column 3 Only"
+msgstr "მხოლოდ სვეტი 3"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__col3_rate
+msgid "Column 3 Rate"
+msgstr "მე-3 სვეტის განაკვეთი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration.py:0
+msgid ""
+"Column 3 rate of research and development companies is set to 10%: check it."
+msgstr "კვლევისა და განვითარების კომპანიის მე-3 სვეტის განაკვეთად მითითებულია 10%: გადაამოწმეთ."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_cell__columns
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__columns
+msgid "Columns"
+msgstr "სვეტები"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_cell__columns__both
+msgid "Columns 2 and 3"
+msgstr "სვეტები 2 და 3"
+
+#. module: gec_profit_tax_report
+#: model:ir.model,name:gec_profit_tax_report.model_res_company
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__company_id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__company_id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__company_id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_recovery__company_id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_taxed_item__company_id
+msgid "Company"
+msgstr "კომპანია"
+
+#. module: gec_profit_tax_report
+#: model:ir.model,name:gec_profit_tax_report.model_res_config_settings
+msgid "Config Settings"
+msgstr "პარამეტრების კონფიგურაცია"
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "Confirm"
+msgstr "დადასტურება"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_declaration__state__confirmed
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_search
+msgid "Confirmed"
+msgstr "დადასტურებული"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration.py:0
+msgid ""
+"Confirmed declarations %(names)s already count money back on amounts this "
+"declaration taxed. Set them back to draft first."
+msgstr "დადასტურებული დეკლარაციები %(names)s უკვე ასახავს ამ დეკლარაციით დაბეგრილი თანხების დაბრუნებას. ჯერ ისინი დააბრუნეთ მონახაზზე."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_company__gec_cit_post_entry
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_config_settings__gec_cit_post_entry
+msgid ""
+"Confirming a declaration posts its profit tax, except the dividend tax the "
+"CIT wizard already books."
+msgstr "დეკლარაციის დადასტურება ატარებს მის მოგების გადასახადს, გარდა დივიდენდზე გადასახადისა, რომელსაც CIT ოსტატი უკვე არიცხავს."
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.res_config_settings_view_form_gec_cit
+msgid ""
+"Confirming a declaration posts its profit tax, except the dividend tax the "
+"CIT wizard books"
+msgstr "დეკლარაციის დადასტურება ატარებს მის მოგების გადასახადს, გარდა დივიდენდზე გადასახადისა, რომელსაც CIT ოსტატი არიცხავს"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+#: model:ir.model,name:gec_profit_tax_report.model_res_partner
+msgid "Contact"
+msgstr "კონტაქტი"
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "Contract"
+msgstr "ხელშეკრულება"
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "Correct"
+msgstr "შესწორება"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_declaration__declaration_type__corrected
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_search
+msgid "Corrected"
+msgstr "შესწორებული"
+
+#. module: gec_profit_tax_report
+#: model:ir.model,name:gec_profit_tax_report.model_res_country
+msgid "Country"
+msgstr "ქვეყანა"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__create_uid
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_cell__create_uid
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__create_uid
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__create_uid
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_recovery__create_uid
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_taxed_item__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__create_date
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_cell__create_date
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__create_date
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__create_date
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_recovery__create_date
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_taxed_item__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Credit"
+msgstr "კრედიტი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__currency_id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__currency_id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__currency_id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_recovery__currency_id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_taxed_item__currency_id
+msgid "Currency"
+msgstr "ვალუტა"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__date
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_taxed_item__date
+msgid "Date"
+msgstr "თარიღი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__date_to
+msgid "Date To"
+msgstr "თარიღამდე"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Debit"
+msgstr "დებეტი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_cell__measure__balance
+msgid "Debit - Credit"
+msgstr "დებეტი - კრედიტი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_cell__measure__debit
+msgid "Debits Only"
+msgstr "მხოლოდ დებეტი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__declaration_id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__declaration_id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_recovery__declaration_id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_taxed_item__declaration_id
+msgid "Declaration"
+msgstr "დეკლარაცია"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_taxed_item__state
+msgid "Declaration Status"
+msgstr "დეკლარაციის სტატუსი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__declaration_type
+msgid "Declaration Type"
+msgstr "დეკლარაციის სახე"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__xlsx_file
+msgid "Declaration Workbook"
+msgstr "დეკლარაციის ფაილი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Declaration type"
+msgstr "დეკლარაციის სახე"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_account_account__display_name
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_account_chart_template__display_name
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_account_move_line__display_name
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_company__display_name
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_country__display_name
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_partner__display_name
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__display_name
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_cell__display_name
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__display_name
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__display_name
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_recovery__display_name
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_taxed_item__display_name
+msgid "Display Name"
+msgstr "სახელი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Dividend"
+msgstr "დივიდენდი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__dividend_total
+msgid "Dividend Total"
+msgstr "დივიდენდი სულ"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__dividend_unmatched
+msgid "Dividend Unmatched"
+msgstr "დაუწყვილებელი დივიდენდი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__dividend_unmatched
+msgid ""
+"Dividend payments not matched with their declaration entry: any withholding "
+"tax kept from them is missing from line 16.1."
+msgstr "დივიდენდის გადახდები, რომლებიც არ არის დაწყვილებული დარიცხვის გატარებასთან: მათგან დაკავებული გადასახადი 16.1 სტრიქონს აკლია."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__dividend_total
+msgid "Dividends paid this month and taxed, withholding tax included."
+msgstr "ამ თვეში გადახდილი და დასაბეგრი დივიდენდი, წყაროსთან დაკავებული გადასახადის ჩათვლით."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__documentation
+msgid "Documentation"
+msgstr "დოკუმენტაცია"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__charity_taxed
+msgid "Donations to charities taxed on line 19 by this declaration."
+msgstr "ამ დეკლარაციით მე-19 სტრიქონში დაბეგრილი შემოწირულობა საქველმოქმედო ორგანიზაციებზე."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_declaration__state__draft
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_search
+msgid "Draft"
+msgstr "მონახაზი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.constraint,message:gec_profit_tax_report.constraint_rs_cit_declaration_line_declaration_cell_uniq
+msgid "Each form row appears once per declaration."
+msgstr "ფორმის თითოეული სტრიქონი დეკლარაციაში ერთხელ ჩნდება."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__company_status
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.res_config_settings_view_form_gec_cit
+msgid "Enterprise Status"
+msgstr "საწარმოს სტატუსი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Enterprise status"
+msgstr "საწარმოს სტატუსი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Entry"
+msgstr "გატარება"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__res_partner__gec_cit_status__exempt
+msgid "Exempt from Profit Tax"
+msgstr "მოგების გადასახადისაგან გათავისუფლებული პირი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Expenses"
+msgstr "ხარჯი"
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "Export XLSX"
+msgstr "XLSX ექსპორტი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__account_account__gec_cit_balance_group__fixed_asset
+msgid "Fixed Assets"
+msgstr "ძირითადი საშუალებები"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a2_fixed
+msgid "Fixed Assets at Year End"
+msgstr "ძირითადი საშუალებების ნაშთი წლის ბოლოს"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_partner__gec_cit_fixed_tax
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_users__gec_cit_fixed_tax
+msgid "Fixed Tax Payer"
+msgstr "ფიქსირებული გადასახადის გადამხდელი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Fixed assets at year end"
+msgstr "ძირითადი საშუალებების ნაშთი წლის ბოლოს"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_cell__kind__calc
+msgid "Formula"
+msgstr "ფორმულა"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration.py:0
+msgid ""
+"Founding year: the representation limit is 1% of the year's expenses, known "
+"only in December. Line 20 may stay empty until then (instruction example 6)."
+msgstr "დაფუძნების წელი: წარმომადგენლობითი ხარჯის ზღვრული ოდენობაა წლის ხარჯის 1%, რომელიც მხოლოდ დეკემბერში ხდება ცნობილი. მე-20 სტრიქონი მანამდე შეიძლება ცარიელი დარჩეს (ინსტრუქციის მე-6 მაგალითი)."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_cell__kind__auto
+msgid "From Accounting"
+msgstr "ბუღალტერიიდან"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_cell__kind
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration_line__kind
+msgid ""
+"From Accounting: read from posted journal items of the month. Formula: "
+"calculated from other rows. Typed In: entered by the accountant."
+msgstr "ბუღალტერიიდან: იკითხება თვის გატარებული საბუღალტრო სტრიქონებიდან. ფორმულა: გაიანგარიშება სხვა სტრიქონებიდან. ხელით: შეყავს ბუღალტერს."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_company__gec_cit_gambling
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_config_settings__gec_cit_gambling
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__gambling
+msgid "Gambling Organiser"
+msgstr "აზარტული თამაშობების ორგანიზატორი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_company__gec_cit_gambling
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_config_settings__gec_cit_gambling
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__gambling
+msgid ""
+"Gaming hall, online casino or online betting organiser: shows part IV of the"
+" declaration."
+msgstr "სათამაშო აპარატების სალონის, სისტემურ-ელექტრონული ფორმით აზარტული თამაშობების ან ტოტალიზატორის ორგანიზატორი: ჩანს დეკლარაციის IV ნაწილი."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__g3
+msgid "Gaming hall: stakes less winnings paid."
+msgstr "სათამაშო აპარატების სალონი: მიღებულ ფსონებსა და გაცემულ მოგებას შორის სხვაობა."
+
+#. module: gec_profit_tax_report
+#: model:ir.module.module,shortdesc:base.module_gec_profit_tax_report
+msgid "Georgia - Profit Tax Declaration (rs.ge Form II-086)"
+msgstr "საქართველო - მოგების გადასახადის დეკლარაცია (rs.ge, ფორმა II-086)"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__res_partner__gec_cit_status__enterprise
+msgid "Georgian Enterprise"
+msgstr "ქართული საწარმო"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__operation__goods
+msgid "Goods or services supplied or bought"
+msgstr "საქონლის/მომსახურების მიწოდება/შესყიდვა"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__operation__guarantee
+msgid "Guarantee received or given"
+msgstr "მიღებული/გაცემული გარანტია"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_partner__gec_cit_charity
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_users__gec_cit_charity
+msgid ""
+"Holds charity status. Donations to it on line 19 are taxed only above 10% of"
+" last year's net profit."
+msgstr "აქვს საქველმოქმედო ორგანიზაციის სტატუსი. მასზე გაცემული შემოწირულობა მე-19 სტრიქონში იბეგრება მხოლოდ წინა წლის წმინდა მოგების 10%-ს ზემოთ."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_cell__measure
+msgid ""
+"How journal items of the month count on a row read from accounting. Debits "
+"Only: payments such as dividends, advances or loans given, so the accrual or"
+" the later settlement on the same account does not cancel them out. Market "
+"Price Difference: invoice lines with a market value, compared with their "
+"amount (lines 16.3 and 16.4). Taxed Items Recovered: money back on amounts "
+"taxed earlier on lines 18.1.1, 18.1.3, 18.1.4, 18.2 and 18.3 (lines 27.1 and"
+" 27.2). No account can feed these two kinds of rows."
+msgstr "როგორ აისახება თვის საბუღალტრო სტრიქონები ბუღალტერიიდან წაკითხულ სტრიქონზე. მხოლოდ დებეტი: გადახდები, როგორიცაა დივიდენდი, ავანსი ან გაცემული სესხი, რომ იმავე ანგარიშზე დარიცხვამ ან შემდგომმა დაფარვამ ისინი არ გააბათილოს. საბაზრო ფასის სხვაობა: საბაზრო ღირებულების მქონე ინვოისის სტრიქონები, შედარებული მათ თანხასთან (16.3 და 16.4 სტრიქონები). დაბეგრილი თანხების დაბრუნება: 18.1.1, 18.1.3, 18.1.4, 18.2 და 18.3 სტრიქონებში ადრე დაბეგრილი თანხების დაბრუნება (27.1 და 27.2 სტრიქონები). ამ ორი სახის სტრიქონს ანგარიში ვერ შეავსებს."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_partner__gec_cit_status
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_users__gec_cit_status
+msgid ""
+"How the monthly profit tax declaration treats this contact. Empty: an individual, a foreign person or a non-commercial legal entity.\n"
+"Georgian Enterprise: resident LLC, JSC, cooperative, general or limited partnership taxed under the general rule. Dividends paid to it stay out of line 16.1.\n"
+"Exempt from Profit Tax: e.g. a free industrial zone enterprise, special trading company or virtual zone person. Dividends paid to it are taxed; deals with it feed lines 16.4 and 18.\n"
+"Budget Organisation: exempt, but left out of lines 16.4 and 18.1.1-18.1.3; gifts to it stay out of line 19.\n"
+"NBG or Deposit Insurance Agency: exempt, but left out of lines 16.4 and 18.1; gifts to it stay out of line 19.\n"
+"Bank, Credit Union, Microfinance or Lending Entity: dividends paid to it are taxed."
+msgstr ""
+"როგორ ეპყრობა ამ კონტაქტს მოგების გადასახადის ყოველთვიური დეკლარაცია. ცარიელი: ფიზიკური პირი, უცხოური პირი ან არასამეწარმეო იურიდიული პირი.\n"
+"ქართული საწარმო: რეზიდენტი შპს, სს, კოოპერატივი, სპს ან კს, რომელიც საერთო წესით იბეგრება. მასზე განაწილებული დივიდენდი 16.1 სტრიქონში არ აისახება.\n"
+"მოგების გადასახადისაგან გათავისუფლებული პირი: მაგ. თავისუფალი ინდუსტრიული ზონის საწარმო, სპეციალური სავაჭრო კომპანია ან ვირტუალური ზონის პირი. მასზე განაწილებული დივიდენდი იბეგრება; მასთან ოპერაციები აისახება 16.4 და მე-18 სტრიქონებში.\n"
+"საბიუჯეტო ორგანიზაცია: გათავისუფლებულია, მაგრამ არ აისახება 16.4 და 18.1.1-18.1.3 სტრიქონებში; მასზე უსასყიდლო გადაცემა მე-19 სტრიქონში არ აისახება.\n"
+"საქართველოს ეროვნული ბანკი ან დეპოზიტების დაზღვევის სააგენტო: გათავისუფლებულია, მაგრამ არ აისახება 16.4 და 18.1 სტრიქონებში; მასზე უსასყიდლო გადაცემა მე-19 სტრიქონში არ აისახება.\n"
+"საბანკო დაწესებულება, საკრედიტო კავშირი, მიკროსაფინანსო ორგანიზაცია ან სესხის გამცემი სუბიექტი: მასზე განაწილებული დივიდენდი იბეგრება."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__documentation__no
+msgid "I don't have it"
+msgstr "არ მაქვს"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__documentation__yes
+msgid "I have it"
+msgstr "მაქვს"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_account_account__id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_account_chart_template__id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_account_move_line__id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_company__id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_config_settings__id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_country__id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_partner__id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_cell__id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_recovery__id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_taxed_item__id
+msgid "ID"
+msgstr "ID"
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "III ნაწილი"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "IV ნაწილი"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__partner_vat
+msgid "Identification Number"
+msgstr "საიდენტიფიკაციო ნომერი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Identification number"
+msgstr "საიდენტიფიკაციო ნომერი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__res_company__gec_cit_special_status__innovative_sme
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_declaration__special_status__innovative_sme
+msgid "Innovative Small or Medium Company"
+msgstr "ინოვაციური მცირე და საშუალო კომპანიის სტატუსის მქონე სუბიექტი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__res_company__gec_cit_special_status__startup
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_declaration__special_status__startup
+msgid "Innovative Startup"
+msgstr "ინოვაციური სტარტაპის სტატუსის მქონე სუბიექტი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_company__gec_cit_insurer
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_config_settings__gec_cit_insurer
+msgid "Insurance Organisation"
+msgstr "სადაზღვევო ორგანიზაცია"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__operation__interest
+msgid "Interest income or expense"
+msgstr "საპროცენტო შემოსავალი/ხარჯი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__res_company__gec_cit_company_status__international
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_declaration__company_status__international
+msgid "International Company"
+msgstr "საერთაშორისო კომპანია"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__account_account__gec_cit_balance_group__inventory
+msgid "Inventory"
+msgstr "სასაქონლო-მატერიალური ფასეულობები"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__a2_inventory
+msgid "Inventory at Year End"
+msgstr "სასაქონლო-მატერიალური ფასეულობის ნაშთი წლის ბოლოს"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Inventory at year end"
+msgstr "სასაქონლო-მატერიალური ფასეულობის ნაშთი წლის ბოლოს"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__res_company__gec_cit_special_status__investment
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_declaration__special_status__investment
+msgid "Investment Company"
+msgstr "საინვესტიციო კომპანია"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__is_march
+msgid "Is March"
+msgstr "მარტია"
+
+#. module: gec_profit_tax_report
+#: model:ir.model,name:gec_profit_tax_report.model_account_move_line
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_taxed_item__move_line_id
+msgid "Journal Item"
+msgstr "საბუღალტრო სტრიქონი"
+
+#. module: gec_profit_tax_report
+#. odoo-javascript
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+#: code:addons/gec_profit_tax_report/static/src/part3/part3_field.xml:0
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__move_line_ids
+msgid "Journal Items"
+msgstr "საბუღალტრო სტრიქონები"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__unclassified_count
+msgid "Journal items on line 18 accounts without a contact."
+msgstr "მე-18 სტრიქონის ანგარიშებზე კონტაქტის გარეშე არსებული საბუღალტრო სტრიქონები."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_cell__kind
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__kind
+msgid "Kind"
+msgstr "სახე"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Label"
+msgstr "აღწერა"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__write_uid
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_cell__write_uid
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__write_uid
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__write_uid
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_recovery__write_uid
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_taxed_item__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__write_date
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_cell__write_date
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__write_date
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__write_date
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_recovery__write_date
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_taxed_item__write_date
+msgid "Last Updated on"
+msgstr "ბოლოს განახლებულია"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__level
+msgid "Level"
+msgstr "დონე"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__line_ids
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_recovery__code
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_entry__code
+msgid "Line"
+msgstr "სტრიქონი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Line 16.1.1"
+msgstr "სტრიქონი 16.1.1"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Line 16.1.2"
+msgstr "სტრიქონი 16.1.2"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Line 25.1"
+msgstr "სტრიქონი 25.1"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration.py:0
+msgid ""
+"Line 25.2 is above the tax on line 16.1 less line 25.1, its upper limit."
+msgstr "25.2 სტრიქონი აღემატება მის ზედა ზღვარს: 16.1 სტრიქონის გადასახადს გამოკლებული 25.1 სტრიქონი."
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Line 25.3"
+msgstr "სტრიქონი 25.3"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__tax_payable
+msgid "Line 28 of both columns plus part IV."
+msgstr "ორივე სვეტის 28-ე სტრიქონი დამატებული IV ნაწილი."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__tax_refund
+msgid "Line 29 of both columns."
+msgstr "ორივე სვეტის 29-ე სტრიქონი."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__operation__loan
+msgid "Loan received or given"
+msgstr "მიღებული/გაცემული სესხი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__account_account__gec_cit_balance_group__loan_given
+msgid "Loans Given"
+msgstr "გაცემული სესხები"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__account_account__gec_cit_balance_group__loan_received
+msgid "Loans Received"
+msgstr "მიღებული სესხები"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration.py:0
+msgid "Loans given"
+msgstr "გაცემული სესხ(ებ)ი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration.py:0
+msgid "Loans received"
+msgstr "მიღებული სესხ(ებ)ი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_company__gec_cit_financial
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_config_settings__gec_cit_financial
+msgid ""
+"Loans to individuals and non-residents then stay out of line 18.3; loans to "
+"shareholders feed line 18.4."
+msgstr "ფიზიკურ პირებსა და არარეზიდენტებზე გაცემული სესხები მაშინ 18.3 სტრიქონში არ აისახება; პარტნიორებზე გაცემული სესხები აისახება 18.4 სტრიქონში."
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration.py:0
+msgid ""
+"March: annex 2 is empty. Check the Profit Tax Balance Group of the inventory"
+" and fixed asset accounts."
+msgstr "მარტი: დანართი 2 ცარიელია. შეამოწმეთ სასაქონლო-მატერიალური ფასეულობებისა და ძირითადი საშუალებების ანგარიშების „მოგების გადასახადის ნაშთის ჯგუფი“."
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration.py:0
+msgid ""
+"March: fill annex 4 if last year's international controlled transactions "
+"exceeded 500,000 GEL."
+msgstr "მარტი: შეავსეთ დანართი 4, თუ წინა წლის საერთაშორისო კონტროლირებული ოპერაციები 500 000 ლარს აღემატებოდა."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_cell__measure__market
+msgid "Market Price Difference"
+msgstr "საბაზრო ფასის სხვაობა"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_account_move_line__gec_cit_market_value
+msgid "Market Value"
+msgstr "საბაზრო ღირებულება"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_account_move_line__gec_cit_market_value
+msgid ""
+"Market value of this invoice line in company currency, for a deal with a "
+"related party or a person exempt from profit tax. A sale below it, or a "
+"purchase above it, adds the difference to line 16.3 or 16.4 of the profit "
+"tax declaration."
+msgstr "ინვოისის ამ სტრიქონის საბაზრო ღირებულება კომპანიის ვალუტაში, ურთიერთდამოკიდებულ ან მოგების გადასახადისაგან გათავისუფლებულ პირთან გარიგებისთვის. მასზე ნაკლებ ფასად მიწოდება ან მასზე მეტ ფასად შესყიდვა სხვაობას ამატებს დეკლარაციის 16.3 ან 16.4 სტრიქონს."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_cell__measure
+msgid "Measure"
+msgstr "ასახვის წესი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_partner__gec_cit_micro_business
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_users__gec_cit_micro_business
+msgid "Micro Business Status"
+msgstr "მიკრობიზნესის სტატუსი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_recovery__move_line_id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_taxed_item__recovery_ids
+msgid "Money Back"
+msgstr "შესამცირებელი (დასაბრუნებელი)"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_taxed_item__recovered
+msgid "Money back counted by confirmed declarations."
+msgstr "დადასტურებული დეკლარაციებით ასახული დაბრუნებული თანხა."
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__date_from
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_search
+msgid "Month"
+msgstr "თვე"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Month/year"
+msgstr "თვე/წელი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Monthly profit tax declaration (form II-086)"
+msgstr "მოგების გადასახადის ყოველთვიური დეკლარაცია (ფორმა II-086)"
+
+#. module: gec_profit_tax_report
+#: model:ir.module.module,summary:base.module_gec_profit_tax_report
+msgid "Monthly profit tax declaration built from posted accounting"
+msgstr "მოგების გადასახადის ყოველთვიური დეკლარაცია გატარებული ბუღალტერიიდან"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__move_line_count
+msgid "Move Line Count"
+msgstr "საბუღალტრო სტრიქონების რაოდენობა"
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "N"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__res_partner__gec_cit_status__nbg_dia
+msgid "NBG or Deposit Insurance Agency"
+msgstr "საქართველოს ეროვნული ბანკი ან დეპოზიტების დაზღვევის სააგენტო"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__name
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_cell__name
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__name
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__name
+msgid "Name"
+msgstr "დასახელება"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Net profit"
+msgstr "წმინდა მოგება"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__a1_3
+msgid "Net profit of the old periods in total, losses included."
+msgstr "ძველი პერიოდების წმინდა მოგება ჯამურად, ზარალის გათვალისწინებით."
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration.py:0
+msgid ""
+"No country is marked Preferential Taxation, so lines 18.1 cannot see such "
+"persons. Tick the countries of the Government list in Contacts > "
+"Configuration > Localization > Countries."
+msgstr "არცერთი ქვეყანა არ არის მონიშნული, როგორც შეღავათიანი დაბეგვრის მქონე, ამიტომ 18.1 სტრიქონები ასეთ პირებს ვერ ხედავს. მონიშნეთ მთავრობის ნუსხის ქვეყნები: კონტაქტები > კონფიგურაცია > ლოკალიზაცია > ქვეყნები."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__special_status
+msgid "Not printed in Part I: decides column 3, line 16.1.4 and annex 1.7."
+msgstr "I ნაწილში არ აისახება: განსაზღვრავს მე-3 სვეტს, 16.1.4 სტრიქონს და დანართ 1⁷-ს."
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "Odoo"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__a17_2
+msgid "Of column 1, dividends paid out of last financial year's net profit."
+msgstr "პირველი სვეტიდან წინა ფინანსური წლის წმინდა მოგებიდან განაწილებული დივიდენდი."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_company__gec_cit_insurer
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_config_settings__gec_cit_insurer
+msgid ""
+"Old profits are those of 2015-2023 instead of 2008-2016 (lines 16.1.1 and "
+"25.1, annexes 1 and 1.1)."
+msgstr "ძველი მოგება არის 2015-2023 წლების მოგება 2008-2016 წლების ნაცვლად (16.1.1 და 25.1 სტრიქონები, დანართები 1 და 1¹)."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_country__gec_cit_preferential
+msgid ""
+"On the Government of Georgia list of countries with preferential taxation. "
+"Payments to persons registered there feed line 18.1 of the profit tax "
+"declaration, and dividends received from them are taxed when distributed "
+"again."
+msgstr "შეღავათიანი დაბეგვრის მქონე ქვეყნების საქართველოს მთავრობის ნუსხაშია. იქ რეგისტრირებულ პირებზე გადახდები აისახება დეკლარაციის 18.1 სტრიქონში, ხოლო მათგან მიღებული დივიდენდი იბეგრება შემდგომი განაწილებისას."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.constraint,message:gec_profit_tax_report.constraint_rs_cit_declaration_company_month_version_uniq
+msgid "One declaration per company, month and version."
+msgstr "ერთი დეკლარაცია კომპანიაზე, თვესა და ვერსიაზე."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__g5
+msgid "Online betting, foreign players: stakes less winnings paid."
+msgstr "სისტემურ-ელექტრონული ტოტალიზატორი, უცხო ქვეყნის მოქალაქეები: მიღებულ ფსონებსა და გაცემულ მოგებას შორის სხვაობა."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__g2
+msgid "Online betting: stakes received."
+msgstr "სისტემურ-ელექტრონული ტოტალიზატორი: მიღებული ფსონების ჯამური თანხა."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__g4
+msgid "Online casino, foreign players: stakes less winnings paid."
+msgstr "სისტემურ-ელექტრონული აზარტული თამაშობა, უცხო ქვეყნის მოქალაქეები: მიღებულ ფსონებსა და გაცემულ მოგებას შორის სხვაობა."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__g1
+msgid "Online casino: stakes less winnings paid."
+msgstr "სისტემურ-ელექტრონული აზარტული თამაშობა: მიღებულ ფსონებსა და გაცემულ მოგებას შორის სხვაობა."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__operation__other
+msgid "Other controlled transaction"
+msgstr "სხვა კონტროლირებული ოპერაცია"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__operation__financial
+msgid "Other financial operation"
+msgstr "სხვა ფინანსური ოპერაციები"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__account_account__gec_cit_balance_group__capital
+msgid "Own Capital"
+msgstr "საწარმოს კაპიტალი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration.py:0
+msgid "Own capital"
+msgstr "საწარმოს კაპიტალი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__a1_4
+msgid ""
+"Own shares given to partners instead of dividends out of the old net profit."
+msgstr "ძველი წმინდა მოგების ხარჯზე დივიდენდის სანაცვლოდ პარტნიორისთვის გადაცემული საწარმოს აქციების/წილის ღირებულება."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__relation__direct
+msgid "Owns more than 50% directly"
+msgstr "პირდაპირ საწარმოს 50 პროცენტზე მეტის ფლობა"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__relation__indirect
+msgid "Owns more than 50% indirectly"
+msgstr "არაპირდაპირ საწარმოს 50 პროცენტზე მეტის ფლობა"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_cell__parent_id
+msgid "Parent"
+msgstr "მშობელი სტრიქონი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_cell__part
+msgid "Part"
+msgstr "ნაწილი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Part I"
+msgstr "I ნაწილი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_company__gec_cit_company_status
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_config_settings__gec_cit_company_status
+msgid ""
+"Part I box 6 of the profit tax declaration. International Company also moves"
+" line 16.1.3 to column 3 at 5%."
+msgstr "მოგების გადასახადის დეკლარაციის I ნაწილი, უჯრა 6. საერთაშორისო კომპანიის შემთხვევაში 16.1.3 სტრიქონი აისახება მე-3 სვეტში 5%-იანი განაკვეთით."
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.res_config_settings_view_form_gec_cit
+msgid "Part I of the declaration; it also decides what goes to column 3"
+msgstr "დეკლარაციის I ნაწილი; ასევე განსაზღვრავს, რა აისახება მე-3 სვეტში"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_cell__part__3
+msgid "Part III"
+msgstr "III ნაწილი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Part III. Profit tax calculation (GEL)"
+msgstr "III ნაწილი. მოგების გადასახადის გაანგარიშება (ლარი)"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_cell__part__4
+msgid "Part IV"
+msgstr "IV ნაწილი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__g1
+msgid "Part IV Line 1"
+msgstr "IV ნაწილი, სტრიქონი 1"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__g2
+msgid "Part IV Line 2"
+msgstr "IV ნაწილი, სტრიქონი 2"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__g3
+msgid "Part IV Line 3"
+msgstr "IV ნაწილი, სტრიქონი 3"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__g4
+msgid "Part IV Line 4"
+msgstr "IV ნაწილი, სტრიქონი 4"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__g5
+msgid "Part IV Line 5"
+msgstr "IV ნაწილი, სტრიქონი 5"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__g1_tax
+msgid "Part IV Tax 1"
+msgstr "IV ნაწილი, გადასახადი 1"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__g2_tax
+msgid "Part IV Tax 2"
+msgstr "IV ნაწილი, გადასახადი 2"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__g3_tax
+msgid "Part IV Tax 3"
+msgstr "IV ნაწილი, გადასახადი 3"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__g4_tax
+msgid "Part IV Tax 4"
+msgstr "IV ნაწილი, გადასახადი 4"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__g5_tax
+msgid "Part IV Tax 5"
+msgstr "IV ნაწილი, გადასახადი 5"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__gambling_total
+msgid "Part IV Total"
+msgstr "IV ნაწილი, ჯამი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Part IV. Gambling organisers"
+msgstr "IV ნაწილი. აზარტული თამაშობების ორგანიზატორები"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_taxed_item__partner_id
+msgid "Partner"
+msgstr "პარტნიორი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_partner__gec_cit_fixed_tax
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_users__gec_cit_fixed_tax
+msgid ""
+"Pays fixed tax on the activity purchased. Purchases from them feed line "
+"17.3, except activities taxed at the rate of Tax Code art. 95.3.1.b: then "
+"leave it unticked."
+msgstr "იხდის ფიქსირებულ გადასახადს შესყიდულ საქმიანობაზე. მისგან შესყიდვები 17.3 სტრიქონში აისახება, გარდა სსკ-ის 95³ მუხლის 1-ლი ნაწილის „ბ“ ქვეპუნქტის განაკვეთით დასაბეგრი საქმიანობისა: მაშინ მონიშვნა მოხსენით."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__res_company__gec_cit_company_status__pe
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_declaration__company_status__pe
+msgid "Permanent Establishment of a Non-Resident"
+msgstr "არარეზიდენტი საწარმოს მუდმივი დაწესებულება"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__relation__pe
+msgid "Permanent establishment"
+msgstr "მუდმივი დაწესებულება"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__documentation__planned
+msgid "Planned"
+msgstr "ვაპირებ მომზადებას"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_company__gec_cit_post_entry
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_config_settings__gec_cit_post_entry
+msgid "Post Profit Tax Entry"
+msgstr "მოგების გადასახადის გატარება"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__relation__control
+msgid "Practical control of business decisions"
+msgstr "სამეწარმეო გადაწყვეტილებების პრაქტიკული კონტროლი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_country__gec_cit_preferential
+msgid "Preferential Taxation"
+msgstr "შეღავათიანი დაბეგვრის მქონე ქვეყანა"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_declaration__declaration_type__primary
+msgid "Primary"
+msgstr "პირველადი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_account_account__gec_cit_balance_group
+msgid "Profit Tax Balance Group"
+msgstr "მოგების გადასახადის ნაშთის ჯგუფი"
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.res_config_settings_view_form_gec_cit
+msgid "Profit Tax Declaration"
+msgstr "მოგების გადასახადის დეკლარაცია"
+
+#. module: gec_profit_tax_report
+#: model:ir.ui.menu,name:gec_profit_tax_report.rs_cit_declaration_menu
+msgid "Profit Tax Declaration (II-086)"
+msgstr "მოგების გადასახადის დეკლარაცია (II-086)"
+
+#. module: gec_profit_tax_report
+#: model:ir.actions.act_window,name:gec_profit_tax_report.rs_cit_cell_action
+#: model:ir.ui.menu,name:gec_profit_tax_report.rs_cit_cell_menu
+msgid "Profit Tax Declaration Rows"
+msgstr "მოგების გადასახადის დეკლარაციის სტრიქონები"
+
+#. module: gec_profit_tax_report
+#: model:ir.actions.act_window,name:gec_profit_tax_report.rs_cit_declaration_action
+msgid "Profit Tax Declarations"
+msgstr "მოგების გადასახადის დეკლარაციები"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__move_id
+msgid "Profit Tax Entry"
+msgstr "მოგების გადასახადის გატარება"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_company__gec_cit_expense_account_id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_config_settings__gec_cit_expense_account_id
+msgid "Profit Tax Expense Account"
+msgstr "მოგების გადასახადის ხარჯის ანგარიში"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_company__gec_cit_journal_id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_config_settings__gec_cit_journal_id
+msgid "Profit Tax Journal"
+msgstr "მოგების გადასახადის ჟურნალი"
+
+#. module: gec_profit_tax_report
+#. odoo-javascript
+#: code:addons/gec_profit_tax_report/static/src/part3/part3_field.js:0
+msgid "Profit Tax Part III"
+msgstr "მოგების გადასახადი – III ნაწილი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_company__gec_cit_payable_account_id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_config_settings__gec_cit_payable_account_id
+msgid "Profit Tax Payable Account"
+msgstr "მოგების გადასახადის ვალდებულების ანგარიში"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_account_account__gec_cit_cell_id
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_account_move_line__gec_cit_cell_id
+msgid "Profit Tax Row"
+msgstr "მოგების გადასახადის სტრიქონი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_company__gec_cit_company_status
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_config_settings__gec_cit_company_status
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_partner__gec_cit_status
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_users__gec_cit_status
+msgid "Profit Tax Status"
+msgstr "მოგების გადასახადის სტატუსი"
+
+#. module: gec_profit_tax_report
+#: model:ir.actions.act_window,name:gec_profit_tax_report.rs_cit_taxed_item_action
+#: model:ir.ui.menu,name:gec_profit_tax_report.rs_cit_taxed_item_menu
+msgid "Profit Tax Taxed Items"
+msgstr "მოგების გადასახადით დაბეგრილი თანხები"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__a1_2
+msgid "Profit tax accrued and paid for the old periods."
+msgstr "ძველი პერიოდების მიხედვით დარიცხული და გადახდილი მოგების გადასახადი."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__col3_rate
+msgid ""
+"Profit tax rate of column 3: 5% for international and investment companies, "
+"15% for innovative startups and innovative small or medium companies."
+msgstr "მე-3 სვეტის მოგების გადასახადის განაკვეთი: 5% საერთაშორისო და საინვესტიციო კომპანიებისთვის, 15% ინოვაციური სტარტაპისა და ინოვაციური მცირე და საშუალო კომპანიისთვის."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__booking_amount
+msgid ""
+"Profit tax this declaration books: payable less refundable, less the "
+"dividend tax the CIT wizard books with the dividend."
+msgstr "მოგების გადასახადი, რომელსაც ეს დეკლარაცია არიცხავს: კუთვნილს გამოკლებული დასაბრუნებელი და დივიდენდზე გადასახადი, რომელსაც CIT ოსტატი დივიდენდთან ერთად არიცხავს."
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "Recalculate"
+msgstr "ხელახლა გაანგარიშება"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_taxed_item__recovered
+msgid "Recovered"
+msgstr "დაბრუნებული"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__result1
+msgid "Reduction"
+msgstr "შესამცირებელი თანხა"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_partner__gec_cit_related_party
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_users__gec_cit_related_party
+msgid "Related Party"
+msgstr "ურთიერთდამოკიდებული პირი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__partner_id
+msgid "Related Person"
+msgstr "ურთიერთდამოკიდებული პირი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_partner__gec_cit_related_party
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_users__gec_cit_related_party
+msgid ""
+"Related to this company in a way that affects deal prices (Tax Code art. "
+"18). Invoice lines with a market value then feed line 16.3 of the profit tax"
+" declaration, unless the contact is a Georgian Enterprise."
+msgstr "ამ კომპანიასთან ისეთ ურთიერთდამოკიდებულებაშია, რომელიც გარიგების ფასზე გავლენას ახდენს (სსკ-ის მე-18 მუხლი). საბაზრო ღირებულების მქონე ინვოისის სტრიქონები მაშინ დეკლარაციის 16.3 სტრიქონში აისახება, თუ კონტაქტი ქართული საწარმო არ არის."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__relation
+msgid "Relation"
+msgstr "ურთიერთდამოკიდებულების ფორმა"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_taxed_item__remaining
+msgid "Remaining"
+msgstr "დარჩენილი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__representation_founding_year
+msgid "Representation Founding Year"
+msgstr "წარმომადგენლობითი ხარჯი – დაფუძნების წელი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__res_company__gec_cit_special_status__research
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_declaration__special_status__research
+msgid "Research and Development Company"
+msgstr "კვლევისა და განვითარების მომსახურების გამწევი კომპანიის სტატუსის მქონე სუბიექტი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__partner_country_id
+msgid "Residency"
+msgstr "რეზიდენტობა"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__res_company__gec_cit_company_status__resident
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_declaration__company_status__resident
+msgid "Resident Enterprise"
+msgstr "რეზიდენტი საწარმო"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__relation__preferential
+msgid "Resident of a preferential tax country"
+msgstr "შეღავათიანი დაბეგვრის მქონე ქვეყნის რეზიდენტი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_taxed_item__cell_id
+msgid "Row"
+msgstr "სტრიქონი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration.py:0
+msgid "Row %s"
+msgstr "სტრიქონი %s"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.constraint,message:gec_profit_tax_report.constraint_rs_cit_cell_code_uniq
+msgid "Row code must be unique."
+msgstr "სტრიქონის კოდი უნიკალური უნდა იყოს."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_cell__code
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration_line__code
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_taxed_item__code
+msgid "Row number on the form, e.g. 16.1.1."
+msgstr "სტრიქონის ნომერი ფორმაზე, მაგ. 16.1.1."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_account_account__gec_cit_cell_id
+msgid ""
+"Row of the monthly profit tax declaration that journal items on this account"
+" feed. A journal item can choose another row."
+msgstr "მოგების გადასახადის ყოველთვიური დეკლარაციის სტრიქონი, რომელშიც ამ ანგარიშის საბუღალტრო სტრიქონები აისახება. საბუღალტრო სტრიქონს შეუძლია სხვა სტრიქონის არჩევა."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_account_move_line__gec_cit_cell_id
+msgid ""
+"Row of the monthly profit tax declaration this item feeds, instead of the "
+"row set on its account."
+msgstr "მოგების გადასახადის ყოველთვიური დეკლარაციის სტრიქონი, რომელშიც ეს ჩანაწერი აისახება, ანგარიშზე მითითებული სტრიქონის ნაცვლად."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_cell__name
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration_line__name
+msgid "Row text exactly as the rs.ge form prints it."
+msgstr "სტრიქონის ტექსტი ზუსტად ისე, როგორც rs.ge-ის ფორმაზეა."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__operation__royalty
+msgid "Royalty"
+msgstr "როიალტი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__sequence
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_cell__sequence
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration_line__sequence
+msgid "Sequence"
+msgstr "მიმდევრობა"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration.py:0
+msgid ""
+"Set the profit tax journal and accounts in Accounting > Settings, or turn "
+"off Post Profit Tax Entry."
+msgstr "მიუთითეთ მოგების გადასახადის ჟურნალი და ანგარიშები ბუღალტერია > პარამეტრებში, ან გამორთეთ „მოგების გადასახადის გატარება“."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_partner__gec_cit_share
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_users__gec_cit_share
+msgid "Share in Capital (%)"
+msgstr "წილი კაპიტალში (%)"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_partner__gec_cit_listed_abroad
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_users__gec_cit_listed_abroad
+msgid "Shares Listed on a Recognised Foreign Exchange"
+msgstr "აქციები განთავსებულია უცხო ქვეყნის აღიარებულ საფონდო ბირჟაზე"
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.res_config_settings_view_form_gec_cit
+msgid "Special Activities"
+msgstr "განსაკუთრებული საქმიანობა"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_company__gec_cit_special_status
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_res_config_settings__gec_cit_special_status
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__special_status
+msgid "Special Status"
+msgstr "სპეციალური სტატუსი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Special status (not printed in part I)"
+msgstr "სპეციალური სტატუსი (I ნაწილში არ აისახება)"
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "Start Date"
+msgstr "დაწყების თარიღი"
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "Start a corrected declaration of the same month"
+msgstr "იმავე თვის შესწორებული დეკლარაციის დაწყება"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__state
+msgid "State"
+msgstr "მდგომარეობა"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_annex_line__operation__assets
+msgid "Tangible or intangible assets supplied or bought"
+msgstr "მატერიალური/არამატერიალური აქტივების მიწოდება/შესყიდვა"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__tax_payable
+msgid "Tax Payable"
+msgstr "კუთვნილი მოგების გადასახადი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__tax_refund
+msgid "Tax Refundable"
+msgstr "დაბრუნებას დაქვემდებარებული მოგების გადასახადი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Tax demand number"
+msgstr "საგადასახადო მოთხოვნის ნომერი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__booking_amount
+msgid "Tax to Book"
+msgstr "დასარიცხი გადასახადი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Taxable"
+msgstr "დასაბეგრი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__result2
+msgid "Taxable Distribution"
+msgstr "დასაბეგრი განაწილებული მოგება"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_taxed_item__amount
+msgid "Taxed Amount"
+msgstr "დაბეგრილი თანხა"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_recovery__taxed_period
+msgid "Taxed In"
+msgstr "დაბეგვრის პერიოდი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_recovery__taxed_item_id
+msgid "Taxed Item"
+msgstr "დაბეგრილი თანხა"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__taxed_item_ids
+msgid "Taxed Items"
+msgstr "დაბეგრილი თანხები"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_cell__measure__register
+msgid "Taxed Items Recovered"
+msgstr "დაბეგრილი თანხების დაბრუნება"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_recovery__taxed_code
+msgid "Taxed On Line"
+msgstr "დაბეგვრის სტრიქონი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Taxed in period"
+msgstr "საანგარიშო პერიოდი, რომელშიც დაიბეგრა თანხა"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Taxed on line"
+msgstr "დეკლარაციის გრაფა, რომელშიც დაიბეგრა თანხა"
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "Taxed this month (recovered later on lines 27.1 and 27.2)"
+msgstr "ამ თვეში დაბეგრილი (შემდგომ ბრუნდება 27.1 და 27.2 სტრიქონებით)"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Taxpayer"
+msgstr "გადამხდელი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration_line__move_line_ids
+msgid "The journal items the calculated amount was read from."
+msgstr "საბუღალტრო სტრიქონები, საიდანაც გაანგარიშებული თანხა იქნა წაკითხული."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_cell__parent_id
+msgid "The row this one is a part of."
+msgstr "სტრიქონი, რომლის ნაწილიცაა ეს სტრიქონი."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__checks
+msgid "Things to look at before filing."
+msgstr "რა უნდა შემოწმდეს წარდგენამდე."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_partner__gec_cit_share
+#: model:ir.model.fields,help:gec_profit_tax_report.field_res_users__gec_cit_share
+msgid ""
+"This contact's share in this company's capital. A bank, credit union, "
+"microfinance organisation or lending entity reports loans to a non-resident "
+"or exempt shareholder, or to an individual shareholder with at least 1%, on "
+"line 18.4."
+msgstr "ამ კონტაქტის წილი ამ კომპანიის კაპიტალში. საბანკო დაწესებულება, საკრედიტო კავშირი, მიკროსაფინანსო ორგანიზაცია ან სესხის გამცემი სუბიექტი 18.4 სტრიქონში ასახავს არარეზიდენტ ან გათავისუფლებულ პარტნიორზე, ან არანაკლებ 1%-იანი წილის მქონე პარტნიორ ფიზიკურ პირზე გაცემულ სესხს."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__a17_3
+msgid "Three times last financial year's research and development expenses."
+msgstr "წინა ფინანსური წლის განმავლობაში კვლევისა და განვითარებისთვის გაწეული ხარჯების სამმაგი ოდენობა."
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_list
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_taxed_item_view_list
+msgid "Total"
+msgstr "ჯამი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__operation_currency_id
+msgid "Transaction Currency"
+msgstr "ოპერაციის ვალუტა"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_annex_line__operation
+msgid "Transaction Type"
+msgstr "ოპერაციის სახე"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields.selection,name:gec_profit_tax_report.selection__rs_cit_cell__kind__manual
+msgid "Typed In"
+msgstr "ხელით"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__unclassified_count
+msgid "Unclassified Count"
+msgstr "კონტაქტის გარეშე ჩანაწერები"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__version
+msgid "Version"
+msgstr "ვერსია"
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "Volume in Currency"
+msgstr "მოცულობა ვალუტაში"
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "Volume in GEL"
+msgstr "მოცულობა ლარში"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__xlsx_filename
+msgid "Xlsx Filename"
+msgstr "XLSX ფაილის სახელი"
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration_xlsx.py:0
+msgid "Year"
+msgstr "წელი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_annex_line__partner_vat
+msgid "You can use '/' to indicate that the customer has no Tax ID."
+msgstr "შეგიძლიათ გამოიყენოთ „/“ იმის აღსანიშნად, რომ მომხმარებელს საგადასახადო ID არ აქვს."
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration.py:0
+msgid "capital"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration.py:0
+msgid "investment"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_declaration.py:0
+msgid "loan_received"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model:ir.model,name:gec_profit_tax_report.model_rs_cit_declaration
+msgid "rs.ge Monthly Profit Tax Declaration"
+msgstr "rs.ge მოგების გადასახადის ყოველთვიური დეკლარაცია"
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.view_partner_form_gec_cit
+msgid "rs.ge Profit Tax"
+msgstr "rs.ge მოგების გადასახადი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model,name:gec_profit_tax_report.model_rs_cit_annex_line
+msgid "rs.ge Profit Tax Annex Line"
+msgstr "rs.ge მოგების გადასახადის დანართის სტრიქონი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model,name:gec_profit_tax_report.model_rs_cit_declaration_line
+msgid "rs.ge Profit Tax Declaration Line"
+msgstr "rs.ge მოგების გადასახადის დეკლარაციის სტრიქონი"
+
+#. module: gec_profit_tax_report
+#: model:ir.model,name:gec_profit_tax_report.model_rs_cit_cell
+msgid "rs.ge Profit Tax Declaration Row"
+msgstr "rs.ge მოგების გადასახადის დეკლარაციის სტრიქონი (ფორმა)"
+
+#. module: gec_profit_tax_report
+#: model:ir.model,name:gec_profit_tax_report.model_rs_cit_recovery
+msgid "rs.ge Profit Tax Recovery"
+msgstr "rs.ge მოგების გადასახადის დაბრუნება"
+
+#. module: gec_profit_tax_report
+#: model:ir.model,name:gec_profit_tax_report.model_rs_cit_taxed_item
+msgid "rs.ge Profit Tax Taxed Item"
+msgstr "rs.ge მოგების გადასახადით დაბეგრილი თანხა"
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "განაწილებული დივიდენდი"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "გაწეული ხარჯი: სულ"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "დაბეგვრის ობიექტი"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"დაბეგრილი თანხა, რომლის შესაბამისი მოგების გადასახადიც ექვემდებარება "
+"შემცირებას(დაბრუნებას)"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"დამატებით ჩასათვლელი თანხა<br/>(II ნაწილის მე-5 სტრიქონისა და I ნაწილის მე-2"
+" სვეტის ჯამს შორის სხვაობა, მაგრამ არა უმეტეს I ნაწილის მე-3 სვეტის ჯამში "
+"ასახული მონაცემის შესაბამისად გამოანგარიშებული მოგების გადასახადის თანხასა "
+"და ამავე ნაწილის მე-2 სვეტის ჯამში ასახულ მონაცემს შორის სხვაობისა)"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "დანართი 1"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "დანართი 1²"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "დანართი 1³"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "დანართი 1¹"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "დანართი 1⁴"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "დანართი 1⁵"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "დანართი 1⁶"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "დანართი 1⁷"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "დანართი 2"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "დანართი 3"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "დანართი 4"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "ზრდა: მათ შორის, გადაფასება"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "ზრდა: სულ"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#. odoo-javascript
+#: code:addons/gec_profit_tax_report/static/src/part3/part3_field.xml:0
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "თანხა"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "თანხის ოდენობა, რომლითაც მცირდება განაწილებული მოგება"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "თვე/წელი"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"ინოვაციური მცირე და საშუალო კომპანიის სტატუსის მქონე სუბიექტის მოგების "
+"გადასახადით დასაბეგრი განაწილებული მოგების თანხის გაანგარიშება"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"ინფორმაცია საქართველოს საგადასახადო კოდექსის 126-129¹ მუხლებით "
+"გათვალისწინებული საერთაშორისო კონტროლირებული ოპერაციების შესახებ"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "კალენდარული წელი"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "კუთვნილი მოგების გადასახადი"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "ლარი"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"მათ შორის, წინა ფინანსური წლის განმავლობაში მიღებული წმინდა მოგებიდან "
+"მიმდინარე საანგარიშო პერიოდში (თვეში) განაწილებული დივიდენდის ოდენობა"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"მიმდინარე საანგარიშო პერიოდში (თვეში) განაწილებული დივიდენდის ოდენობა, "
+"რომელიც ექვემდებარება მოგების გადასახადით დაბეგვრას"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"მიმდინარე საანგარიშო პერიოდში მოგების გადასახადით დასაბეგრი განაწილებული "
+"მოგების თანხა"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "მოგების გადასახადით დასაბეგრი განაწილებული მოგების თანხა"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#. odoo-javascript
+#: code:addons/gec_profit_tax_report/static/src/part3/part3_field.xml:0
+msgid "მოგების გადასახადის გაანგარიშება (ლარი)"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "ნაწილი I"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"ნაწილი I<br/>მოგების გადასახადის ყოველთვიური დეკლარაციის საანგარიშო პერიოდი,"
+" რომელშიც განაწილებული დივიდენდის მიხედვით ჩასათვლელი თანხის კორექტირება "
+"ხორციელდება"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "ნაწილი II"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "ნაწილი III"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"საანგარიშო პერიოდებში დივიდენდის სახით განაწილებული თანხის ოდენობა, რომელიც "
+"ექვემდებარება დაბეგვრას"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "საანგარიშო პერიოდი, რომელშიც დაიბეგრა თანხა"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "საანგარიშო პერიოდის საბოლოო ნაშთი"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "საანგარიშო პერიოდის საწყისი ნაშთი"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"საანგარიშო პერიოდში დივიდენდის სახით განაწილებული თანხის ოდენობა, რომელიც "
+"ექვემდებარება დაბეგვრას ( III ნაწილის სტ. 16.1.1 )"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"საანგარიშო პერიოდში დივიდენდის სახით განაწილებული თანხის ოდენობა, რომელიც "
+"ექვემდებარება დაბეგვრას ( III ნაწილის სტ. 16.1.2 )"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "საგადასახადო მოთხოვნის თარიღი"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "საგადასახადო მოთხოვნის ნომერი"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"საგადასახადო ორგანოს მიერ დაბეგრილი თანხა, რომლის შესაბამისი მოგების "
+"გადასახადიც ექვემდებარება შემცირებას (დაბრუნებას)"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"სადაზღვევო ორგანიზაციის შემთხვევაში - 2015 წლის 1 იანვრიდან 2024 წლის 1 "
+"იანვრამდე საანგარიშო პერიოდების, ხოლო სხვა შემთხვევაში - 2008 წლის 1 "
+"იანვრიდან 2017 წლის 1 იანვრამდე საანგარიშო პერიოდების მიხედვით დარიცხული და "
+"გადახდილი მოგების გადასახადის თანხა"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"სადაზღვევო ორგანიზაციის შემთხვევაში - 2015 წლის 1 იანვრიდან 2024 წლის 1 "
+"იანვრამდე საანგარიშო პერიოდების, ხოლო სხვა შემთხვევაში - 2008 წლის 1 "
+"იანვრიდან 2017 წლის 1 იანვრამდე საანგარიშო პერიოდებში მიღებული წმინდა "
+"მოგების ოდენობა"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"სადაზღვევო ორგანიზაციის შემთხვევაში - 2015 წლის 1 იანვრიდან 2024 წლის 1 "
+"იანვრამდე საანგარიშო პერიოდების, ხოლო სხვა შემთხვევაში - 2008 წლის 1 "
+"იანვრიდან 2017 წლის 1 იანვრამდე საანგარიშო პერიოდებში მიღებული წმინდა "
+"მოგების ხარჯზე დივიდენდის სანაცვლოდ საწარმოს მიერ პარტნიორისათვის გადაცემული"
+" ამ საწარმოს აქციების/წილის ღირებულება"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"სადაზღვევო ორგანიზაციის შემთხვევაში - 2015 წლის 1 იანვრიდან 2024 წლის 1 "
+"იანვრამდე, ხოლო სხვა შემთხვევაში - 2008 წლის 1 იანვრიდან 2017 წლის 1 "
+"იანვრამდე მიღებული წმინდა მოგებიდან დივიდენდის განაწილებისას ამავე "
+"საანგარიშო პერიოდების მიხედვით დარიცხული და გადახდილი მოგების გადასახადის "
+"თანხა, რომელიც ექვემდებარება ჩათვლას"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"სადაზღვევო ორგანიზაციის შემთხვევაში - 2015 წლის 1 იანვრიდან 2024 წლის 1 "
+"იანვრამდე, ხოლო სხვა შემთხვევაში - 2008 წლის 1 იანვრიდან 2017 წლის 1 "
+"იანვრამდე მიღებული წმინდა მოგებიდან დივიდენდის განაწილებისას ამავე "
+"საანგარიშო პერიოდების მიხედვით დარიცხული და გადახდილი მოგების გადასახადის "
+"თანხის მიხედვით ჩასათვლელი თანხის კორექტირება"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"საერთაშორისო კომპანიის სტატუსის მქონე საწარმოს მოგების გადასახადით დასაბეგრი"
+" განაწილებული მოგების თანხის გაანგარიშება"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"სათამაშო აპარატების სალონის მომწყობი პირის მიერ საქმიანობის ამ ნაწილში "
+"საანგარიშო თვის განმავლობაში მიღებულ ფსონებსა და გაცემულ მოგებას შორის "
+"სხვაობის თანხა"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"სათამაშო აპარატების სალონის მომწყობი პირის, სისტემურ-ელექტრონული ფორმით "
+"აზარტული თამაშობების ან/და სისტემურ-ელექტრონული ფორმით ტოტალიზატორის "
+"თამაშობების ორგანიზატორის მოგების გადასახადის გაანგარიშება"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "სასაქონლო-მატერიალური ფასეულობების და ძირითადი საშუალებების ნაშთი"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "სასაქონლო-მატერიალური ფასეულობის ნაშთი წლის ბოლოს"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "საწარმოს სტატუსი"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "სესხების და კაპიტალის აღრიცხვა"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"სისტემურ-ელექტრონული ფორმით აზარტული თამაშობების ორგანიზატორის მიერ "
+"საქმიანობის ამ ნაწილში (გარდა უცხო ქვეყნის მოქალაქეების სისტემურ-ელექტრონული"
+" ფორმით ორგანიზებულ აზარტულ თამაშობებში მონაწილეობის შედეგად მიღებული "
+"დასაბეგრი მოგებისა) საანგარიშო თვის განმავლობაში მიღებულ ფსონებსა და გაცემულ"
+" მოგებას შორის სხვაობის თანხა"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"სისტემურ-ელექტრონული ფორმით ტოტალიზატორის თამაშობების ორგანიზატორის მიერ "
+"საქმიანობის ამ ნაწილში (გარდა უცხო ქვეყნის მოქალაქეების სისტემურ-ელექტრონული"
+" ფორმით ორგანიზებულ ტოტალიზატორის თამაშობებში მონაწილეობის შედეგად მიღებული "
+"დასაბეგრი მოგებისა) საანგარიშო თვის განმავლობაში მიღებული ფსონების ჯამური "
+"თანხა"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "სულ"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"უცხო ქვეყნის მოქალაქეების სისტემურ-ელექტრონული ფორმით აზარტულ თამაშობებში "
+"მონაწილეობის შედეგად, სისტემურ-ელექტრონული ფორმით აზარტული თამაშობების "
+"ორგანიზატორის მიერ საანგარიშო თვის განმავლობაში მიღებულ ფსონებსა და ამ "
+"მოთამაშეებზე გაცემულ მოგებას შორის სხვაობის თანხა"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"უცხო ქვეყნის მოქალაქეების სისტემურ-ელექტრონული ფორმით ტოტალიზატორის "
+"თამაშობებში მონაწილეობის შედეგად, სისტემურ-ელექტრონული ფორმით ტოტალიზატორის "
+"თამაშობების ორგანიზატორის მიერ საანგარიშო თვის განმავლობაში მიღებულ ფსონებსა"
+" და ამ მოთამაშეებზე გაცემულ მოგებას შორის სხვაობის თანხა"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "შემცირება: მათ შორის, გადაფასება"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "შემცირება: სულ"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"შენიშვნა:<br/>მიღებულ ფსონებში:<br/>-გაითვალისწინება მოთამაშეთა მიერ "
+"გამოყენებული უფასო ფსონები;<br/>-არ გაითვალისწინება მოთამაშეთა შორის "
+"დადებული ფსონები, როდესაც თამაშობა არ გულისხმობს თამაშობის ორგანიზატორის "
+"მიერ ფსონის მიღებას."
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "შესაბამისი დეკლარაციის გრაფა, რომელშიც დაიბეგრა თანხა"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "შესამცირებელი(დასაბრუნებელი) მოგების გადასახადის გაანგარიშება"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"შესამცირებელი(დასაბრუნებელი) მოგების გადასახადის გაანგარიშება საგადასახადო "
+"შემოწმების შედეგად დარიცხული მოგების გადასახადის მიხედვით"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "შინაარსი"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "ჩასათვლელი თანხა (სტ.1*სტ.2/(სტ.3-სტ.4))"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "ჩასათვლელი თანხა (სტ.1*სტ.2/(სტ3-სტ.4))"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "ძირითადი საშუალებების ნაშთი წლის ბოლოს"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"წინა ფინანსური წლის განმავლობაში კვლევისა და განვითარებისთვის გაწეული "
+"ხარჯების სამმაგი ოდენობა"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "წმინდა მოგების ოდენობა"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"ხარჯების ოდენობა, რომლითაც მიმდინარე საანგარიშო პერიოდში მცირდება მოგების "
+"გადასახადით დასაბეგრი განაწილებული მოგების თანხა (სვ.3-სვ.4)"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid ""
+"ხარჯების ოდენობა, რომლითაც წინა საანგარიშო პერიოდებში შემცირდა მოგების "
+"გადასახადით დასაბეგრი განაწილებული მოგების თანხა"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "ჯამი"
+msgstr ""
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "rs.ge Entry"
+msgstr "rs.ge-ზე შესავსები"
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "Values to type on rs.ge, with copy buttons"
+msgstr "rs.ge-ზე ჩასაწერი მნიშვნელობები კოპირების ღილაკებით"
+
+#. module: gec_profit_tax_report
+#: model_terms:ir.ui.view,arch_db:gec_profit_tax_report.rs_cit_declaration_view_form
+msgid "Entered on rs.ge: "
+msgstr "rs.ge-ზე შეყვანილია: "
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_declaration__rs_entry_progress
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_entry__entered
+msgid "Entered on rs.ge"
+msgstr "შეყვანილია rs.ge-ზე"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_entry__entered
+msgid "Ticked by the accountant once this value is typed on rs.ge."
+msgstr "ბუღალტერი მონიშნავს, როცა ამ მნიშვნელობას rs.ge-ზე შეიყვანს."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_declaration__rs_entry_progress
+msgid "Values ticked as entered on rs.ge, out of the values to type there."
+msgstr "rs.ge-ზე შეყვანილად მონიშნული მნიშვნელობები ჩასაწერი მნიშვნელობებიდან."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_entry__section
+msgid "Section"
+msgstr "განყოფილება"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_entry__section
+msgid "Part or annex of the rs.ge form."
+msgstr "rs.ge-ის ფორმის ნაწილი ან დანართი."
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_entry__name
+msgid "Description"
+msgstr "აღწერა"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,field_description:gec_profit_tax_report.field_rs_cit_entry__value
+msgid "Value"
+msgstr "მნიშვნელობა"
+
+#. module: gec_profit_tax_report
+#: model:ir.model.fields,help:gec_profit_tax_report.field_rs_cit_entry__value
+msgid "The value as rs.ge takes it: amounts with a dot and no thousands separator."
+msgstr "მნიშვნელობა rs.ge-ის ფორმატით: თანხა წერტილით, ათასების გამყოფის გარეშე."
+
+#. module: gec_profit_tax_report
+#. odoo-python
+#: code:addons/gec_profit_tax_report/models/rs_cit_entry.py:0
+msgid "rs.ge Entry: %s"
+msgstr "rs.ge-ზე შესავსები: %s"

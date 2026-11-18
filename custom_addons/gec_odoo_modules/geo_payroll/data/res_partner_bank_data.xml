@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- One Pension Agency account per bank, so gec_payroll_bank can pay from the journal's own bank. -->
+
+        <record id="pension_agency_bank_bg" model="res.partner.bank">
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="account_number">GE03BG0000000131131564</field>
+            <field name="allow_out_payment" eval="True"/>
+        </record>
+
+        <record id="pension_agency_bank_tb" model="res.partner.bank">
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="account_number">GE88TB7458336020100010</field>
+            <field name="allow_out_payment" eval="True"/>
+        </record>
+
+        <record id="pension_agency_bank_hb" model="res.partner.bank">
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="account_number">GE52HB0000000000023609</field>
+            <field name="allow_out_payment" eval="True"/>
+        </record>
+
+        <record id="pension_agency_bank_lb" model="res.partner.bank">
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="account_number">GE20LB0113112569633000</field>
+            <field name="allow_out_payment" eval="True"/>
+        </record>
+
+        <record id="pension_agency_bank_bs" model="res.partner.bank">
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="account_number">GE28BS0000000000134004</field>
+            <field name="allow_out_payment" eval="True"/>
+        </record>
+
+        <record id="pension_agency_bank_bt" model="res.partner.bank">
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="account_number">GE97BT0360001162110001</field>
+            <field name="allow_out_payment" eval="True"/>
+        </record>
+
+        <record id="pension_agency_bank_pb" model="res.partner.bank">
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="account_number">GE02PB1036090021960001</field>
+            <field name="allow_out_payment" eval="True"/>
+        </record>
+
+        <record id="pension_agency_bank_cr" model="res.partner.bank">
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="account_number">GE27CR0000000000023609</field>
+            <field name="allow_out_payment" eval="True"/>
+        </record>
+
+        <record id="pension_agency_bank_ks" model="res.partner.bank">
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="account_number">GE69KS0000000360900006</field>
+            <field name="allow_out_payment" eval="True"/>
+        </record>
+
+        <record id="pension_agency_bank_cd" model="res.partner.bank">
+            <field name="partner_id" ref="partner_pension_agency"/>
+            <field name="account_number">GE40CD0360000029844607</field>
+            <field name="allow_out_payment" eval="True"/>
+        </record>
+
+    </data>
+</odoo>

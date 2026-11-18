@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="signify.FileViewer" t-inherit="web.FileViewer" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('o-FileViewer-download')][hasclass('o-FileViewer-headerButton')]" position="before">
+            <div
+                t-if="this.canSendWithSignify"
+                class="o-FileViewer-headerButton d-flex align-items-center px-3 cursor-pointer"
+                role="button"
+                title="Send with Signify"
+                t-on-click.stop="this.onClickSendWithSignify"
+            >
+                <i class="oi oi-fw me-1" data-icon="send" role="img"/>
+                <span>Send with Signify</span>
+            </div>
+        </xpath>
+    </t>
+</templates>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_rs_spec_site_list" model="ir.ui.view">
+        <field name="name">rs.spec.site.list</field>
+        <field name="model">rs.spec.site</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="rs_un_id"/>
+                <field name="code"/>
+                <field name="address"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rs_spec_site_search" model="ir.ui.view">
+        <field name="name">rs.spec.site.search</field>
+        <field name="model">rs.spec.site</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="code"/>
+                <field name="address"/>
+                <field name="rs_un_id"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_rs_spec_site" model="ir.actions.act_window">
+        <field name="name">RS Petroleum Sites</field>
+        <field name="res_model">rs.spec.site</field>
+        <field name="view_mode">list</field>
+    </record>
+</odoo>

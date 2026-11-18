@@ -1,0 +1,12 @@
+.o_account_kanban .o_kanban_record:has(.o_gec_bank_logo) {
+    isolation: isolate;
+}
+
+.o_gec_bank_logo {
+    position: absolute;
+    inset: 40% map-get($spacers, 4) map-get($spacers, 3) 62%;
+    z-index: -1;
+    background: no-repeat right bottom / contain;
+    opacity: var(--GecBankLogo-opacity, .08);
+    pointer-events: none;
+}

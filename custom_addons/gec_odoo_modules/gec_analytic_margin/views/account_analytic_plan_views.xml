@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_analytic_plan_form_gec" model="ir.ui.view">
+        <field name="name">account.analytic.plan.form.gec</field>
+        <field name="model">account.analytic.plan</field>
+        <field name="inherit_id" ref="analytic.account_analytic_plan_form_view"/>
+        <field name="arch" type="xml">
+            <field name="default_applicability" position="after">
+                <field name="gec_section_key"
+                       groups="gec_analytic_margin.group_gec_abc"/>
+                <field name="gec_items_behind_count"
+                       string="Items Missing This Tag"
+                       groups="gec_analytic_margin.group_gec_abc"
+                       invisible="gec_items_behind_count == 0"/>
+                <button name="action_gec_fill_from_projects" type="object"
+                        string="Fill them from their projects" class="btn-link"
+                        icon="history"
+                        invisible="gec_items_behind_count == 0"
+                        groups="gec_analytic_margin.group_gec_abc"
+                        confirm="This tags analytic items that are already posted.
+                                 Past periods will measure differently afterwards,
+                                 so any allocation run covering them should be
+                                 recomputed. Continue?"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_account_analytic_plan_list_gec" model="ir.ui.view">
+        <field name="name">account.analytic.plan.list.gec</field>
+        <field name="model">account.analytic.plan</field>
+        <field name="inherit_id" ref="analytic.account_analytic_plan_tree_view"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="gec_section_key" optional="show"
+                       groups="gec_analytic_margin.group_gec_abc"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

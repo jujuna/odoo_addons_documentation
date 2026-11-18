@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rs_waybill_return_decision_wizard_form" model="ir.ui.view">
+        <field name="name">rs.waybill.return.decision.wizard.form</field>
+        <field name="model">rs.waybill.return.decision.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Goods No Longer on the Waybill">
+                <field name="waybill_id" invisible="1"/>
+                <field name="has_sale_lines" invisible="1"/>
+                <field name="ask_where" invisible="1"/>
+                <div class="alert alert-info" role="status" invisible="ask_where">
+                    <p class="mb-0">These goods came back on a return and are in stock again.</p>
+                </div>
+                <div class="alert alert-info" role="status" invisible="not ask_where">
+                    <p class="mb-1">These goods are no longer on the <b>completed</b> waybill.
+                        The delivery was lowered and they are back in stock.</p>
+                    <p class="mb-0">Say where each one is. If it was lost or damaged on the way,
+                        it is scrapped.</p>
+                </div>
+                <field name="line_ids" nolabel="1">
+                    <list editable="bottom" create="0" delete="0">
+                        <field name="product_id"/>
+                        <field name="qty"/>
+                        <field name="uom_id" optional="hide"/>
+                        <field name="returned" column_invisible="1"/>
+                        <field name="disposition" widget="radio" options="{'horizontal': true}"
+                               column_invisible="not parent.ask_where" readonly="returned"/>
+                    </list>
+                </field>
+                <p class="mt-3 mb-0" invisible="not has_sale_lines">
+                    <b>Does the customer still want these goods?</b>
+                </p>
+                <footer>
+                    <button name="action_deliver_later" type="object" string="Deliver later"
+                            class="btn-primary" invisible="not has_sale_lines"/>
+                    <button name="action_reduce_order" type="object" string="Reduce the order"
+                            class="btn-secondary" invisible="not has_sale_lines"/>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary" invisible="has_sale_lines"/>
+                    <button string="Decide later" class="btn-link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

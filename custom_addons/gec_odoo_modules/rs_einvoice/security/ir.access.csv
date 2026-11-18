@@ -1,0 +1,15 @@
+id,name,model_id,group_id/id,operation,domain
+access_rs_einvoice_log,rs.einvoice.log,rs.einvoice.log,account.group_account_invoice,cru,
+rule_rs_einvoice_log_company,rs.einvoice.log: multi-company,rs.einvoice.log,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+access_rs_einvoice_advance_settlement,rs.einvoice.advance.settlement,rs.einvoice.advance.settlement,account.group_account_invoice,cru,
+rule_rs_einvoice_advance_settlement_company,rs.einvoice.advance.settlement: multi-company,rs.einvoice.advance.settlement,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+access_rs_einvoice_correction_line,rs.einvoice.correction.line,rs.einvoice.correction.line,account.group_account_invoice,crud,
+rule_rs_einvoice_correction_line_company,rs.einvoice.correction.line: multi-company,rs.einvoice.correction.line,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+access_rs_reject_wizard,rs.einvoice.reject.wizard,rs.einvoice.reject.wizard,account.group_account_invoice,crud,
+access_rs_orphan_resolve_wizard,rs.einvoice.orphan.resolve.wizard,rs.einvoice.orphan.resolve.wizard,account.group_account_invoice,crud,
+access_rs_inbox_wizard,rs.einvoice.inbox.wizard,rs.einvoice.inbox.wizard,account.group_account_invoice,crud,
+access_rs_inbox_line,rs.einvoice.inbox.line,rs.einvoice.inbox.line,account.group_account_invoice,crud,
+access_rs_replace_preview,rs.einvoice.replace.preview,rs.einvoice.replace.preview,account.group_account_invoice,crud,
+access_rs_replace_preview_line,rs.einvoice.replace.preview.line,rs.einvoice.replace.preview.line,account.group_account_invoice,crud,
+access_rs_einvoice_view_wizard,rs.einvoice.view.wizard,rs.einvoice.view.wizard,account.group_account_invoice,crud,
+access_rs_einvoice_view_line,rs.einvoice.view.line,rs.einvoice.view.line,account.group_account_invoice,crud,

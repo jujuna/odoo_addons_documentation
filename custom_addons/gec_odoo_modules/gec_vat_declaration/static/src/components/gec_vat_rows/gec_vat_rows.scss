@@ -1,0 +1,80 @@
+// Colours come from the .o_gec_vat_grid variables (gec_vat_grid.scss).
+.o_gec_vat_rows {
+    .o_gvr_table {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+
+        th, td {
+            padding: 6px 8px;
+            border: 1px solid var(--gvg-border);
+            vertical-align: middle;
+            overflow-wrap: anywhere;
+        }
+
+        thead th {
+            background: var(--gvg-header);
+            font-size: 0.75rem;
+            font-weight: 600;
+            line-height: 1.4;
+            text-align: center;
+            white-space: normal;
+            word-break: normal;
+        }
+
+        thead .o_gvr_group_head {
+            color: var(--gvg-green-text);
+        }
+
+        tbody tr:hover td {
+            background: var(--gvg-green-soft);
+        }
+
+        tfoot td {
+            background: var(--gvg-header);
+            font-weight: 600;
+        }
+    }
+
+    .o_gvr_icon_col {
+        width: 40px;
+    }
+
+    .o_gvr_icon {
+        text-align: center;
+    }
+
+    .o_gvr_number {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+
+        .o_field_widget input {
+            text-align: right;
+        }
+    }
+
+    .o_gvr_editable {
+        cursor: text;
+    }
+
+    .o_gvr_typed td {
+        background: var(--gvg-locked);
+    }
+
+    .o_gvr_footer {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 14px;
+        background: var(--gvg-header);
+        color: var(--gvg-text-muted);
+
+        .o_pager {
+            margin-left: auto;
+        }
+    }
+}
+
+.o_gec_vat_rows + .o_gec_vat_rows {
+    margin-top: 12px;
+}

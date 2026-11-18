@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_customs_fetch_wizard_form" model="ir.ui.view">
+        <field name="name">gec.customs.fetch.wizard.form</field>
+        <field name="model">gec.customs.fetch.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Fetch Customs Declarations">
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        Pulls assessed customs declarations from rs.ge where the
+                        authenticated user is the importer or exporter. RS accepts a
+                        maximum range of <b>20 days</b>. Existing lines are refreshed
+                        in place.
+                    </div>
+                    <group>
+                        <field name="user_id" options="{'no_create': True, 'no_open': True}"/>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_fetch" type="object" string="Fetch" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_customs_fetch_wizard" model="ir.actions.act_window">
+        <field name="name">Fetch from RS</field>
+        <field name="res_model">gec.customs.fetch.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

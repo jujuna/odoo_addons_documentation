@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="signify_document_view_list" model="ir.ui.view">
+        <field name="name">signify.document.list</field>
+        <field name="model">signify.document</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="reference_doc" optional="show"/>
+                <field name="create_uid"/>
+                <field name="create_date"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'finished'"
+                       decoration-info="state == 'shared'"
+                       decoration-danger="state == 'rejected'"
+                       decoration-muted="state in ('canceled', 'deleted')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="signify_document_view_form" model="ir.ui.view">
+        <field name="name">signify.document.form</field>
+        <field name="model">signify.document</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_send" type="object" string="Send" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_refresh" type="object" string="Refresh Status"
+                            invisible="state != 'shared' and (state != 'finished' or evidence_attachment_id)"/>
+                    <button name="action_recall" type="object" string="Recall"
+                            invisible="state != 'shared'"
+                            confirm="Recall this document? The recipients will no longer be able to sign it."/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,shared,finished"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Service agreement" readonly="state != 'draft'"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="file" filename="file_name" readonly="state != 'draft'"
+                                   options="{'accepted_file_extensions': '.pdf,.doc,.docx'}"/>
+                            <field name="file_name" invisible="1"/>
+                            <field name="reference_doc" readonly="state != 'draft'"/>
+                            <field name="workflow_type" widget="radio" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
+                            <field name="signify_ref" invisible="not signify_ref"/>
+                            <field name="connection_id" invisible="not connection_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Recipients" name="recipients">
+                            <field name="recipient_ids" readonly="state != 'draft'">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="partner_id"/>
+                                    <field name="role"/>
+                                    <field name="contact_type"/>
+                                    <field name="auth_type" invisible="role in ('receive_signed_copy', 'auto_signer')"/>
+                                    <field name="qualified_type"
+                                           invisible="role != 'signer' or auth_type != 'qualified'"/>
+                                    <field name="personal_id"
+                                           invisible="not (role == 'signer' and auth_type == 'qualified'
+                                                     and qualified_type == 'geo_id_card'
+                                                     or role in ('signer', 'approver') and auth_type == 'remote_id')"/>
+                                    <field name="auto_sign_type" invisible="role != 'auto_signer'"/>
+                                    <field name="placement_keyword" invisible="role not in ('signer', 'auto_signer')"/>
+                                    <field name="status" column_invisible="parent.state == 'draft'"/>
+                                    <field name="action_time" optional="hide"/>
+                                    <field name="signify_ref" column_invisible="True"/>
+                                    <button name="action_open_signing_page" type="object" icon="open_in_new"
+                                            title="Open Signing Page"
+                                            invisible="contact_type != 'link' or not signify_ref"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Message" name="message">
+                            <field name="message" readonly="state != 'draft'"
+                                   placeholder="Text sent to the recipients with the invitation"/>
+                        </page>
+                        <page string="Signed Files" name="signed_files"
+                              invisible="not signed_attachment_ids and not evidence_attachment_id">
+                            <group>
+                                <field name="signed_attachment_ids" widget="many2many_binary"/>
+                                <field name="evidence_attachment_id"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="signify_document_view_search" model="ir.ui.view">
+        <field name="name">signify.document.search</field>
+        <field name="model">signify.document</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <filter name="my_documents" string="My Documents" domain="[('create_uid', '=', uid)]"/>
+                <separator/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="shared" string="Sent" domain="[('state', '=', 'shared')]"/>
+                <filter name="finished" string="Signed" domain="[('state', '=', 'finished')]"/>
+                <filter name="rejected" string="Rejected" domain="[('state', '=', 'rejected')]"/>
+                <filter name="canceled" string="Recalled" domain="[('state', '=', 'canceled')]"/>
+                <group>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_sender" string="Created by" context="{'group_by': 'create_uid'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_signify_document" model="ir.actions.act_window">
+        <field name="name">Documents</field>
+        <field name="res_model">signify.document</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Send your first document for signature</p>
+            <p>Upload a PDF or Word file, add the people who must sign it and send it with Signify.</p>
+        </field>
+    </record>
+</odoo>

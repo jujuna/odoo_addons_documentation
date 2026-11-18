@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form_gec_abc" model="ir.ui.view">
+        <field name="name">res.config.settings.form.gec.abc</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@id='analytic']//setting[@id='track_costs_revenues']"
+                   position="after">
+                <setting id="gec_abc"
+                         string="Activity-Based Costing"
+                         groups="account.group_account_user"
+                         help="Allocate shared costs to products and business lines using measured drivers">
+                    <field name="group_gec_abc"/>
+                </setting>
+                <setting id="gec_pl_mode"
+                         string="P&amp;L Presentation"
+                         help="Read costs by what was bought, or by what they were for: Cost of Sales, R&amp;D, Sales &amp; Marketing, G&amp;A">
+                    <field name="gec_pl_mode" widget="radio"/>
+                </setting>
+                <setting id="gec_abc_monthly_allocation"
+                         string="Monthly Allocation"
+                         groups="gec_analytic_margin.group_gec_abc"
+                         help="Prepare the allocation run for each period the books say is closed">
+                    <field name="gec_allocation_cron_mode"/>
+                    <div class="content-group mt-2"
+                         invisible="gec_allocation_cron_mode == 'off'">
+                        <field name="gec_allocation_cron_basis"/>
+                        <div class="mt-2"
+                             invisible="gec_allocation_cron_basis != 'delay'">
+                            <field name="gec_allocation_cron_delay_days"
+                                   class="oe_inline"/>
+                            <span class="ms-1">days after the month ends</span>
+                        </div>
+                    </div>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

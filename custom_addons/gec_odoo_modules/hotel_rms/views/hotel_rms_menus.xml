@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_hotel_rms_root" name="Revenue" sequence="60"
+              web_icon="hotel_rms,static/description/icon.png"
+              groups="hotel_rms.group_hotel_rms_user"/>
+    <menuitem id="menu_hotel_rms_calendar" name="Pricing Calendar" parent="menu_hotel_rms_root"
+              action="action_pricing_calendar" sequence="10"/>
+    <menuitem id="menu_hotel_rms_price" name="Prices" parent="menu_hotel_rms_root"
+              action="action_hotel_rms_price" sequence="20"/>
+    <menuitem id="menu_hotel_rms_forecast" name="Forecast" parent="menu_hotel_rms_root"
+              action="action_hotel_rms_forecast" sequence="30"/>
+    <menuitem id="menu_hotel_rms_reservation" name="Bookings" parent="menu_hotel_rms_root"
+              action="action_hotel_rms_reservation" sequence="40"/>
+    <menuitem id="menu_hotel_rms_import" name="Import" parent="menu_hotel_rms_root"
+              action="action_hotel_rms_import_new" sequence="50"
+              groups="hotel_rms.group_hotel_rms_revenue_manager"/>
+
+    <menuitem id="menu_hotel_rms_reports" name="Reports" parent="menu_hotel_rms_root" sequence="80"/>
+    <menuitem id="menu_hotel_rms_price_audit" name="Price History" parent="menu_hotel_rms_reports"
+              action="action_hotel_rms_price_audit" sequence="10"/>
+    <menuitem id="menu_hotel_rms_forecast_accuracy" name="Forecast accuracy" parent="menu_hotel_rms_reports"
+              action="action_hotel_rms_forecast_accuracy" sequence="20"/>
+    <menuitem id="menu_hotel_rms_run" name="Engine Runs" parent="menu_hotel_rms_reports"
+              action="action_hotel_rms_run" sequence="30"/>
+
+    <menuitem id="menu_hotel_rms_config" name="Configuration" parent="menu_hotel_rms_root" sequence="90"
+              groups="hotel_rms.group_hotel_rms_revenue_manager"/>
+    <menuitem id="menu_hotel_rms_property" name="Hotels" parent="menu_hotel_rms_config"
+              action="action_hotel_rms_property" sequence="10"/>
+    <menuitem id="menu_hotel_rms_event" name="Events" parent="menu_hotel_rms_config"
+              action="action_hotel_rms_event" sequence="20"/>
+    <menuitem id="menu_hotel_rms_demo" name="Demo Data" parent="menu_hotel_rms_config"
+              action="action_hotel_rms_demo" sequence="90"
+              groups="hotel_rms.group_hotel_rms_manager"/>
+</odoo>

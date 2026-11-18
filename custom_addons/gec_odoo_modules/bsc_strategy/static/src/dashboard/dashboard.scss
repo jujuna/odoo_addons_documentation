@@ -1,0 +1,78 @@
+.o_bsc_dashboard {
+    background-color: $o-view-background-color;
+
+    .o_bsc_dash_toolbar {
+        background-color: $o-view-background-color;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+
+    .o_bsc_dash_big {
+        font-size: 2rem;
+        font-weight: 600;
+        line-height: 1.2;
+    }
+
+    .o_bsc_dash_clickable {
+        cursor: pointer;
+    }
+
+    .card.o_bsc_dash_clickable:hover {
+        border-color: $primary;
+    }
+
+    .o_bsc_dash_status {
+        display: inline-block;
+        padding: 0.1rem 0.5rem;
+        border-radius: 1rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .o_bsc_dash_green { background-color: rgba($success, 0.15); color: shade-color($success, 35%); }
+    .o_bsc_dash_amber { background-color: rgba($warning, 0.22); color: shade-color($warning, 55%); }
+    .o_bsc_dash_red { background-color: rgba($danger, 0.15); color: shade-color($danger, 25%); }
+    .o_bsc_dash_no_data { background-color: rgba($gray-500, 0.18); color: $gray-700; }
+
+    .o_bsc_dash_chip {
+        border: 0;
+        font-weight: 600;
+    }
+
+    .o_bsc_dash_bar_green { background-color: $success; }
+    .o_bsc_dash_bar_amber { background-color: $warning; }
+    .o_bsc_dash_bar_red { background-color: $danger; }
+    .o_bsc_dash_bar_no_data { background-color: $gray-500; }
+
+    .o_bsc_dash_table td {
+        vertical-align: middle;
+    }
+
+    .o_bsc_dash_comment {
+        max-width: 22rem;
+        white-space: normal;
+    }
+
+    .o_bsc_dash_chart {
+        max-height: 230px;
+
+        .o_bsc_dash_grid { stroke: $border-color; stroke-width: 1; }
+        .o_bsc_dash_axis { fill: $gray-600; font-size: 11px; }
+        .o_bsc_dash_value { fill: $body-color; font-size: 11px; font-weight: 600; }
+        .o_bsc_dash_line_green { stroke: $success; stroke-dasharray: 4 4; stroke-width: 1.2; }
+        .o_bsc_dash_line_amber { stroke: $warning; stroke-dasharray: 4 4; stroke-width: 1.2; }
+        .o_bsc_dash_path { fill: none; stroke: $primary; stroke-width: 2.5; }
+        .o_bsc_dash_dot { stroke: $o-view-background-color; stroke-width: 2; }
+        .o_bsc_dash_dot_green { fill: $success; }
+        .o_bsc_dash_dot_amber { fill: $warning; }
+        .o_bsc_dash_dot_red { fill: $danger; }
+        .o_bsc_dash_dot_no_data { fill: $gray-500; }
+    }
+}
+
+.o_form_view .o_bsc_objective_code {
+    max-width: 5.5rem;
+    flex: 0 0 auto;
+}

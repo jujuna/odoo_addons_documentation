@@ -1,0 +1,173 @@
+$rsw-forward-actions: (
+    'action_close_waybill',
+    'action_send_rs_waybill',
+    'action_send_carrier_waybill',
+    'action_confirm_waybill',
+    'action_submit_edit_to_rs',
+    'action_active_transporter',
+    'action_close_transporter',
+    'action_subwaybill_complete',
+);
+$rsw-destructive-actions: ('action_refuse_waybill', 'action_reject_waybill', 'action_delete_template');
+
+#{$rsw-form} {
+    color: var(--rsw-ink);
+
+    .o_form_sheet_bg { background: var(--rsw-paper); }
+    .o_form_sheet {
+        background: var(--rsw-sheet);
+        max-width: 1180px;
+        border: 1px solid var(--rsw-rule);
+        border-radius: var(--rsw-R);
+        box-shadow: none;
+    }
+
+    .o_statusbar_buttons {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        width: 100% !important;
+        gap: 6px;
+
+        &::after { content: ''; flex: 1 1 auto; order: 50; }
+        .rsw-right { order: 99 !important; }
+
+        > .btn {
+            @include rsw-btn-secondary;
+            height: 34px;
+            padding: 0 14px;
+            display: inline-flex;
+            align-items: center;
+            border-radius: var(--rsw-r);
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0;
+            transition: none;
+
+            > i, > .oi, > .fa { display: none; }
+            .oe_stat_text { display: inline; font: inherit; color: inherit; }
+        }
+
+        @each $name in $rsw-destructive-actions {
+            > .btn[name="#{$name}"] { @include rsw-btn-destructive; }
+        }
+    }
+
+    @for $i from 1 through length($rsw-forward-actions) {
+        $name: nth($rsw-forward-actions, $i);
+        $stronger: '';
+        @for $j from 1 to $i {
+            $stronger: $stronger + if($j > 1, ', ', '') + '> .btn[name="#{nth($rsw-forward-actions, $j)}"]';
+        }
+        @if $i == 1 {
+            .o_statusbar_buttons > .btn[name="#{$name}"] { @include rsw-btn-filled; }
+        } @else {
+            .o_statusbar_buttons:not(:has(#{$stronger})) > .btn[name="#{$name}"] { @include rsw-btn-filled; }
+        }
+    }
+
+    [name="button_box"] { align-items: center; }
+
+    .rsw-headstatus {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-right: 12px;
+
+        > .badge { @include rsw-mark; }
+
+        > .badge:first-child.text-secondary { @include rsw-mark-draft; }
+        > .badge:first-child.text-info      { @include rsw-mark-active; }
+        > .badge:first-child.text-success   { @include rsw-mark-completed; }
+        > .badge:first-child.text-danger    { @include rsw-mark-cancelled; }
+
+        > .badge + .badge.text-info {
+            background: transparent !important;
+            border: 1px dashed var(--rsw-line) !important;
+            color: var(--rsw-label) !important;
+        }
+        > .badge + .badge.text-success {
+            background: var(--rsw-done-tint) !important;
+            border: 1px solid var(--rsw-done) !important;
+            color: var(--rsw-done) !important;
+            &::before { content: "✓\00a0"; }
+        }
+        > .badge + .badge.text-danger,
+        > .badge + .badge.text-warning {
+            background: transparent !important;
+            border: 1px solid var(--rsw-alert) !important;
+            color: var(--rsw-alert) !important;
+        }
+        > .badge + .badge.text-secondary {
+            background: transparent !important;
+            border: 1px solid var(--rsw-rule) !important;
+            color: var(--rsw-label) !important;
+        }
+    }
+
+    .oe_stat_button {
+        height: 32px;
+        min-height: 32px;
+        border: 1px solid var(--rsw-line) !important;
+        border-radius: var(--rsw-r);
+        background: var(--rsw-sheet);
+        box-shadow: none;
+        > .o_button_icon, > i, > .oi, > .fa { display: none; }
+        .o_stat_info { justify-content: center; }
+        .o_stat_text { color: var(--rsw-ink-2); font-size: 13px; font-weight: 600; }
+        &:hover { background: var(--rsw-head); }
+    }
+
+    .o_form_sheet .alert {
+        border-radius: var(--rsw-R) !important;
+        padding: 12px 16px;
+        color: var(--rsw-ink);
+        font-size: 14px;
+        line-height: 1.45;
+        box-shadow: none;
+
+        strong { display: block; font-weight: 700; }
+        > .oi, > .fa, div > .oi[data-icon="warning"] { display: none; }
+
+        .btn-warning, .btn-danger, .btn-secondary {
+            @include rsw-btn-secondary;
+            --bs-btn-border-color: var(--rsw-ink);
+            --bs-btn-hover-border-color: var(--rsw-ink);
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            border-radius: var(--rsw-r);
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .btn-primary {
+            @include rsw-btn-filled;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            border-radius: var(--rsw-r);
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .o_input {
+            border: 1px solid var(--rsw-line);
+            border-radius: var(--rsw-r);
+            padding: 4px 8px;
+            background: var(--rsw-sheet);
+            &:focus { @include rsw-focus; }
+        }
+    }
+    .o_form_sheet .alert-warning {
+        background: var(--rsw-active-tint);
+        border: 1px solid var(--rsw-active);
+    }
+    .o_form_sheet .alert-danger {
+        background: var(--rsw-alert-tint);
+        border: 1px solid var(--rsw-alert);
+    }
+    .o_form_sheet .alert-info {
+        background: var(--rsw-head);
+        border: 1px solid var(--rsw-rule);
+    }
+}

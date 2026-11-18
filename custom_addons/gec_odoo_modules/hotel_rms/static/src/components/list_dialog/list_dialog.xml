@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="hotel_rms.ListDialog">
+        <Dialog title="this.props.title" size="'xl'" withBodyPadding="false">
+            <View t-props="this.viewProps"/>
+            <t t-set-slot="footer">
+                <button class="btn btn-primary" t-on-click="() => this.openFullList()">Open full list</button>
+                <button class="btn btn-secondary" data-hotkey="z" t-on-click="() => this.props.close()">Close</button>
+            </t>
+        </Dialog>
+    </t>
+</templates>

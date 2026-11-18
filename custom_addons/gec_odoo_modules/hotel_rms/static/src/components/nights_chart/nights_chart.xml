@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="hotel_rms.NightsChart">
+        <div class="o_rms_nights" t-ref="this.root">
+            <div class="o_rms_chart o_rms_nights_chart">
+                <canvas t-ref="this.chart.ref"/>
+            </div>
+            <div class="o_rms_nights_price o_rms_muted">Recommended price, reference room</div>
+            <div t-if="this.hasPrices" class="o_rms_chart o_rms_nights_strip">
+                <canvas t-ref="this.strip.ref"/>
+            </div>
+            <p t-else="" class="o_rms_nights_noprice o_rms_muted">
+                No recommended prices for these nights yet. Run the engine to get them.
+            </p>
+        </div>
+    </t>
+</templates>

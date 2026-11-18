@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="hotel_rms.Sparkline">
+        <svg t-if="this.props.values.length > 1" class="o_rms_sparkline" viewBox="0 0 100 24"
+             preserveAspectRatio="none" aria-hidden="true">
+            <polyline t-att-points="this.points"/>
+        </svg>
+    </t>
+
+    <t t-name="hotel_rms.SparklineField">
+        <Sparkline values="this.values"/>
+    </t>
+</templates>

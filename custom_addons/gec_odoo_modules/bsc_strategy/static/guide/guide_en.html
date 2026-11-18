@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Balanced Scorecard - User Guide</title>
+<style>
+:root{--bg:#fff;--fg:#1f2328;--muted:#5d6670;--line:#e3e6ea;--soft:#f5f7f9;--accent:#714b67;--green:#1e8a4c;--amber:#b7791f;--red:#c0392b;--grey:#7b8794}
+@media (prefers-color-scheme:dark){:root{--bg:#1b1d21;--fg:#e6e8eb;--muted:#a3abb5;--line:#33373d;--soft:#24272c;--accent:#c59bbd}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Georgian",sans-serif}
+.layout{display:flex;min-height:100vh}
+nav{width:270px;flex:0 0 270px;border-right:1px solid var(--line);padding:24px 18px;position:sticky;top:0;height:100vh;overflow:auto;background:var(--soft)}
+nav h2{font-size:15px;margin:0 0 12px;color:var(--accent)}
+nav a{display:block;color:var(--fg);text-decoration:none;font-size:14px;padding:4px 8px;border-radius:6px}
+nav a:hover{background:var(--line)}
+nav a.sub{padding-left:22px;color:var(--muted);font-size:13px}
+main{flex:1;max-width:980px;padding:32px 40px 80px}
+h1{font-size:30px;margin:0 0 6px}
+h2{font-size:23px;margin:48px 0 10px;padding-top:12px;border-top:1px solid var(--line)}
+h3{font-size:18px;margin:28px 0 8px}
+p,li{color:var(--fg)}
+.lead{color:var(--muted);font-size:17px}
+figure{margin:16px 0 24px}
+figure img{width:100%;border:1px solid var(--line);border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+.box{border-radius:8px;padding:12px 16px;margin:16px 0;border:1px solid var(--line);background:var(--soft)}
+.tip{border-left:4px solid var(--green)}
+.warn{border-left:4px solid var(--amber)}
+.rule{border-left:4px solid var(--accent)}
+.box strong:first-child{display:block;margin-bottom:2px}
+table{border-collapse:collapse;width:100%;margin:12px 0 20px;font-size:14.5px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft)}
+code,.k{font-family:ui-monospace,Consolas,monospace;font-size:13.5px;background:var(--soft);border:1px solid var(--line);border-radius:4px;padding:0 5px}
+.path{font-weight:600;color:var(--accent)}
+ol.steps{counter-reset:s;list-style:none;padding-left:0}
+ol.steps>li{counter-increment:s;position:relative;padding-left:44px;margin:14px 0}
+ol.steps>li:before{content:counter(s);position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px}
+.pill{display:inline-block;border-radius:12px;padding:0 9px;font-size:13px;font-weight:600}
+.g{background:rgba(30,138,76,.15);color:var(--green)}.a{background:rgba(183,121,31,.18);color:var(--amber)}.r{background:rgba(192,57,43,.15);color:var(--red)}.n{background:rgba(123,135,148,.18);color:var(--grey)}
+@media (max-width:900px){.layout{display:block}nav{position:static;width:auto;height:auto;border-right:0;border-bottom:1px solid var(--line)}main{padding:20px 16px 60px}}
+@media print{nav{display:none}main{max-width:none}}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav>
+  <h2>User Guide</h2>
+  <a href="#intro">1. What this module does</a>
+  <a href="#concepts">2. The ideas in five minutes</a>
+  <a href="#roles">3. Who can do what</a>
+  <a href="#demo">4. Start with the demo</a>
+  <a href="#setup">5. Setting up a scorecard</a>
+  <a class="sub" href="#s-perspectives">Perspectives</a>
+  <a class="sub" href="#s-scorecard">The scorecard</a>
+  <a class="sub" href="#s-objectives">Objectives</a>
+  <a class="sub" href="#s-kpis">KPIs and targets</a>
+  <a class="sub" href="#s-links">Cause-effect links</a>
+  <a class="sub" href="#s-initiatives">Initiatives</a>
+  <a class="sub" href="#s-activate">Activating</a>
+  <a href="#cycle">6. Every period</a>
+  <a class="sub" href="#c-entry">Entering figures</a>
+  <a class="sub" href="#c-close">Closing a period</a>
+  <a class="sub" href="#c-review">The strategy review</a>
+  <a href="#dashboard">7. The dashboard</a>
+  <a href="#map">8. The strategy map</a>
+  <a href="#initiatives">9. Initiatives in detail</a>
+  <a href="#automation">10. Automated figures</a>
+  <a href="#maths">11. How scores are calculated</a>
+  <a href="#faq">12. Questions and problems</a>
+  <a href="#glossary">13. Glossary</a>
+</nav>
+<main>
+
+<h1>Balanced Scorecard - User Guide</h1>
+<p class="lead">How to set up a strategy in Odoo, fill it in every period, and use it to make decisions. Read sections 1-6 once; after that, the dashboard and this guide's question section are what you will come back to.</p>
+
+<h2 id="intro">1. What this module does</h2>
+<p>The module turns a strategy into something that is checked every period. You write down a small number of <b>strategic objectives</b>, decide how each one is <b>measured</b> (KPIs with targets), say which objective is supposed to <b>drive</b> which (the strategy map), plan the <b>work</b> that should move them (initiatives), and then, every quarter or month, the people responsible enter the <b>figures</b>. The period is closed, a <b>strategy review</b> is held, and the decisions of that review are recorded.</p>
+<p>It is not a KPI dashboard with extra fields. A number on its own changes nothing; the module is built around the moment where a manager looks at a red figure, asks why, and decides what to do.</p>
+<div class="box tip"><strong>The menu at a glance</strong>
+<span class="path">Dashboard</span> - where things stand (managers) ·
+<span class="path">Strategy</span> - scorecards, strategy map, objectives, KPIs, links, initiatives ·
+<span class="path">Data Entry</span> - the figures you have to report ·
+<span class="path">Reviews</span> - strategy reviews and periods ·
+<span class="path">Analysis</span> - charts and pivot tables ·
+<span class="path">Configuration</span> - perspectives, stages, data sources, demo data ·
+<span class="path">User Guide</span> - this page.</div>
+
+<h2 id="concepts">2. The ideas in five minutes</h2>
+<table>
+<tr><th style="width:24%">Term</th><th>What it means here</th><th style="width:28%">Example</th></tr>
+<tr><td><b>Scorecard</b></td><td>One strategy for one planning cycle (usually a year). Everything else belongs to a scorecard.</td><td>Company Strategy 2026</td></tr>
+<tr><td><b>Perspective</b></td><td>A layer of the strategy. The classic four, from bottom to top: Learning and Growth → Internal Processes → Customer → Financial. You can rename them or add your own (for example ESG).</td><td>Customer</td></tr>
+<tr><td><b>Strategic objective</b></td><td>What you want to achieve, in a few words, inside one perspective. Has an owner.</td><td>C1 Raise customer satisfaction</td></tr>
+<tr><td><b>KPI</b></td><td>How an objective is measured: a figure with a unit, a direction (is higher better or lower better?), a target and a data owner who reports it.</td><td>NPS, points, higher is better, target 40</td></tr>
+<tr><td><b>Period</b></td><td>A reporting window (month, quarter, half-year or year), generated automatically when the scorecard is activated.</td><td>2026-Q2</td></tr>
+<tr><td><b>Figure (measurement)</b></td><td>One KPI in one period: target, actual, achievement %, status, comment.</td><td>NPS 2026-Q2: target 40, actual 41</td></tr>
+<tr><td><b>Cause-effect link</b></td><td>A written hypothesis that one objective drives another. Shown as an arrow on the strategy map. Dashed until it is validated with data.</td><td>Faster delivery → happier customers</td></tr>
+<tr><td><b>Initiative</b></td><td>A project or action that should move one or more objectives. Has a budget, dates, progress and an approval flow.</td><td>Warehouse redesign</td></tr>
+<tr><td><b>Strategy review</b></td><td>The meeting after a period: findings, decisions, corrective initiatives. Opened automatically when a period closes.</td><td>Review 2026-Q1</td></tr>
+</table>
+<h3>The status colours</h3>
+<p><span class="pill g">On Track</span> achievement at or above the green threshold (95 % by default) ·
+<span class="pill a">At Risk</span> between amber (80 %) and green ·
+<span class="pill r">Off Track</span> below 80 % ·
+<span class="pill n">No Data</span> nothing reported yet, or no target to compare with.</p>
+<div class="box rule"><strong>Zero is a figure; empty is not.</strong> A KPI that has not been reported is <i>not</i> counted as zero. It is left out of the average and shown as "No Data". Zero complaints or zero accidents are real results and are counted.</div>
+
+<h2 id="roles">3. Who can do what</h2>
+<table>
+<tr><th>Access level</th><th>Can</th><th>Typical person</th></tr>
+<tr><td><b>Contributor</b></td><td>See the strategy; enter the figures of their own KPIs; propose initiatives and edit the ones they own.</td><td>Department heads, data owners</td></tr>
+<tr><td><b>Manager</b></td><td>Everything above, plus design objectives, KPIs, links and initiatives; validate figures; close periods; run reviews; see the dashboard.</td><td>Strategy office, management team</td></tr>
+<tr><td><b>Administrator</b></td><td>Everything above, plus configure perspectives, stages and automated data sources; reopen a closed period; load and remove demo data; delete records.</td><td>Odoo administrator</td></tr>
+</table>
+<p><b>What the system enforces, whatever screen or tool is used:</b></p>
+<ul>
+<li>A contributor enters the figure and comment of their own KPIs only. The target, the KPI and the period of a row are a manager's; a contributor cannot validate their own figure or change it once a manager has validated it.</li>
+<li>A contributor proposes an initiative; only a manager can approve it, start it or close it. Who approved it, and when, is recorded automatically and cannot be typed. Once approved, its planned budget is changed by a manager only.</li>
+<li>A closed period is locked for everyone except an Administrator, and only an Administrator can reopen it.</li>
+<li>Figures marked as coming from Odoo data are written by the automation only - a typed figure cannot be dressed up as an automated one.</li>
+<li>Connecting a KPI to Odoo data: the total is the same for everyone, but a filter ("Only count records where") may only cover records the person setting it is allowed to see.</li>
+<li>Only the Demo Data window can mark data as demo, so "Remove demo data" can never delete a real scorecard.</li>
+<li>Every BSC record is visible only inside its own company.</li>
+</ul>
+<p>Give access in <span class="path">Settings → Users &amp; Companies → Users</span>, open the person, and choose a level in the <b>Balanced Scorecard</b> field. The person who installed the module is an Administrator automatically; nobody else gets access until you give it.</p>
+<div class="box warn"><strong>Someone cannot see the app?</strong> They have no Balanced Scorecard access level yet. Give them at least <b>Contributor</b> and ask them to reload the page.</div>
+
+<h2 id="demo">4. Start with the demo</h2>
+<p>The fastest way to understand the module is to look at a filled-in one. Open <span class="path">Configuration → Demo Data</span> and press <b>Load Demo Data</b>.</p>
+<figure><img src="/bsc_strategy/static/guide/img_en/14_demo_data.jpg" alt="Demo data window"><figcaption>Configuration → Demo Data. The same window removes the demo again.</figcaption></figure>
+<p>You get one scorecard for a full year: eight objectives in the four perspectives, eight KPIs with targets, nine cause-effect links, six initiatives, three closed quarters with figures and reviews, and the current quarter partly filled in. Texts are in the language of your interface. You are the owner of everything, so every screen shows something.</p>
+<p>When you are done, open the same window and press <b>Remove Demo Data</b>. Only the demo scorecard and what is in it are deleted - your own scorecards are never touched. You can load and remove it as often as you like.</p>
+
+<h2 id="setup">5. Setting up a scorecard</h2>
+<p>The order matters: objectives first, then the links between them, then the measures, then the work. The scorecard form shows a <b>setup checklist</b> that follows exactly this order and tells you, by name, what is still missing.</p>
+<figure><img src="/bsc_strategy/static/guide/img_en/02_draft_checklist.jpg" alt="Setup checklist on a draft scorecard"><figcaption>A new scorecard with its setup checklist. Save the form to refresh the list.</figcaption></figure>
+
+<h3 id="s-perspectives">Step 0 - Perspectives (once, administrator)</h3>
+<p><span class="path">Configuration → Perspectives</span>. The four classic perspectives are already there. Rename them, change their order (the order is bottom-to-top on the strategy map), change the default weight, or add a fifth one. You normally do this once for the whole company.</p>
+
+<h3 id="s-scorecard">Step 1 - Create the scorecard</h3>
+<ol class="steps">
+<li><span class="path">Strategy → Scorecards → New</span>.</li>
+<li>Give it a name, for example <i>Strategy 2027</i>.</li>
+<li>Choose the <b>Strategy Owner</b> - the person who runs the reviews.</li>
+<li>Set <b>Cycle Start</b> and <b>Cycle End</b> (usually 1 January - 31 December) and the <b>Review Frequency</b> (monthly, quarterly, semi-annual or annual). Periods are generated from these when you activate.</li>
+<li>Optionally write the vision and mission on their tab, and set perspective weights on the <b>Perspective Weights</b> tab (leave it empty to use each perspective's default weight).</li>
+</ol>
+
+<h3 id="s-objectives">Step 2 - Objectives</h3>
+<p>On the <b>Objectives</b> tab type the objectives straight into the table, one line each: a short code (F1, C2, P1, L1 ...), the perspective, the name and the owner. Two to four objectives per perspective is normal; more than that makes a strategy hard to follow.</p>
+<figure><img src="/bsc_strategy/static/guide/img_en/03_scorecard.jpg" alt="Scorecard with the objectives table"><figcaption>The objectives of a scorecard. The arrow at the end of a line opens the full objective form.</figcaption></figure>
+<ul>
+<li><b>Weight</b> is optional. Leave every weight at zero and all objectives of a perspective count equally.</li>
+<li><b>Assessment Mode</b>: most objectives are <i>measured by KPIs</i>. An objective that does not turn into a number (for example "Digitalise core processes") can be set to <i>Qualitative assessment</i>: its owner rates it green, amber or red with a short note, and it needs no KPI.</li>
+</ul>
+
+<h3 id="s-kpis">Step 3 - KPIs and targets</h3>
+<p>Open an objective (arrow at the end of its line) and fill the <b>KPIs</b> tab - one line per KPI.</p>
+<figure><img src="/bsc_strategy/static/guide/img_en/04_objective_kpis.jpg" alt="Objective with its KPIs"><figcaption>An objective and its KPI. Everything that matters is on one line.</figcaption></figure>
+<table>
+<tr><th style="width:22%">Field</th><th>What to enter</th></tr>
+<tr><td>Name</td><td>What is measured, e.g. <i>Average delivery time</i>.</td></tr>
+<tr><td>Unit</td><td>Free text: %, GEL, days, points, complaints ...</td></tr>
+<tr><td>Direction</td><td><b>Higher is better</b> (revenue, satisfaction), <b>Lower is better</b> (costs, delivery time, complaints) or <b>Inside a range</b> (for example engagement between 70 and 85 %).</td></tr>
+<tr><td>Target</td><td>The target for each period. It is copied onto every period's row and can be changed there. For a range KPI fill <i>Range Minimum</i> and <i>Range Maximum</i> instead.</td></tr>
+<tr><td>Data Owner</td><td>The person who will be asked for the figure every period. Required.</td></tr>
+<tr><td>Weight</td><td>Optional, inside the objective. Leave at zero for equal weights.</td></tr>
+</table>
+<div class="box warn"><strong>Always set a target.</strong> Without one, a figure that is entered still shows "No Data", because there is nothing to compare it with. The setup checklist lists the KPIs that have no target.</div>
+<p>The full KPI form (arrow at the end of the line) has more: a <b>Definition</b> tab (write down exactly how the figure is obtained - next year nobody will remember), the <b>Baseline</b>, the green and amber thresholds, the <b>Target Rule</b> (for example "last period's actual plus 5 %") and the history of all periods.</p>
+<figure><img src="/bsc_strategy/static/guide/img_en/06_kpi_form.jpg" alt="KPI form"><figcaption>The full KPI form.</figcaption></figure>
+<div class="box tip"><strong>Many KPIs at once?</strong> <span class="path">Strategy → KPIs</span> (or <b>Edit KPIs in a table</b> on the scorecard's KPIs tab) is an editable table of every KPI: choose the objective on each line and type.</div>
+
+<h3 id="s-links">Step 4 - Cause-effect links</h3>
+<p>Say which objective is supposed to drive which, and in one sentence why. Two places do the same thing:</p>
+<ul>
+<li>on an objective, the <b>Strategy Map</b> tab: "This objective contributes to" and "This objective is driven by";</li>
+<li><span class="path">Strategy → Cause-Effect Links</span>: the whole map as one table - faster when you write all links at once.</li>
+</ul>
+<figure><img src="/bsc_strategy/static/guide/img_en/05_objective_links.jpg" alt=""><figcaption>The Strategy Map tab of an objective: what it drives and what drives it.</figcaption></figure>
+<figure><img src="/bsc_strategy/static/guide/img_en/07_links.jpg" alt="Cause-effect links table"><figcaption>All links of a scorecard as one editable table.</figcaption></figure>
+<p>Each link has a <b>hypothesis</b> (in plain words), a <b>strength</b> (how strongly you believe it) and a <b>Validated</b> switch. Tick <i>validated</i> only once the figures really show the two moving together. Links are optional, but a strategy without them is just a list of goals.</p>
+
+<h3 id="s-initiatives">Step 5 - Initiatives</h3>
+<p>On the scorecard's <b>Initiatives</b> tab, or in <span class="path">Strategy → Initiatives</span>, add the projects and actions that should move the objectives. Details are in <a href="#initiatives">section 9</a>. Initiatives are optional for activation.</p>
+
+<h3 id="s-activate">Step 6 - Activate</h3>
+<p>Press <b>Activate</b> at the top of the scorecard. The module checks the design (every measured objective needs a KPI, every KPI a data owner) and lists <i>all</i> problems at once if there are any. Then it:</p>
+<ul>
+<li>generates the periods of the cycle (for example 2027-Q1 ... 2027-Q4);</li>
+<li>creates an empty row for every KPI in every period that has already started - so a cycle activated in October still collects January-September;</li>
+<li>from then on reminds data owners in the last week of each period.</li>
+</ul>
+<div class="box tip"><strong>Next year</strong> use <b>Copy to New Cycle</b> on the scorecard: objectives, KPIs, weights and links are copied into a new draft; figures and periods stay with the old cycle.</div>
+
+<h2 id="cycle">6. Every period</h2>
+<h3 id="c-entry">Entering figures</h3>
+<p><span class="path">Data Entry</span> shows the figures <b>you</b> have to report for the <b>open period</b>. Click into the <b>Actual</b> column, type the figure, press Enter. Achievement and status are calculated immediately. Managers can open the same list for a whole scorecard with <b>Enter Figures</b> on the scorecard.</p>
+<figure><img src="/bsc_strategy/static/guide/img_en/09_data_entry.jpg" alt="Data entry list"><figcaption>Data Entry: your KPIs for the open period. Grey lines are not reported yet.</figcaption></figure>
+<ul>
+<li><b>Target</b> is filled in already; change it on the row if this period's target is different.</li>
+<li>A figure that comes out <span class="pill r">Off Track</span> needs a <b>Variance Comment</b> - why it happened and what is being done. The row cannot be saved without it: a red figure without an explanation cannot be acted upon.</li>
+<li><b>Previous</b> shows last period's actual, to catch typing mistakes.</li>
+<li>Select rows and press <b>Submit</b> when your figures are final. A manager presses <b>Validate</b> to sign them off.</li>
+<li>Entered a figure by mistake? Open the row and press <b>Clear Figure</b> - it goes back to "not reported".</li>
+</ul>
+<div class="box tip"><strong>Seen a figure somewhere you cannot change?</strong> Wherever a figure, KPI or objective is only shown - on a scorecard, a KPI, a review, the dashboard or the strategy map - there is a <b>Figure</b>, <b>Edit</b> or <b>Enter / change figure</b> button next to it that opens the place where it can be changed.</div>
+<h3 id="c-close">Closing a period</h3>
+<p><span class="path">Reviews → Periods</span>, open the period and press <b>Close Period</b>.</p>
+<figure><img src="/bsc_strategy/static/guide/img_en/10_period.jpg" alt="Period form"><figcaption>A period: completion, buttons to prepare rows, remind owners and close.</figcaption></figure>
+<ul>
+<li>If figures are missing, closing is refused and the missing KPIs are listed. <b>Close Anyway</b> closes regardless - use it consciously.</li>
+<li>A closed period is locked: nobody can change its figures. Only an administrator can <b>Reopen</b> it, and the reopening is written to the scorecard's history.</li>
+<li>Closing prepares the next period and opens the period's <b>strategy review</b>.</li>
+</ul>
+<h3 id="c-review">The strategy review</h3>
+<p>When a period closes, its review is created as a draft: the score and completion of <i>that</i> period are frozen, and the off-track objectives are listed. The strategy owner gets a to-do. The meeting is yours:</p>
+<figure><img src="/bsc_strategy/static/guide/img_en/11_review.jpg" alt="Strategy review"><figcaption>A strategy review with its off-track objectives and the period's figures.</figcaption></figure>
+<ol class="steps">
+<li>Open the review (<span class="path">Reviews → Strategy Reviews</span>, or <b>Start/Open the review</b> on the dashboard). Add the participants.</li>
+<li>Go through <b>Figures of the Period</b> and the <b>Off-track Objectives</b>. Write what the figures say on the <b>Findings</b> tab.</li>
+<li>For each off-track objective decide something. <b>Act on it</b> creates a corrective initiative linked to the objective and to this review.</li>
+<li>Write the <b>Decisions</b> - what, who, by when. A review cannot be closed without decisions: a review that decides nothing is a report.</li>
+<li>If the review changed objectives, targets or links, say so on <b>Strategy Adjustment</b>. Press <b>Close Review</b>. <b>Board Pack</b> prints the PDF for the board for this period.</li>
+</ol>
+
+<h2 id="dashboard">7. The dashboard</h2>
+<p><span class="path">Dashboard</span> (managers) answers in one screen: where does the strategy stand, what moved, and what does somebody have to act on? Choose the scorecard and the period at the top - you can look at any past period, not only the current one.</p>
+<figure><img src="/bsc_strategy/static/guide/img_en/01_dashboard.jpg" alt="Dashboard"><figcaption>The dashboard of the demo scorecard.</figcaption></figure>
+<table>
+<tr><th style="width:26%">Part</th><th>What it shows</th></tr>
+<tr><td>Scorecard index</td><td>The weighted score of the whole scorecard for the chosen period and its status.</td></tr>
+<tr><td>Figures reported</td><td>How many figures are in, out of how many expected, and days left. Click to open the missing ones.</td></tr>
+<tr><td>KPI status</td><td>How many KPIs are on track, at risk, off track, without data. Click a chip to filter the KPI table below.</td></tr>
+<tr><td>Initiatives / budget</td><td>Running initiatives, average progress, overdue ones; budget spent against planned.</td></tr>
+<tr><td>Perspectives</td><td>The score of every perspective, top of the map first; how many links are validated.</td></tr>
+<tr><td>Index over the cycle</td><td>The score of every period up to the chosen one, with the green and amber thresholds as dashed lines.</td></tr>
+<tr><td>Needs attention</td><td>Missing figures by person, off-track objectives with no running initiative, red figures without explanation, held automated figures, overdue and over-budget initiatives. Everything is clickable.</td></tr>
+<tr><td>Strategy review</td><td>The state of this period's review, with a button to open or start it.</td></tr>
+<tr><td>Objectives, KPIs, initiatives</td><td>The detail tables. Click any line to open it.</td></tr>
+</table>
+<p>Buttons at the top: <b>Figures</b> (all rows of the period), <b>Strategy Map</b>, <b>Board Pack</b> (PDF for the chosen period), <b>Scorecard</b>.</p>
+
+<h2 id="map">8. The strategy map</h2>
+<p><span class="path">Strategy → Strategy Map</span> draws the scorecard: perspectives as horizontal bands, objectives as cards coloured by status, links as arrows from cause up to effect. <b>A dashed arrow is a hypothesis nobody has checked against data</b>; a solid one is validated. Thicker means more strongly believed.</p>
+<figure><img src="/bsc_strategy/static/guide/img_en/08_strategy_map.jpg" alt="Strategy map"><figcaption>The strategy map with the inspector panel on the right.</figcaption></figure>
+<ul>
+<li>Click a card: its KPIs, figures, comments, links and initiatives appear on the right. Click again to close.</li>
+<li>Click an arrow: the hypothesis, with a button to mark it validated.</li>
+<li><b>Highlight proven links</b> fades every unchecked assumption.</li>
+<li>How to read it: find the red card near the top and follow the arrows down - those are the causes your own strategy nominated for that result.</li>
+</ul>
+
+<h2 id="initiatives">9. Initiatives in detail</h2>
+<figure><img src="/bsc_strategy/static/guide/img_en/12_initiatives.jpg" alt="Initiatives kanban"><figcaption>Initiatives by stage.</figcaption></figure>
+<ul>
+<li>Every initiative serves at least one objective of the same scorecard.</li>
+<li>Stages: <i>Proposed → Under Assessment → Approved → In Progress → Done</i> (or <i>Cancelled</i>). Drag the card or click the stage on the form.</li>
+<li><b>Approval needs a planned budget</b> - an initiative without resources is a wish, not a plan. <b>Done needs a result</b> on the Result tab.</li>
+<li>On the <b>Execution</b> tab an approved initiative can create a <b>Project</b> (for big work) or a single <b>Task</b>. Progress then follows the tasks <b>the moment one changes</b>: a task counts as done when it is marked Done or dragged into the <i>Done</i> column; a cancelled task is left out; a task with subtasks counts through its subtasks. Each change of progress is recorded in the initiative's chatter. Untick <i>Track Progress from Project</i> to type the progress yourself.</li>
+<li>The project shows an <b>Initiatives</b> button that leads back to the initiative.</li>
+<li>Overdue (end date passed, still running) and over-budget initiatives appear on the dashboard.</li>
+</ul>
+<figure><img src="/bsc_strategy/static/guide/img_en/13_initiative_form.jpg" alt="Initiative form"><figcaption>An initiative: objectives, owner, dates, budget, progress.</figcaption></figure>
+
+<h2 id="automation">10. Figures filled from Odoo (optional)</h2>
+<p>Some figures already exist in Odoo - revenue, orders, won deals, deliveries, completed tasks. Such a KPI does not have to be typed in.</p>
+<ol>
+<li>Open the KPI. Under the targets a grey box says the owner types the figure in. Press <b>Connect to Odoo data</b>.</li>
+<li>Pick a <b>ready-made measure</b>, for example <i>Accounting: Invoiced revenue</i> or <i>CRM: Win rate (%)</i>. Only the apps installed in your database are listed. Each one explains what it counts.</li>
+<li>Optional: <b>Only count records where</b> narrows it - one sales team, one project, one product category.</li>
+<li>Look at <b>What it would report now</b>: the figure for the current period and how many records it comes from. Then press <b>Connect</b>.</li>
+</ol>
+<figure><img src="/bsc_strategy/static/guide/img_en/15_connect_wizard.jpg" alt="Connect to Odoo data"><figcaption>Connecting a KPI: choose a measure, optionally narrow it, check the preview.</figcaption></figure>
+<p>The KPI box turns green and shows where the figure comes from. Every open period is filled at once and refreshed every night.</p>
+<ul>
+<li><b>Money</b> is always in the company currency, without tax, and revenue is net of credit notes.</li>
+<li>A query that finds no records leaves the figure <b>empty</b> rather than publishing a zero.</li>
+<li>A figure that moves more than the KPI's deviation limit from the previous period is <b>held</b> until the owner confirms or rejects it.</li>
+<li>A figure somebody typed before the KPI was connected is <b>kept</b>. Typing over an automated figure keeps yours too. <b>Clear Figure</b> hands the row back to Odoo.</li>
+<li><b>Type In Instead</b> disconnects the KPI; figures already pulled stay.</li>
+</ul>
+<p>A figure the list does not have can be built by an administrator in <span class="path">Configuration → KPI Data Sources</span> (which records, which date decides the period, count / sum / share). It then appears in the same window under <i>A data source defined by your administrator</i>.</p>
+<p>Automate only unambiguous figures. Satisfaction, quality and capability stay manual - and that is correct.</p>
+
+<h2 id="maths">11. How scores are calculated</h2>
+<table>
+<tr><th>Direction</th><th>Achievement</th><th>Example</th></tr>
+<tr><td>Higher is better</td><td>actual ÷ target × 100</td><td>NPS 35 against 40 → 87.5 % <span class="pill a">At Risk</span></td></tr>
+<tr><td>Lower is better</td><td>target ÷ actual × 100 (actual 0 → 100 %)</td><td>Delivery 4.2 days against 3 → 71.4 % <span class="pill r">Off Track</span></td></tr>
+<tr><td>Inside a range</td><td>100 % inside the range; proportional outside it</td><td>Engagement 66 % with range 70-85 → 94.3 % <span class="pill a">At Risk</span></td></tr>
+</table>
+<ul>
+<li>Achievement is capped at 150 %, so one very good figure cannot hide two bad ones.</li>
+<li>Status: green from 95 %, amber from 80 % (each KPI can have its own thresholds).</li>
+<li>The objective score is the weighted average of its KPIs; the perspective score the weighted average of its objectives; the scorecard index the weighted average of the perspectives. All weights zero → equal weights.</li>
+<li>KPIs without a figure are left out of the average entirely - they never count as zero.</li>
+<li>A qualitative objective scores 100 (green), 85 (amber) or 50 (red).</li>
+</ul>
+
+<h2 id="faq">12. Questions and problems</h2>
+<h3>I entered a figure but the status says "No Data".</h3>
+<p>The row has no target (target 0 on a "higher is better" KPI). Enter the target on the row, and set it on the KPI so future periods get it automatically.</p>
+<h3>The figure is exactly 0. How do I report it?</h3>
+<p>Typing 0 over the empty 0 changes nothing, so there is nothing to save. Switch on <b>Reported</b> on the row instead - the 0 is then a reported figure and counts.</p>
+<h3>I cannot save a figure.</h3>
+<p>The figure is off track and the <b>Variance Comment</b> is empty. Write why, then save.</p>
+<h3>I cannot change a figure any more.</h3>
+<p>The period is closed. Ask an administrator to reopen it (<span class="path">Reviews → Periods → Reopen</span>).</p>
+<h3>Data Entry is empty.</h3>
+<p>Either no scorecard is active, or no KPI has you as its data owner, or there is no open period. Remove the filters in the search bar to see everybody's figures.</p>
+<h3>The scorecard cannot be activated.</h3>
+<p>The message lists every problem. Usually an objective has no KPI - add one, or set the objective to qualitative assessment.</p>
+<h3>Why is a past quarter not shown in Data Entry?</h3>
+<p>Data Entry shows open periods only. If an old period is still open, it is listed too; once closed, its figures are visible in <span class="path">Analysis</span>, on the period and in the review.</p>
+<h3>How do I look at an earlier quarter?</h3>
+<p>On the dashboard choose the period at the top. The board pack printed from a review is always for that review's period.</p>
+<h3>Can I change the weights or thresholds later?</h3>
+<p>Yes. Scores are calculated on reading, so a change is visible at once - also for past periods. Reviews keep the score they had when they were prepared.</p>
+
+<h2 id="glossary">13. Glossary</h2>
+<table>
+<tr><th style="width:28%">Term</th><th>Meaning</th></tr>
+<tr><td>Achievement</td><td>How far the actual figure reaches the target, in %.</td></tr>
+<tr><td>Baseline</td><td>The value before the strategy started; reference point and basis for "baseline plus %" targets.</td></tr>
+<tr><td>Board Pack</td><td>The PDF summary of a scorecard for one period.</td></tr>
+<tr><td>Completion</td><td>The share of a period's figures that have been reported.</td></tr>
+<tr><td>Data owner</td><td>The person who reports a KPI's figure every period.</td></tr>
+<tr><td>Hypothesis</td><td>The assumption behind a cause-effect link, in plain words.</td></tr>
+<tr><td>Strategy owner</td><td>The person responsible for the scorecard and its reviews.</td></tr>
+<tr><td>Target rule</td><td>How the next period's target is proposed: same as last period, last actual plus %, baseline plus %, or empty.</td></tr>
+<tr><td>Variance comment</td><td>The explanation of a figure that missed its target.</td></tr>
+</table>
+<p class="lead" style="margin-top:40px">Questions about this module: contact your Odoo administrator.</p>
+</main>
+</div>
+</body>
+</html>

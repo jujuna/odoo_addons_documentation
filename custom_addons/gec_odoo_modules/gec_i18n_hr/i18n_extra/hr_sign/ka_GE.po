@@ -1,0 +1,399 @@
+# Georgian translation of the Odoo addon hr_sign, kept in gec_i18n_hr.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-28 17:54+0000\n"
+"PO-Revision-Date: 2026-09-30 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian (ka_GE)\n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#. module: hr_sign
+#. odoo-python
+#: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
+msgid "%(responsible)s, %(employee)s"
+msgstr "%(responsible)s, %(employee)s"
+
+#. module: hr_sign
+#. odoo-python
+#: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
+msgid "%(signer)s"
+msgstr "%(signer)s"
+
+#. module: hr_sign
+#. odoo-python
+#: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
+msgid "%s does not have a private email set."
+msgstr "%s-ს პირადი ელფოსტა მითითებული არ აქვს."
+
+#. module: hr_sign
+#. odoo-python
+#: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
+msgid "%s does not have a work email set."
+msgstr "%s-ს სამსახურის ელფოსტა მითითებული არ აქვს."
+
+#. module: hr_sign
+#: model_terms:ir.ui.view,arch_db:hr_sign.hr_employee_public_view_form model_terms:ir.ui.view,arch_db:hr_sign.hr_employee_sign_view_form
+msgid "<span class=\"o_stat_text\">Signature Requests</span>"
+msgstr "<span class=\"o_stat_text\">ხელმოწერის მოთხოვნები</span>"
+
+#. module: hr_sign
+#: model:ir.model,name:hr_sign.model_mail_activity_plan_template
+msgid "Activity plan template"
+msgstr "აქტივობის გეგმის შაბლონი"
+
+#. module: hr_sign
+#: model:ir.model,name:hr_sign.model_mail_activity_schedule
+msgid "Activity schedule plan Wizard"
+msgstr "აქტივობის დაგეგმვის ვიზარდი "
+
+#. module: hr_sign
+#: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
+msgid "Attach a file"
+msgstr "ფაილის მიმაგრება"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__attachment_ids
+msgid "Attachment"
+msgstr "დანართი"
+
+#. module: hr_sign
+#: model:ir.model.fields,help:hr_sign.field_hr_contract_sign_document_wizard__signing_employee
+msgid "Choose who will sign the document when the selected template has a single signer."
+msgstr "აირჩიეთ, ვინ მოაწერს ხელს დოკუმენტს, როდესაც შერჩეულ შაბლონს ერთი ხელმომწერი აქვს."
+
+#. module: hr_sign
+#: model:sign.template,redirect_url_text:hr_sign.template_sign_termination
+msgid "Close"
+msgstr "დახურვა"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__version_id
+msgid "Contract"
+msgstr "კონტრაქტი"
+
+#. module: hr_sign
+#: model:ir.module.module,shortdesc:base.module_hr_sign
+msgid "Contract - Signature"
+msgstr "კონტრაქტი - ხელმოწერა"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__cc_partner_ids
+msgid "Copy to"
+msgstr "ასლის მიმღებნი"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: hr_sign
+#: model:sign.item.role,name:hr_sign.sign_item_role_default
+msgid "Customer"
+msgstr "კლიენტი"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__display_name model:ir.model.fields,field_description:hr_sign.field_hr_employee__display_name model:ir.model.fields,field_description:hr_sign.field_hr_employee_public__display_name model:ir.model.fields,field_description:hr_sign.field_hr_version__display_name model:ir.model.fields,field_description:hr_sign.field_mail_activity_plan_template__display_name model:ir.model.fields,field_description:hr_sign.field_mail_activity_schedule__display_name model:ir.model.fields,field_description:hr_sign.field_res_users__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__sign_template_ids
+msgid "Documents to sign"
+msgstr "ხელმოსაწერი დოკუმენტები"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__mail_to
+msgid "Email"
+msgstr "ელ. ფოსტა"
+
+#. module: hr_sign
+#: model:ir.model.fields,help:hr_sign.field_hr_contract_sign_document_wizard__mail_to
+msgid ""
+"Email used to send the signature request.\n"
+"                - Work takes the email defined in \"work email\"\n"
+"                - Private takes the email defined in Private Information\n"
+"                - If the selected email is not defined, the available one will be used."
+msgstr ""
+"ელფოსტა, რომელიც ხელმოწერის მოთხოვნის გასაგზავნად გამოიყენება.\n"
+"                - სამსახური იღებს ველში „სამსახურის ელფოსტა“ მითითებულს\n"
+"                - პირადი იღებს პირად ინფორმაციაში მითითებულს\n"
+"                - თუ არჩეული ელფოსტა მითითებული არ არის, გამოყენებული იქნება ხელმისაწვდომი."
+
+#. module: hr_sign
+#: model:ir.model,name:hr_sign.model_hr_employee model:ir.model.fields.selection,name:hr_sign.selection__hr_contract_sign_document_wizard__signing_employee__employee model:sign.item.role,name:hr_sign.sign_item_role_employee_signatory
+msgid "Employee"
+msgstr "თანამშრომელი"
+
+#. module: hr_sign
+msgid "Employee Contract"
+msgstr "თანამშრომლის ხელშეკრულება"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__employee_role_id model:ir.model.fields,field_description:hr_sign.field_mail_activity_plan_template__employee_role_id
+msgid "Employee Role"
+msgstr "თანამშრომლის როლი"
+
+#. module: hr_sign
+#: model:ir.model.fields,help:hr_sign.field_hr_contract_sign_document_wizard__employee_role_id model:ir.model.fields,help:hr_sign.field_mail_activity_plan_template__employee_role_id
+msgid "Employee's role on the templates to sign. The same role must be present in all the templates"
+msgstr "თანამშრომლის როლი ხელმოსაწერ შაბლონებში. იგივე როლი ყველა შაბლონში უნდა იყოს"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__employee_ids
+msgid "Employees"
+msgstr "თანამშრომლები"
+
+#. module: hr_sign
+#: model:ir.model.fields.selection,name:hr_sign.selection__hr_contract_sign_document_wizard__signing_employee__hr_responsible model:sign.item.role,name:hr_sign.sign_item_role_job_responsible
+msgid "HR Responsible"
+msgstr "HR პასუხისმგებელი"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__has_both_template
+msgid "Has Both Template"
+msgstr "აქვს ორივე შაბლონი"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__id model:ir.model.fields,field_description:hr_sign.field_hr_employee__id model:ir.model.fields,field_description:hr_sign.field_hr_employee_public__id model:ir.model.fields,field_description:hr_sign.field_hr_version__id model:ir.model.fields,field_description:hr_sign.field_mail_activity_plan_template__id model:ir.model.fields,field_description:hr_sign.field_mail_activity_schedule__id model:ir.model.fields,field_description:hr_sign.field_res_users__id
+msgid "ID"
+msgstr "ID"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__is_single_signer
+msgid "Is Single Signer"
+msgstr "არის ერთი ხელმომწერი"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__write_date
+msgid "Last Updated on"
+msgstr "ბოლოს განახლდა"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__mail_displayed
+msgid "Mail Displayed"
+msgstr "ნაჩვენები ელფოსტა"
+
+#. module: hr_sign
+#: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
+msgid "Mail Options"
+msgstr "ელ-ფოსტის პარამეტრები"
+
+#. module: hr_sign
+#: model:ir.module.module,summary:base.module_hr_sign
+msgid "Manage your documents to sign in contracts"
+msgstr "მართეთ კონტრაქტებში ხელმოსაწერი დოკუმენტები"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__message
+msgid "Message"
+msgstr "შეტყობინება"
+
+#. module: hr_sign
+#. odoo-python
+#: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
+msgid "No documents templates on the database."
+msgstr "ბაზაში დოკუმენტების შაბლონები არ არის."
+
+#. module: hr_sign
+#: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
+msgid "No template available"
+msgstr "შაბლონი ხელმისაწვდომი არ არის"
+
+#. module: hr_sign
+#: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
+msgid "Optional Message..."
+msgstr "არასავალდებულო შეტყობინება..."
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__possible_template_ids
+msgid "Possible Template"
+msgstr "შესაძლო შაბლონი"
+
+#. module: hr_sign
+#: model:ir.model.fields.selection,name:hr_sign.selection__hr_contract_sign_document_wizard__mail_to__private
+msgid "Private"
+msgstr "პირადი"
+
+#. module: hr_sign
+#: model:ir.model,name:hr_sign.model_hr_employee_public
+msgid "Public Employee"
+msgstr "საჯარო თანამშრომელი"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_employee__sign_request_ids model:ir.model.fields,field_description:hr_sign.field_hr_version__sign_request_ids
+msgid "Requested Signatures"
+msgstr "მოთხოვნილი ხელმოწერები"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__responsible_id
+msgid "Responsible"
+msgstr "პასუხისმგებელი"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_mail_activity_plan_template__responsible_count
+msgid "Responsible Count"
+msgstr "პასუხისმგებელთა რაოდენობა"
+
+#. module: hr_sign
+#: model:ir.model.fields,help:hr_sign.field_hr_contract_sign_document_wizard__sign_template_ids
+msgid ""
+"Select only documents with either 1 or 2 different signatories.\n"
+"        Documents with 1 signatory require only the employee's signature, while those with 2 signatories require signatures from both the employee and the HR responsible.\n"
+"        "
+msgstr ""
+"აირჩიეთ მხოლოდ ის დოკუმენტები, რომლებსაც 1 ან 2 სხვადასხვა ხელმომწერი აქვს.\n"
+"        1 ხელმომწერის მქონე დოკუმენტებს მხოლოდ თანამშრომლის ხელმოწერა სჭირდება, ხოლო 2 ხელმომწერის მქონეს — როგორც თანამშრომლის, ისე HR-ის პასუხისმგებლის ხელმოწერა.\n"
+"        "
+
+#. module: hr_sign
+#: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
+msgid "Send"
+msgstr "გაგზავნა"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__show_sign_now
+msgid "Show Sign Now"
+msgstr "ახლავე ხელმოწერის ჩვენება"
+
+#. module: hr_sign
+#: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
+msgid "Sign Now"
+msgstr "ახლავე ხელმოწერა"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_employee_public__sign_request_ids
+msgid "Sign Request"
+msgstr "ხელმოწერის მოთხოვნა"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_employee__sign_request_count model:ir.model.fields,field_description:hr_sign.field_hr_employee_public__sign_request_count model:ir.model.fields,field_description:hr_sign.field_hr_version__sign_request_count
+msgid "Sign Request Count"
+msgstr "ხელმოწერის მოთხოვნების რაოდენობა"
+
+#. module: hr_sign
+#: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
+msgid "Sign Request Options"
+msgstr "ხელმოწერის მოთხოვნის პარამეტრები"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__sign_template_responsible_ids model:ir.model.fields,field_description:hr_sign.field_mail_activity_plan_template__sign_template_responsible_ids
+msgid "Sign Template Responsible"
+msgstr "ხელმოწერის შაბლონის პასუხისმგებელი"
+
+#. module: hr_sign
+#: model:ir.model,name:hr_sign.model_hr_contract_sign_document_wizard
+msgid "Sign document in contract"
+msgstr "დოკუმენტის ხელმოწერა ხელშეკრულებაში"
+
+#. module: hr_sign
+#. odoo-python
+#: code:addons/hr_sign/models/hr_employee.py:0 code:addons/hr_sign/wizard/mail_activity_schedule.py:0 model:ir.actions.server,name:hr_sign.action_signature_request_multi model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
+msgid "Signature Request"
+msgstr "ხელმოწერის მოთხოვნა"
+
+#. module: hr_sign
+#. odoo-python
+#: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
+msgid "Signature requested for the following document(s):"
+msgstr "ხელმოწერა მოთხოვნილია შემდეგ დოკუმენტ(ებ)ზე:"
+
+#. module: hr_sign
+#. odoo-python
+#: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
+msgid "Signer(s): %(signatories)s"
+msgstr "ხელმომწერ(ებ)ი: %(signatories)s"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__signing_employee
+msgid "Signing Employee"
+msgstr "ხელმომწერი თანამშრომელი"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__subject
+msgid "Subject"
+msgstr "თემა"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_hr_contract_sign_document_wizard__template_warning
+msgid "Template Warning"
+msgstr "შაბლონის გაფრთხილება"
+
+#. module: hr_sign
+#: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
+msgid "Upload a PDF to set a new one."
+msgstr "ატვირთეთ PDF ახლის დასაყენებლად."
+
+#. module: hr_sign
+#: model:ir.model,name:hr_sign.model_res_users
+msgid "User"
+msgstr "მომხმარებელი"
+
+#. module: hr_sign
+#: model:ir.model.fields.selection,name:hr_sign.selection__hr_contract_sign_document_wizard__mail_to__work
+msgid "Work"
+msgstr "სამსახური"
+
+#. module: hr_sign
+#: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
+msgid "Write email or search contact..."
+msgstr "დაწერეთ ელ-ფოსტა ან მოძებნეთ კონტაქტი..."
+
+#. module: hr_sign
+#. odoo-python
+#: code:addons/hr_sign/models/hr_version.py:0
+msgid "You can't delete a contract linked to a signed document, archive it instead."
+msgstr "ვერ წაშლით ხელშეკრულებას, რომელიც ხელმოწერილ დოკუმენტს უკავშირდება — სანაცვლოდ დაარქივეთ."
+
+#. module: hr_sign
+#. odoo-python
+#: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
+msgid "%(employee)s and %(responsible)s are the signatories."
+msgstr "ხელმომწერები არიან %(employee)s და %(responsible)s."
+
+#. module: hr_sign
+#. odoo-python
+#: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
+msgid "%(user_name)s requested a new signature on the following documents:"
+msgstr "%(user_name)s-მა მოითხოვა ახალი ხელმოწერა შემდეგ დოკუმენტებზე:"
+
+#. module: hr_sign
+#: model_terms:ir.ui.view,arch_db:hr_sign.view_hr_contract_sign
+msgid "Discard"
+msgstr "უარყოფა"
+
+#. module: hr_sign
+#: model:ir.actions.act_window,name:hr_sign.sign_contract_wizard_action
+msgid "Document Signature"
+msgstr "დოკუმენტის ხელმოწერა"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_mail_activity_plan_template__sign_template_id
+msgid "Document to sign"
+msgstr "ხელმოსაწერი დოკუმენტი"
+
+#. module: hr_sign
+#: model:ir.model.fields,field_description:hr_sign.field_mail_activity_plan_template__is_signature_request
+msgid "Is Signature Request"
+msgstr "არის ხელმოწერის მოთხოვნა"
+
+#. module: hr_sign
+#. odoo-python
+#: code:addons/hr_sign/wizard/hr_contract_sign_document_wizard.py:0
+msgid "Only %s has to sign."
+msgstr "ხელი მხოლოდ %s-მა უნდა მოაწეროს."

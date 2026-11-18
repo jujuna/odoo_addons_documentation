@@ -1,0 +1,58 @@
+$rms-dark: $o-webclient-color-scheme == dark;
+
+:root {
+    --rms-accent: #{$o-brand-primary};
+    --rms-accent-text: #{if($rms-dark, mix($o-brand-primary, white, 55%), $o-brand-primary)};
+    --rms-accent-soft: #{rgba($o-brand-primary, 0.12)};
+    --rms-accent-mid: #{rgba($o-brand-primary, if($rms-dark, 0.5, 0.3))};
+    --rms-success: #{$o-success};
+    --rms-success-soft: #{rgba($o-success, 0.14)};
+    --rms-danger: #{$o-danger};
+    --rms-danger-soft: #{rgba($o-danger, 0.12)};
+    --rms-info: #{$o-info};
+    --rms-info-soft: #{rgba($o-info, 0.14)};
+    --rms-muted: #{$o-gray-600};
+    --rms-muted-soft: #{rgba($o-gray-600, 0.14)};
+    --rms-border: #{$o-gray-300};
+    --rms-subtle: #{$o-gray-100};
+    --rms-surface: #{$o-view-background-color};
+    --rms-weekend: #{if($rms-dark, rgba(white, 0.04), rgba(black, 0.03))};
+    --rms-cell-accepted: #{mix($o-success, $o-view-background-color, if($rms-dark, 40%, 30%))};
+    --rms-cell-edited: #{mix($o-info, $o-view-background-color, if($rms-dark, 34%, 30%))};
+    --rms-level-0: #{if($rms-dark, $o-brand-primary, mix($o-brand-primary, #fff, 44%))};
+    --rms-level-1: #{if($rms-dark, mix($o-brand-primary, #fff, 85%), mix($o-brand-primary, #fff, 56%))};
+    --rms-level-2: #{if($rms-dark, mix($o-brand-primary, #fff, 70%), mix($o-brand-primary, #fff, 68%))};
+    --rms-level-3: #{if($rms-dark, mix($o-brand-primary, #fff, 55%), mix($o-brand-primary, #fff, 86%))};
+    --rms-level-4: #{if($rms-dark, mix($o-brand-primary, #fff, 40%), $o-brand-primary)};
+    --rms-level-0-ink: #{if($rms-dark, #fff, #212529)};
+    --rms-level-1-ink: #{if($rms-dark, #fff, #212529)};
+    --rms-level-2-ink: #{if($rms-dark, #212529, #212529)};
+    --rms-level-3-ink: #{if($rms-dark, #212529, #fff)};
+    --rms-level-4-ink: #{if($rms-dark, #212529, #fff)};
+    --rms-neg-ink: #{if($rms-dark, #fff, #212529)};
+    --rms-neg-0: #{if($rms-dark, mix($o-danger, $o-view-background-color, 78%), mix($o-danger, #fff, 46%))};
+    --rms-neg-1: #{if($rms-dark, $o-danger, mix($o-danger, #fff, 70%))};
+    --rms-hatch: #{repeating-linear-gradient(135deg, rgba($o-gray-600, 0.25), rgba($o-gray-600, 0.25) 2px, transparent 2px, transparent 6px)};
+}
+
+.o_rms_legend_items { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.o_rms_legend_item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    > i, > .o_rms_swatch, > .o_rms_dot { flex: none; }
+}
+
+@for $step from 0 through 4 {
+    .o_rms_level_#{$step} {
+        background: var(--rms-level-#{$step});
+        color: var(--rms-level-#{$step}-ink);
+    }
+}
+@for $step from 0 through 1 {
+    .o_rms_neg_#{$step} {
+        background: var(--rms-neg-#{$step});
+        color: var(--rms-neg-ink);
+    }
+}

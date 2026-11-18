@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_move_reversal_rs_spec_invoice" model="ir.ui.view">
+        <field name="name">account.move.reversal.form.rs.spec.invoice</field>
+        <field name="model">account.move.reversal</field>
+        <field name="inherit_id" ref="rs_einvoice.view_account_move_reversal_rs"/>
+        <field name="arch" type="xml">
+            <field name="rs_einv_needs_k_type" position="after">
+                <field name="rs_spec_is_filed" invisible="1"/>
+            </field>
+            <field name="rs_einv_k_type" position="attributes">
+                <attribute name="invisible" add="rs_spec_is_filed" separator="or"/>
+                <attribute name="required" add="not rs_spec_is_filed" separator="and"/>
+            </field>
+            <field name="rs_einv_k_type" position="after">
+                <field name="rs_spec_k_type" widget="radio"
+                       invisible="not rs_spec_is_filed or rs_einv_flow != 'correct_reissue'"
+                       required="rs_spec_is_filed and rs_einv_flow == 'correct_reissue'"/>
+            </field>
+        </field>
+    </record>
+</odoo>

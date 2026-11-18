@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_gec_activity_rate_list" model="ir.ui.view">
+        <field name="name">gec.activity.rate.list</field>
+        <field name="model">gec.activity.rate</field>
+        <field name="arch" type="xml">
+            <list string="Activity Rates" create="false" edit="false"
+                  default_order="date_from desc, activity_id">
+                <field name="date_from"/>
+                <field name="date_to" optional="hide"/>
+                <field name="activity_id"/>
+                <field name="driver_label" optional="show"/>
+                <field name="rate_mode" optional="hide"/>
+                <field name="rate" digits="[16,4]"/>
+                <field name="quantity" sum="Measured"/>
+                <field name="practical_capacity" optional="hide" sum="Capacity"/>
+                <field name="capacity_used" widget="percentage" optional="show"
+                       decoration-warning="capacity_used &lt; 80 and capacity_used > 0"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="pool_amount" sum="Pool" optional="show"/>
+                <field name="charged_amount" sum="Charged" optional="show"/>
+                <field name="variance_amount" sum="Not Charged"/>
+                <field name="volume_variance" sum="Idle Capacity" optional="hide"/>
+                <field name="spending_variance" sum="Rate Variance" optional="hide"/>
+                <field name="unused_quantity" optional="hide"/>
+                <field name="rule_id" optional="hide"/>
+                <field name="run_id" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_gec_activity_rate_form" model="ir.ui.view">
+        <field name="name">gec.activity.rate.form</field>
+        <field name="model">gec.activity.rate</field>
+        <field name="arch" type="xml">
+            <form string="Activity Rate" create="false" edit="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="activity_id" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Period">
+                            <label for="date_from" string="Period"/>
+                            <div class="o_row">
+                                <field name="date_from" nolabel="1" class="oe_inline"/>
+                                <i class="oi mx-2" data-icon="east" aria-label="to" title="to"/>
+                                <field name="date_to" nolabel="1" class="oe_inline"/>
+                            </div>
+                            <field name="run_id"/>
+                            <field name="rule_id"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Rate">
+                            <field name="rate_mode"/>
+                            <field name="driver_label"/>
+                            <field name="rate" digits="[16,4]"/>
+                            <field name="quantity"/>
+                            <field name="practical_capacity"/>
+                            <field name="capacity_used" widget="percentage"/>
+                            <field name="unused_quantity"/>
+                        </group>
+                    </group>
+                    <group string="Absorption">
+                        <group>
+                            <field name="pool_amount"/>
+                            <field name="charged_amount"/>
+                            <field name="variance_amount"/>
+                        </group>
+                        <group>
+                            <field name="volume_variance"/>
+                            <field name="spending_variance"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_gec_activity_rate_graph" model="ir.ui.view">
+        <field name="name">gec.activity.rate.graph</field>
+        <field name="model">gec.activity.rate</field>
+        <field name="arch" type="xml">
+            <graph string="Cost per Unit" type="line" sample="1">
+                <field name="date_from" interval="month"/>
+                <field name="activity_id"/>
+                <field name="rate" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_gec_activity_rate_pivot" model="ir.ui.view">
+        <field name="name">gec.activity.rate.pivot</field>
+        <field name="model">gec.activity.rate</field>
+        <field name="arch" type="xml">
+            <pivot string="Activity Rates" sample="1">
+                <field name="activity_id" type="row"/>
+                <field name="date_from" interval="month" type="col"/>
+                <field name="rate" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_gec_activity_rate_search" model="ir.ui.view">
+        <field name="name">gec.activity.rate.search</field>
+        <field name="model">gec.activity.rate</field>
+        <field name="arch" type="xml">
+            <search string="Activity Rates">
+                <field name="activity_id"/>
+                <field name="run_id"/>
+                <field name="rule_id"/>
+                <filter name="filter_date" string="Period" date="date_from"/>
+                <separator/>
+                <filter name="filter_idle" string="Left Idle Capacity"
+                        domain="[('volume_variance', '!=', 0)]"
+                        help="Periods where the activity ran below the capacity
+                              it was sized for."/>
+                <filter name="filter_rate_variance" string="Off the Standard Rate"
+                        domain="[('spending_variance', '!=', 0)]"
+                        help="Periods where the pool differed from what the
+                              standard rate assumed."/>
+                <group>
+                    <filter name="group_activity" string="Activity"
+                            context="{'group_by': 'activity_id'}"/>
+                    <filter name="group_period" string="Month"
+                            context="{'group_by': 'date_from:month'}"/>
+                    <filter name="group_run" string="Run" context="{'group_by': 'run_id'}"/>
+                    <filter name="group_mode" string="Rate Basis"
+                            context="{'group_by': 'rate_mode'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_gec_activity_rate" model="ir.actions.act_window">
+        <field name="name">Activity Rates</field>
+        <field name="res_model">gec.activity.rate</field>
+        <field name="view_mode">list,graph,pivot,form</field>
+        <field name="context">{'search_default_group_activity': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No rates recorded yet</p>
+            <p>
+                Every allocation run writes down what one unit of each activity
+                cost in the period it covered — per hour, per ticket, per
+                delivery. Rates appear here as soon as a run has generated an
+                allocation driven by an activity.
+            </p>
+            <p>
+                <b>Not Charged</b> is the cost that stayed on the cost centre.
+                It splits into <b>Idle Capacity</b>, which means the activity ran
+                below the capacity it was sized for, and <b>Rate Variance</b>,
+                which means the pool differed from what the standard rate assumed.
+            </p>
+        </field>
+    </record>
+
+</odoo>

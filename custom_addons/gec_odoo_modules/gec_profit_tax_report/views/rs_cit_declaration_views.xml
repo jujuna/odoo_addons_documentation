@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rs_cit_declaration_view_list" model="ir.ui.view">
+        <field name="name">rs.cit.declaration.list</field>
+        <field name="model">rs.cit.declaration</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="date_from" widget="date" options="{'format': 'MM/yyyy'}"/>
+                <field name="declaration_type"/>
+                <field name="version" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="tax_payable" sum="Total"/>
+                <field name="tax_refund" optional="show" sum="Total"/>
+                <field name="move_id" optional="hide"/>
+                <field name="state" widget="badge" decoration-success="state == 'confirmed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="rs_cit_declaration_view_search" model="ir.ui.view">
+        <field name="name">rs.cit.declaration.search</field>
+        <field name="model">rs.cit.declaration</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="confirmed" string="Confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter name="corrected" string="Corrected" domain="[('declaration_type', '=', 'corrected')]"/>
+                <separator/>
+                <filter name="month" string="Month" date="date_from"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="rs_cit_declaration_view_form" model="ir.ui.view">
+        <field name="name">rs.cit.declaration.form</field>
+        <field name="model">rs.cit.declaration</field>
+        <field name="arch" type="xml">
+            <form class="o_rs_cit_form">
+                <header>
+                    <button name="action_compute" string="Recalculate" type="object" invisible="state != 'draft'"/>
+                    <button name="action_confirm" string="Confirm" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_open_rs_entry" string="rs.ge Entry" type="object"
+                            help="Values to type on rs.ge, with copy buttons"/>
+                    <button name="action_export_xlsx" string="Export XLSX" type="object"/>
+                    <button name="action_create_correction" string="Correct" type="object" invisible="state != 'confirmed'"
+                            help="Start a corrected declaration of the same month"/>
+                    <button name="action_draft" string="Back to Draft" type="object" invisible="state != 'confirmed'"
+                            groups="account.group_account_manager"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="gambling" invisible="1"/>
+                    <field name="is_march" invisible="1"/>
+                    <div class="alert alert-warning" role="alert" invisible="not checks">
+                        <field name="checks" class="text-break" style="white-space: pre-line;"/>
+                    </div>
+                    <div class="o_rs_cit_titlebar">
+                        <span>მოგების გადასახადის ყოველთვიური დეკლარაცია</span>
+                        <span class="ms-auto"><field name="company_id" readonly="state != 'draft'" options="{'no_open': True}"/></span>
+                    </div>
+                    <div class="o_rs_cit_period">
+                        <field name="declaration_type"/>
+                        <span>,</span>
+                        <field name="period_label"/>
+                        <span class="ms-auto fw-normal fs-6 text-muted">
+                            <span>Payable: </span><field name="tax_payable" class="fw-bold"/>
+                            <span class="ms-3">Refundable: </span><field name="tax_refund" class="fw-bold"/>
+                            <span class="ms-3" invisible="not rs_entry_progress">Entered on rs.ge: </span>
+                            <field name="rs_entry_progress" class="fw-bold" invisible="not rs_entry_progress"/>
+                        </span>
+                    </div>
+                    <notebook>
+                        <page string="1. ნაწილი I" name="part_1">
+                            <div class="o_rs_cit_bar mt-0">ნაწილი I</div>
+                            <table class="o_rs_cit_table o_rs_cit_fields">
+                                <tr>
+                                    <td class="w-25">საანგარიშო პერიოდი</td>
+                                    <td><field name="date_from" widget="date" options="{'min_precision': 'months', 'numeric': true}" readonly="state != 'draft'"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="w-25">საწარმოს სტატუსი</td>
+                                    <td><field name="company_status" widget="radio" readonly="state != 'draft'"/></td>
+                                </tr>
+                            </table>
+                            <div class="o_rs_cit_bar">Odoo</div>
+                            <table class="o_rs_cit_table o_rs_cit_fields">
+                                <tr>
+                                    <td class="w-25"><label for="special_status"/></td>
+                                    <td><field name="special_status" readonly="state != 'draft'"/></td>
+                                </tr>
+                                <tr>
+                                    <td><label for="col3_rate"/></td>
+                                    <td><field name="col3_rate" widget="percentage" readonly="state != 'draft'"/></td>
+                                </tr>
+                            </table>
+                        </page>
+
+                        <page string="2. ნაწილი III და დანართები" name="part_3">
+                            <div class="o_rs_cit_bar mt-0">III ნაწილი</div>
+                            <field name="line_ids" widget="rs_cit_part3" readonly="state != 'draft'">
+                                <list limit="200">
+                                    <field name="cell_id" column_invisible="1"/>
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="kind"/>
+                                    <field name="columns"/>
+                                    <field name="amount_auto"/>
+                                    <field name="amount_adjust"/>
+                                    <field name="amount"/>
+                                    <field name="amount3_auto"/>
+                                    <field name="amount3_adjust"/>
+                                    <field name="amount3"/>
+                                    <field name="move_line_count"/>
+                                </list>
+                            </field>
+
+                            <div class="o_rs_cit_bar o_rs_cit_bar_annex">დანართი 1</div>
+                            <div class="o_rs_cit_subbar">სადაზღვევო ორგანიზაციის შემთხვევაში - 2015 წლის 1 იანვრიდან 2024 წლის 1 იანვრამდე, ხოლო სხვა შემთხვევაში - 2008 წლის 1 იანვრიდან 2017 წლის 1 იანვრამდე მიღებული წმინდა მოგებიდან დივიდენდის განაწილებისას ამავე საანგარიშო პერიოდების მიხედვით დარიცხული და გადახდილი მოგების გადასახადის თანხა, რომელიც ექვემდებარება ჩათვლას</div>
+                            <table class="o_rs_cit_table o_rs_cit_fields">
+                                <tr><th>N</th><th>შინაარსი</th><th class="o_rs_cit_amount">ლარი</th></tr>
+                                <tr><td class="o_rs_cit_n">1</td><td>საანგარიშო პერიოდში დივიდენდის სახით განაწილებული თანხის ოდენობა, რომელიც ექვემდებარება დაბეგვრას ( III ნაწილის სტ. 16.1.1 )</td><td class="o_rs_cit_amount"><field name="a1_1" options="{'no_symbol': True}" readonly="state != 'draft'"/></td></tr>
+                                <tr><td class="o_rs_cit_n">2</td><td>სადაზღვევო ორგანიზაციის შემთხვევაში - 2015 წლის 1 იანვრიდან 2024 წლის 1 იანვრამდე საანგარიშო პერიოდების, ხოლო სხვა შემთხვევაში - 2008 წლის 1 იანვრიდან 2017 წლის 1 იანვრამდე საანგარიშო პერიოდების მიხედვით დარიცხული და გადახდილი მოგების გადასახადის თანხა</td><td class="o_rs_cit_amount"><field name="a1_2" options="{'no_symbol': True}" readonly="state != 'draft'"/></td></tr>
+                                <tr><td class="o_rs_cit_n">3</td><td>სადაზღვევო ორგანიზაციის შემთხვევაში - 2015 წლის 1 იანვრიდან 2024 წლის 1 იანვრამდე საანგარიშო პერიოდების, ხოლო სხვა შემთხვევაში - 2008 წლის 1 იანვრიდან 2017 წლის 1 იანვრამდე საანგარიშო პერიოდებში მიღებული წმინდა მოგების ოდენობა</td><td class="o_rs_cit_amount"><field name="a1_3" options="{'no_symbol': True}" readonly="state != 'draft'"/></td></tr>
+                                <tr><td class="o_rs_cit_n">4</td><td>სადაზღვევო ორგანიზაციის შემთხვევაში - 2015 წლის 1 იანვრიდან 2024 წლის 1 იანვრამდე საანგარიშო პერიოდების, ხოლო სხვა შემთხვევაში - 2008 წლის 1 იანვრიდან 2017 წლის 1 იანვრამდე საანგარიშო პერიოდებში მიღებული წმინდა მოგების ხარჯზე დივიდენდის სანაცვლოდ საწარმოს მიერ პარტნიორისათვის გადაცემული ამ საწარმოს აქციების/წილის ღირებულება</td><td class="o_rs_cit_amount"><field name="a1_4" options="{'no_symbol': True}" readonly="state != 'draft'"/></td></tr>
+                                <tr><td class="o_rs_cit_n">5</td><td>ჩასათვლელი თანხა (სტ.1*სტ.2/(სტ.3-სტ.4))</td><td class="o_rs_cit_amount"><field name="a1_5" options="{'no_symbol': True}"/></td></tr>
+                            </table>
+
+                            <div>
+                                <div class="o_rs_cit_bar text-center">IV ნაწილი</div>
+                                <div class="o_rs_cit_subbar">სათამაშო აპარატების სალონის მომწყობი პირის, სისტემურ-ელექტრონული ფორმით აზარტული თამაშობების ან/და სისტემურ-ელექტრონული ფორმით ტოტალიზატორის თამაშობების ორგანიზატორის მოგების გადასახადის გაანგარიშება</div>
+                                <table class="o_rs_cit_table o_rs_cit_fields">
+                                    <tr><th>N</th><th>დაბეგვრის ობიექტი</th><th class="o_rs_cit_amount">თანხა</th><th class="o_rs_cit_amount">კუთვნილი მოგების გადასახადი</th></tr>
+                                    <tr><td class="o_rs_cit_n">1</td><td>სისტემურ-ელექტრონული ფორმით აზარტული თამაშობების ორგანიზატორის მიერ საქმიანობის ამ ნაწილში (გარდა უცხო ქვეყნის მოქალაქეების სისტემურ-ელექტრონული ფორმით ორგანიზებულ აზარტულ თამაშობებში მონაწილეობის შედეგად მიღებული დასაბეგრი მოგებისა) საანგარიშო თვის განმავლობაში მიღებულ ფსონებსა და გაცემულ მოგებას შორის სხვაობის თანხა</td><td class="o_rs_cit_amount"><field name="g1" options="{'no_symbol': True}" readonly="state != 'draft'"/></td><td class="o_rs_cit_amount"><field name="g1_tax" options="{'no_symbol': True}"/></td></tr>
+                                    <tr><td class="o_rs_cit_n">2</td><td>სისტემურ-ელექტრონული ფორმით ტოტალიზატორის თამაშობების ორგანიზატორის მიერ საქმიანობის ამ ნაწილში (გარდა უცხო ქვეყნის მოქალაქეების სისტემურ-ელექტრონული ფორმით ორგანიზებულ ტოტალიზატორის თამაშობებში მონაწილეობის შედეგად მიღებული დასაბეგრი მოგებისა) საანგარიშო თვის განმავლობაში მიღებული ფსონების ჯამური თანხა</td><td class="o_rs_cit_amount"><field name="g2" options="{'no_symbol': True}" readonly="state != 'draft'"/></td><td class="o_rs_cit_amount"><field name="g2_tax" options="{'no_symbol': True}"/></td></tr>
+                                    <tr><td class="o_rs_cit_n">3</td><td>სათამაშო აპარატების სალონის მომწყობი პირის მიერ საქმიანობის ამ ნაწილში საანგარიშო თვის განმავლობაში მიღებულ ფსონებსა და გაცემულ მოგებას შორის სხვაობის თანხა</td><td class="o_rs_cit_amount"><field name="g3" options="{'no_symbol': True}" readonly="state != 'draft'"/></td><td class="o_rs_cit_amount"><field name="g3_tax" options="{'no_symbol': True}"/></td></tr>
+                                    <tr><td class="o_rs_cit_n">4</td><td>უცხო ქვეყნის მოქალაქეების სისტემურ-ელექტრონული ფორმით აზარტულ თამაშობებში მონაწილეობის შედეგად, სისტემურ-ელექტრონული ფორმით აზარტული თამაშობების ორგანიზატორის მიერ საანგარიშო თვის განმავლობაში მიღებულ ფსონებსა და ამ მოთამაშეებზე გაცემულ მოგებას შორის სხვაობის თანხა</td><td class="o_rs_cit_amount"><field name="g4" options="{'no_symbol': True}" readonly="state != 'draft'"/></td><td class="o_rs_cit_amount"><field name="g4_tax" options="{'no_symbol': True}"/></td></tr>
+                                    <tr><td class="o_rs_cit_n">5</td><td>უცხო ქვეყნის მოქალაქეების სისტემურ-ელექტრონული ფორმით ტოტალიზატორის თამაშობებში მონაწილეობის შედეგად, სისტემურ-ელექტრონული ფორმით ტოტალიზატორის თამაშობების ორგანიზატორის მიერ საანგარიშო თვის განმავლობაში მიღებულ ფსონებსა და ამ მოთამაშეებზე გაცემულ მოგებას შორის სხვაობის თანხა</td><td class="o_rs_cit_amount"><field name="g5" options="{'no_symbol': True}" readonly="state != 'draft'"/></td><td class="o_rs_cit_amount"><field name="g5_tax" options="{'no_symbol': True}"/></td></tr>
+                                    <tr><td/><td>ჯამი</td><td/><td class="o_rs_cit_amount"><field name="gambling_total" options="{'no_symbol': True}"/></td></tr>
+                                </table>
+                                <div class="o_rs_cit_note">შენიშვნა:<br/>მიღებულ ფსონებში:<br/>-გაითვალისწინება მოთამაშეთა მიერ გამოყენებული უფასო ფსონები;<br/>-არ გაითვალისწინება მოთამაშეთა შორის დადებული ფსონები, როდესაც თამაშობა არ გულისხმობს თამაშობის ორგანიზატორის მიერ ფსონის მიღებას.</div>
+                            </div>
+
+                            <div class="o_rs_cit_bar o_rs_cit_bar_annex">დანართი 1¹</div>
+                            <div class="o_rs_cit_subbar">სადაზღვევო ორგანიზაციის შემთხვევაში - 2015 წლის 1 იანვრიდან 2024 წლის 1 იანვრამდე, ხოლო სხვა შემთხვევაში - 2008 წლის 1 იანვრიდან 2017 წლის 1 იანვრამდე მიღებული წმინდა მოგებიდან დივიდენდის განაწილებისას ამავე საანგარიშო პერიოდების მიხედვით დარიცხული და გადახდილი მოგების გადასახადის თანხის მიხედვით ჩასათვლელი თანხის კორექტირება</div>
+                            <div class="o_rs_cit_subbar text-start">ნაწილი I<br/>მოგების გადასახადის ყოველთვიური დეკლარაციის საანგარიშო პერიოდი, რომელშიც განაწილებული დივიდენდის მიხედვით ჩასათვლელი თანხის კორექტირება ხორციელდება</div>
+                            <field name="annex11_line_ids" readonly="state != 'draft'" context="{'default_annex': '1.1'}">
+                                <list editable="bottom">
+                                    <field name="annex" column_invisible="1"/>
+                                    <field name="name" string="თვე/წელი"/>
+                                    <field name="amount1" string="25.1 სტრიქონის მონაცემი" width="260px" sum="სულ" readonly="1" force_save="1"/>
+                                    <field name="amount2" string="16.1.1 სტრიქონის მონაცემი" width="260px" sum="სულ" readonly="1" force_save="1"/>
+                                </list>
+                            </field>
+                            <div class="o_rs_cit_bar">ნაწილი II</div>
+                            <table class="o_rs_cit_table o_rs_cit_fields">
+                                <tr><th>N</th><th>შინაარსი</th><th class="o_rs_cit_amount">ლარი</th></tr>
+                                <tr><td class="o_rs_cit_n">1</td><td>საანგარიშო პერიოდებში დივიდენდის სახით განაწილებული თანხის ოდენობა, რომელიც ექვემდებარება დაბეგვრას</td><td class="o_rs_cit_amount"><field name="a11_1" options="{'no_symbol': True}" readonly="state != 'draft'"/></td></tr>
+                                <tr><td class="o_rs_cit_n">2</td><td>სადაზღვევო ორგანიზაციის შემთხვევაში - 2015 წლის 1 იანვრიდან 2024 წლის 1 იანვრამდე საანგარიშო პერიოდების, ხოლო სხვა შემთხვევაში - 2008 წლის 1 იანვრიდან 2017 წლის 1 იანვრამდე საანგარიშო პერიოდების მიხედვით დარიცხული და გადახდილი მოგების გადასახადის თანხა</td><td class="o_rs_cit_amount"><field name="a11_2" options="{'no_symbol': True}" readonly="state != 'draft'"/></td></tr>
+                                <tr><td class="o_rs_cit_n">3</td><td>სადაზღვევო ორგანიზაციის შემთხვევაში - 2015 წლის 1 იანვრიდან 2024 წლის 1 იანვრამდე საანგარიშო პერიოდების, ხოლო სხვა შემთხვევაში - 2008 წლის 1 იანვრიდან 2017 წლის 1 იანვრამდე საანგარიშო პერიოდებში მიღებული წმინდა მოგების ოდენობა</td><td class="o_rs_cit_amount"><field name="a11_3" options="{'no_symbol': True}" readonly="state != 'draft'"/></td></tr>
+                                <tr><td class="o_rs_cit_n">4</td><td>სადაზღვევო ორგანიზაციის შემთხვევაში - 2015 წლის 1 იანვრიდან 2024 წლის 1 იანვრამდე საანგარიშო პერიოდების, ხოლო სხვა შემთხვევაში - 2008 წლის 1 იანვრიდან 2017 წლის 1 იანვრამდე საანგარიშო პერიოდებში მიღებული წმინდა მოგების ხარჯზე დივიდენდის სანაცვლოდ საწარმოს მიერ პარტნიორისათვის გადაცემული ამ საწარმოს აქციების/წილის ღირებულება</td><td class="o_rs_cit_amount"><field name="a11_4" options="{'no_symbol': True}" readonly="state != 'draft'"/></td></tr>
+                                <tr><td class="o_rs_cit_n">5</td><td>ჩასათვლელი თანხა (სტ.1*სტ.2/(სტ3-სტ.4))</td><td class="o_rs_cit_amount"><field name="a11_5" options="{'no_symbol': True}"/></td></tr>
+                            </table>
+                            <div class="o_rs_cit_bar">ნაწილი III</div>
+                            <table class="o_rs_cit_table o_rs_cit_fields">
+                                <tr><td class="o_rs_cit_n">1</td><td>დამატებით ჩასათვლელი თანხა<br/>(II ნაწილის მე-5 სტრიქონისა და I ნაწილის მე-2 სვეტის ჯამს შორის სხვაობა, მაგრამ არა უმეტეს I ნაწილის მე-3 სვეტის ჯამში ასახული მონაცემის შესაბამისად გამოანგარიშებული მოგების გადასახადის თანხასა და ამავე ნაწილის მე-2 სვეტის ჯამში ასახულ მონაცემს შორის სხვაობისა)</td><td class="o_rs_cit_amount"><field name="a11_extra" options="{'no_symbol': True}" readonly="state != 'draft'"/></td></tr>
+                            </table>
+
+                            <div class="o_rs_cit_bar o_rs_cit_bar_annex">დანართი 1²</div>
+                            <div class="o_rs_cit_subbar">შესამცირებელი(დასაბრუნებელი) მოგების გადასახადის გაანგარიშება</div>
+                            <field name="recovery_ids">
+                                <list>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="taxed_period" string="საანგარიშო პერიოდი, რომელშიც დაიბეგრა თანხა"/>
+                                    <field name="taxed_code" string="შესაბამისი დეკლარაციის გრაფა, რომელშიც დაიბეგრა თანხა" width="300px"/>
+                                    <field name="amount" string="დაბეგრილი თანხა, რომლის შესაბამისი მოგების გადასახადიც ექვემდებარება შემცირებას(დაბრუნებას)" width="300px" sum="სულ"/>
+                                    <field name="code" optional="hide"/>
+                                    <field name="move_line_id" optional="hide"/>
+                                </list>
+                            </field>
+
+                            <div class="o_rs_cit_bar o_rs_cit_bar_annex">დანართი 1³</div>
+                            <div class="o_rs_cit_subbar">2017 წლის 1 იანვრიდან საქართველოს საგადასახადო კოდექსის 309-ე მუხლის 94-ე ნაწილით გათვალისწინებული პირის სტატუსის დაკარგვამდე საანგარიშო პერიოდებში მიღებული წმინდა მოგებიდან დივიდენდის განაწილებისას ამ პერიოდების მიხედვით დარიცხული და გადახდილი მოგების გადასახადი, რომელიც ექვემდებარება ჩათვლას</div>
+                            <table class="o_rs_cit_table o_rs_cit_fields">
+                                <tr><th>N</th><th>შინაარსი</th><th class="o_rs_cit_amount">ლარი</th></tr>
+                                <tr><td class="o_rs_cit_n">1</td><td>საანგარიშო პერიოდში დივიდენდის სახით განაწილებული თანხის ოდენობა, რომელიც ექვემდებარება დაბეგვრას ( III ნაწილის სტ. 16.1.2 )</td><td class="o_rs_cit_amount"><field name="a13_1" options="{'no_symbol': True}" readonly="state != 'draft'"/></td></tr>
+                                <tr><td class="o_rs_cit_n">2</td><td>2017 წლის 1 იანვრიდან სტატუსის დაკარგვამდე საანგარიშო პერიოდების მიხედვით დარიცხული და გადახდილი მოგების გადასახადის თანხა</td><td class="o_rs_cit_amount"><field name="a13_2" options="{'no_symbol': True}" readonly="state != 'draft'"/></td></tr>
+                                <tr><td class="o_rs_cit_n">3</td><td>2017 წლის 1 იანვრიდან სტატუსის დაკარგვამდე საანგარიშო პერიოდებში მიღებული წმინდა მოგების ოდენობა</td><td class="o_rs_cit_amount"><field name="a13_3" options="{'no_symbol': True}" readonly="state != 'draft'"/></td></tr>
+                                <tr><td class="o_rs_cit_n">4</td><td>2017 წლის 1 იანვრიდან სტატუსის დაკარგვამდე საანგარიშო პერიოდებში მიღებული წმინდა მოგების ხარჯზე დივიდენდის სანაცვლოდ საწარმოს მიერ პარტნიორისთვის გადაცემული ამ საწარმოს აქციების/წილის ღირებულება</td><td class="o_rs_cit_amount"><field name="a13_4" options="{'no_symbol': True}" readonly="state != 'draft'"/></td></tr>
+                                <tr><td class="o_rs_cit_n">5</td><td>ჩასათვლელი თანხა (სტ.1*სტ.2/(სტ.3-სტ.4))</td><td class="o_rs_cit_amount"><field name="a13_5" options="{'no_symbol': True}"/></td></tr>
+                            </table>
+
+                            <div class="o_rs_cit_bar o_rs_cit_bar_annex">დანართი 1⁴</div>
+                            <div class="o_rs_cit_subbar">2017 წლის 1 იანვრიდან საქართველოს საგადასახადო კოდექსის 309-ე მუხლის 94-ე ნაწილით გათვალისწინებული პირის სტატუსის დაკარგვამდე საანგარიშო პერიოდებში მიღებული წმინდა მოგებიდან დივიდენდის განაწილებისას ამ პერიოდების მიხედვით დარიცხული და გადახდილი მოგების გადასახადის თანხის მიხედვით ჩასათვლელი თანხის კორექტირება</div>
+                            <div class="o_rs_cit_subbar text-start">ნაწილი I<br/>მოგების გადასახადის ყოველთვიური დეკლარაციის საანგარიშო პერიოდი, რომელშიც განაწილებული დივიდენდის მიხედვით ჩასათვლელი თანხის კორექტირება ხორციელდება</div>
+                            <field name="annex14_line_ids" readonly="state != 'draft'" context="{'default_annex': '1.4'}">
+                                <list editable="bottom">
+                                    <field name="annex" column_invisible="1"/>
+                                    <field name="name" string="თვე/წელი"/>
+                                    <field name="amount1" string="25.3 სტრიქონის მონაცემი" width="260px" sum="სულ" readonly="1" force_save="1"/>
+                                    <field name="amount2" string="16.1.2 სტრიქონის მონაცემი" width="260px" sum="სულ" readonly="1" force_save="1"/>
+                                </list>
+                            </field>
+                            <div class="o_rs_cit_bar">ნაწილი II</div>
+                            <table class="o_rs_cit_table o_rs_cit_fields">
+                                <tr><th>N</th><th>შინაარსი</th><th class="o_rs_cit_amount">ლარი</th></tr>
+                                <tr><td class="o_rs_cit_n">1</td><td>საანგარიშო პერიოდებში დივიდენდის სახით განაწილებული თანხის ოდენობა, რომელიც ექვემდებარება დაბეგვრას</td><td class="o_rs_cit_amount"><field name="a14_1" options="{'no_symbol': True}" readonly="state != 'draft'"/></td></tr>
+                                <tr><td class="o_rs_cit_n">2</td><td>2017 წლის 1 იანვრიდან სტატუსის დაკარგვამდე საანგარიშო პერიოდების მიხედვით დარიცხული და გადახდილი მოგების გადასახადის თანხა</td><td class="o_rs_cit_amount"><field name="a14_2" options="{'no_symbol': True}" readonly="state != 'draft'"/></td></tr>
+                                <tr><td class="o_rs_cit_n">3</td><td>2017 წლის 1 იანვრიდან სტატუსის დაკარგვამდე საანგარიშო პერიოდებში მიღებული წმინდა მოგების ოდენობა</td><td class="o_rs_cit_amount"><field name="a14_3" options="{'no_symbol': True}" readonly="state != 'draft'"/></td></tr>
+                                <tr><td class="o_rs_cit_n">4</td><td>2017 წლის 1 იანვრიდან სტატუსის დაკარგვამდე საანგარიშო პერიოდებში მიღებული წმინდა მოგების ხარჯზე დივიდენდის სანაცვლოდ საწარმოს მიერ პარტნიორისათვის გადაცემული ამ საწარმოს აქციების/წილის ღირებულება</td><td class="o_rs_cit_amount"><field name="a14_4" options="{'no_symbol': True}" readonly="state != 'draft'"/></td></tr>
+                                <tr><td class="o_rs_cit_n">5</td><td>ჩასათვლელი თანხა (სტ.1*სტ.2/(სტ3-სტ.4))</td><td class="o_rs_cit_amount"><field name="a14_5" options="{'no_symbol': True}"/></td></tr>
+                            </table>
+                            <div class="o_rs_cit_bar">ნაწილი III</div>
+                            <table class="o_rs_cit_table o_rs_cit_fields">
+                                <tr><td class="o_rs_cit_n">1</td><td>დამატებით ჩასათვლელი თანხა<br/>(II ნაწილის მე-5 სტრიქონისა და I ნაწილის მე-2 სვეტის ჯამს შორის სხვაობა, მაგრამ არა უმეტეს I ნაწილის მე-3 სვეტის ჯამში ასახული მონაცემის შესაბამისად გამოანგარიშებული მოგების გადასახადის თანხასა და ამავე ნაწილის მე-2 სვეტის ჯამში ასახულ მონაცემს შორის სხვაობისა)</td><td class="o_rs_cit_amount"><field name="a14_extra" options="{'no_symbol': True}" readonly="state != 'draft'"/></td></tr>
+                            </table>
+
+                            <div class="o_rs_cit_bar o_rs_cit_bar_annex">დანართი 1⁵</div>
+                            <div class="o_rs_cit_subbar">შესამცირებელი(დასაბრუნებელი) მოგების გადასახადის გაანგარიშება საგადასახადო შემოწმების შედეგად დარიცხული მოგების გადასახადის მიხედვით</div>
+                            <field name="annex15_line_ids" readonly="state != 'draft'" context="{'default_annex': '1.5'}">
+                                <list editable="bottom">
+                                    <field name="annex" column_invisible="1"/>
+                                    <field name="name" string="საგადასახადო მოთხოვნის ნომერი"/>
+                                    <field name="date" string="საგადასახადო მოთხოვნის თარიღი" width="300px"/>
+                                    <field name="amount1" string="საგადასახადო ორგანოს მიერ დაბეგრილი თანხა, რომლის შესაბამისი მოგების გადასახადიც ექვემდებარება შემცირებას (დაბრუნებას)" width="320px" sum="სულ"/>
+                                </list>
+                            </field>
+
+                            <div>
+                                <div class="o_rs_cit_bar o_rs_cit_bar_annex">დანართი 1⁶</div>
+                                <div class="o_rs_cit_subbar">საერთაშორისო კომპანიის სტატუსის მქონე საწარმოს მოგების გადასახადით დასაბეგრი განაწილებული მოგების თანხის გაანგარიშება</div>
+                                <field name="annex16_line_ids" readonly="state != 'draft'" context="{'default_annex': '1.6'}">
+                                    <list editable="bottom">
+                                        <field name="annex" column_invisible="1"/>
+                                        <field name="name" string="კალენდარული წელი"/>
+                                        <field name="amount1" string="წმინდა მოგების ოდენობა" width="160px" sum="სულ"/>
+                                        <field name="amount2" string="განაწილებული დივიდენდი" width="160px" sum="სულ"/>
+                                        <field name="amount3" string="გაწეული ხარჯი: სულ" width="160px" sum="სულ"/>
+                                        <field name="result1" string="გაწეული ხარჯი: თანხის ოდენობა, რომლითაც მცირდება განაწილებული მოგება" width="200px" sum="სულ"/>
+                                        <field name="result2" string="მოგების გადასახადით დასაბეგრი განაწილებული მოგების თანხა" width="190px" sum="სულ"/>
+                                    </list>
+                                </field>
+                            </div>
+
+                            <div invisible="special_status != 'innovative_sme'">
+                                <div class="o_rs_cit_bar o_rs_cit_bar_annex">დანართი 1⁷</div>
+                                <div class="o_rs_cit_subbar">ინოვაციური მცირე და საშუალო კომპანიის სტატუსის მქონე სუბიექტის მოგების გადასახადით დასაბეგრი განაწილებული მოგების თანხის გაანგარიშება</div>
+                                <table class="o_rs_cit_table o_rs_cit_fields">
+                                    <tr><th>N</th><th>შინაარსი</th><th class="o_rs_cit_amount">ლარი</th></tr>
+                                    <tr><td class="o_rs_cit_n">1</td><td>მიმდინარე საანგარიშო პერიოდში (თვეში) განაწილებული დივიდენდის ოდენობა, რომელიც ექვემდებარება მოგების გადასახადით დაბეგვრას</td><td class="o_rs_cit_amount"><field name="a17_1" options="{'no_symbol': True}"/></td></tr>
+                                    <tr><td class="o_rs_cit_n">2</td><td>მათ შორის, წინა ფინანსური წლის განმავლობაში მიღებული წმინდა მოგებიდან მიმდინარე საანგარიშო პერიოდში (თვეში) განაწილებული დივიდენდის ოდენობა</td><td class="o_rs_cit_amount"><field name="a17_2" options="{'no_symbol': True}" readonly="state != 'draft'"/></td></tr>
+                                    <tr><td class="o_rs_cit_n">3</td><td>წინა ფინანსური წლის განმავლობაში კვლევისა და განვითარებისთვის გაწეული ხარჯების სამმაგი ოდენობა</td><td class="o_rs_cit_amount"><field name="a17_3" options="{'no_symbol': True}" readonly="state != 'draft'"/></td></tr>
+                                    <tr><td class="o_rs_cit_n">4</td><td>ხარჯების ოდენობა, რომლითაც წინა საანგარიშო პერიოდებში შემცირდა მოგების გადასახადით დასაბეგრი განაწილებული მოგების თანხა</td><td class="o_rs_cit_amount"><field name="a17_4" options="{'no_symbol': True}"/></td></tr>
+                                    <tr><td class="o_rs_cit_n">5</td><td>ხარჯების ოდენობა, რომლითაც მიმდინარე საანგარიშო პერიოდში მცირდება მოგების გადასახადით დასაბეგრი განაწილებული მოგების თანხა (სვ.3-სვ.4)</td><td class="o_rs_cit_amount"><field name="a17_5" options="{'no_symbol': True}"/></td></tr>
+                                    <tr><td class="o_rs_cit_n">6</td><td>მიმდინარე საანგარიშო პერიოდში მოგების გადასახადით დასაბეგრი განაწილებული მოგების თანხა</td><td class="o_rs_cit_amount"><field name="a17_6" options="{'no_symbol': True}"/></td></tr>
+                                </table>
+                            </div>
+
+                            <div invisible="not is_march">
+                                <div class="o_rs_cit_bar o_rs_cit_bar_annex">დანართი 2</div>
+                                <div class="o_rs_cit_subbar">სასაქონლო-მატერიალური ფასეულობების და ძირითადი საშუალებების ნაშთი</div>
+                                <table class="o_rs_cit_table o_rs_cit_fields">
+                                    <tr><th>N</th><th>შინაარსი</th><th class="o_rs_cit_amount">ლარი</th></tr>
+                                    <tr><td class="o_rs_cit_n">1</td><td>სასაქონლო-მატერიალური ფასეულობის ნაშთი წლის ბოლოს</td><td class="o_rs_cit_amount"><field name="a2_inventory" options="{'no_symbol': True}"/></td></tr>
+                                    <tr><td class="o_rs_cit_n">2</td><td>ძირითადი საშუალებების ნაშთი წლის ბოლოს</td><td class="o_rs_cit_amount"><field name="a2_fixed" options="{'no_symbol': True}"/></td></tr>
+                                </table>
+                            </div>
+
+                            <div class="o_rs_cit_bar o_rs_cit_bar_annex">დანართი 3</div>
+                            <div class="o_rs_cit_subbar">სესხების და კაპიტალის აღრიცხვა</div>
+                            <field name="annex3_line_ids" widget="rs_cit_annex3" readonly="state != 'draft'">
+                                <list>
+                                    <field name="annex" column_invisible="1"/>
+                                    <field name="sequence"/>
+                                    <field name="name"/>
+                                    <field name="amount1"/>
+                                    <field name="amount2"/>
+                                    <field name="amount3"/>
+                                    <field name="amount4"/>
+                                    <field name="amount5"/>
+                                    <field name="amount6"/>
+                                    <field name="manual"/>
+                                </list>
+                            </field>
+                            <div class="o_rs_cit_annex3_none">
+                                <span class="o_rs_cit_annex3_none_text">იმ შემთხვევაში თუ არ გიფიქსირდებათ N3 დანართის სვეტებით მოთხოვნილი ინფორმაცია,გთხოვთ გააკეთოთ მონიშვნა</span>
+                                <field name="annex3_none" readonly="state != 'draft'"/>
+                            </div>
+
+                            <div invisible="not is_march and not annex4_line_ids">
+                                <div class="o_rs_cit_bar o_rs_cit_bar_annex">დანართი 4</div>
+                                <div class="o_rs_cit_subbar">ინფორმაცია საქართველოს საგადასახადო კოდექსის 126-129¹ მუხლებით გათვალისწინებული საერთაშორისო კონტროლირებული ოპერაციების შესახებ</div>
+                                <field name="annex4_line_ids" readonly="state != 'draft'" context="{'default_annex': '4'}">
+                                    <list editable="bottom">
+                                        <field name="annex" column_invisible="1"/>
+                                        <field name="partner_id"/>
+                                        <field name="partner_vat" optional="show"/>
+                                        <field name="partner_country_id" optional="show"/>
+                                        <field name="relation"/>
+                                        <field name="operation"/>
+                                        <field name="operation_currency_id"/>
+                                        <field name="amount1" string="Volume in Currency"/>
+                                        <field name="amount2" string="Volume in GEL" sum="Total"/>
+                                        <field name="amount3" string="Balance at Year End"/>
+                                        <field name="date" string="Start Date"/>
+                                        <field name="documentation"/>
+                                        <field name="name" string="Contract" optional="hide"/>
+                                    </list>
+                                </field>
+                            </div>
+                        </page>
+
+                        <page string="Odoo" name="odoo">
+                            <group>
+                                <group>
+                                    <field name="date_to"/>
+                                    <field name="version"/>
+                                    <field name="booking_amount"/>
+                                    <field name="booked_amount"/>
+                                    <field name="move_id"/>
+                                </group>
+                                <group>
+                                    <field name="dividend_total"/>
+                                    <field name="dividend_unmatched"/>
+                                    <field name="charity_taxed"/>
+                                </group>
+                            </group>
+                            <group string="Taxed this month (recovered later on lines 27.1 and 27.2)">
+                                <field name="taxed_item_ids" nolabel="1" colspan="2">
+                                    <list>
+                                        <field name="currency_id" column_invisible="1"/>
+                                        <field name="code"/>
+                                        <field name="date"/>
+                                        <field name="partner_id"/>
+                                        <field name="account_id"/>
+                                        <field name="amount" sum="Total"/>
+                                        <field name="remaining"/>
+                                    </list>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="rs_cit_entry_view_list" model="ir.ui.view">
+        <field name="name">rs.cit.entry.list</field>
+        <field name="model">rs.cit.entry</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" create="false" delete="false" decoration-muted="entered" class="o_rs_cit_entry">
+                <field name="entered" widget="boolean_toggle" width="90px"/>
+                <field name="section" width="190px"/>
+                <field name="code" width="110px"/>
+                <field name="name"/>
+                <field name="value" widget="CopyClipboardChar" width="240px"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="rs_cit_declaration_action" model="ir.actions.act_window">
+        <field name="name">Profit Tax Declarations</field>
+        <field name="res_model">rs.cit.declaration</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="rs_cit_declaration_menu"
+              name="Profit Tax Declaration (II-086)"
+              parent="account.menu_finance_reports"
+              action="rs_cit_declaration_action"
+              sequence="61"/>
+
+    <record id="rs_cit_taxed_item_view_list" model="ir.ui.view">
+        <field name="name">rs.cit.taxed.item.list</field>
+        <field name="model">rs.cit.taxed.item</field>
+        <field name="arch" type="xml">
+            <list create="false" delete="false">
+                <field name="currency_id" column_invisible="1"/>
+                <field name="declaration_id"/>
+                <field name="code"/>
+                <field name="date"/>
+                <field name="partner_id"/>
+                <field name="account_id"/>
+                <field name="move_line_id" optional="hide"/>
+                <field name="amount" sum="Total"/>
+                <field name="recovered" sum="Total"/>
+                <field name="remaining"/>
+                <field name="state" widget="badge" decoration-success="state == 'confirmed'"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="rs_cit_taxed_item_action" model="ir.actions.act_window">
+        <field name="name">Profit Tax Taxed Items</field>
+        <field name="res_model">rs.cit.taxed.item</field>
+        <field name="view_mode">list</field>
+        <field name="domain">[('state', '=', 'confirmed')]</field>
+        <field name="help" type="html">
+            <p>Amounts taxed on lines 18.1.1, 18.1.3, 18.1.4, 18.2 and 18.3 by confirmed declarations. When the
+               money comes back, the declaration of that month counts it on line 27.1 or 27.2.</p>
+        </field>
+    </record>
+
+    <menuitem id="rs_cit_taxed_item_menu"
+              name="Profit Tax Taxed Items"
+              parent="account.menu_finance_reports"
+              action="rs_cit_taxed_item_action"
+              groups="account.group_account_user"
+              sequence="62"/>
+</odoo>

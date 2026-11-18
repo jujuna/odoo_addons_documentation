@@ -1,0 +1,13 @@
+id,name,model_id,group_id/id,operation,domain
+access_signify_document_manager,signify.document.manager,signify.document,signify.group_signify_manager,crud,
+access_signify_document_user_create,signify.document.user.create,signify.document,signify.group_signify_user,c,
+access_signify_document_user_read,signify.document.user.read own,signify.document,signify.group_signify_user,r,"[('create_uid', '=', user.id)]"
+access_signify_document_user_edit,signify.document.user.edit own draft,signify.document,signify.group_signify_user,ud,"[('create_uid', '=', user.id), ('state', '=', 'draft')]"
+rule_signify_document_company,Signify Document: Multi-Company,signify.document,,crud,"[('company_id', 'in', company_ids)]"
+access_signify_recipient_manager,signify.recipient.manager,signify.recipient,signify.group_signify_manager,crud,
+access_signify_recipient_user_read,signify.recipient.user.read own,signify.recipient,signify.group_signify_user,r,"[('document_id.create_uid', '=', user.id)]"
+access_signify_recipient_user_edit,signify.recipient.user.edit own draft,signify.recipient,signify.group_signify_user,cud,"[('document_id.create_uid', '=', user.id), ('document_id.state', '=', 'draft')]"
+rule_signify_recipient_company,Signify Recipient: Multi-Company,signify.recipient,,crud,"[('company_id', 'in', company_ids)]"
+access_signify_connection_user,signify.connection.user,signify.connection,signify.group_signify_user,r,
+access_signify_connection_system,signify.connection.system,signify.connection,base.group_system,crud,
+rule_signify_connection_company,Signify Account: Multi-Company,signify.connection,,crud,"[('company_id', 'in', company_ids)]"

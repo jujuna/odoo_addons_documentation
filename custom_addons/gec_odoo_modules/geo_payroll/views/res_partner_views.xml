@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_geo_payroll" model="ir.ui.view">
+        <field name="name">res.partner.form.geo.payroll</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='sales_purchases']" position="inside">
+                <group name="geo_payroll_pension" string="Pension" invisible="is_company">
+                    <field name="pension_fund_member"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,534 @@
+# Georgian translation of the Odoo addon pos_platform_order_glovo.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-03 09:01+0000\n"
+"PO-Revision-Date: 2026-11-03 09:01+0000\n"
+"Last-Translator: \n"
+"Language-Team: Georgian (ka_GE)\n"
+"Language: ka_GE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#. module: pos_platform_order_glovo
+#: model:ir.module.module,description:base.module_pos_platform_order_glovo
+msgid ""
+"\n"
+"Integrates Glovo with the Point of Sale through the platform order framework. Glovo order\n"
+"notifications (dispatched, picked up, cancelled) create and update POS orders, and marking the\n"
+"food ready in the POS tells Glovo the order is ready for pickup. Orders are delivered by Glovo\n"
+"couriers.\n"
+"Full documentation: README.md and README_DEV.md in the module directory.\n"
+msgstr ""
+"\n"
+"აკავშირებს Glovo-ს გაყიდვის წერტილთან პლატფორმის შეკვეთების ჩარჩოს მეშვეობით. Glovo-ს შეკვეთების\n"
+"შეტყობინებები (გაგზავნილი, აღებული, გაუქმებული) ქმნის და ანახლებს POS-ის შეკვეთებს, ხოლო როცა\n"
+"POS-ში საკვებს მზადად მონიშნავთ, Glovo იგებს, რომ შეკვეთა აღებისთვის მზადაა. შეკვეთებს Glovo-ს\n"
+"კურიერები აწვდიან.\n"
+"სრული დოკუმენტაცია: README.md და README_DEV.md მოდულის საქაღალდეში.\n"
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/pos_order.py:0
+msgid "Add a cash payment method to %s for Glovo CASH orders."
+msgstr ""
+"Glovo-ს CASH შეკვეთებისთვის გაყიდვის წერტილს „%s“ დაამატეთ ნაღდი ფულის "
+"გადახდის მეთოდი."
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/platform_order_entity.py:0
+msgid "Allergies: %s"
+msgstr "ალერგიები: %s"
+
+#. module: pos_platform_order_glovo
+#: model:ir.model.fields,help:pos_platform_order_glovo.field_pos_order__glovo_payment_method
+msgid ""
+"As sent by Glovo: CASH (the courier pays the store in cash) or DELAYED (paid"
+" by Glovo invoice)."
+msgstr ""
+"Glovo-ს მიერ გამოგზავნილი: CASH (კურიერი მაღაზიას ნაღდი ფულით უხდის) ან "
+"DELAYED (Glovo იხდის ანგარიშ-ფაქტურით)."
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/pos_session.py:0
+msgid "Ask a POS manager to resolve Glovo order %s."
+msgstr "სთხოვეთ POS-ის მენეჯერს, მოაგვაროს Glovo-ს შეკვეთა %s."
+
+#. module: pos_platform_order_glovo
+#: model:ir.model.fields.selection,name:pos_platform_order_glovo.selection__pos_glovo_order_resolve__resolution__cancelled
+msgid "Cancelled"
+msgstr "გაუქმებული"
+
+#. module: pos_platform_order_glovo
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_platform_order_provider__code
+msgid "Code"
+msgstr "კოდი"
+
+#. module: pos_platform_order_glovo
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_glovo.pos_glovo_order_resolve_view_form
+msgid "Confirm"
+msgstr "დადასტურება"
+
+#. module: pos_platform_order_glovo
+#. odoo-javascript
+#: code:addons/pos_platform_order_glovo/static/src/app/screens/ticket_screen/ticket_screen.xml:0
+msgid "Courier pays cash:"
+msgstr "კურიერი ნაღდი ფულით იხდის:"
+
+#. module: pos_platform_order_glovo
+#. odoo-javascript
+#: code:addons/pos_platform_order_glovo/static/src/app/screens/ticket_screen/ticket_screen.xml:0
+msgid "Courier:"
+msgstr "კურიერი:"
+
+#. module: pos_platform_order_glovo
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_pos_glovo_order_resolve__create_uid
+msgid "Created by"
+msgstr "შემქმნელი"
+
+#. module: pos_platform_order_glovo
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_pos_glovo_order_resolve__create_date
+msgid "Created on"
+msgstr "შექმნის თარიღი"
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/platform_order_entity.py:0
+msgid "Cutlery requested"
+msgstr "მოთხოვნილია დანა-ჩანგალი"
+
+#. module: pos_platform_order_glovo
+#: model:ir.model.fields.selection,name:pos_platform_order_glovo.selection__pos_glovo_order_resolve__resolution__delivered
+msgid "Picked up"
+msgstr "აღებული"
+
+#. module: pos_platform_order_glovo
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_glovo_event__display_name
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_platform_order_entity__display_name
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_platform_order_provider__display_name
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_pos_glovo_order_resolve__display_name
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_pos_order__display_name
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_pos_order_line__display_name
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_pos_payment__display_name
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_pos_session__display_name
+msgid "Display Name"
+msgstr "საჩვენებელი სახელი"
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/pos_order.py:0
+msgid "Food is already marked as ready for pickup."
+msgstr "საკვები უკვე მონიშნულია აღებისთვის მზადად."
+
+#. module: pos_platform_order_glovo
+#. odoo-javascript
+#: code:addons/pos_platform_order_glovo/static/src/app/components/order_display/order_display.xml:0
+#: code:addons/pos_platform_order_glovo/static/src/app/screens/ticket_screen/ticket_screen.xml:0
+#: model:ir.model.fields.selection,name:pos_platform_order_glovo.selection__platform_order_provider__code__glovo
+#: model:platform.order.provider,name:pos_platform_order_glovo.platform_order_provider_glovo
+msgid "Glovo"
+msgstr "Glovo"
+
+#. module: pos_platform_order_glovo
+#: model:ir.ui.menu,name:pos_platform_order_glovo.menu_glovo_event
+msgid "Glovo Events"
+msgstr "Glovo-ს შეტყობინებები"
+
+#. module: pos_platform_order_glovo
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_pos_order__glovo_payment_method
+msgid "Glovo Payment Method"
+msgstr "Glovo-ს გადახდის მეთოდი"
+
+#. module: pos_platform_order_glovo
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_platform_order_provider__glovo_token
+msgid "Glovo Token"
+msgstr "Glovo-ს ტოკენი"
+
+#. module: pos_platform_order_glovo
+#: model:ir.model,name:pos_platform_order_glovo.model_glovo_event
+msgid "Glovo Webhook Event"
+msgstr "Glovo Webhook-ის შეტყობინება"
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/pos_order.py:0
+msgid ""
+"Glovo couldn't mark this order ready. Check the order in the Glovo Partner "
+"Webapp or ask a POS manager."
+msgstr ""
+"Glovo-მ ეს შეკვეთა მზადად ვერ მონიშნა. შეამოწმეთ შეკვეთა Glovo Partner "
+"Webapp-ში ან მიმართეთ POS-ის მენეჯერს."
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/pos_order.py:0
+msgid "Glovo isn't responding. Try again in a minute."
+msgstr "Glovo არ პასუხობს. სცადეთ ხელახლა ერთ წუთში."
+
+#. module: pos_platform_order_glovo
+#. odoo-javascript
+#: code:addons/pos_platform_order_glovo/static/src/app/screens/ticket_screen/ticket_screen.js:0
+#: code:addons/pos_platform_order_glovo/static/src/app/services/pos_store.js:0
+msgid "Glovo order"
+msgstr "Glovo-ს შეკვეთა"
+
+#. module: pos_platform_order_glovo
+#. odoo-javascript
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/pos_order.py:0
+#: code:addons/pos_platform_order_glovo/static/src/app/services/pos_store.js:0
+msgid ""
+"Glovo orders can't be cancelled here. Refuse the order in the Glovo Partner "
+"Webapp or via Glovo support."
+msgstr ""
+"Glovo-ს შეკვეთის აქ გაუქმება შეუძლებელია. უარი თქვით შეკვეთაზე Glovo Partner"
+" Webapp-ში ან Glovo-ს მხარდაჭერის მეშვეობით."
+
+#. module: pos_platform_order_glovo
+#. odoo-javascript
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/pos_order.py:0
+#: code:addons/pos_platform_order_glovo/static/src/app/services/pos_store.js:0
+msgid ""
+"Glovo orders can't be changed or paid in the POS. Glovo pays the store when "
+"the courier picks up the order."
+msgstr ""
+"Glovo-ს შეკვეთის POS-ში შეცვლა ან გადახდა შეუძლებელია. Glovo მაღაზიას უხდის,"
+" როცა კურიერი შეკვეთას აიღებს."
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/glovo_event.py:0
+msgid "Glovo provider is disabled"
+msgstr "Glovo-ს მიმწოდებელი გათიშულია"
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/pos_order.py:0
+msgid ""
+"Glovo refused the store's token. Ask a POS manager to check the Glovo token."
+msgstr ""
+"Glovo-მ მაღაზიის ტოკენი არ მიიღო. სთხოვეთ POS-ის მენეჯერს, შეამოწმოს Glovo-ს"
+" ტოკენი."
+
+#. module: pos_platform_order_glovo
+#: model:ir.actions.act_window,name:pos_platform_order_glovo.action_pos_glovo_order_mark_cancelled
+msgid "Glovo: mark cancelled"
+msgstr "Glovo: გაუქმებულად მონიშვნა"
+
+#. module: pos_platform_order_glovo
+#: model:ir.actions.act_window,name:pos_platform_order_glovo.action_pos_glovo_order_mark_delivered
+msgid "Glovo: mark picked up"
+msgstr "Glovo: აღებულად მონიშვნა"
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/platform_order_entity.py:0
+msgid "Glovo: menu synchronisation is not implemented yet."
+msgstr "Glovo: მენიუს სინქრონიზაცია ჯერ არ არის რეალიზებული."
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/pos_order.py:0
+msgid "Glovo: no order found matching order ID %s."
+msgstr "Glovo: შეკვეთა ID-ით %s ვერ მოიძებნა."
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/platform_order_entity.py:0
+msgid "Glovo: no product with Internal Reference %s."
+msgstr "Glovo: პროდუქტი შიდა მითითებით %s ვერ მოიძებნა."
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/platform_order_entity.py:0
+msgid "Glovo: no store found matching ID %s."
+msgstr "Glovo: მაღაზია ID-ით %s ვერ მოიძებნა."
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/pos_order.py:0
+msgid ""
+"Glovo: order %s was picked up by the courier but is cancelled in Odoo. Check"
+" it in the Glovo Partner Webapp."
+msgstr ""
+"Glovo: შეკვეთა %s კურიერმა აიღო, მაგრამ Odoo-ში ის გაუქმებულია. შეამოწმეთ "
+"Glovo Partner Webapp-ში."
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/platform_order_entity.py:0
+msgid "Glovo: received data without a store ID."
+msgstr "Glovo: მიღებულ მონაცემებში მაღაზიის ID არ არის."
+
+#. module: pos_platform_order_glovo
+#: model:ir.actions.server,name:pos_platform_order_glovo.ir_cron_glovo_retry_failed_events_ir_actions_server
+msgid "Glovo: retry failed notifications"
+msgstr "Glovo: ვერ დამუშავებული შეტყობინებების ხელახლა ცდა"
+
+#. module: pos_platform_order_glovo
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_glovo_event__id
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_platform_order_entity__id
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_platform_order_provider__id
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_pos_glovo_order_resolve__id
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_pos_order__id
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_pos_order_line__id
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_pos_payment__id
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_pos_session__id
+msgid "ID"
+msgstr "ID"
+
+#. module: pos_platform_order_glovo
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_pos_glovo_order_resolve__write_uid
+msgid "Last Updated by"
+msgstr "ბოლოს განაახლა"
+
+#. module: pos_platform_order_glovo
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_pos_glovo_order_resolve__write_date
+msgid "Last Updated on"
+msgstr "ბოლოს განახლდა"
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/wizard/pos_glovo_order_resolve.py:0
+msgid "Marked picked up by a manager. Reason: %s"
+msgstr "მენეჯერმა მონიშნა აღებულად. მიზეზი: %s"
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/platform_order_entity.py:0
+msgid "No open POS session."
+msgstr "POS-ის ღია სესია არ არის."
+
+#. module: pos_platform_order_glovo
+#. odoo-javascript
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/pos_order.py:0
+#: code:addons/pos_platform_order_glovo/static/src/app/screens/ticket_screen/ticket_screen.js:0
+msgid "Only a POS manager can refund a Glovo order or delete its payments."
+msgstr ""
+"Glovo-ს შეკვეთის თანხის დაბრუნება ან მისი გადახდების წაშლა მხოლოდ POS-ის "
+"მენეჯერს შეუძლია."
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/glovo_event.py:0
+msgid "Only a POS manager can retry Glovo events."
+msgstr "Glovo-ს შეტყობინებების ხელახლა ცდა მხოლოდ POS-ის მენეჯერს შეუძლია."
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/pos_order.py:0
+msgid "Order already paid in Odoo; check it manually"
+msgstr "შეკვეთა Odoo-ში უკვე გადახდილია; შეამოწმეთ ხელით"
+
+#. module: pos_platform_order_glovo
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_pos_glovo_order_resolve__order_ids
+msgid "Orders"
+msgstr "შეკვეთები"
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/platform_order_entity.py:0
+msgid ""
+"POS order total %(total)s differs from Glovo total after product discounts "
+"%(expected)s (difference %(difference)s %(currency)s)."
+msgstr ""
+"POS-ის შეკვეთის ჯამი %(total)s განსხვავდება Glovo-ს ჯამისგან პროდუქტების "
+"ფასდაკლების შემდეგ %(expected)s (სხვაობა %(difference)s %(currency)s)."
+
+#. module: pos_platform_order_glovo
+#. odoo-javascript
+#: code:addons/pos_platform_order_glovo/static/src/app/screens/ticket_screen/ticket_screen.xml:0
+msgid "Paid by Glovo invoice"
+msgstr "იხდის Glovo ანგარიშ-ფაქტურით"
+
+#. module: pos_platform_order_glovo
+#. odoo-javascript
+#: code:addons/pos_platform_order_glovo/static/src/app/screens/ticket_screen/ticket_screen.xml:0
+msgid "Pickup code:"
+msgstr "აღების კოდი:"
+
+#. module: pos_platform_order_glovo
+#: model:ir.model,name:pos_platform_order_glovo.model_platform_order_entity
+msgid "Platform Order Entity"
+msgstr "პლატფორმის შეკვეთის ერთეული"
+
+#. module: pos_platform_order_glovo
+#: model:ir.model,name:pos_platform_order_glovo.model_platform_order_provider
+msgid "Platform Order Provider"
+msgstr "პლატფორმის შეკვეთის მიმწოდებელი"
+
+#. module: pos_platform_order_glovo
+#: model:ir.module.module,shortdesc:base.module_pos_platform_order_glovo
+msgid "Platform Order Provider: Glovo"
+msgstr "პლატფორმის შეკვეთის მიმწოდებელი: Glovo"
+
+#. module: pos_platform_order_glovo
+#: model:ir.model,name:pos_platform_order_glovo.model_pos_order
+msgid "Point of Sale Order"
+msgstr "გაყიდვის წერტილის შეკვეთა"
+
+#. module: pos_platform_order_glovo
+#: model:ir.model,name:pos_platform_order_glovo.model_pos_order_line
+msgid "Point of Sale Order Line"
+msgstr "გაყიდვის წერტილის შეკვეთის ხაზი"
+
+#. module: pos_platform_order_glovo
+#: model:ir.model,name:pos_platform_order_glovo.model_pos_payment
+msgid "Point of Sale Payment"
+msgstr "გაყიდვის წერტილის გადახდა"
+
+#. module: pos_platform_order_glovo
+#: model:ir.model,name:pos_platform_order_glovo.model_pos_session
+msgid "Point of Sale Session"
+msgstr "გაყიდვის წერტილის სესია"
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/glovo_event.py:0
+msgid "Processed Glovo events can't be retried."
+msgstr "დამუშავებულ Glovo-ს შეტყობინებებზე ხელახლა ცდა შეუძლებელია."
+
+#. module: pos_platform_order_glovo
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_pos_glovo_order_resolve__reason
+msgid "Reason"
+msgstr "მიზეზი"
+
+#. module: pos_platform_order_glovo
+#: model:ir.module.module,summary:base.module_pos_platform_order_glovo
+msgid "Receive Glovo orders in the Point of Sale"
+msgstr "Glovo-ს შეკვეთების მიღება გაყიდვის წერტილში"
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/pos_order.py:0
+msgid "Refuse the order in the Glovo Partner Webapp or via Glovo support."
+msgstr ""
+"უარი თქვით შეკვეთაზე Glovo Partner Webapp-ში ან Glovo-ს მხარდაჭერის "
+"მეშვეობით."
+
+#. module: pos_platform_order_glovo
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_pos_glovo_order_resolve__resolution
+msgid "Resolution"
+msgstr "გადაწყვეტა"
+
+#. module: pos_platform_order_glovo
+#: model:ir.model,name:pos_platform_order_glovo.model_pos_glovo_order_resolve
+msgid "Resolve a Glovo order without a Glovo notification"
+msgstr "Glovo-ს შეკვეთის მოგვარება Glovo-ს შეტყობინების გარეშე"
+
+#. module: pos_platform_order_glovo
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_glovo.glovo_event_view_form_inherit_pos_platform_order_glovo
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_glovo.glovo_event_view_list_inherit_pos_platform_order_glovo
+msgid "Retry"
+msgstr "ხელახლა ცდა"
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/wizard/pos_glovo_order_resolve.py:0
+msgid "Select only Glovo orders."
+msgstr "აირჩიეთ მხოლოდ Glovo-ს შეკვეთები."
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/platform_order_entity.py:0
+msgid "Special requirements: %s"
+msgstr "განსაკუთრებული მოთხოვნები: %s"
+
+#. module: pos_platform_order_glovo
+#: model:ir.model.fields,help:pos_platform_order_glovo.field_platform_order_provider__glovo_token
+msgid ""
+"Static token from the Glovo account manager. Sent on every API call and "
+"checked on every Glovo notification."
+msgstr ""
+"Glovo-ს ანგარიშის მენეჯერისგან მიღებული მუდმივი ტოკენი. იგზავნება ყოველ API "
+"მოთხოვნაში და მოწმდება Glovo-ს ყოველ შეტყობინებაზე."
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/platform_order_provider.py:0
+msgid "The Glovo token must contain only ASCII characters."
+msgstr "Glovo-ს ტოკენი მხოლოდ ASCII სიმბოლოებს უნდა შეიცავდეს."
+
+#. module: pos_platform_order_glovo
+#: model:ir.model.fields,help:pos_platform_order_glovo.field_platform_order_provider__code
+msgid "The technical code of this platform order provider."
+msgstr "ამ პლატფორმის შეკვეთის მიმწოდებლის ტექნიკური კოდი."
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/glovo_event.py:0
+msgid "This event is being processed right now. Try again in a moment."
+msgstr "ეს შეტყობინება ახლა მუშავდება. სცადეთ ხელახლა ცოტა ხანში."
+
+#. module: pos_platform_order_glovo
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_glovo.platform_order_provider_form_inherit
+msgid "Token"
+msgstr "ტოკენი"
+
+#. module: pos_platform_order_glovo
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_glovo.pos_glovo_order_resolve_view_form
+msgid ""
+"Use only if Glovo cancelled the order or confirmed it won't be collected."
+msgstr ""
+"გამოიყენეთ მხოლოდ მაშინ, თუ Glovo-მ შეკვეთა გააუქმა ან დაადასტურა, რომ მას "
+"არავინ აიღებს."
+
+#. module: pos_platform_order_glovo
+#: model_terms:ir.ui.view,arch_db:pos_platform_order_glovo.pos_glovo_order_resolve_view_form
+msgid ""
+"Use only if the courier collected the order. This books the sale and payment.\n"
+"                    If the food never left the store, use Glovo: mark cancelled."
+msgstr ""
+"გამოიყენეთ მხოლოდ მაშინ, თუ კურიერმა შეკვეთა აიღო. ეს აფორმებს გაყიდვას და გადახდას.\n"
+"                    თუ საკვები მაღაზიიდან არ გასულა, გამოიყენეთ „Glovo: გაუქმებულად მონიშვნა“."
+
+#. module: pos_platform_order_glovo
+#: model:ir.model.fields,field_description:pos_platform_order_glovo.field_glovo_event__order_id
+msgid "POS Order"
+msgstr "POS შეკვეთა"
+
+#. module: pos_platform_order_glovo
+#: model:ir.model.fields,help:pos_platform_order_glovo.field_pos_glovo_order_resolve__reason
+msgid "Why the order is resolved without Glovo's notification; it is posted on the order."
+msgstr "რატომ იხურება შეკვეთა Glovo-ს შეტყობინების გარეშე; მიზეზი შეკვეთაზე ჩაიწერება."
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/glovo_event.py:0
+msgid "Glovo: order %s belongs to another store."
+msgstr "Glovo: შეკვეთა %s სხვა მაღაზიას ეკუთვნის."
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/pos_order.py:0
+msgid "Only an order the customer collects at the store can be marked picked up by the customer."
+msgstr "კლიენტის მიერ აღებულად მხოლოდ ის შეკვეთა მოინიშნება, რომელსაც კლიენტი თავად იღებს მაღაზიაში."
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/pos_order.py:0
+msgid ""
+"Glovo couldn't mark this order picked up. Check the order in the Glovo "
+"Partner Webapp or ask a POS manager."
+msgstr ""
+"Glovo-მ ეს შეკვეთა აღებულად ვერ მონიშნა. შეამოწმეთ შეკვეთა Glovo Partner "
+"Webapp-ში ან მიმართეთ POS-ის მენეჯერს."
+
+#. module: pos_platform_order_glovo
+#. odoo-python
+#: code:addons/pos_platform_order_glovo/models/pos_order.py:0
+msgid "The customer picked up the order; the sale is booked."
+msgstr "კლიენტმა შეკვეთა აიღო; გაყიდვა გაფორმდა."
+
+#. module: pos_platform_order_glovo
+#. odoo-javascript
+#: code:addons/pos_platform_order_glovo/static/src/app/screens/ticket_screen/ticket_screen.xml:0
+msgid "Customer Picked Up"
+msgstr "კლიენტმა აიღო"

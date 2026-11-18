@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="gec_declaration_card_view_kanban" model="ir.ui.view">
+        <field name="name">gec.declaration.card.kanban</field>
+        <field name="model">gec.declaration.card</field>
+        <field name="arch" type="xml">
+            <kanban create="false" delete="false" group_create="false" records_draggable="false"
+                    action="action_open" type="object" class="o_kanban_dashboard" highlight_color="color">
+                <field name="color"/>
+                <field name="draft_count"/>
+                <field name="next_due"/>
+                <templates>
+                    <t t-name="card" class="p-0">
+                        <div class="h-100 d-flex flex-column">
+                            <div class="p-3 pb-2">
+                                <field name="name" class="fs-4 fw-bold"/>
+                                <field name="description" class="d-block text-muted small"/>
+                            </div>
+                            <div class="px-3 pb-2 flex-grow-1">
+                                <div t-if="record.latest_name.raw_value">
+                                    <span class="text-muted">Latest: </span>
+                                    <field name="latest_name"/>
+                                    <field name="latest_state" class="badge rounded-pill text-bg-light ms-1"/>
+                                </div>
+                                <div t-else="" class="text-muted">No declaration yet</div>
+                                <div t-if="record.next_due.raw_value" class="mt-1">
+                                    <span class="text-muted">Next due: </span>
+                                    <field name="next_due" widget="date"/>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2 p-3 pt-2 border-top">
+                                <button name="action_open" type="object" class="btn btn-primary btn-sm">Open</button>
+                                <button name="action_new" type="object" class="btn btn-secondary btn-sm">New</button>
+                                <button t-if="record.draft_count.raw_value" name="action_open_drafts" type="object"
+                                        class="btn btn-link btn-sm ms-auto">
+                                    <field name="draft_count"/> Drafts
+                                </button>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="gec_declaration_card_view_list" model="ir.ui.view">
+        <field name="name">gec.declaration.card.list</field>
+        <field name="model">gec.declaration.card</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" create="false" delete="false">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="description"/>
+                <field name="frequency"/>
+                <field name="module_name" readonly="1"/>
+                <field name="available"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="gec_declaration_card_action" model="ir.actions.act_window">
+        <field name="name">Declarations</field>
+        <field name="res_model">gec.declaration.card</field>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="gec_declaration_card_view_kanban"/>
+        <field name="domain">[('available', '=', True)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No declaration module is installed</p>
+            <p>Install VAT, Income Tax (Form 30), Profit Tax or Property Tax declarations to see their cards here.</p>
+        </field>
+    </record>
+
+    <record id="gec_declaration_card_action_config" model="ir.actions.act_window">
+        <field name="name">Declaration Cards</field>
+        <field name="res_model">gec.declaration.card</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="gec_declaration_card_view_list"/>
+    </record>
+
+    <menuitem id="menu_declarations_root" name="Declarations" sequence="46"
+              web_icon="gec_declarations,static/description/icon.png"
+              groups="account.group_account_readonly,account.group_account_invoice"/>
+    <menuitem id="menu_declarations_overview" name="Overview" parent="menu_declarations_root"
+              action="gec_declaration_card_action" sequence="1"/>
+    <menuitem id="menu_declarations_filing" name="Declarations" parent="menu_declarations_root" sequence="10"/>
+    <menuitem id="menu_declarations_registers" name="Registers" parent="menu_declarations_root" sequence="20"/>
+    <menuitem id="menu_declarations_config" name="Configuration" parent="menu_declarations_root" sequence="90"
+              groups="account.group_account_manager"/>
+    <menuitem id="menu_declarations_settings" name="Settings" parent="menu_declarations_config"
+              action="account.action_account_config" sequence="1" groups="base.group_system"/>
+    <menuitem id="menu_declarations_cards" name="Declaration Cards" parent="menu_declarations_config"
+              action="gec_declaration_card_action_config" sequence="99"/>
+</odoo>

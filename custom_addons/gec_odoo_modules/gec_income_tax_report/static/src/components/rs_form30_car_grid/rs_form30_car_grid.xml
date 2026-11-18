@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="gec_income_tax_report.RsForm30CarGrid">
+        <section class="o_rs_form30_grid o_rsf30_centered" t-att-class="this.className" t-ref="this.gridRef">
+            <header class="o_rsf30_toolbar">
+                <div class="o_rsf30_title">
+                    <span class="o_rsf30_mark">RS</span>
+                    <span>
+                        <strong>Form No. 30 — Annex D</strong>
+                        <small>Private use of a company car</small>
+                    </span>
+                </div>
+                <div class="o_rsf30_toolbar_stats">
+                    <span class="o_rsf30_stat">
+                        <i class="oi" data-icon="directions_car" aria-hidden="true"/>
+                        <t t-out="this.list.count"/> rows
+                    </span>
+                </div>
+                <div class="o_rsf30_toolbar_actions">
+                    <button t-if="this.canEdit" type="button" class="btn btn-primary btn-sm"
+                            t-on-click="this.addLine" title="Add a car row">
+                        <i class="oi me-1" data-icon="add" aria-hidden="true"/>
+                        Add a Line
+                    </button>
+                    <t t-call="gec_income_tax_report.RsForm30Grid.FitColumnsButton"/>
+                </div>
+            </header>
+
+            <t t-call="gec_income_tax_report.RsForm30Grid.Pager"/>
+
+            <div class="o_rsf30_table_wrap">
+                <table class="o_rsf30_table" t-att-style="this.tableStyle">
+                    <t t-call="gec_income_tax_report.RsForm30Grid.Colgroup"/>
+                    <thead>
+                        <tr class="o_rsf30_group_headers">
+                            <th rowspan="2" class="o_rsf30_sticky_col">№</th>
+                            <th colspan="3">Car data</th>
+                            <th colspan="3">Employee data</th>
+                            <th rowspan="2" t-out="this.taxColumn.label"/>
+                        </tr>
+                        <tr class="o_rsf30_leaf_headers">
+                            <t t-foreach="this.leafColumns" t-as="column" t-key="column.field">
+                                <th>
+                                    <t t-out="column.label"/>
+                                    <span class="o_rsf30_resize_handle" role="separator"
+                                          title="Drag to resize the column"
+                                          t-on-mousedown.stop.prevent="(event) => this.startColumnResize(column, event)"/>
+                                </th>
+                            </t>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-if="!this.records.length" class="o_rsf30_empty_row">
+                            <td t-att-colspan="this.columns.length + 1">
+                                <span class="o_rsf30_empty_icon"><i class="oi" data-icon="directions_car" aria-hidden="true"/></span>
+                                <strong>No cars yet</strong>
+                                <small t-if="this.canEdit">Click “Add a Line” to declare a car used privately.</small>
+                            </td>
+                        </tr>
+                        <t t-foreach="this.records" t-as="record" t-key="record.id">
+                            <tr t-att-class="{ 'o_rsf30_edited_row': record.isInEdition }"
+                                t-on-click="() => this.onRowClick(record)">
+                                <td class="o_rsf30_row_actions o_rsf30_sticky_col">
+                                    <span class="o_rsf30_row_number" t-out="record_index + 1 + this.list.offset"/>
+                                    <button t-if="this.canEdit" type="button" class="o_rsf30_remove_row"
+                                            title="Remove this row"
+                                            t-on-click.stop="() => this.removeLine(record)">
+                                        <i class="oi" data-icon="delete" aria-hidden="true"/>
+                                    </button>
+                                </td>
+                                <t t-foreach="this.columns" t-as="column" t-key="column.field">
+                                    <td t-att-class="column.cssClass">
+                                        <Field name="column.field" record="record" readonly="!this.canEdit"/>
+                                    </td>
+                                </t>
+                            </tr>
+                        </t>
+                    </tbody>
+                    <t t-call="gec_income_tax_report.RsForm30Grid.Totals"/>
+                </table>
+            </div>
+            <footer class="o_rsf30_hint">
+                <i class="oi" data-icon="info" aria-hidden="true"/>
+                Annex D is filled in by hand. Pick a vehicle and the plate, engine band, employee and
+                personal number are proposed; the tax amount follows the engine band and cannot be typed in.
+            </footer>
+        </section>
+    </t>
+
+</templates>

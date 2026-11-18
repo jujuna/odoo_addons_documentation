@@ -1,0 +1,53 @@
+id,name,model_id,group_id/id,operation,domain
+access_bsc_perspective_contributor,bsc.perspective contributor,bsc.perspective,bsc_strategy.group_bsc_contributor,r,
+access_bsc_perspective_admin,bsc.perspective admin,bsc.perspective,bsc_strategy.group_bsc_admin,crud,
+access_bsc_scorecard_contributor,bsc.scorecard contributor,bsc.scorecard,bsc_strategy.group_bsc_contributor,r,
+access_bsc_scorecard_manager,bsc.scorecard manager,bsc.scorecard,bsc_strategy.group_bsc_manager,cru,
+access_bsc_scorecard_admin,bsc.scorecard admin,bsc.scorecard,bsc_strategy.group_bsc_admin,crud,
+access_bsc_scorecard_perspective_contributor,bsc.scorecard.perspective contributor,bsc.scorecard.perspective,bsc_strategy.group_bsc_contributor,r,
+access_bsc_scorecard_perspective_manager,bsc.scorecard.perspective manager,bsc.scorecard.perspective,bsc_strategy.group_bsc_manager,crud,
+access_bsc_objective_contributor,bsc.objective contributor,bsc.objective,bsc_strategy.group_bsc_contributor,r,
+access_bsc_objective_manager,bsc.objective manager,bsc.objective,bsc_strategy.group_bsc_manager,cru,
+access_bsc_objective_admin,bsc.objective admin,bsc.objective,bsc_strategy.group_bsc_admin,crud,
+access_bsc_objective_link_contributor,bsc.objective.link contributor,bsc.objective.link,bsc_strategy.group_bsc_contributor,r,
+access_bsc_objective_link_manager,bsc.objective.link manager,bsc.objective.link,bsc_strategy.group_bsc_manager,crud,
+access_bsc_kpi_contributor,bsc.kpi contributor,bsc.kpi,bsc_strategy.group_bsc_contributor,r,
+access_bsc_kpi_manager,bsc.kpi manager,bsc.kpi,bsc_strategy.group_bsc_manager,cru,
+access_bsc_kpi_admin,bsc.kpi admin,bsc.kpi,bsc_strategy.group_bsc_admin,crud,
+access_bsc_period_contributor,bsc.period contributor,bsc.period,bsc_strategy.group_bsc_contributor,r,
+access_bsc_period_manager,bsc.period manager,bsc.period,bsc_strategy.group_bsc_manager,cru,
+access_bsc_period_admin,bsc.period admin,bsc.period,bsc_strategy.group_bsc_admin,crud,
+access_bsc_measurement_contributor_read,bsc.measurement contributor (read all),bsc.measurement,bsc_strategy.group_bsc_contributor,r,
+access_bsc_measurement_contributor_own_write,bsc.measurement contributor: write own KPIs only,bsc.measurement,bsc_strategy.group_bsc_contributor,u,"[('kpi_id.owner_id', '=', user.id)]"
+access_bsc_measurement_manager,bsc.measurement manager,bsc.measurement,bsc_strategy.group_bsc_manager,cru,
+access_bsc_measurement_admin,bsc.measurement admin,bsc.measurement,bsc_strategy.group_bsc_admin,crud,
+access_bsc_initiative_stage_contributor,bsc.initiative.stage contributor,bsc.initiative.stage,bsc_strategy.group_bsc_contributor,r,
+access_bsc_initiative_stage_admin,bsc.initiative.stage admin,bsc.initiative.stage,bsc_strategy.group_bsc_admin,crud,
+access_bsc_initiative_contributor_read_create,"bsc.initiative contributor (read, create)",bsc.initiative,bsc_strategy.group_bsc_contributor,cr,
+access_bsc_initiative_contributor_own_write,bsc.initiative contributor: edit own,bsc.initiative,bsc_strategy.group_bsc_contributor,u,"['|', ('owner_id', '=', user.id), ('create_uid', '=', user.id)]"
+access_bsc_initiative_manager,bsc.initiative manager,bsc.initiative,bsc_strategy.group_bsc_manager,cru,
+access_bsc_initiative_admin,bsc.initiative admin,bsc.initiative,bsc_strategy.group_bsc_admin,crud,
+access_bsc_review_contributor,bsc.review contributor,bsc.review,bsc_strategy.group_bsc_contributor,r,
+access_bsc_review_manager,bsc.review manager,bsc.review,bsc_strategy.group_bsc_manager,cru,
+access_bsc_review_admin,bsc.review admin,bsc.review,bsc_strategy.group_bsc_admin,crud,
+access_bsc_kpi_source_contributor,bsc.kpi.source contributor,bsc.kpi.source,bsc_strategy.group_bsc_contributor,r,
+access_bsc_kpi_source_manager,bsc.kpi.source manager,bsc.kpi.source,bsc_strategy.group_bsc_manager,r,
+access_bsc_kpi_source_admin,bsc.kpi.source admin,bsc.kpi.source,bsc_strategy.group_bsc_admin,crud,
+rule_bsc_perspective_company,BSC Perspective: multi-company,bsc.perspective,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+rule_bsc_scorecard_company,BSC Scorecard: multi-company,bsc.scorecard,,crud,"[('company_id', 'in', company_ids)]"
+rule_bsc_objective_company,BSC Objective: multi-company,bsc.objective,,crud,"[('company_id', 'in', company_ids)]"
+rule_bsc_kpi_company,BSC KPI: multi-company,bsc.kpi,,crud,"[('company_id', 'in', company_ids)]"
+rule_bsc_period_company,BSC Period: multi-company,bsc.period,,crud,"[('company_id', 'in', company_ids)]"
+rule_bsc_measurement_company,BSC Measurement: multi-company,bsc.measurement,,crud,"[('company_id', 'in', company_ids)]"
+rule_bsc_initiative_company,BSC Initiative: multi-company,bsc.initiative,,crud,"[('company_id', 'in', company_ids)]"
+rule_bsc_review_company,BSC Review: multi-company,bsc.review,,crud,"[('company_id', 'in', company_ids)]"
+rule_bsc_objective_link_company,BSC Cause-Effect Link: multi-company,bsc.objective.link,,crud,"[('company_id', 'in', company_ids)]"
+rule_bsc_scorecard_perspective_company,BSC Perspective Weight: multi-company,bsc.scorecard.perspective,,crud,"[('company_id', 'in', company_ids)]"
+rule_bsc_initiative_stage_company,BSC Initiative Stage: multi-company,bsc.initiative.stage,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+access_bsc_demo_data_admin,bsc.demo.data admin,bsc.demo.data,bsc_strategy.group_bsc_admin,crud,"[('create_uid', '=', user.id)]"
+access_bsc_kpi_connect_manager,bsc.kpi.connect manager,bsc.kpi.connect,bsc_strategy.group_bsc_manager,crud,"[('create_uid', '=', user.id)]"
+access_bsc_objective_rating_contributor,bsc.objective.rating contributor,bsc.objective.rating,bsc_strategy.group_bsc_contributor,r,
+access_bsc_objective_rating_manager,bsc.objective.rating manager,bsc.objective.rating,bsc_strategy.group_bsc_manager,cru,
+access_bsc_objective_rating_admin,bsc.objective.rating admin,bsc.objective.rating,bsc_strategy.group_bsc_admin,crud,
+rule_bsc_objective_rating_company,BSC Objective Rating: multi-company,bsc.objective.rating,,crud,"[('company_id', 'in', company_ids)]"
+access_bsc_objective_contributor_rate_own,bsc.objective contributor: rate own,bsc.objective,bsc_strategy.group_bsc_contributor,u,"[('owner_id', '=', user.id)]"

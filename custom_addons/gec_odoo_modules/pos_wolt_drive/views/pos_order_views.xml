@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_pos_pos_form_inherit_wolt_drive" model="ir.ui.view">
+        <field name="name">pos.order.form.inherit.pos_wolt_drive</field>
+        <field name="model">pos.order</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+        <field name="arch" type="xml">
+            <page name="extra" position="after">
+                <page name="wolt_drive" string="Wolt Courier" invisible="not wolt_drive_status">
+                    <group>
+                        <group>
+                            <field name="wolt_drive_status"/>
+                            <field name="wolt_drive_tracking_url" widget="url"/>
+                            <field name="wolt_drive_price"/>
+                        </group>
+                        <group>
+                            <field name="wolt_drive_ref"/>
+                            <field name="wolt_drive_pickup_eta"/>
+                            <field name="wolt_drive_dropoff_eta"/>
+                        </group>
+                    </group>
+                </page>
+            </page>
+        </field>
+    </record>
+
+</odoo>

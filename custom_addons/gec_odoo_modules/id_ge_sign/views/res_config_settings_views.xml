@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.id_ge_sign</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="sign.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='sign']" position="inside">
+                <setting id="geoeid" string="Sign with Georgian ID Card"
+                         help="Let signatories sign with their Georgian ID Card (Qualified Electronic Signature)">
+                    <div class="content-group mt16">
+                        <div class="row mt8">
+                            <label string="Application language" class="col-lg-4 o_light_label" for="geoeid_language"/>
+                            <field name="geoeid_language"/>
+                        </div>
+                        <div class="mt8 text-muted">
+                            Card signatures are checked against the state's certificates (GEO Signing CA, id.ge), which come with this module.
+                            When id.ge publishes a new one, turn on developer mode and add its PEM text after the others in
+                            Settings &gt; Technical &gt; Parameters &gt; System Parameters, key <code>id_ge_sign.trust_anchor</code>.
+                        </div>
+                    </div>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

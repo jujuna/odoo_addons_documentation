@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_payment_form_tbc" model="ir.ui.view">
+        <field name="name">account.payment.form.tbc</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <header position="inside">
+                <button name="action_tbc_submit_approval" type="object"
+                        string="Submit for TBC Approval" groups="tbc_bank.group_tbc_user"
+                        invisible="gec_bank_code != 'tbc_transfer' or gec_bank_state != 'pending'
+                                   or tbc_processing_mode != 'odoo_approve'"/>
+                <button name="action_tbc_approve" type="object"
+                        string="Approve TBC Transfer" class="btn-primary"
+                        invisible="gec_bank_code != 'tbc_transfer' or gec_bank_state != 'awaiting_approval'"/>
+                <button name="action_tbc_send" type="object"
+                        groups="tbc_bank.group_tbc_user"
+                        string="Send to TBC" class="btn-primary"
+                        confirm="This sends a real payment order to TBC Bank. Continue?"
+                        invisible="gec_bank_code != 'tbc_transfer' or state != 'paid' or gec_bank_state not in ('pending', 'approved')"/>
+                <button name="action_tbc_reset_to_pending" type="object"
+                        groups="tbc_bank.group_tbc_user"
+                        string="Reset to Pending"
+                        confirm="Only reset this after checking TBC Internet Banking. If TBC executed the transfer after all, sending again will pay twice."
+                        invisible="gec_bank_code != 'tbc_transfer' or gec_bank_state != 'failed'"/>
+                <button name="action_tbc_refresh_status" type="object"
+                        string="Refresh TBC Status"
+                        invisible="gec_bank_code != 'tbc_transfer' or gec_bank_state not in ('sent', 'unknown')"/>
+                <button name="action_tbc_recover" type="object"
+                        groups="tbc_bank.group_tbc_user"
+                        string="Recover from TBC"
+                        invisible="gec_bank_code != 'tbc_transfer' or gec_bank_state not in ('sending', 'unknown')"/>
+                <button name="action_tbc_confirm_manual" type="object"
+                        groups="tbc_bank.group_tbc_user"
+                        string="Confirm Manually"
+                        confirm="Only confirm a transfer you can see executed in TBC Internet Banking. Odoo then stops checking it with the bank."
+                        invisible="gec_bank_code != 'tbc_transfer' or gec_bank_state != 'sent'"/>
+            </header>
+            <sheet position="inside">
+                <field name="tbc_processing_mode" invisible="1"/>
+                <div class="alert alert-warning" role="alert"
+                     invisible="gec_bank_code != 'tbc_transfer' or gec_bank_state != 'sent' or tbc_processing_mode == 'bank_confirm'">
+                    Sent to TBC — waiting for the bank statement to confirm the money left.
+                    If it doesn't appear, use <b>Confirm Manually</b>.
+                </div>
+                <div class="alert alert-info" role="alert"
+                     invisible="gec_bank_code != 'tbc_transfer' or gec_bank_state != 'sent' or tbc_processing_mode != 'bank_confirm'">
+                    Sent to TBC — the money has <b>not</b> moved yet. This connection
+                    is set to <b>Manual confirmation in Internet Banking</b>, so someone
+                    must still release the transfer in TBC's Internet Bank.
+                </div>
+                <div class="alert alert-info" role="status"
+                     invisible="gec_bank_code != 'tbc_transfer' or gec_bank_state != 'approved'">
+                    Approved by <field name="gec_bank_approved_by" readonly="1" nolabel="1" class="oe_inline"/> —
+                    ready to send.
+                </div>
+                <div class="alert alert-success" role="status"
+                     invisible="gec_bank_code != 'tbc_transfer' or gec_bank_state != 'confirmed'">
+                    Confirmed — the transfer is verified
+                    (<field name="gec_bank_confirmed_source" readonly="1" nolabel="1" class="oe_inline"/>).
+                </div>
+                <div class="alert alert-danger" role="alert"
+                     invisible="gec_bank_code != 'tbc_transfer' or gec_bank_state not in ('failed', 'unknown')">
+                    This transfer is <b>not confirmed</b>. If it failed, fix the error, use Reset to Pending and send it again. If its outcome is unknown, use Recover from TBC - do not create a new payment.
+                </div>
+                <group name="tbc_transfer" string="TBC Transfer" invisible="gec_bank_code != 'tbc_transfer'">
+                    <group>
+                        <field name="gec_bank_state"/>
+                        <field name="tbc_transfer_type" required="gec_bank_code == 'tbc_transfer'"/>
+                        <field name="gec_bank_reference"/>
+                        <field name="gec_bank_request_id"/>
+                        <field name="gec_bank_approved_by"/>
+                        <field name="gec_bank_error" invisible="not gec_bank_error"/>
+                        <field name="tbc_bank_status" invisible="not tbc_bank_status"/>
+                    </group>
+                    <group string="Beneficiary / SWIFT / Treasury"
+                           invisible="tbc_transfer_type not in ('national', 'foreign', 'treasury')">
+                        <field name="tbc_additional_description"/>
+                        <field name="tbc_beneficiary_name"
+                               invisible="tbc_transfer_type not in ('national', 'foreign')"/>
+                        <field name="tbc_beneficiary_tax_code" invisible="tbc_transfer_type != 'national'"/>
+                        <field name="tbc_beneficiary_address" invisible="tbc_transfer_type != 'foreign'"/>
+                        <field name="tbc_beneficiary_bank_code" invisible="tbc_transfer_type != 'foreign'"/>
+                        <field name="tbc_beneficiary_bank_name" invisible="tbc_transfer_type != 'foreign'"/>
+                        <field name="tbc_intermediary_bank_code" invisible="tbc_transfer_type != 'foreign'"/>
+                        <field name="tbc_intermediary_bank_name" invisible="tbc_transfer_type != 'foreign'"/>
+                        <field name="tbc_charge_details" invisible="tbc_transfer_type != 'foreign'"/>
+                        <field name="tbc_treasury_code" invisible="tbc_transfer_type != 'treasury'"/>
+                        <field name="tbc_taxpayer_code" invisible="tbc_transfer_type != 'treasury'"/>
+                        <field name="tbc_taxpayer_name" invisible="tbc_transfer_type != 'treasury'"/>
+                    </group>
+                </group>
+            </sheet>
+        </field>
+    </record>
+
+    <record id="action_tbc_payment" model="ir.actions.act_window">
+        <field name="name">TBC Transfers</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('payment_method_line_id.payment_method_id.code', '=', 'tbc_transfer')]</field>
+    </record>
+
+    <record id="action_tbc_pending_approval" model="ir.actions.act_window">
+        <field name="name">Pending TBC Approval</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('payment_method_line_id.payment_method_id.code', '=', 'tbc_transfer'), ('gec_bank_state', '=', 'awaiting_approval')]</field>
+    </record>
+</odoo>

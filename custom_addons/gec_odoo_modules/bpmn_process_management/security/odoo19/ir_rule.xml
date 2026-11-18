@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Viewers only see what has been approved. -->
+    <record id="rule_process_viewer_published" model="ir.rule">
+        <field name="name">Process viewers: published processes only</field>
+        <field name="model_id" ref="model_business_process"/>
+        <field name="domain_force">[('state', '=', 'published')]</field>
+        <field name="groups" eval="[(4, ref('group_process_user'))]"/>
+    </record>
+    <record id="rule_process_manager_all" model="ir.rule">
+        <field name="name">Process managers: all processes</field>
+        <field name="model_id" ref="model_business_process"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_process_manager'))]"/>
+    </record>
+    <record id="rule_element_viewer_published" model="ir.rule">
+        <field name="name">Process elements: published processes only</field>
+        <field name="model_id" ref="model_business_process_element"/>
+        <field name="domain_force">[('process_id.state', '=', 'published')]</field>
+        <field name="groups" eval="[(4, ref('group_process_user'))]"/>
+    </record>
+    <record id="rule_element_manager_all" model="ir.rule">
+        <field name="name">Process elements: all</field>
+        <field name="model_id" ref="model_business_process_element"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_process_manager'))]"/>
+    </record>
+
+    <record id="rule_kpi_viewer_published" model="ir.rule">
+        <field name="name">Process indicators: published processes only</field>
+        <field name="model_id" ref="model_business_process_kpi"/>
+        <field name="domain_force">[('process_id.state', '=', 'published')]</field>
+        <field name="groups" eval="[(4, ref('group_process_user'))]"/>
+    </record>
+    <record id="rule_kpi_manager_all" model="ir.rule">
+        <field name="name">Process indicators: all</field>
+        <field name="model_id" ref="model_business_process_kpi"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_process_manager'))]"/>
+    </record>
+    <record id="rule_ack_viewer_own" model="ir.rule">
+        <field name="name">Read confirmations: own ones</field>
+        <field name="model_id" ref="model_business_process_ack"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_process_user'))]"/>
+    </record>
+    <record id="rule_ack_manager_all" model="ir.rule">
+        <field name="name">Read confirmations: all</field>
+        <field name="model_id" ref="model_business_process_ack"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_process_manager'))]"/>
+    </record>
+
+    <record id="rule_process_company" model="ir.rule">
+        <field name="name">Business process: multi-company</field>
+        <field name="model_id" ref="model_business_process"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_element_company" model="ir.rule">
+        <field name="name">Business process element: multi-company</field>
+        <field name="model_id" ref="model_business_process_element"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_kpi_company" model="ir.rule">
+        <field name="name">Process indicator: multi-company</field>
+        <field name="model_id" ref="model_business_process_kpi"/>
+        <field name="domain_force">['|', ('process_id.company_id', '=', False), ('process_id.company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_ack_company" model="ir.rule">
+        <field name="name">Process read confirmation: multi-company</field>
+        <field name="model_id" ref="model_business_process_ack"/>
+        <field name="domain_force">['|', ('process_id.company_id', '=', False), ('process_id.company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

@@ -1,0 +1,24 @@
+id,name,model_id,group_id/id,operation,domain
+rule_work_log_employee_read,Work Log: employee/manager read own scope,hr.employee.work.log,base.group_user,r,"['|', ('employee_id.user_id', '=', user.id), ('employee_id.parent_id.user_id', '=', user.id)]"
+rule_work_log_employee_edit,Work Log: employee edits own drafts,hr.employee.work.log,base.group_user,cud,"[('employee_id.user_id', '=', user.id), ('state', 'in', ('draft', 'rejected'))]"
+rule_work_log_manager_edit,Work Log: manager handles direct reports,hr.employee.work.log,base.group_user,cu,"[('employee_id.parent_id.user_id', '=', user.id), ('state', 'in', ('draft', 'submitted'))]"
+rule_work_log_payroll_all,Work Log: payroll officers full company scope,hr.employee.work.log,hr_payroll.group_hr_payroll_officer,crud,
+rule_work_log_payroll_read,Work Log: payroll assistants read company scope,hr.employee.work.log,hr_payroll.group_hr_payroll_user,r,
+rule_work_log_company,Work Log: multi-company,hr.employee.work.log,,crud,"[('company_id', 'in', company_ids)]"
+access_hr_payroll_component_settlement_payroll,hr.payroll.component.settlement payroll,hr.payroll.component.settlement,hr_payroll.group_hr_payroll_user,cru,
+rule_settlement_company,Component Settlement: multi-company,hr.payroll.component.settlement,,crud,"[('company_id', 'in', company_ids)]"
+access_gec_payroll_timesheet_waiver_manager,gec.payroll.timesheet.waiver manager,gec.payroll.timesheet.waiver,hr_payroll.group_hr_payroll_manager,crud,
+rule_timesheet_waiver_own,Timesheet Waiver: access only your own wizard,gec.payroll.timesheet.waiver,,crud,"[('create_uid', '=', user.id)]"
+access_hr_payroll_unit_rate_user,hr.payroll.unit.rate user,hr.payroll.unit.rate,base.group_user,r,
+access_hr_payroll_unit_rate_manager,hr.payroll.unit.rate manager,hr.payroll.unit.rate,hr_payroll.group_hr_payroll_manager,crud,
+rule_unit_rate_company,Unit Work Rate: multi-company,hr.payroll.unit.rate,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+access_hr_payroll_benefit_payroll,hr.payroll.benefit payroll,hr.payroll.benefit,hr_payroll.group_hr_payroll_user,crud,
+rule_benefit_company,Payroll Benefit: multi-company,hr.payroll.benefit,,crud,"[('company_id', 'in', company_ids)]"
+access_hr_payroll_benefit_line_payroll,hr.payroll.benefit.line payroll,hr.payroll.benefit.line,hr_payroll.group_hr_payroll_user,crud,
+rule_benefit_line_company,Payroll Benefit Line: multi-company,hr.payroll.benefit.line,,crud,"[('company_id', 'in', company_ids)]"
+access_hr_payroll_benefit_assign_payroll,hr.payroll.benefit.assign payroll,hr.payroll.benefit.assign,hr_payroll.group_hr_payroll_user,crud,
+rule_benefit_assign_own,Benefit Assign: access only your own wizard,hr.payroll.benefit.assign,,crud,"[('create_uid', '=', user.id)]"
+access_hr_payroll_benefit_payrun_payroll,hr.payroll.benefit.payrun payroll,hr.payroll.benefit.payrun,hr_payroll.group_hr_payroll_user,crud,
+rule_benefit_payrun_own,Benefits Pay Run: access only your own wizard,hr.payroll.benefit.payrun,,crud,"[('create_uid', '=', user.id)]"
+access_hr_payroll_tax_exemption_payroll,hr.payroll.tax.exemption payroll,hr.payroll.tax.exemption,hr_payroll.group_hr_payroll_user,r,
+access_hr_payroll_tax_exemption_manager,hr.payroll.tax.exemption manager,hr.payroll.tax.exemption,hr_payroll.group_hr_payroll_manager,crud,

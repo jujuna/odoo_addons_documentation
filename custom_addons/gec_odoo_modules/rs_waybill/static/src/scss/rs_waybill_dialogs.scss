@@ -1,0 +1,66 @@
+#{$rsw-dialog} {
+    .modal-content {
+        border: 1px solid var(--rsw-line);
+        border-radius: var(--rsw-R);
+        box-shadow: none;
+        background: var(--rsw-sheet);
+        color: var(--rsw-ink);
+    }
+    .modal-header {
+        border-bottom: 1px solid var(--rsw-rule);
+        .modal-title { font-size: 17px; font-weight: 700; color: var(--rsw-ink); }
+    }
+
+    .alert-info {
+        background: transparent;
+        border: 0;
+        border-bottom: 1px solid var(--rsw-rule);
+        border-radius: 0;
+        padding: 0 0 14px;
+        margin-bottom: 14px;
+        color: var(--rsw-ink-2);
+        > p:first-child { font-size: 17px; font-weight: 700; color: var(--rsw-ink); }
+    }
+
+    .o_field_x2many .o_list_renderer {
+        @include rsw-table;
+        .o_list_table td[name="qty"] { font-weight: 700; }
+        .o_field_radio .form-check-input:checked { background-color: var(--rsw-accent); border-color: var(--rsw-accent); }
+    }
+
+    .modal-footer {
+        border-top: 1px solid var(--rsw-rule);
+        .btn {
+            height: 34px;
+            padding: 0 14px;
+            border-radius: var(--rsw-r);
+            font-size: 13px;
+            font-weight: 600;
+            > i, > .oi, > .fa { display: none; }
+        }
+        .btn-primary { @include rsw-btn-filled; }
+        .btn-secondary { @include rsw-btn-secondary; }
+        .btn-link {
+            color: var(--rsw-accent);
+            text-decoration: underline;
+            background: transparent;
+            border: 0;
+        }
+    }
+}
+
+#{$rsw-form} .o_rs_drift {
+    background-color: var(--rsw-drift-tint);
+    box-shadow: inset 0 0 0 1px var(--rsw-active);
+    border-radius: var(--rsw-r);
+    &.rsw-field { padding-left: 16px; }
+    &.rsw-field > .rsw-label::after {
+        content: "RS ≠ Odoo";
+        margin-left: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 1;
+        color: var(--rsw-active);
+    }
+    &:not(.rsw-field) { padding: 2px 6px; }
+}

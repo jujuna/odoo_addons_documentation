@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bsc_objective_link_list" model="ir.ui.view">
+        <field name="name">bsc.objective.link.list</field>
+        <field name="model">bsc.objective.link</field>
+        <field name="arch" type="xml">
+            <list string="Cause-Effect Links" editable="bottom"
+                  decoration-muted="not validated">
+                <field name="scorecard_id" optional="hide"/>
+                <field name="source_id" string="Cause (drives)"
+                       options="{'no_create': True}"
+                       domain="[('scorecard_id', '=', context.get('bsc_scorecard_id'))] if context.get('bsc_scorecard_id') else []"/>
+                <field name="target_id" string="Effect (is driven)"
+                       options="{'no_create': True}"
+                       domain="[('scorecard_id', '=', scorecard_id), ('id', '!=', source_id)] if scorecard_id else []"/>
+                <field name="hypothesis" placeholder="If the cause improves, the effect improves because..."/>
+                <field name="strength"/>
+                <field name="validated" widget="boolean_toggle"/>
+                <field name="validation_note" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bsc_objective_link_form" model="ir.ui.view">
+        <field name="name">bsc.objective.link.form</field>
+        <field name="model">bsc.objective.link</field>
+        <field name="arch" type="xml">
+            <form string="Cause-Effect Link">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="source_id" string="Cause (drives)"
+                                   options="{'no_create': True}"/>
+                            <field name="target_id" string="Effect (is driven)"
+                                   options="{'no_create': True}"
+                                   domain="[('scorecard_id', '=', scorecard_id), ('id', '!=', source_id)] if scorecard_id else []"/>
+                            <field name="scorecard_id"/>
+                        </group>
+                        <group>
+                            <field name="strength" widget="radio"/>
+                            <field name="validated" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                    <group string="Hypothesis">
+                        <field name="hypothesis" nolabel="1" colspan="2"
+                               placeholder="If the cause improves, what should happen to the effect, and why?"/>
+                    </group>
+                    <group string="Evidence" invisible="not validated">
+                        <field name="validation_note" nolabel="1" colspan="2"
+                               placeholder="Which figures support the link: periods, KPIs, what moved together."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bsc_objective_link_search" model="ir.ui.view">
+        <field name="name">bsc.objective.link.search</field>
+        <field name="model">bsc.objective.link</field>
+        <field name="arch" type="xml">
+            <search string="Cause-Effect Links">
+                <field name="source_id"/>
+                <field name="target_id"/>
+                <field name="scorecard_id"/>
+                <filter name="filter_unvalidated" string="Not Yet Validated"
+                        domain="[('validated', '=', False)]"/>
+                <filter name="filter_validated" string="Validated"
+                        domain="[('validated', '=', True)]"/>
+                <separator/>
+                <filter name="filter_active_card" string="Active Scorecard"
+                        domain="[('scorecard_id.state', '=', 'active')]"/>
+                <group>
+                    <filter name="group_scorecard" string="Scorecard"
+                            context="{'group_by': 'scorecard_id'}"/>
+                    <filter name="group_source" string="Cause"
+                            context="{'group_by': 'source_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bsc_objective_link" model="ir.actions.act_window">
+        <field name="name">Cause-Effect Links</field>
+        <field name="res_model">bsc.objective.link</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_bsc_objective_link_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Connect the objectives</p>
+            <p>One line per link: which objective drives which, and in one sentence
+               why you believe it. These are hypotheses - tick "validated" only once
+               the figures show the two really move together.</p>
+        </field>
+    </record>
+
+</odoo>

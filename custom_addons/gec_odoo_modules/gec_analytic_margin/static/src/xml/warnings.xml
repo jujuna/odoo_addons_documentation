@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates>
+    <t t-name="gec_analytic_margin.warning_unclassified">
+        <b t-out="warningParams.amount"/> is on accounts with no margin component,
+        so it appears on the <b>Unclassified</b> line and in no margin.
+        Set a component on those accounts, or correct the documents that used them.
+    </t>
+
+    <t t-name="gec_analytic_margin.warning_unused_capacity">
+        <b t-out="warningParams.amount"/> of activity cost was not charged to any
+        cost object this period — unused capacity and absorption variance.
+        It stayed on the cost centres, which is deliberate: it is the cost of
+        capacity nobody consumed, not a cost your projects caused.
+    </t>
+    <t t-name="gec_analytic_margin.warning_unallocated_pool">
+        <b t-out="warningParams.amount"/> of allocatable cost is sitting on cost
+        centres that no allocation rule covers, so it was never charged to a
+        project, product or customer — and every margin below is that much too
+        good.
+        <t t-if="warningParams.accounts">
+            On: <b t-out="warningParams.accounts"/>.
+        </t>
+        Write a rule for it, or mark the component non-allocatable if it is
+        meant to stay where it is.
+    </t>
+
+</templates>

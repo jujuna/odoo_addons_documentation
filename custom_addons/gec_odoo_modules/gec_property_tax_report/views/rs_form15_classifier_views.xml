@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_rs_form15_property_type_list" model="ir.ui.view">
+        <field name="name">rs.form15.property.type.list</field>
+        <field name="model">rs.form15.property.type</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="display_code"/>
+                <field name="name"/>
+                <field name="is_immovable"/>
+                <field name="has_name"/>
+                <field name="valid_from" options="{'enable_formatting': false}"/>
+                <field name="valid_to" options="{'enable_formatting': false}"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_rs_form15_property_type" model="ir.actions.act_window">
+        <field name="name">Property Types</field>
+        <field name="res_model">rs.form15.property.type</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <record id="view_rs_form15_territory_list" model="ir.ui.view">
+        <field name="name">rs.form15.territory.list</field>
+        <field name="model">rs.form15.territory</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_rs_form15_territory" model="ir.actions.act_window">
+        <field name="name">Territorial Units (Part III)</field>
+        <field name="res_model">rs.form15.territory</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <record id="view_rs_form15_year_acquire_list" model="ir.ui.view">
+        <field name="name">rs.form15.year.list</field>
+        <field name="model">rs.form15.year</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_rs_form15_year_acquire" model="ir.actions.act_window">
+        <field name="name">Acquisition Years</field>
+        <field name="res_model">rs.form15.year</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <record id="view_rs_form15_exemption_basis_list" model="ir.ui.view">
+        <field name="name">rs.form15.exemption.basis.list</field>
+        <field name="model">rs.form15.exemption.basis</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="valid_from" options="{'enable_formatting': false}"/>
+                <field name="valid_to" options="{'enable_formatting': false}"/>
+                <field name="note" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_rs_form15_exemption_basis" model="ir.actions.act_window">
+        <field name="name">Exemption Bases</field>
+        <field name="res_model">rs.form15.exemption.basis</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <record id="view_rs_form15_building_rate_list" model="ir.ui.view">
+        <field name="name">rs.form15.building.rate.list</field>
+        <field name="model">rs.form15.building.rate</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="tax_year" options="{'enable_formatting': false}"/>
+                <field name="territory_id"/>
+                <field name="rate"/>
+                <field name="note" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rs_form15_building_rate_search" model="ir.ui.view">
+        <field name="name">rs.form15.building.rate.search</field>
+        <field name="model">rs.form15.building.rate</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="territory_id"/>
+                <field name="tax_year"/>
+                <filter name="group_year" string="Year" context="{'group_by': 'tax_year'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_rs_form15_building_rate" model="ir.actions.act_window">
+        <field name="name">Building Tax Rates</field>
+        <field name="res_model">rs.form15.building.rate</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Set the building tax rate per territorial unit</p>
+            <p>rs.ge publishes no rate table for part III. A territorial unit with no row
+               falls back to the 1% cap of Tax Code art. 202(1), and the declaration line says so.</p>
+        </field>
+    </record>
+
+    <record id="view_rs_form15_land_territory_list" model="ir.ui.view">
+        <field name="name">rs.form15.land.territory.list</field>
+        <field name="model">rs.form15.land.territory</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="code"/>
+                <field name="region"/>
+                <field name="municipality"/>
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rs_form15_land_territory_search" model="ir.ui.view">
+        <field name="name">rs.form15.land.territory.search</field>
+        <field name="model">rs.form15.land.territory</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" filter_domain="['|', ('name', 'ilike', self), ('code', '=', self)]"/>
+                <field name="region"/>
+                <field name="municipality"/>
+                <filter name="group_region" string="Region" context="{'group_by': 'region'}"/>
+                <filter name="group_municipality" string="Municipality" context="{'group_by': 'municipality'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_rs_form15_land_territory" model="ir.actions.act_window">
+        <field name="name">Land Territorial Units (Part IV)</field>
+        <field name="res_model">rs.form15.land.territory</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <record id="view_rs_form15_land_type_list" model="ir.ui.view">
+        <field name="name">rs.form15.land.type.list</field>
+        <field name="model">rs.form15.land.type</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="unit"/>
+                <field name="uses_base_rate"/>
+                <field name="base_rate"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_rs_form15_land_type" model="ir.actions.act_window">
+        <field name="name">Land Types</field>
+        <field name="res_model">rs.form15.land.type</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <record id="view_rs_form15_land_rate_list" model="ir.ui.view">
+        <field name="name">rs.form15.land.rate.list</field>
+        <field name="model">rs.form15.land.rate</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="land_territory_id"/>
+                <field name="land_type_id"/>
+                <field name="rate"/>
+                <field name="valid_from" options="{'enable_formatting': false}"/>
+                <field name="valid_to" options="{'enable_formatting': false}"/>
+                <field name="note" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rs_form15_land_rate_search" model="ir.ui.view">
+        <field name="name">rs.form15.land.rate.search</field>
+        <field name="model">rs.form15.land.rate</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="land_territory_id"/>
+                <field name="land_type_id"/>
+                <filter name="nonzero" string="Rate Set" domain="[('rate', '!=', 0)]"/>
+                <filter name="group_type" string="Land Type" context="{'group_by': 'land_type_id'}"/>
+                <filter name="group_territory" string="Territorial Unit" context="{'group_by': 'land_territory_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_rs_form15_land_rate" model="ir.actions.act_window">
+        <field name="name">Land Rates</field>
+        <field name="res_model">rs.form15.land.rate</field>
+        <field name="view_mode">list</field>
+        <field name="context">{'search_default_nonzero': 1}</field>
+    </record>
+
+    <record id="view_rs_form15_revaluation_list" model="ir.ui.view">
+        <field name="name">rs.form15.revaluation.coefficient.list</field>
+        <field name="model">rs.form15.revaluation.coefficient</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="year_from" options="{'enable_formatting': false}"/>
+                <field name="year_to" options="{'enable_formatting': false}"/>
+                <field name="coefficient"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_rs_form15_revaluation" model="ir.actions.act_window">
+        <field name="name">Revaluation Coefficients</field>
+        <field name="res_model">rs.form15.revaluation.coefficient</field>
+        <field name="view_mode">list</field>
+    </record>
+
+</odoo>

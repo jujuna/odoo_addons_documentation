@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_payroll_pay_wizard_view_form" model="ir.ui.view">
+        <field name="name">hr.payroll.pay.wizard.form</field>
+        <field name="model">hr.payroll.pay.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Pay Salaries">
+                <field name="company_id" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="payslip_ids" invisible="1"/>
+                <field name="manual_ack_required" invisible="1"/>
+                <group>
+                    <group>
+                        <field name="payment_date"/>
+                        <field name="payslip_run_id" readonly="1" force_save="1"
+                               invisible="not payslip_run_id"/>
+                    </group>
+                    <group>
+                        <field name="channel_id" options="{'no_create': True}"/>
+                    </group>
+                </group>
+                <div class="alert alert-warning" role="alert" invisible="not warning">
+                    <field name="warning" nolabel="1" readonly="1"/>
+                </div>
+                <notebook>
+                    <page string="Employees" name="employees">
+                        <field name="line_ids">
+                            <list editable="bottom" multi_edit="1" create="false" delete="false"
+                                  default_group_by="channel_id">
+                                <field name="company_id" column_invisible="1"/>
+                                <field name="currency_id" column_invisible="1"/>
+                                <field name="employee_id" readonly="1"/>
+                                <field name="payslip_id" readonly="1" force_save="1"/>
+                                <field name="amount" sum="Total" readonly="1" force_save="1"/>
+                                <field name="channel_id" options="{'no_create': True}"/>
+                            </list>
+                        </field>
+                    </page>
+                    <page string="Authorities" name="authorities"
+                          invisible="not authority_line_ids">
+                        <field name="authority_line_ids">
+                            <list editable="bottom" multi_edit="1" create="false" delete="false">
+                                <field name="company_id" column_invisible="1"/>
+                                <field name="currency_id" column_invisible="1"/>
+                                <field name="partner_id" readonly="1" force_save="1"/>
+                                <field name="account_id" readonly="1" force_save="1"/>
+                                <field name="amount" sum="Total" readonly="1" force_save="1"/>
+                                <field name="channel_id" options="{'no_create': True}"/>
+                            </list>
+                        </field>
+                    </page>
+                </notebook>
+                <group>
+                    <field name="manual_ack" invisible="not manual_ack_required"/>
+                    <field name="remember_routing"/>
+                </group>
+                <footer>
+                    <button name="action_pay" type="object" string="Create Payments"
+                            class="btn-primary"
+                            confirm="This creates and reconciles the salary payments, and marks the payslips as paid. Transmitting each batch to its bank is a separate step. Continue?"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

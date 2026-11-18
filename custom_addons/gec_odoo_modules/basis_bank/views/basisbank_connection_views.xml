@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_basisbank_connection_form" model="ir.ui.view">
+        <field name="name">basisbank.connection.form</field>
+        <field name="model">basisbank.connection</field>
+        <field name="arch" type="xml">
+            <form string="Basis Bank Connection">
+                <header>
+                    <button name="action_test_connection" type="object"
+                            string="Test Connection" class="oe_highlight"/>
+                    <button name="action_reauthenticate" type="object"
+                            string="Re-authenticate"/>
+                    <button name="action_basisbank_logout" type="object" string="Logout"/>
+                    <button name="action_view_logs" type="object" string="API Logs"/>
+                    <button name="action_basisbank_change_password" type="object"
+                            string="Change Password"
+                            groups="basis_bank.group_basisbank_manager"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,active"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="company_id" options="{'no_create': True}"/></h1>
+                    </div>
+                    <group>
+                        <group string="Credentials">
+                            <field name="login_name"/>
+                            <field name="password" password="True"/>
+                        </group>
+                        <group string="Endpoint">
+                            <field name="api_host"/>
+                            <field name="api_version"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Processing">
+                            <field name="processing_mode"/>
+                            <field name="approval_id"
+                                   invisible="processing_mode != 'odoo_approve'"
+                                   required="processing_mode == 'odoo_approve'"
+                                   options="{'no_create': True}"/>
+                            <field name="allow_self_approval"
+                                   invisible="processing_mode != 'odoo_approve'"/>
+                        </group>
+                        <group string="Status">
+                            <field name="last_error_code" readonly="1"/>
+                            <field name="last_error_message" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_basisbank_connection_list" model="ir.ui.view">
+        <field name="name">basisbank.connection.list</field>
+        <field name="model">basisbank.connection</field>
+        <field name="arch" type="xml">
+            <list string="Basis Bank Connections">
+                <field name="company_id"/>
+                <field name="processing_mode"/>
+                <field name="approval_id"/>
+                <field name="state"
+                       decoration-success="state == 'active'"
+                       decoration-danger="state in ('error', 'blocked')"
+                       decoration-muted="state == 'draft'"
+                       widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_basisbank_connection" model="ir.actions.act_window">
+        <field name="name">Connections</field>
+        <field name="res_model">basisbank.connection</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_budget_analytic_form_gl_account" model="ir.ui.view">
+        <field name="name">budget.analytic.form.gl.account</field>
+        <field name="model">budget.analytic</field>
+        <field name="inherit_id" ref="account_budget.view_budget_analytic_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='budget_line_ids']/list/field[@name='account_id']" position="after">
+                <field name="general_account_id" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_budget_line_tree_gl_account" model="ir.ui.view">
+        <field name="name">budget.line.list.gl.account</field>
+        <field name="model">budget.line</field>
+        <field name="inherit_id" ref="account_budget.view_budget_line_tree"/>
+        <field name="arch" type="xml">
+            <field name="account_id" position="after">
+                <field name="general_account_id" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_budget_line_form_gl_account" model="ir.ui.view">
+        <field name="name">budget.line.form.gl.account</field>
+        <field name="model">budget.line</field>
+        <field name="inherit_id" ref="account_budget.view_budget_line_form"/>
+        <field name="arch" type="xml">
+            <field name="account_id" position="after">
+                <field name="general_account_id"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_budget_line_search_gl_account" model="ir.ui.view">
+        <field name="name">budget.line.search.gl.account</field>
+        <field name="model">budget.line</field>
+        <field name="inherit_id" ref="account_budget.view_budget_line_search"/>
+        <field name="arch" type="xml">
+            <field name="budget_analytic_id" position="after">
+                <field name="general_account_id"/>
+            </field>
+            <filter name="account_id" position="after">
+                <filter name="group_general_account_id" string="GL Account"
+                        context="{'group_by': 'general_account_id'}"/>
+            </filter>
+        </field>
+    </record>
+
+</odoo>

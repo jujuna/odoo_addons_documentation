@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hotel_rms_reservation_view_list" model="ir.ui.view">
+        <field name="name">hotel.rms.reservation.list</field>
+        <field name="model">hotel.rms.reservation</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="status == 'cancelled'">
+                <field name="source_ref"/>
+                <field name="property_id" optional="hide"/>
+                <field name="booking_date" optional="hide"/>
+                <field name="arrival"/>
+                <field name="departure" optional="hide"/>
+                <field name="nights"/>
+                <field name="room_type_id"/>
+                <field name="rooms" sum="Rooms" optional="hide"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="revenue" sum="Revenue"/>
+                <field name="status" widget="badge" decoration-success="status == 'confirmed'"
+                       decoration-warning="status == 'no_show'" decoration-muted="status == 'cancelled'"/>
+                <field name="cancel_date" optional="hide"/>
+                <field name="channel" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hotel_rms_reservation_view_form" model="ir.ui.view">
+        <field name="name">hotel.rms.reservation.form</field>
+        <field name="model">hotel.rms.reservation</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="confirmed,cancelled"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Stay">
+                            <field name="property_id"/>
+                            <field name="source_ref"/>
+                            <field name="arrival"/>
+                            <field name="departure"/>
+                            <field name="nights"/>
+                        </group>
+                        <group string="Booking">
+                            <field name="room_type_id"/>
+                            <field name="rooms"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="revenue"/>
+                            <field name="booking_date"/>
+                            <field name="cancel_date" invisible="status != 'cancelled'"/>
+                            <field name="channel"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="hotel_rms_reservation_view_pivot" model="ir.ui.view">
+        <field name="name">hotel.rms.reservation.pivot</field>
+        <field name="model">hotel.rms.reservation</field>
+        <field name="arch" type="xml">
+            <pivot string="Bookings by month">
+                <field name="arrival" interval="month" type="row"/>
+                <field name="room_type_id" type="col"/>
+                <field name="revenue" type="measure"/>
+                <field name="rooms" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="hotel_rms_reservation_view_search" model="ir.ui.view">
+        <field name="name">hotel.rms.reservation.search</field>
+        <field name="model">hotel.rms.reservation</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="source_ref"/>
+                <field name="property_id"/>
+                <field name="room_type_id"/>
+                <field name="channel"/>
+                <filter name="confirmed" string="Confirmed" domain="[('status', '=', 'confirmed')]"/>
+                <filter name="cancelled" string="Cancelled" domain="[('status', '=', 'cancelled')]"/>
+                <filter name="no_show" string="No-show" domain="[('status', '=', 'no_show')]"/>
+                <separator/>
+                <filter name="future" string="Future"
+                        domain="[('arrival', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="past" string="Past"
+                        domain="[('departure', '&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="this_month" string="This month"
+                        domain="[('arrival', '&gt;=', context_today().strftime('%Y-%m-01')),
+                                 ('arrival', '&lt;', (context_today() + relativedelta(months=1)).strftime('%Y-%m-01'))]"/>
+                <group>
+                    <filter name="group_property" string="Hotel" context="{'group_by': 'property_id'}"/>
+                    <filter name="group_room_type" string="Room type" context="{'group_by': 'room_type_id'}"/>
+                    <filter name="group_channel" string="Channel" context="{'group_by': 'channel'}"/>
+                    <filter name="group_status" string="Status" context="{'group_by': 'status'}"/>
+                    <filter name="group_arrival" string="Arrival month" context="{'group_by': 'arrival:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hotel_rms_reservation" model="ir.actions.act_window">
+        <field name="name">Bookings</field>
+        <field name="res_model">hotel.rms.reservation</field>
+        <field name="view_mode">list,pivot,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No bookings yet</p>
+            <p>Import your bookings from a CSV or Excel file: the engine learns from them how your nights fill up.</p>
+        </field>
+    </record>
+</odoo>

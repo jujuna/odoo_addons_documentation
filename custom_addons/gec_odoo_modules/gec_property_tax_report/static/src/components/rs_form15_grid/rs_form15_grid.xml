@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="gec_property_tax_report.RsForm15Grid">
+        <section class="o_rs_form15_grid" t-att-class="this.className" t-ref="this.gridRef">
+            <header class="o_rsf15_toolbar">
+                <div class="o_rsf15_title">
+                    <span class="o_rsf15_mark">RS</span>
+                    <span>
+                        <strong t-out="this.gridTitle"/>
+                        <small t-out="this.gridSubtitle"/>
+                    </span>
+                </div>
+                <div class="o_rsf15_toolbar_stats">
+                    <span class="o_rsf15_stat">
+                        <i class="oi" t-att-data-icon="this.gridIcon" aria-hidden="true"/>
+                        <t t-out="this.list.count"/> rows
+                    </span>
+                    <span t-if="this.warningCount" class="o_rsf15_stat o_rsf15_stat_warning">
+                        <i class="oi" data-icon="warning" aria-hidden="true"/>
+                        <t t-out="this.warningCount"/> warnings
+                    </span>
+                </div>
+                <div class="o_rsf15_toolbar_actions">
+                    <button t-if="this.canEdit" type="button" class="btn btn-primary btn-sm"
+                            t-on-click="this.addLine" title="Add a row">
+                        <i class="oi me-1" data-icon="add" aria-hidden="true"/>
+                        Add a Line
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm" t-on-click="this.resetColumnWidths"
+                            title="Automatically fit column widths">
+                        <i class="oi me-1" data-icon="arrow_range" aria-hidden="true"/>
+                        Fit Columns
+                    </button>
+                    <button t-if="this.hasFilters" type="button" class="btn btn-secondary btn-sm"
+                            t-on-click="this.clearFilters">
+                        <i class="oi me-1" data-icon="ink_eraser" aria-hidden="true"/>
+                        Clear Filters
+                    </button>
+                </div>
+            </header>
+
+            <div class="o_rsf15_pager" t-if="this.list.count &gt; this.list.limit">
+                <Pager t-props="this.pagerProps"/>
+                <span class="text-muted ms-2">Filters and totals cover this page only.</span>
+            </div>
+
+            <div class="o_rsf15_table_wrap">
+                <table class="o_rsf15_table" t-att-style="this.tableStyle">
+                    <colgroup>
+                        <col class="o_rsf15_col_actions"/>
+                        <t t-foreach="this.shownColumns" t-as="column" t-key="column.field">
+                            <col t-att-class="column.cssClass" t-att-style="this.columnStyle(column)"/>
+                        </t>
+                    </colgroup>
+                    <thead>
+                        <t t-set="layout" t-value="this.headerLayout"/>
+                        <tr class="o_rsf15_group_headers">
+                            <th t-att-rowspan="layout.indexRowspan" class="o_rsf15_sticky_col">№</th>
+                            <t t-foreach="layout.top" t-as="head" t-key="head.key">
+                                <th t-att-colspan="head.colspan" t-att-rowspan="head.rowspan">
+                                    <t t-out="head.label"/>
+                                    <i t-if="head.column and head.column.locked"
+                                       class="oi o_rsf15_lock" data-icon="lock" aria-hidden="true"
+                                       title="The portal computes this column; the value here is a cross-check."/>
+                                </th>
+                            </t>
+                        </tr>
+                        <tr t-if="layout.hasGroups" class="o_rsf15_leaf_headers">
+                            <t t-foreach="layout.leaf" t-as="column" t-key="column.field">
+                                <th>
+                                    <t t-out="column.label"/>
+                                    <i t-if="column.locked" class="oi o_rsf15_lock" data-icon="lock"
+                                       aria-hidden="true"
+                                       title="The portal computes this column; the value here is a cross-check."/>
+                                </th>
+                            </t>
+                        </tr>
+                        <tr class="o_rsf15_filters">
+                            <th class="o_rsf15_sticky_col">
+                                <button t-if="this.hasFilters" type="button" title="Clear filters"
+                                        class="o_rsf15_clear_filter" t-on-click="this.clearFilters">
+                                    <i class="oi" data-icon="close" aria-hidden="true"/>
+                                </button>
+                            </th>
+                            <t t-foreach="this.shownColumns" t-as="column" t-key="column.field">
+                                <th>
+                                    <select t-if="column.filterType === 'many2one'"
+                                            t-att-value="this.state.filters[column.field]"
+                                            t-on-change="(event) => this.onFilterInput(column.field, event)">
+                                        <option value="">All</option>
+                                        <t t-foreach="this.filterOptions(column.field)" t-as="option" t-key="option.value">
+                                            <option t-att-value="option.value" t-out="option.label"/>
+                                        </t>
+                                    </select>
+                                    <select t-elif="column.filterType === 'boolean'"
+                                            t-att-value="this.state.filters[column.field]"
+                                            t-on-change="(event) => this.onFilterInput(column.field, event)">
+                                        <option value="">All</option>
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                    <input t-else="" t-att-type="column.filterType === 'date' ? 'date' : 'search'"
+                                           t-att-value="this.state.filters[column.field]"
+                                           t-on-input="(event) => this.onFilterInput(column.field, event)"
+                                           aria-label="Filter"/>
+                                    <span class="o_rsf15_resize_handle" role="separator"
+                                          title="Drag to resize the column"
+                                          t-on-mousedown.stop.prevent="(event) => this.startColumnResize(column, event)"/>
+                                </th>
+                            </t>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-if="!this.visibleRecords.length" class="o_rsf15_empty_row">
+                            <td t-att-colspan="this.shownColumns.length + 1">
+                                <span class="o_rsf15_empty_icon">
+                                    <i class="oi" t-att-data-icon="this.gridIcon" aria-hidden="true"/>
+                                </span>
+                                <strong t-if="this.records.length">No rows match the filters</strong>
+                                <strong t-else="">No rows yet</strong>
+                                <small t-if="!this.records.length" t-out="this.emptyHint"/>
+                            </td>
+                        </tr>
+                        <t t-foreach="this.visibleRecords" t-as="record" t-key="record.id">
+                            <tr t-att-class="{
+                                    'o_rsf15_warning_row': record.data.warning,
+                                    'o_rsf15_edited_row': record.isInEdition,
+                                }">
+                                <td class="o_rsf15_row_actions o_rsf15_sticky_col">
+                                    <span class="o_rsf15_row_number" t-out="record_index + 1 + this.list.offset"/>
+                                    <span class="o_rsf15_source" t-att-data-source="record.data.source"/>
+                                    <a t-if="this.canOpenSource(record)" class="o_rsf15_open_source"
+                                       t-att-href="this.sourceUrl(record)" target="_blank"
+                                       rel="noopener noreferrer" title="Open the source record"
+                                       t-on-click.stop="">
+                                        <i class="oi" data-icon="open_in_new" aria-hidden="true"/>
+                                    </a>
+                                    <button t-if="this.canExplain(record)" type="button"
+                                            class="o_rsf15_summary_explain"
+                                            title="Explain how this row was built"
+                                            t-on-click.stop="() => this.explain(record)">
+                                        <i class="oi" data-icon="help" aria-hidden="true"/>
+                                    </button>
+                                    <button t-if="this.canEdit and !record.isInEdition" type="button"
+                                            class="o_rsf15_edit_row" title="Edit this row"
+                                            t-on-click.stop="() => this.editLine(record)">
+                                        <i class="oi" data-icon="edit" aria-hidden="true"/>
+                                    </button>
+                                    <button t-if="this.canEdit and record.isInEdition" type="button"
+                                            class="o_rsf15_edit_row" title="Done editing this row"
+                                            t-on-click.stop="this.finishLine">
+                                        <i class="oi" data-icon="check" aria-hidden="true"/>
+                                    </button>
+                                    <button t-if="this.canEdit" type="button" class="o_rsf15_remove_row"
+                                            title="Remove this row"
+                                            t-on-click.stop="() => this.removeLine(record)">
+                                        <i class="oi" data-icon="delete" aria-hidden="true"/>
+                                    </button>
+                                    <i t-if="record.data.warning"
+                                       class="oi o_rsf15_warning_icon" data-icon="warning"
+                                       t-att-title="record.data.warning" aria-hidden="true"/>
+                                </td>
+                                <t t-foreach="this.shownColumns" t-as="column" t-key="column.field">
+                                    <td t-att-class="this.cellClass(record, column)">
+                                        <span t-if="this.isCellHidden(record, column)"
+                                              title="The portal hides this cell for this row.">—</span>
+                                        <span t-elif="this.cellText(record, column)" class="o_rsf15_cell_text"
+                                              t-out="this.cellText(record, column)"/>
+                                        <Field t-elif="column.filterType === 'many2one'"
+                                               name="column.field" record="record" fieldInfo="this.fieldInfo(column)"
+                                               readonly="this.isCellReadonly(column)" canOpen="false"/>
+                                        <t t-else="">
+                                            <t t-set="suffix" t-value="this.cellSuffix(record, column)"/>
+                                            <div t-if="suffix" class="o_rsf15_cell_with_suffix">
+                                                <Field name="column.field" record="record" fieldInfo="this.fieldInfo(column)"
+                                                       readonly="this.isCellReadonly(column)"/>
+                                                <span class="o_rsf15_cell_suffix" t-out="suffix"/>
+                                            </div>
+                                            <Field t-else="" name="column.field" record="record" fieldInfo="this.fieldInfo(column)"
+                                                   readonly="this.isCellReadonly(column)"/>
+                                        </t>
+                                    </td>
+                                </t>
+                            </tr>
+                        </t>
+                    </tbody>
+                    <tfoot t-if="this.visibleRecords.length">
+                        <t t-set="pageTotals" t-value="this.totals"/>
+                        <tr>
+                            <td class="o_rsf15_sticky_col">Σ</td>
+                            <t t-foreach="this.shownColumns" t-as="column" t-key="column.field">
+                                <td t-out="pageTotals[column.field] || ''"/>
+                            </t>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <footer class="o_rsf15_hint">
+                <i class="oi" data-icon="info" aria-hidden="true"/>
+                <t t-out="this.gridHint"/>
+                <div>Filters and footer totals apply to this page.</div>
+            </footer>
+        </section>
+    </t>
+
+</templates>
